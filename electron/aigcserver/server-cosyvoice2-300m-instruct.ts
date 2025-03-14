@@ -76,7 +76,6 @@ export const ServerCosyvoice2300mInstruct: ServerContext = {
                 content: `
 <p><b>支持指令如下</b></p>
 <p><code>[breath]</code> 插入呼吸声音</p>
-<p><code>[breath]</code> 插入呼吸声音</p>
 <p><code>&lt;strong&gt;&lt;/strong&gt;</code> 强调说明</p>
 <p><code>&lt;laughter&gt;&lt;/laughter&gt;</code> 笑着说</p>
 <p><code>[noise]</code> 表示噪音或杂音</p>
