@@ -3,7 +3,6 @@
 import AudioPlayer from "../../components/common/AudioPlayer.vue";
 import SoundClonePromptDialog from "../../components/Sound/SoundClonePromptDialog.vue";
 import {onBeforeUnmount, onMounted, ref} from "vue";
-import {SoundCloneRecord, SoundCloneService} from "../../service/SoundCloneService";
 import {TaskChangeType, useTaskStore} from "../../store/modules/task";
 import SoundCloneCreate from "../../components/Sound/SoundCloneCreate.vue";
 import SoundCloneActionDownload from "../../components/Sound/SoundCloneActionDownload.vue";
@@ -11,10 +10,11 @@ import SoundCloneActionDelete from "../../components/Sound/SoundCloneActionDelet
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
 import SoundDuration from "../../components/Sound/SoundDuration.vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
+import {TaskRecord, TaskService} from "../../service/TaskService";
 
 const soundClonePromptDialog = ref<InstanceType<typeof SoundClonePromptDialog>>()
 
-const records = ref<SoundCloneRecord[]>([])
+const records = ref<TaskRecord[]>([])
 const taskStore = useTaskStore()
 
 const taskChangeCallback = (bizId: string, type: TaskChangeType) => {
@@ -30,7 +30,7 @@ onBeforeUnmount(() => {
 })
 
 const doRefresh = async () => {
-    records.value = await SoundCloneService.list()
+    records.value = await TaskService.list('SoundClone')
 }
 
 </script>
@@ -76,7 +76,7 @@ const doRefresh = async () => {
                                 </div>
                                 <div class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-8 h-8">
                                     <i class="iconfont icon-sound-prompt mr-1"></i>
-                                    {{ r.promptName }}
+                                    {{ r.modelConfig.promptName }}
                                 </div>
                                 <div v-if="r.param.speed"
                                      class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-8 h-8">
@@ -98,12 +98,12 @@ const doRefresh = async () => {
                             </div>
                         </div>
                         <div class="pt-4">
-                            {{ r.text }}
+                            {{ r.modelConfig.text }}
                         </div>
-                        <div class="pt-4" v-if="r.resultWav">
+                        <div class="pt-4" v-if="r.result.url">
                             <AudioPlayer
                                 show-wave
-                                :url="'file://'+r.resultWav"/>
+                                :url="'file://'+r.result.url"/>
                         </div>
                         <div class="pt-4">
                             <SoundCloneActionDownload :record="r"/>

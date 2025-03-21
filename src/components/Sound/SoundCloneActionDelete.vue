@@ -2,10 +2,10 @@
 import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
 import {sleep} from "../../lib/util";
-import {SoundCloneRecord, SoundCloneService} from "../../service/SoundCloneService";
+import {TaskRecord} from "../../service/TaskService";
 
 const props = defineProps<{
-    record: SoundCloneRecord,
+    record: TaskRecord,
 }>()
 const emit = defineEmits({
     update: () => true

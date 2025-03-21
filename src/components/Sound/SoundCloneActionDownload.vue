@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
-import {SoundCloneRecord} from "../../service/SoundCloneService";
 import {mapError} from "../../lib/error";
 import {contentToFilenamePathPart} from "../../lib/aigcpanel";
+import {TaskRecord} from "../../service/TaskService";
 
 const props = defineProps<{
-    record: SoundCloneRecord,
+    record: TaskRecord,
 }>()
 
 const doDownload = async () => {

@@ -6,15 +6,13 @@ import {useServerStore} from "../../store/modules/server";
 import {Dialog} from "../../lib/dialog";
 import {StorageUtil} from "../../lib/storage";
 import {t} from "../../lang";
-import {SoundTtsRecord, SoundTtsService} from "../../service/SoundTtsService";
-import {SoundCloneRecord, SoundCloneService} from "../../service/SoundCloneService";
 import {VideoTemplateRecord, VideoTemplateService} from "../../service/VideoTemplateService";
 import {EnumServerStatus} from "../../types/Server";
-import {VideoGenRecord, VideoGenService} from "../../service/VideoGenService";
 import ParamForm from "../common/ParamForm.vue";
 import {mapError} from "../../lib/error";
 import {PermissionService} from "../../service/PermissionService";
 import ServerContentInfoAction from "../Server/ServerContentInfoAction.vue";
+import {TaskRecord, TaskService} from "../../service/TaskService";
 
 const serverStore = useServerStore()
 const paramForm = ref<InstanceType<typeof ParamForm> | null>(null)
@@ -31,8 +29,8 @@ const formData = ref({
 });
 const formDataParam = ref([])
 
-const soundTtsRecords = ref<SoundTtsRecord[]>([])
-const soundCloneRecords = ref<SoundCloneRecord[]>([])
+const soundTtsRecords = ref<TaskRecord[]>([])
+const soundCloneRecords = ref<TaskRecord[]>([])
 const videoTemplateRecords = ref<VideoTemplateRecord[]>([])
 
 onMounted(() => {
@@ -48,9 +46,9 @@ watch(() => formData.value, async (value) => {
 
 watch(() => formData.value.soundType, async (value) => {
     if (value === 'soundTts') {
-        soundTtsRecords.value = await SoundTtsService.list()
+        soundTtsRecords.value = await TaskService.list('SoundTts')
     } else if (value === 'soundClone') {
-        soundCloneRecords.value = await SoundCloneService.list()
+        soundCloneRecords.value = await TaskService.list('SoundClone')
     }
 }, {
     immediate: true
@@ -80,15 +78,15 @@ const doSubmit = async () => {
         Dialog.tipError(t('请选择模型'))
         return
     }
-    let soundTtsRecord: SoundTtsRecord | null = null
-    let soundCloneRecord: SoundCloneRecord | null = null
+    let soundTtsRecord: TaskRecord | null = null
+    let soundCloneRecord: TaskRecord | null = null
     let soundCustomFile: string | null = null
     if (formData.value.soundType === 'soundTts') {
         if (!formData.value.soundTtsId) {
             Dialog.tipError(t('请选择声音'))
             return
         }
-        soundTtsRecord = await SoundTtsService.get(formData.value.soundTtsId)
+        soundTtsRecord = await TaskService.get(formData.value.soundTtsId)
         if (!soundTtsRecord) {
             Dialog.tipError(t('请选择声音'))
             return
@@ -98,7 +96,7 @@ const doSubmit = async () => {
             Dialog.tipError(t('请选择声音'))
             return
         }
-        soundCloneRecord = await SoundCloneService.get(formData.value.soundCloneId)
+        soundCloneRecord = await TaskService.get(formData.value.soundCloneId)
         if (!soundCloneRecord) {
             Dialog.tipError(t('请选择声音'))
             return
@@ -132,24 +130,27 @@ const doSubmit = async () => {
         Dialog.tipError(t('模型未启动'))
         return
     }
-    const record: VideoGenRecord = {
+    const record: TaskRecord = {
+        biz: 'VideoGen',
         serverName: server.name,
         serverTitle: server.title,
         serverVersion: server.version,
-        videoTemplateId: videoTemplate.id as number,
-        videoTemplateName: videoTemplate.name,
-        soundType: formData.value.soundType,
-        soundTtsId: formData.value.soundTtsId as number,
-        soundTtsText: soundTtsRecord ? soundTtsRecord.text : '',
-        soundCloneId: formData.value.soundCloneId,
-        soundCloneText: soundCloneRecord ? soundCloneRecord.text : '',
-        soundCustomFile: soundCustomFile || '',
+        modelConfig: {
+            videoTemplateId: videoTemplate.id as number,
+            videoTemplateName: videoTemplate.name,
+            soundType: formData.value.soundType,
+            soundTtsId: formData.value.soundTtsId as number,
+            soundTtsText: soundTtsRecord ? soundTtsRecord.modelConfig.text : '',
+            soundCloneId: formData.value.soundCloneId,
+            soundCloneText: soundCloneRecord ? soundCloneRecord.modelConfig.text : '',
+            soundCustomFile: soundCustomFile || '',
+        },
         param: formData.value.param,
     }
     if (!await PermissionService.checkForTask('VideoGen', record)) {
         return
     }
-    const id = await VideoGenService.submit(record)
+    const id = await TaskService.submit(record)
     Dialog.tipSuccess(t('任务已经提交成功，等待视频生成完成'))
     emit('submitted')
 }
@@ -227,7 +228,7 @@ defineExpose({
                     <a-option :value="0">{{ $t('请选择') }}</a-option>
                     <a-option v-for="record in soundTtsRecords" :key="record.id" :value="record.id">
                         <div>
-                            #{{ record.id }} {{ record.text }}
+                            #{{ record.id }} {{ record.modelConfig.text }}
                         </div>
                     </a-option>
                 </a-select>
@@ -237,7 +238,7 @@ defineExpose({
                     <a-option :value="0">{{ $t('请选择') }}</a-option>
                     <a-option v-for="record in soundCloneRecords" :key="record.id" :value="record.id">
                         <div>
-                            #{{ record.id }} {{ record.text }}
+                            #{{ record.id }} {{ record.modelConfig.text }}
                         </div>
                     </a-option>
                 </a-select>

@@ -2,10 +2,10 @@
 import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
 import {sleep} from "../../lib/util";
-import {VideoGenRecord, VideoGenService} from "../../service/VideoGenService";
+import {TaskRecord, TaskService} from "../../service/TaskService";
 
 const props = defineProps<{
-    record: VideoGenRecord,
+    record: TaskRecord,
 }>()
 const emit = defineEmits({
     update: () => true
@@ -15,7 +15,7 @@ const doDelete = async () => {
     const record = props.record
     Dialog.loadingOn(t('正在删除'))
     await sleep(500)
-    await VideoGenService.delete(record)
+    await TaskService.delete(record)
     Dialog.loadingOff()
     emit('update')
 }

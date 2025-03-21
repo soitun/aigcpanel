@@ -2,10 +2,10 @@
 import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
 import {sleep} from "../../lib/util";
-import {SoundTtsRecord, SoundTtsService} from "../../service/SoundTtsService";
+import {TaskRecord, TaskService} from "../../service/TaskService";
 
 const props = defineProps<{
-    record: SoundTtsRecord,
+    record: TaskRecord,
 }>()
 const emit = defineEmits({
     update: () => true
@@ -15,7 +15,7 @@ const doDelete = async () => {
     const record = props.record
     Dialog.loadingOn(t('正在删除'))
     await sleep(500)
-    await SoundTtsService.delete(record)
+    await TaskService.delete(record)
     Dialog.loadingOff()
     emit('update')
 }

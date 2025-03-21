@@ -1,5 +1,3 @@
-import {VideoGenRecord} from "./VideoGenService";
-
 export type VideoTemplateRecord = {
     id?: number;
     name: string;

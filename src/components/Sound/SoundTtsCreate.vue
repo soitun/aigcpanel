@@ -4,7 +4,7 @@ import ServerSelector from "../Server/ServerSelector.vue";
 import {onMounted, ref, watch} from "vue";
 import {useServerStore} from "../../store/modules/server";
 import {Dialog} from "../../lib/dialog";
-import {SoundTtsRecord, SoundTtsService} from "../../service/SoundTtsService";
+import {TaskRecord, TaskService} from "../../service/TaskService";
 import {StorageUtil} from "../../lib/storage";
 import {mapError} from "../../lib/error";
 import {t} from "../../lang";
@@ -70,17 +70,20 @@ const doSubmit = async () => {
         Dialog.tipError(t('模型未启动'))
         return
     }
-    const record: SoundTtsRecord = {
+    const record: TaskRecord = {
+        biz: 'SoundTts',
         serverName: server.name,
         serverTitle: server.title,
         serverVersion: server.version,
-        text: formData.value.text,
+        modelConfig: {
+            text: formData.value.text,
+        },
         param: formData.value.param,
     }
     if (!await PermissionService.checkForTask('SoundTts', record)) {
         return
     }
-    const id = await SoundTtsService.submit(record)
+    const id = await TaskService.submit(record)
     formData.value.text = ''
     Dialog.tipSuccess(t('任务已经提交成功，等待合成完成'))
     emit('submitted')
@@ -120,7 +123,7 @@ const emit = defineEmits({
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 {{ $t('开始合成') }}
             </a-button>
-            <ServerContentInfoAction :config="modelConfig as any" func="soundTts" />
+            <ServerContentInfoAction :config="modelConfig as any" func="soundTts"/>
         </div>
     </div>
 </template>

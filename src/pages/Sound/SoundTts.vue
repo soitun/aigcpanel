@@ -3,15 +3,15 @@
 import AudioPlayer from "../../components/common/AudioPlayer.vue";
 import SoundTtsCreate from "../../components/Sound/SoundTtsCreate.vue";
 import {onBeforeUnmount, onMounted, ref} from "vue";
-import {SoundTtsRecord, SoundTtsService} from "../../service/SoundTtsService";
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
 import {TaskChangeType, useTaskStore} from "../../store/modules/task";
 import SoundTtsActionDelete from "../../components/Sound/SoundTtsActionDelete.vue";
 import SoundTtsActionDownload from "../../components/Sound/SoundTtsActionDownload.vue";
 import SoundDuration from "../../components/Sound/SoundDuration.vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
+import {TaskRecord, TaskService} from "../../service/TaskService";
 
-const records = ref<SoundTtsRecord[]>([])
+const records = ref<TaskRecord[]>([])
 const taskStore = useTaskStore()
 
 const taskChangeCallback = (bizId: string, type: TaskChangeType) => {
@@ -27,7 +27,7 @@ onBeforeUnmount(() => {
 })
 
 const doRefresh = async () => {
-    records.value = await SoundTtsService.list()
+    records.value = await TaskService.list('SoundTts')
 }
 
 </script>
@@ -83,12 +83,12 @@ const doRefresh = async () => {
                             </div>
                         </div>
                         <div class="pt-4">
-                            {{ r.text }}
+                            {{ r.modelConfig.text }}
                         </div>
-                        <div class="pt-4" v-if="r.resultWav">
+                        <div class="pt-4" v-if="r.result && r.result.url">
                             <AudioPlayer
                                 show-wave
-                                :url="'file://'+r.resultWav"/>
+                                :url="'file://'+r.result.url"/>
                         </div>
                         <div class="pt-4">
                             <SoundTtsActionDownload :record="r"/>

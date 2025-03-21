@@ -81,14 +81,130 @@ const versions = [
         version:2,
         up: async (db: DB) => {
             await db.execute(`ALTER TABLE data_sound_tts ADD COLUMN result TEXT`);
-            await db.execute(`ALTER TABLE data_sound_clone ADD COLUMN result TEXT`);
-            await db.execute(`ALTER TABLE data_video_gen ADD COLUMN result TEXT`);
+            await db.execute(`ALTER TABLE data_sound_clone_delete ADD COLUMN result TEXT`);
+            await db.execute(`ALTER TABLE data_video_gen_delete ADD COLUMN result TEXT`);
         }
     },
     {
         version:3,
         up: async (db: DB) => {
-            await db.execute(`ALTER TABLE data_video_gen ADD COLUMN soundCustomFile TEXT`);
+            await db.execute(`ALTER TABLE data_video_gen_delete ADD COLUMN soundCustomFile TEXT`);
+        }
+    },
+    {
+        version:4,
+        up: async (db: DB) => {
+            await db.execute(`CREATE TABLE IF NOT EXISTS data_task (
+                   id INTEGER PRIMARY KEY,
+
+                   biz TEXT,
+
+                   status TEXT,
+                   statusMsg TEXT,
+                   startTime INTEGER,
+                   endTime INTEGER,
+
+                   serverName TEXT,
+                   serverTitle TEXT,
+                   serverVersion TEXT,
+
+                   param TEXT,
+                   jobResult TEXT,
+                   modelConfig TEXT,
+                   result TEXT
+
+            )`);
+        }
+    },
+    {
+        version: 5,
+        up: async (db: DB) => {
+            // await db.execute(`DELETE FROM data_task where 1=1`);
+            // SoundClone
+            let records = await db.select(`SELECT * FROM data_sound_clone_delete`);
+            for(const r of records){
+                const values = [
+                    'SoundClone',
+                    r.status,
+                    r.statusMsg,
+                    r.startTime,
+                    r.endTime,
+                    r.serverName,
+                    r.serverTitle,
+                    r.serverVersion,
+                    r.param,
+                    r.jobResult,
+                    JSON.stringify({
+                        promptName: r.promptName,
+                        promptWav: r.promptWav,
+                        promptText: r.promptText,
+                        text: r.text,
+                    }),
+                    JSON.stringify({
+                        url: r.resultWav,
+                    }),
+                ]
+                await db.insert(`INSERT INTO data_task
+                    (biz, status, statusMsg, startTime, endTime, serverName, serverTitle, serverVersion, param, jobResult, modelConfig,  result)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, values)
+            }
+            // SoundTts
+            records = await db.select(`SELECT * FROM data_sound_tts`);
+            for(const r of records){
+                const values = [
+                    'SoundTts',
+                    r.status,
+                    r.statusMsg,
+                    r.startTime,
+                    r.endTime,
+                    r.serverName,
+                    r.serverTitle,
+                    r.serverVersion,
+                    r.param,
+                    r.jobResult,
+                    JSON.stringify({
+                        text: r.text,
+                    }),
+                    JSON.stringify({
+                        url: r.resultWav,
+                    }),
+                ]
+                await db.insert(`INSERT INTO data_task
+                                 (biz, status, statusMsg, startTime, endTime, serverName, serverTitle, serverVersion, param, jobResult, modelConfig,  result)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, values)
+            }
+            // VideoGen
+            records = await db.select(`SELECT * FROM data_video_gen_delete`);
+            for(const r of records){
+                const values = [
+                    'VideoGen',
+                    r.status,
+                    r.statusMsg,
+                    r.startTime,
+                    r.endTime,
+                    r.serverName,
+                    r.serverTitle,
+                    r.serverVersion,
+                    r.param,
+                    r.jobResult,
+                    JSON.stringify({
+                        videoTemplateId: r.videoTemplateId,
+                        videoTemplateName: r.videoTemplateName,
+                        soundType: r.soundType,
+                        soundTtsId: r.soundTtsId,
+                        soundTtsText: r.soundTtsText,
+                        soundCloneId: r.soundCloneId,
+                        soundCloneText: r.soundCloneText,
+                        soundCustomFile: r.soundCustomFile,
+                    }),
+                    JSON.stringify({
+                        url: r.resultMp4,
+                    }),
+                ]
+                await db.insert(`INSERT INTO data_task
+                                 (biz, status, statusMsg, startTime, endTime, serverName, serverTitle, serverVersion, param, jobResult, modelConfig,  result)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, values)
+            }
         }
     },
 ]

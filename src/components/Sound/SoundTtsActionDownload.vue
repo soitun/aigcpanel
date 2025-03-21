@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
-import {SoundTtsRecord} from "../../service/SoundTtsService";
 import {mapError} from "../../lib/error";
 import {contentToFilenamePathPart} from "../../lib/aigcpanel";
+import {TaskRecord} from "../../service/TaskService";
 
 const props = defineProps<{
-    record: SoundTtsRecord,
+    record: TaskRecord,
 }>()
 
 const doDownload = async () => {
     const record = props.record
-    const title = `${t('声音合成')}_${record.id}_${contentToFilenamePathPart(record.text)}.wav`
+    const title = `${t('声音合成')}_${record.id}_${contentToFilenamePathPart(record.modelConfig.text)}.wav`
     let filePath = await window.$mapi.file.openSave({
         defaultPath: title
     })
@@ -21,7 +21,7 @@ const doDownload = async () => {
         }
         // console.log('filePath', record.resultWav, filePath)
         try {
-            await window.$mapi.file.copy(record.resultWav as string, filePath, {isFullPath: true})
+            await window.$mapi.file.copy(record.result.url as string, filePath, {isFullPath: true})
         } catch (e) {
             console.error(e)
             Dialog.tipError(mapError(e))
@@ -35,7 +35,7 @@ const doDownload = async () => {
 <template>
     <a-tooltip :content="$t('下载')">
         <a-button class="mr-2"
-                  :disabled="!record.resultWav"
+                  :disabled="!record.result.url"
                   @click="doDownload()">
             <template #icon>
                 <icon-download/>

@@ -3,7 +3,6 @@
 import VideoTemplateDialog from "../../components/Video/VideoTemplateDialog.vue";
 import {onBeforeUnmount, onMounted, ref} from "vue";
 import VideoGenCreate from "../../components/Video/VideoGenCreate.vue";
-import {VideoGenRecord, VideoGenService} from "../../service/VideoGenService";
 import {TaskChangeType, useTaskStore} from "../../store/modules/task";
 import VideoGenActionDownload from "../../components/Video/VideoGenActionDownload.vue";
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
@@ -12,15 +11,16 @@ import VideoPlayer from "../../components/common/VideoPlayer.vue";
 import VideoDuration from "../../components/Video/VideoDuration.vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
 import AudioPlayer from "../../components/common/AudioPlayer.vue";
+import {TaskRecord, TaskService} from "../../service/TaskService";
 
 const videoTemplateDialog = ref<InstanceType<typeof VideoTemplateDialog> | null>(null)
 const videoGenCreate = ref<InstanceType<typeof VideoGenCreate> | null>(null)
 
-const records = ref<VideoGenRecord[]>([])
+const records = ref<TaskRecord[]>([])
 const taskStore = useTaskStore()
 
 const doRefresh = async () => {
-    records.value = await VideoGenService.list()
+    records.value = await TaskService.list('VideoGen')
 }
 
 const taskChangeCallback = (bizId: string, type: TaskChangeType) => {
@@ -96,10 +96,10 @@ onBeforeUnmount(() => {
                                         </div>
                                     </div>
                                     <div class="pt-1">
-                                        {{ r.videoTemplateName }}
+                                        {{ r.modelConfig.videoTemplateName }}
                                     </div>
                                 </div>
-                                <div v-if="r.soundType==='soundTts'" class="flex">
+                                <div v-if="r.modelConfig.soundType==='soundTts'" class="flex">
                                     <div class="mr-2 flex-shrink-0">
                                         <div class="bg-gray-100 px-3 py-1 leading-6 rounded">
                                             <i class="iconfont icon-sound"></i>
@@ -107,32 +107,32 @@ onBeforeUnmount(() => {
                                         </div>
                                     </div>
                                     <div class="pt-1">
-                                        {{ r.soundTtsText }}
+                                        {{ r.modelConfig.soundTtsText }}
                                     </div>
                                 </div>
-                                <div v-if="r.soundType==='soundClone'" class="flex items-center">
+                                <div v-if="r.modelConfig.soundType==='soundClone'" class="flex items-center">
                                     <div class="bg-gray-100 px-3 py-1 leading-6 rounded mr-2">
                                         <i class="iconfont icon-video-template"></i>
                                         {{ $t('声音克隆') }}
                                     </div>
                                     <div>
-                                        {{ r.soundCloneText }}
+                                        {{ r.modelConfig.soundCloneText }}
                                     </div>
                                 </div>
-                                <div v-if="r.soundType==='soundCustom'" class="flex items-start">
+                                <div v-if="r.modelConfig.soundType==='soundCustom'" class="flex items-start">
                                     <div class="bg-gray-100 px-3 py-1 leading-6 rounded mr-2">
                                         <icon-file/>
                                         {{ $t('本地文件') }}
                                     </div>
                                     <div class="flex-grow">
-                                        <AudioPlayer :url="`file://${r.soundCustomFile}`" />
+                                        <AudioPlayer :url="`file://${r.modelConfig.soundCustomFile}`"/>
                                     </div>
                                 </div>
                             </div>
                             <div class="flex-shrink-0 ml-8">
-                                <div class="p-2 rounded shadow bg-gray-300" v-if="r.resultMp4">
-                                    <div class="w-48 h-48" v-if="r.resultMp4">
-                                        <VideoPlayer :url="'file://'+r.resultMp4"/>
+                                <div class="p-2 rounded shadow bg-gray-300" v-if="r.result.url">
+                                    <div class="w-48 h-48" v-if="r.result.url">
+                                        <VideoPlayer :url="'file://'+r.result.url"/>
                                     </div>
                                 </div>
                             </div>

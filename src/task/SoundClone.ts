@@ -1,12 +1,11 @@
 import {TaskBiz} from "../store/modules/task";
 import {useServerStore} from "../store/modules/server";
-import {SoundCloneService} from "../service/SoundCloneService";
-import {SoundTtsService} from "../service/SoundTtsService";
+import {TaskService} from "../service/TaskService";
 
 const serverStore = useServerStore()
 
 const prepareData = async (bizId, bizParam) => {
-    const record = await SoundCloneService.get(bizId as any)
+    const record = await TaskService.get(bizId as any)
     // console.log('SoundClone.runFunc.record', record)
     if (!record) {
         throw new Error('record not found')
@@ -24,7 +23,7 @@ const prepareData = async (bizId, bizParam) => {
 export const SoundClone: TaskBiz = {
 
     restore: async () => {
-        await SoundCloneService.restoreForTask()
+        await TaskService.restoreForTask('SoundClone')
     },
 
     runFunc: async (bizId, bizParam) => {
@@ -32,14 +31,14 @@ export const SoundClone: TaskBiz = {
         const {record, server} = await prepareData(bizId, bizParam)
         const serverInfo = await serverStore.serverInfo(server)
         // console.log('runFunc', serverInfo, record)
-        await SoundCloneService.update(bizId as any, {
+        await TaskService.update(bizId as any, {
             status: 'wait',
         })
         const res = await window.$mapi.server.callFunctionWithException(serverInfo, 'soundClone', {
             id: `SoundClone_${bizId}`,
-            text: record.text,
-            promptAudio: record.promptWav,
-            promptText: record.promptText,
+            text: record.modelConfig.text,
+            promptAudio: record.modelConfig.promptWav,
+            promptText: record.modelConfig.promptText,
             param: record.param,
             result: record.result,
         })
@@ -48,7 +47,7 @@ export const SoundClone: TaskBiz = {
         }
         switch (res.data.type) {
             case 'success':
-                await SoundCloneService.update(bizId as any, {
+                await TaskService.update(bizId as any, {
                     status: 'success',
                     jobResult: res,
                 })
@@ -74,7 +73,7 @@ export const SoundClone: TaskBiz = {
         // console.log('SoundClone.queryFunc.res', res)
         switch (res.data.type) {
             case 'success':
-                await SoundCloneService.update(bizId as any, {
+                await TaskService.update(bizId as any, {
                     status: 'success',
                     jobResult: res,
                 })
@@ -85,21 +84,19 @@ export const SoundClone: TaskBiz = {
         return 'fail'
     },
     successFunc: async (bizId, bizParam) => {
-        // console.log('SoundClone.successFunc', {bizId, bizParam})
         const {record, server} = await prepareData(bizId, bizParam)
-        // console.log('SoundClone.successFunc.prepareData', {bizId, bizParam, record, server})
-        const resultWav = await SoundCloneService.saveResultWav(record, record.jobResult.data.data.filePath)
-        // console.log('SoundClone.successFunc.resultWav', resultWav)
-        await SoundCloneService.update(bizId as any, {
+        await TaskService.update(bizId as any, {
             status: 'success',
             endTime: Date.now(),
-            resultWav: resultWav
+            result: {
+                url: await TaskService.saveFile(record.jobResult.data.data.filePath)
+            }
         })
     },
     failFunc: async (bizId, msg, bizParam) => {
         // console.log('SoundClone.failFunc', {bizId, bizParam, msg})
         // const {record, server} = await prepareData(bizId, bizParam)
-        await SoundCloneService.update(bizId as any, {
+        await TaskService.update(bizId as any, {
             status: 'fail',
             statusMsg: msg,
             endTime: Date.now(),
@@ -107,11 +104,11 @@ export const SoundClone: TaskBiz = {
     },
     update: async (bizId, update) => {
         if ('result' in update) {
-            const record = await SoundCloneService.get(bizId as any)
+            const record = await TaskService.get(bizId as any)
             if (record) {
                 update.result = Object.assign({}, record.result, update.result)
             }
         }
-        await SoundCloneService.update(bizId as any, update)
+        await TaskService.update(bizId as any, update)
     }
 }

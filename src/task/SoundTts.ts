@@ -1,12 +1,11 @@
 import {TaskBiz} from "../store/modules/task";
 import {useServerStore} from "../store/modules/server";
-import {SoundTtsService} from "../service/SoundTtsService";
-import {result} from "lodash-es";
+import {TaskService} from "../service/TaskService";
 
 const serverStore = useServerStore()
 
 const prepareData = async (bizId, bizParam) => {
-    const record = await SoundTtsService.get(bizId as any)
+    const record = await TaskService.get(bizId as any)
     // console.log('SoundTts.runFunc.record', record)
     if (!record) {
         throw new Error('record not found')
@@ -24,7 +23,7 @@ const prepareData = async (bizId, bizParam) => {
 export const SoundTts: TaskBiz = {
 
     restore: async () => {
-        await SoundTtsService.restoreForTask()
+        await TaskService.restoreForTask('SoundTts')
     },
 
     runFunc: async (bizId, bizParam) => {
@@ -32,12 +31,12 @@ export const SoundTts: TaskBiz = {
         const {record, server} = await prepareData(bizId, bizParam)
         const serverInfo = await serverStore.serverInfo(server)
         // console.log('SoundTts.runFunc.serverInfo', serverInfo)
-        await SoundTtsService.update(bizId as any, {
+        await TaskService.update(bizId as any, {
             status: 'wait',
         })
         const res = await window.$mapi.server.callFunctionWithException(serverInfo, 'soundTts', {
             id: `SoundTts_${bizId}`,
-            text: record.text,
+            text: record.modelConfig.text,
             param: record.param,
             result: record.result,
         })
@@ -47,7 +46,7 @@ export const SoundTts: TaskBiz = {
         }
         switch (res.data.type) {
             case 'success':
-                await SoundTtsService.update(bizId as any, {
+                await TaskService.update(bizId as any, {
                     status: 'success',
                     jobResult: res,
                 })
@@ -73,7 +72,7 @@ export const SoundTts: TaskBiz = {
         // console.log('SoundTts.queryFunc.res', res)
         switch (res.data.type) {
             case 'success':
-                await SoundTtsService.update(bizId as any, {
+                await TaskService.update(bizId as any, {
                     status: 'success',
                     jobResult: res,
                 })
@@ -84,20 +83,19 @@ export const SoundTts: TaskBiz = {
         return 'fail'
     },
     successFunc: async (bizId, bizParam) => {
-        // console.log('SoundTts.successFunc', {bizId, bizParam})
         const {record, server} = await prepareData(bizId, bizParam)
-        const resultWav = await SoundTtsService.saveResultWav(record, record.jobResult.data.data.filePath)
-        // console.log('SoundTts.successFunc.resultWav', resultWav)
-        await SoundTtsService.update(bizId as any, {
+        await TaskService.update(bizId as any, {
             status: 'success',
             endTime: Date.now(),
-            resultWav: resultWav
+            result: {
+                url: await TaskService.saveFile(record.jobResult.data.data.filePath)
+            }
         })
     },
     failFunc: async (bizId, msg, bizParam) => {
         // console.log('SoundTts.failFunc', {bizId, bizParam, msg})
         // const {record, server} = await prepareData(bizId, bizParam)
-        await SoundTtsService.update(bizId as any, {
+        await TaskService.update(bizId as any, {
             status: 'fail',
             statusMsg: msg,
             endTime: Date.now(),
@@ -106,11 +104,11 @@ export const SoundTts: TaskBiz = {
 
     update: async (bizId, update) => {
         if ('result' in update) {
-            const record = await SoundTtsService.get(bizId as any)
+            const record = await TaskService.get(bizId as any)
             if (record) {
                 update.result = Object.assign({}, record.result, update.result)
             }
         }
-        await SoundTtsService.update(bizId as any, update)
+        await TaskService.update(bizId as any, update)
     }
 }

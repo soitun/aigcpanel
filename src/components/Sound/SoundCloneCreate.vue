@@ -4,7 +4,6 @@ import ServerSelector from "../Server/ServerSelector.vue";
 import {onMounted, ref, watch} from "vue";
 import {useServerStore} from "../../store/modules/server";
 import {Dialog} from "../../lib/dialog";
-import {SoundCloneRecord, SoundCloneService} from "../../service/SoundCloneService";
 import {StorageUtil} from "../../lib/storage";
 import {useSoundClonePromptStore} from "../../store/modules/soundClonePrompt";
 import {t} from "../../lang";
@@ -13,6 +12,7 @@ import ParamForm from "../common/ParamForm.vue";
 import {mapError} from "../../lib/error";
 import {PermissionService} from "../../service/PermissionService";
 import ServerContentInfoAction from "../Server/ServerContentInfoAction.vue";
+import {TaskRecord, TaskService} from "../../service/TaskService";
 
 const modelConfig = ref(null)
 const paramForm = ref<InstanceType<typeof ParamForm> | null>(null)
@@ -83,20 +83,23 @@ const doSubmit = async () => {
         Dialog.tipError(t('模型未启动'))
         return
     }
-    const record: SoundCloneRecord = {
+    const record: TaskRecord = {
+        biz:'SoundClone',
         serverName: server.name,
         serverTitle: server.title,
         serverVersion: server.version,
-        promptName: prompt.name,
-        promptWav: prompt.promptWav,
-        promptText: prompt.promptText,
-        text: formData.value.text,
+        modelConfig: {
+            promptName: prompt.name,
+            promptWav: prompt.promptWav,
+            promptText: prompt.promptText,
+            text: formData.value.text,
+        },
         param: formData.value.param,
     }
     if (!await PermissionService.checkForTask('SoundClone', record)) {
         return
     }
-    const id = await SoundCloneService.submit(record)
+    const id = await TaskService.submit(record)
     formData.value.text = ''
     Dialog.tipSuccess(t('任务已经提交成功，等待克隆完成'))
     emit('submitted')
@@ -143,7 +146,7 @@ const emit = defineEmits({
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 {{ $t('开始克隆') }}
             </a-button>
-            <ServerContentInfoAction :config="modelConfig as any" func="soundClone" />
+            <ServerContentInfoAction :config="modelConfig as any" func="soundClone"/>
         </div>
     </div>
 </template>

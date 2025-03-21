@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
-import {VideoGenRecord} from "../../service/VideoGenService";
 import {mapError} from "../../lib/error";
+import {TaskRecord} from "../../service/TaskService";
 
 const props = defineProps<{
-    record: VideoGenRecord,
+    record: TaskRecord,
 }>()
 
 const doDownload = async () => {
