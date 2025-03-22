@@ -2,7 +2,8 @@
 import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
 import {sleep} from "../../lib/util";
-import {TaskRecord} from "../../service/TaskService";
+import {TaskRecord, TaskService} from "../../service/TaskService";
+import {mapError} from "../../lib/error";
 
 const props = defineProps<{
     record: TaskRecord,
@@ -13,11 +14,16 @@ const emit = defineEmits({
 
 const doDelete = async () => {
     const record = props.record
-    Dialog.loadingOn(t('正在删除'))
-    await sleep(500)
-    await SoundCloneService.delete(record)
-    Dialog.loadingOff()
-    emit('update')
+    try {
+        Dialog.loadingOn(t('正在删除'))
+        await sleep(500)
+        await TaskService.delete(record)
+        Dialog.loadingOff()
+        emit('update')
+    } catch (e) {
+        Dialog.loadingOff()
+        Dialog.tipError(mapError(e))
+    }
 }
 </script>
 

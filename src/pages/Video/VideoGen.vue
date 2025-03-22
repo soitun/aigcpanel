@@ -103,18 +103,22 @@ onBeforeUnmount(() => {
                                     </div>
                                 </div>
                                 <div v-if="r.modelConfig.soundType==='soundClone'" class="flex items-center">
-                                    <div class="bg-gray-100 px-3 py-1 leading-6 rounded mr-2">
-                                        <i class="iconfont icon-video-template"></i>
-                                        {{ $t('声音克隆') }}
+                                    <div class="mr-2 flex-shrink-0">
+                                        <div class="bg-gray-100 px-3 py-1 leading-6 rounded">
+                                            <i class="iconfont icon-video-template"></i>
+                                            {{ $t('声音克隆') }}
+                                        </div>
                                     </div>
                                     <div>
                                         {{ r.modelConfig.soundCloneText }}
                                     </div>
                                 </div>
                                 <div v-if="r.modelConfig.soundType==='soundCustom'" class="flex items-start">
-                                    <div class="bg-gray-100 px-3 py-1 leading-6 rounded mr-2">
-                                        <icon-file/>
-                                        {{ $t('本地文件') }}
+                                    <div class="mr-2 flex-shrink-0">
+                                        <div class="bg-gray-100 px-3 py-1 leading-6 rounded">
+                                            <icon-file/>
+                                            {{ $t('本地文件') }}
+                                        </div>
                                     </div>
                                     <div class="flex-grow">
                                         <AudioPlayer :url="`file://${r.modelConfig.soundCustomFile}`"/>

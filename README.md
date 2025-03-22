@@ -39,6 +39,10 @@
 
 ![](./screenshots/cn/video-gen.png)
 
+### 我的形象
+
+![](./screenshots/cn/video-template.png)
+
 ### 语音克隆
 
 ![](./screenshots/cn/sound-clone.png)
@@ -50,18 +54,6 @@
 ### 模型管理
 
 ![](./screenshots/cn/server.png)
-
-### 模型添加
-
-![](./screenshots/cn/server-add.png)
-
-### 模型日志
-
-![](./screenshots/cn/server-log.png)
-
-### 关于
-
-![](./screenshots/cn/setting.png)
 
 ## 安装使用
 
