@@ -152,7 +152,7 @@ onMounted(async () => {
                             {{$t('工单反馈')}}
                         </div>
                         <div class="text-gray-400">
-                            {{$t('遇到问题随时反馈，记得提交日志')}}
+                            {{$t('遇到问题随时反馈')}}
                         </div>
                     </div>
                     <div>
