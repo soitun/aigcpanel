@@ -45,7 +45,7 @@ watch(() => select.value?.modelValue, async (value) => {
 
 <template>
     <a-select ref="select" :placeholder="$t('选择模型')" size="small">
-        <a-optgroup label="本地模型">
+        <a-optgroup :label="$t('本地模型')">
             <a-option v-for="server in recordsFilter"
                       :key="server.key"
                       :value="server.key">
@@ -60,7 +60,7 @@ watch(() => select.value?.modelValue, async (value) => {
                 </div>
             </a-option>
         </a-optgroup>
-        <a-optgroup label="升级Pro版，畅享云模型"></a-optgroup>
+        <a-optgroup :label="$t('升级Pro版，畅享云模型')"></a-optgroup>
         <template #label="{ data }">
             <div class="text-sm flex items-center flex-nowrap truncate no-wrap">
                 <div v-if="valueStatus===EnumServerStatus.RUNNING"

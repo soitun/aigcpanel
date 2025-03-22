@@ -10,6 +10,7 @@ import SoundTtsActionDownload from "../../components/Sound/SoundTtsActionDownloa
 import SoundDuration from "../../components/Sound/SoundDuration.vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
 import {TaskRecord, TaskService} from "../../service/TaskService";
+import TaskCancelAction from "../../components/Server/TaskCancelAction.vue";
 
 const records = ref<TaskRecord[]>([])
 const taskStore = useTaskStore()
@@ -93,6 +94,7 @@ const doRefresh = async () => {
                         <div class="pt-4">
                             <SoundTtsActionDownload :record="r"/>
                             <SoundTtsActionDelete :record="r" @update="doRefresh"/>
+                            <TaskCancelAction :record="r"/>
                         </div>
                     </div>
                 </div>

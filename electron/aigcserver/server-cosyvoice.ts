@@ -101,6 +101,9 @@ export const ServerCosyvoice: ServerContext = {
         }
         this.send('stopped', this.ServerInfo)
     },
+    async cancel() {
+        await this.ServerApi.launcherCancel(this)
+    },
     async config() {
         return {
             code: 0,
@@ -299,7 +302,7 @@ export const ServerCosyvoice: ServerContext = {
                         promptText: data.promptText,
                         crossLingual: !!param['CrossLingual'],
                     },
-                    setting:this.ServerInfo.setting,
+                    setting: this.ServerInfo.setting,
                 })
                 const result = await this.ServerApi.launcherSubmitAndQuery(this, {
                     id: data.id,

@@ -11,6 +11,7 @@ type LauncherResultType = {
 }
 
 export const EasyServer = function (config: any) {
+    let controller: any = null
     this.serverConfig = config as {
         easyServer: {
             entry: string,
@@ -57,6 +58,9 @@ export const EasyServer = function (config: any) {
         this.serverRuntime.startTime = 0
         this.send('stopped', this.ServerInfo)
         this.send('success', this.ServerInfo)
+    }
+    this.cancel = async function () {
+        controller.stop()
     }
     this._callFunc = async function (
         data: ServerFunctionDataType,
@@ -135,7 +139,8 @@ export const EasyServer = function (config: any) {
             // console.log('easyServer.start', JSON.stringify({command, envMap, configData}))
             await (async () => {
                 return new Promise((resolve, reject) => {
-                    let timer = null, controller = null
+                    let timer = null
+                    controller = null
                     if (option.timeout > 0) {
                         timer = setTimeout(() => {
                             if (controller) {

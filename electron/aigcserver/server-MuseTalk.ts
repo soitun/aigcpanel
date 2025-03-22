@@ -89,6 +89,9 @@ export const ServerMuseTalk: ServerContext = {
         }
         this.send('stopped', this.ServerInfo)
     },
+    async cancel() {
+        await this.ServerApi.launcherCancel(this)
+    },
     async config() {
         return {
             "code": 0,

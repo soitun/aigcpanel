@@ -108,12 +108,7 @@ const typeName = (type: string) => {
                                 <div class="inline-block mr-4">
                                     <a-tooltip :content="typeName(record.type as string)">
                                         <div class="inline-block">
-                                            <i v-if="record.type===EnumServerType.CLOUD"
-                                               class="iconfont icon-network"></i>
-                                            <i v-else-if="record.type===EnumServerType.LOCAL"
-                                               class="iconfont icon-desktop"></i>
-                                            <i v-else-if="record.type===EnumServerType.LOCAL_DIR"
-                                               class="iconfont icon-folder"></i>
+                                            <i class="iconfont icon-folder"></i>
                                         </div>
                                     </a-tooltip>
                                 </div>

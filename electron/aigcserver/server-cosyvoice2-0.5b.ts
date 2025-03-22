@@ -67,6 +67,9 @@ export const ServerCosyvoice205b: ServerContext = {
         }
         this.send('stopped', this.ServerInfo)
     },
+    async cancel() {
+        await this.ServerApi.launcherCancel(this)
+    },
     async config() {
         return {
             code: 0,

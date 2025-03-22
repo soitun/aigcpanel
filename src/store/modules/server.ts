@@ -233,6 +233,17 @@ export const serverStore = defineStore("server", {
             serverInfo.logFile = serverRuntime.logFile
             await window.$mapi.server.stop(serverInfo)
         },
+        async cancel(server: ServerRecord) {
+            const record = this.findRecord(server)
+            if (record?.status === EnumServerStatus.RUNNING) {
+            } else {
+                throw new Error('StatusError')
+            }
+            const serverRuntime = getOrCreateServerRuntime(server)
+            const serverInfo = await this.serverInfo(server)
+            serverInfo.logFile = serverRuntime.logFile
+            await window.$mapi.server.cancel(serverInfo)
+        },
         async updateSetting(key: string, setting: any) {
             const record = this.records.find((record) => record.key === key)
             if (!record) {
@@ -284,6 +295,12 @@ export const serverStore = defineStore("server", {
         },
         async getByNameVersion(name: string, version: string): Promise<ServerRecord | undefined> {
             return this.records.find((record) => record.name === name && record.version === version)
+        },
+        async cancelByNameVersion(name: string, version: string) {
+            const record = await this.getByNameVersion(name, version)
+            if (record) {
+                await this.cancel(record)
+            }
         },
         generateServerKey(server: ServerRecord) {
             return `${server.name}|${server.version}`

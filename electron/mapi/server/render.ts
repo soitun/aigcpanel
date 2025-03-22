@@ -25,6 +25,10 @@ const stop = async (serverInfo: ServerInfo) => {
     return ipcRenderer.invoke('server:stop', serverInfo)
 }
 
+const cancel = async (serverInfo: ServerInfo) => {
+    return ipcRenderer.invoke('server:cancel', serverInfo)
+}
+
 const config = async (serverInfo: ServerInfo) => {
     return ipcRenderer.invoke('server:config', serverInfo)
 }
@@ -51,6 +55,7 @@ export default {
     start,
     ping,
     stop,
+    cancel,
     config,
     callFunction,
     callFunctionWithException,

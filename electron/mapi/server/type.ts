@@ -34,6 +34,7 @@ export type ServerContext = {
 
     init: () => Promise<void>,
     start: () => Promise<void>,
+    cancel: () => Promise<void>,
     stop: () => Promise<void>,
     url: () => string,
     ping: () => Promise<boolean>,

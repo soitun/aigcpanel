@@ -154,6 +154,17 @@ ipcMain.handle('server:stop', async (event, serverInfo: ServerInfo) => {
     }
 })
 
+ipcMain.handle('server:cancel', async (event, serverInfo: ServerInfo) => {
+    const module = await getModule(serverInfo)
+    try {
+        return await module.cancel()
+    } catch (e) {
+        const error = mapError(e)
+        Log.error('mapi.server.cancel.error', error)
+        throw error
+    }
+})
+
 ipcMain.handle('server:config', async (event, serverInfo: ServerInfo) => {
     const module = await getModule(serverInfo)
     try {

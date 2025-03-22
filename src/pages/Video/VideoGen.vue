@@ -11,6 +11,7 @@ import VideoDuration from "../../components/Video/VideoDuration.vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
 import AudioPlayer from "../../components/common/AudioPlayer.vue";
 import {TaskRecord, TaskService} from "../../service/TaskService";
+import TaskCancelAction from "../../components/Server/TaskCancelAction.vue";
 
 const videoGenCreate = ref<InstanceType<typeof VideoGenCreate> | null>(null)
 
@@ -134,6 +135,7 @@ onBeforeUnmount(() => {
                         <div class="pt-4">
                             <VideoGenActionDownload :record="r"/>
                             <VideoGenActionDelete :record="r" @update="doRefresh"/>
+                            <TaskCancelAction :record="r"/>
                         </div>
                     </div>
                 </div>

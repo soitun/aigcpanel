@@ -234,6 +234,14 @@ const sleep = async (ms) => {
     })
 }
 
+const launcherCancel = async (context: ServerContext) => {
+    const ret = await requestPost(`${context.url()}cancel`, {}) as any
+    console.log('cancel', JSON.stringify(ret))
+    if (ret.code) {
+        throw new Error(`cancel ${ret.msg}`)
+    }
+}
+
 const launcherSubmitAndQuery = async (context: ServerContext, data: ServerFunctionDataType, option?: {
     timeout: number,
 }): Promise<{
@@ -341,6 +349,7 @@ export default {
     sleep,
     base64Encode: EncodeUtil.base64Encode,
     base64Decode: EncodeUtil.base64Decode,
+    launcherCancel,
     launcherSubmitAndQuery,
     launcherPrepareConfigJson,
     launcherSubmitConfigJsonAndQuery
