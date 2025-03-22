@@ -2,6 +2,7 @@
 import {nextTick, onMounted, ref} from "vue";
 import {TaskService} from "../service/TaskService";
 import {TimeUtil} from "../lib/util";
+import FeedbackTicketButton from "../components/common/FeedbackTicketButton.vue";
 
 const loading = ref(true);
 
@@ -129,6 +130,37 @@ onMounted(async () => {
                 </div>
             </div>
         </div>
+        <div>
+            <div class="flex gap-5">
+                <a href="https://aigcpanel.com/zh/asset" target="_blank"
+                   class="bg-white rounded-lg p-3 flex items-center flex-grow w-0">
+                    <div class="flex-grow">
+                        <div class="font-bold text-xl mb-3">
+                            {{$t('模型市场')}}
+                        </div>
+                        <div class="text-gray-600">
+                            {{$t('多种开源模型持续更新')}}
+                        </div>
+                    </div>
+                    <div>
+                        <icon-right class="text-2xl text-gray-400" />
+                    </div>
+                </a>
+                <div class="bg-white rounded-lg p-3 flex items-center flex-grow w-0">
+                    <div class="flex-grow">
+                        <div class="font-bold text-xl mb-3">
+                            {{$t('工单反馈')}}
+                        </div>
+                        <div class="text-gray-400">
+                            {{$t('遇到问题随时反馈，记得提交日志')}}
+                        </div>
+                    </div>
+                    <div>
+                        <FeedbackTicketButton/>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div v-if="0" class="bg-white rounded-lg p-4 mb-4">
             <div class="text-xl font-bold mb-4">模型管理</div>
             <div class="flex">
@@ -150,6 +182,7 @@ onMounted(async () => {
 
 <style lang="less" scoped>
 .pb-top-area > div {
+    background-size: 7rem;
     &:nth-child(1) {
         background-image: url(./../assets/image/icon/soundTts.svg);
     }
