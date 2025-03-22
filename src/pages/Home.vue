@@ -88,7 +88,7 @@ onMounted(async () => {
                         <a-statistic animation
                                      placeholder="-"
                                      :value-style="{
-                                        color: usageData.soundTtsToday && usageData.soundTtsToday > 0 ? 'gray' : 'green',
+                                        color: usageData.soundTtsToday && usageData.soundTtsToday > 0 ? 'green' : 'gray',
                                         fontSize: '14px'
                                      }"
                                      :value="usageData.soundTtsToday as any"/>
@@ -105,7 +105,7 @@ onMounted(async () => {
                         {{ $t('今日') }} +
                         <a-statistic animation placeholder="-"
                                      :value-style="{
-                                        color: usageData.soundCloneToday && usageData.soundCloneToday > 0 ? 'gray' : 'green',
+                                        color: usageData.soundCloneToday && usageData.soundCloneToday > 0 ? 'green' : 'gray',
                                         fontSize: '14px'
                                      }"
                                      :value="usageData.soundCloneToday as any"/>
@@ -122,7 +122,7 @@ onMounted(async () => {
                         {{ $t('今日') }} +
                         <a-statistic animation placeholder="-"
                                      :value-style="{
-                                        color: usageData.videoGenToday && usageData.videoGenToday > 0 ? 'gray' : 'green',
+                                        color: usageData.videoGenToday && usageData.videoGenToday > 0 ? 'green' : 'gray',
                                         fontSize: '14px'
                                      }"
                                      :value="usageData.videoGenToday as any"/>

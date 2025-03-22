@@ -137,7 +137,7 @@ const emit = defineEmits({
                                 </div>
                             </div>
                             <div class="flex flex-col items-center">
-                                <img class="w-14 h-14 mb-3" src="./../../assets/image/videoTemplate/2.png" />
+                                <img class="w-14 h-14 mb-3" src="./../../assets/image/videoTemplate/3.png" />
                                 <div class="mt-1 flex items-center gap-1 justify-center">
                                     <icon-close-circle class="text-red-500" />
                                     <span class="text-xs">{{$t('面部有干扰')}}</span>

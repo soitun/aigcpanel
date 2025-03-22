@@ -43,17 +43,17 @@ const doUser = async () => {
             <a-tooltip v-if="setting.basic.userEnable"
                        :content="userTip as string" position="right">
                 <img v-if="!user.isInit||!user.user.id"
-                     class="rounded-full border border-solid border-gray-200"
+                     class="rounded-full border border-solid border-gray-200 w-10 h-10 shadow-lg"
                      src="./../assets/image/avatar.svg"/>
                 <img v-else :src="user.user.avatar as string"
-                     class="rounded-full border border-solid border-gray-200"/>
+                     class="rounded-full border border-solid border-gray-200 w-10 h-10 shadow-lg"/>
             </a-tooltip>
             <div v-else>
                 <img v-if="!user.isInit||!user.user.id"
-                     class="rounded-full border border-solid border-gray-200"
+                     class="rounded-full border border-solid border-gray-200 w-10 h-10 shadow-lg"
                      src="./../assets/image/avatar.svg"/>
                 <img v-else :src="user.user.avatar as string"
-                     class="rounded-full border border-solid border-gray-200"/>
+                     class="rounded-full border border-solid border-gray-200 w-10 h-10 shadow-lg"/>
             </div>
         </div>
         <div class="flex-grow mt-2">
