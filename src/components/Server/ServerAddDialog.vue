@@ -197,7 +197,7 @@ const emit = defineEmits({
                 <div v-if="!modelInfo.name">
                     <div class="px-3">
                         <div>
-                            <img class="w-32 h-32 object-contain m-auto"
+                            <img class="w-48 h-48 object-contain m-auto"
                                  src="./../../assets/image/server-folder.svg"/>
                         </div>
                         <div class="flex gap-4">
@@ -217,12 +217,16 @@ const emit = defineEmits({
                                 {{ t('模型市场') }}
                             </a>
                         </div>
-                        <div class="mt-3 text-sm text-gray-400 rounded-lg">
-                            {{ $t('模型离线运行在本地，对电脑性能有要求') }}
-                            <a-tooltip
-                                :content="'①'+$t('访问官方模型市场，下载模型到本地')+' ②'+$t('解压模型压缩包，选择目录中的config.json文件')">
-                                <icon-question-circle/>
-                            </a-tooltip>
+                        <div class="mt-5 text-sm bg-gray-100 p-5 rounded-lg text-gray-400 leading-6 text-center">
+                            <div>
+                                {{ $t('模型离线运行在本地，对电脑性能有要求') }}
+                            </div>
+                            <div>
+                                {{ '① ' + $t('访问官方模型市场，下载模型到本地') }}
+                            </div>
+                            <div>
+                                {{ '② ' + $t('解压模型压缩包，选择目录中的config.json文件') }}
+                            </div>
                         </div>
                     </div>
                 </div>

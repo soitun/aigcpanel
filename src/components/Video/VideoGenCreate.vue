@@ -9,7 +9,6 @@ import {t} from "../../lang";
 import {VideoTemplateRecord, VideoTemplateService} from "../../service/VideoTemplateService";
 import {EnumServerStatus} from "../../types/Server";
 import ParamForm from "../common/ParamForm.vue";
-import {mapError} from "../../lib/error";
 import {PermissionService} from "../../service/PermissionService";
 import ServerContentInfoAction from "../Server/ServerContentInfoAction.vue";
 import {TaskRecord, TaskService} from "../../service/TaskService";
@@ -54,19 +53,10 @@ watch(() => formData.value.soundType, async (value) => {
     immediate: true
 })
 
-watch(() => formData.value.serverKey, async (value) => {
-    // console.log('formData.serverKey', value)
-    const server = await serverStore.getByKey(value)
-    if (server) {
-        const res = await window.$mapi.server.config(await serverStore.serverInfo(server))
-        if (res.code) {
-            Dialog.tipError(mapError(res.msg))
-            return
-        }
-        formDataParam.value = res.data.functions.videoGen?.param || []
-        modelConfig.value = res.data
-    }
-})
+const onServerUpdate = async (config: any) => {
+    formDataParam.value = config.functions.videoGen?.param || []
+    modelConfig.value = config
+}
 
 onMounted(async () => {
     videoTemplateRecords.value = await VideoTemplateService.list()
@@ -197,7 +187,7 @@ defineExpose({
                 </a-tooltip>
             </div>
             <div class="mr-3 w-96 flex-shrink-0">
-                <ServerSelector v-model="formData.serverKey" functionName="videoGen"/>
+                <ServerSelector v-model="formData.serverKey"  @update="onServerUpdate" functionName="videoGen"/>
             </div>
         </div>
         <div class="flex items-center h-12">
