@@ -6,17 +6,31 @@ import {Apps} from "../app";
 import {Files} from "../file/main";
 import fs from 'node:fs'
 import User, {UserApi} from "../user/main";
-import {EncodeUtil, MemoryCacheUtil, MemoryMapCacheUtil} from "../../lib/util";
+import {EncodeUtil, MemoryMapCacheUtil} from "../../lib/util";
 import {ServerContext, ServerFunctionDataType} from "./type";
+import {Log} from "../log/main";
 
-const request = async (url, data?: {}, option?: {}) => {
+type RequestOptionType = {
+    method?: 'POST' | 'GET',
+    timeout?: number,
+    headers?: Record<string, string>,
+    responseType?: 'json' | 'text',
+    retry?: number,
+    retryTimes?: number,
+    retryInterval?: number,
+}
+
+const request = async (url, data?: {}, option?: RequestOptionType) => {
     option = Object.assign({
         method: 'GET',
         timeout: 60 * 1000,
         headers: {
             'Content-Type': 'application/json'
         },
-        responseType: 'json' as 'json'
+        responseType: 'json' as 'json',
+        retry: 0,
+        retryTimes: 0,
+        retryInterval: 5,
     }, option)
     if (option['method'] === 'GET') {
         url += '?'
@@ -40,7 +54,15 @@ const request = async (url, data?: {}, option?: {}) => {
                     try {
                         resolve(JSON.parse(body))
                     } catch (e) {
-                        resolve({code: -1, msg: `ResponseError: ${body}`})
+                        if (option.retry > 0 && option.retryTimes < option.retry) {
+                            option.retryTimes++
+                            Log.info('request', `retry ${option.retryTimes} ${url}`)
+                            setTimeout(() => {
+                                request(url, data, option).then(resolve).catch(reject)
+                            }, option.retryInterval * 1000)
+                        } else {
+                            resolve({code: -1, msg: `ResponseError: ${body}`})
+                        }
                     }
                 } else {
                     resolve(body)
@@ -48,7 +70,15 @@ const request = async (url, data?: {}, option?: {}) => {
             })
         })
         req.on('error', (err) => {
-            reject(err)
+            if (option.retry > 0 && option.retryTimes < option.retry) {
+                option.retryTimes++
+                Log.info('request', `retry ${option.retryTimes} ${url}`)
+                setTimeout(() => {
+                    request(url, data, option).then(resolve).catch(reject)
+                }, option.retryInterval * 1000)
+            } else {
+                reject(err)
+            }
         })
         if (option['method'] === 'POST') {
             req.write(JSON.stringify(data))
@@ -57,21 +87,21 @@ const request = async (url, data?: {}, option?: {}) => {
     })
 }
 
-const requestPost = async (url, data?: {}, option?: {}) => {
+const requestPost = async (url, data?: {}, option?: RequestOptionType) => {
     option = Object.assign({
         method: 'POST',
-    })
+    }, option)
     return request(url, data, option)
 }
 
-const requestGet = async (url, data?: {}, option?: {}) => {
+const requestGet = async (url, data?: {}, option?: RequestOptionType) => {
     option = Object.assign({
         method: 'GET',
-    })
+    }, option)
     return request(url, data, option)
 }
 
-const requestPostSuccess = async (url, data?: {}, option?: {}) => {
+const requestPostSuccess = async (url, data?: {}, option?: RequestOptionType) => {
     const res = await requestPost(url, data, option)
     if (res['code'] === 0) {
         return res
@@ -234,6 +264,8 @@ const launcherSubmitAndQuery = async (context: ServerContext, data: ServerFuncti
         await sleep(5000)
         const queryRet = await requestPost(`${context.url()}query`, {
             token: submitRet.data.token
+        }, {
+            retry: 3,
         }) as any
         // console.log('queryRet', JSON.stringify(queryRet))
         if (queryRet.code) {
