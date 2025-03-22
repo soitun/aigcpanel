@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const doDownload = async () => {
     const record = props.record
-    const title = `${t('声音克隆')}_${record.id}_${contentToFilenamePathPart(record.text)}.wav`
+    const title = `${t('声音克隆')}_${record.id}_${contentToFilenamePathPart(record.modelConfig.text)}.wav`
     let filePath = await window.$mapi.file.openSave({
         defaultPath: title
     })
@@ -19,9 +19,9 @@ const doDownload = async () => {
         if (!filePath.endsWith('.wav')) {
             filePath = filePath + '.wav'
         }
-        // console.log('filePath', record.resultWav, filePath)
+        // console.log('filePath', record.result.url, filePath)
         try {
-            await window.$mapi.file.copy(record.resultWav as string, filePath, {isFullPath: true})
+            await window.$mapi.file.copy(record.result.url as string, filePath, {isFullPath: true})
         } catch (e) {
             console.error(e)
             Dialog.tipError(mapError(e))
@@ -35,7 +35,7 @@ const doDownload = async () => {
 <template>
     <a-tooltip :content="$t('下载')">
         <a-button class="mr-2"
-                  :disabled="!record.resultWav"
+                  :disabled="!record.result.url"
                   @click="doDownload()">
             <template #icon>
                 <icon-download/>

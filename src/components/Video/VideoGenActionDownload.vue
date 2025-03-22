@@ -18,9 +18,9 @@ const doDownload = async () => {
         if (!filePath.endsWith('.mp4')) {
             filePath = filePath + '.mp4'
         }
-        // console.log('filePath', record.resultMp4, filePath)
+        // console.log('filePath', record.result.url, filePath)
         try {
-            await window.$mapi.file.copy(record.resultMp4 as string, filePath, {isFullPath: true})
+            await window.$mapi.file.copy(record.result.url as string, filePath, {isFullPath: true})
         } catch (e) {
             console.error(e)
             Dialog.tipError(mapError(e))
@@ -34,7 +34,7 @@ const doDownload = async () => {
 <template>
     <a-tooltip :content="$t('下载')">
         <a-button class="mr-2"
-                  :disabled="!record.resultMp4"
+                  :disabled="!record.result.url"
                   @click="doDownload()">
             <template #icon>
                 <icon-download/>
