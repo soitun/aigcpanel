@@ -54,12 +54,6 @@ const typeName = (type: string) => {
                     </template>
                     {{ $t('添加模型服务') }}
                 </a-button>
-                <a-button v-if="0" class="ml-1">
-                    <template #icon>
-                        <icon-apps/>
-                    </template>
-                    {{ $t('添加云端模型') }}
-                </a-button>
             </div>
         </div>
         <div class="-mx-2">
@@ -93,7 +87,7 @@ const typeName = (type: string) => {
                 </div>
                 <div v-if="helpShow" class="pt-5 text-center">
                     <div class="inline-block bg-gray-100 text-left rounded-lg p-6 leading-8">
-                        <div>① {{ $t('访问官方模型页面，下载模型到本地') }}</div>
+                        <div>① {{ $t('访问官方模型市场，下载模型到本地') }}</div>
                         <div>② {{ $t('解压模型压缩包，选择目录中的config.json文件') }}</div>
                         <div class="pt-3">
                             {{ $t('更多内容，请查看') }}

@@ -195,48 +195,34 @@ const emit = defineEmits({
         <div>
             <div class="select-none">
                 <div v-if="!modelInfo.name">
-                    <div class="flex">
-                        <div class="w-1/2 px-3">
-                            <div>
-                                <img class="w-32 h-32 object-contain m-auto"
-                                     src="./../../assets/image/server-folder.svg"/>
-                            </div>
-                            <div>
-                                <a-button @click="doSelectLocalDir"
-                                          class="block w-full"
-                                          :loading="loading">
-                                    <template #icon>
-                                        <icon-folder/>
-                                    </template>
-                                    {{ t('选择本地模型') }}
-                                </a-button>
-                            </div>
-                            <div class="mt-3 text-sm text-gray-400 rounded-lg">
-                                {{ $t('模型离线运行在本地，对电脑性能有要求') }}
-                                <a-tooltip
-                                    :content="'①'+$t('访问官方模型页面，下载模型到本地')+' ②'+$t('解压模型压缩包，选择目录中的config.json文件')">
-                                    <icon-question-circle/>
-                                </a-tooltip>
-                            </div>
+                    <div class="px-3">
+                        <div>
+                            <img class="w-32 h-32 object-contain m-auto"
+                                 src="./../../assets/image/server-folder.svg"/>
                         </div>
-                        <div class="w-1/2 px-3">
-                            <div>
-                                <img class="w-32 h-32 object-contain m-auto"
-                                     src="./../../assets/image/server-file.svg"/>
-                            </div>
-                            <div>
-                                <a-button @click="doSelectCloud"
-                                          class="block w-full"
-                                          :loading="loading">
-                                    <template #icon>
-                                        <icon-desktop/>
-                                    </template>
-                                    {{ t('添加云端模型服务') }}
-                                </a-button>
-                            </div>
-                            <div class="mt-3 text-sm text-gray-400 rounded-lg">
-                                {{ $t('模型运行在云端，避免本地资源不足') }}
-                            </div>
+                        <div class="flex gap-4">
+                            <a-button @click="doSelectLocalDir"
+                                      class="block w-full"
+                                      type="primary"
+                                      :loading="loading">
+                                <template #icon>
+                                    <icon-folder/>
+                                </template>
+                                {{ t('选择本地模型') }}
+                                config.json
+                            </a-button>
+                            <a href="https://aigcpanel.com/zh/asset" target="_blank"
+                               class="arco-btn arco-btn-secondary arco-btn-shape-square arco-btn-size-medium arco-btn-status-normal block w-full text-center py-1">
+                                <icon-cloud/>
+                                {{ t('模型市场') }}
+                            </a>
+                        </div>
+                        <div class="mt-3 text-sm text-gray-400 rounded-lg">
+                            {{ $t('模型离线运行在本地，对电脑性能有要求') }}
+                            <a-tooltip
+                                :content="'①'+$t('访问官方模型市场，下载模型到本地')+' ②'+$t('解压模型压缩包，选择目录中的config.json文件')">
+                                <icon-question-circle/>
+                            </a-tooltip>
                         </div>
                     </div>
                 </div>
