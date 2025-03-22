@@ -15,10 +15,15 @@ const props = defineProps<{
 const doCancel = async () => {
     const record = props.record
     Dialog.loadingOn(t('正在停止运行'))
-    await sleep(500)
-    await serverStore.cancelByNameVersion(record.serverName, record.serverVersion)
-    Dialog.loadingOff()
-    Dialog.tipSuccess(t('停止运行成功'))
+    try {
+        await sleep(500)
+        await serverStore.cancelByNameVersion(record.serverName, record.serverVersion)
+        Dialog.loadingOff()
+        Dialog.tipSuccess(t('停止运行成功'))
+    } catch (e) {
+        Dialog.loadingOff()
+        Dialog.tipError(t('停止运行失败'))
+    }
 }
 const isCloud = computed(() => {
     return props.record.serverName.startsWith('Cloud')

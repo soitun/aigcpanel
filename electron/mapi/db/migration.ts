@@ -84,13 +84,13 @@ const versions = [
         up: async (db: DB) => {
             await db.execute(`ALTER TABLE data_sound_tts ADD COLUMN result TEXT`);
             await db.execute(`ALTER TABLE data_sound_clone ADD COLUMN result TEXT`);
-            await db.execute(`ALTER TABLE data_video_gen_delete ADD COLUMN result TEXT`);
+            await db.execute(`ALTER TABLE data_video_gen ADD COLUMN result TEXT`);
         }
     },
     {
         version:3,
         up: async (db: DB) => {
-            await db.execute(`ALTER TABLE data_video_gen_delete ADD COLUMN soundCustomFile TEXT`);
+            await db.execute(`ALTER TABLE data_video_gen ADD COLUMN soundCustomFile TEXT`);
         }
     },
     {
@@ -179,7 +179,7 @@ const versions = [
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, values)
             }
             // VideoGen
-            records = await db.select(`SELECT * FROM data_video_gen_delete`);
+            records = await db.select(`SELECT * FROM data_video_gen`);
             for(const r of records){
                 const values = [
                     'VideoGen',

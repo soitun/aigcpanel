@@ -128,7 +128,9 @@ export const serverStore = defineStore("server", {
                         record.status = createServerStatus(record)
                         record.runtime = getServerRuntimeComputedValue(record)
                     })
-                    this.records = records
+                    this.records = records.filter((record: ServerRecord) => {
+                        return record.type !== EnumServerType.CLOUD
+                    })
                 })
             await this.refresh()
         },
