@@ -1,0 +1,82 @@
+<script setup lang="ts">
+
+import {onMounted, ref} from "vue";
+import {t} from "../../lang";
+import {Dialog} from "../../lib/dialog";
+import VideoTemplateEditDialog from "../../components/Video/VideoTemplateEditDialog.vue";
+import {VideoTemplateRecord, VideoTemplateService} from "../../service/VideoTemplateService";
+import VideoPlayer from "../../components/common/VideoPlayer.vue";
+
+const editDialog = ref<InstanceType<typeof VideoTemplateEditDialog>>()
+const records = ref<VideoTemplateRecord[]>([])
+const loading = ref(true)
+
+const doRefresh = async () => {
+    loading.value = true
+    records.value = await VideoTemplateService.list()
+    loading.value = false
+}
+
+onMounted(async () => {
+    await doRefresh()
+})
+
+const doDelete = async (record: VideoTemplateRecord) => {
+    await Dialog.confirm(t('确认删除？'))
+    await VideoTemplateService.delete(record)
+    await doRefresh()
+}
+
+const onUpdate = async () => {
+    await doRefresh()
+}
+</script>
+
+<template>
+    <div class="p-5">
+        <div class="mb-4 flex items-center">
+            <div class="text-3xl font-bold flex-grow">
+                {{ $t('我的形象') }}
+            </div>
+            <div class="flex items-center">
+                <a-button @click="editDialog?.add()">
+                    <template #icon>
+                        <icon-plus/>
+                    </template>
+                    {{ $t('添加') }}
+                </a-button>
+            </div>
+        </div>
+        <div>
+            <m-empty v-if="!records.length&&!loading"/>
+            <m-loading v-else-if="!records.length&&loading" page/>
+            <div class="flex flex-wrap -mx-2">
+                <div v-for="r in records" :key="r.id" class="w-1/3 flex-shrink-0 p-2">
+                    <div class="rounded-xl shadow border p-4 hover:shadow-lg">
+                        <div class="flex mb-3">
+                            <div class="flex-grow">
+                                <div class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-8 h-8">
+                                    {{ r.name }}
+                                </div>
+                            </div>
+                            <div>
+                                <a-button @click="doDelete(r)">
+                                    <template #icon>
+                                        <icon-delete/>
+                                    </template>
+                                </a-button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="h-48 bg-black p-2 rounded-lg">
+                                <VideoPlayer :url="'file://'+r.video"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <VideoTemplateEditDialog @update="onUpdate" ref="editDialog"/>
+</template>
+

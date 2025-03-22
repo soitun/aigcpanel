@@ -140,10 +140,20 @@ export const TaskService = {
                                       FROM ${this.tableName()}
                                       WHERE id = ?`, [record.id])
     },
-    async saveFile(file: string) {
-        return await window.$mapi.file.hubSave(file, {
-            isFullPath: true,
-            returnFullPath: true,
-        })
-    },
+    async count(biz: TaskBiz, startTime: number = 0, endTime: number = 0) {
+        let sql = `SELECT COUNT(*) as cnt
+                   FROM ${this.tableName()}
+                   WHERE biz = ?`
+        let params: any[] = [biz]
+        if (startTime > 0) {
+            sql += ` AND createdAt >= ?`
+            params.push(startTime)
+        }
+        if (endTime > 0) {
+            sql += ` AND createdAt <= ?`
+            params.push(endTime)
+        }
+        const result = await window.$mapi.db.first(sql, params)
+        return result.cnt
+    }
 }

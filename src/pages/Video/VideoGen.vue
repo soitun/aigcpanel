@@ -1,6 +1,5 @@
 <script setup lang="ts">
 
-import VideoTemplateDialog from "../../components/Video/VideoTemplateDialog.vue";
 import {onBeforeUnmount, onMounted, ref} from "vue";
 import VideoGenCreate from "../../components/Video/VideoGenCreate.vue";
 import {TaskChangeType, useTaskStore} from "../../store/modules/task";
@@ -13,7 +12,6 @@ import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam
 import AudioPlayer from "../../components/common/AudioPlayer.vue";
 import {TaskRecord, TaskService} from "../../service/TaskService";
 
-const videoTemplateDialog = ref<InstanceType<typeof VideoTemplateDialog> | null>(null)
 const videoGenCreate = ref<InstanceType<typeof VideoGenCreate> | null>(null)
 
 const records = ref<TaskRecord[]>([])
@@ -44,13 +42,6 @@ onBeforeUnmount(() => {
                 {{ $t('视频合成') }}
             </div>
             <div class="flex items-center">
-                <a-button class="ml-1"
-                          @click="videoTemplateDialog?.show()">
-                    <template #icon>
-                        <i class="iconfont icon-video-template"></i>
-                    </template>
-                    {{ $t('视频模板') }}
-                </a-button>
                 <a-tooltip v-if="0"
                            :content="$t('清空历史')" position="right">
                     <a-button class="ml-1">
@@ -149,9 +140,4 @@ onBeforeUnmount(() => {
             </div>
         </div>
     </div>
-    <VideoTemplateDialog ref="videoTemplateDialog" @update="videoGenCreate?.refresh('videoTemplate')"/>
 </template>
-
-<style scoped>
-
-</style>

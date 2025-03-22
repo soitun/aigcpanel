@@ -40,7 +40,7 @@ const typeName = (type: string) => {
 </script>
 
 <template>
-    <div class="pb-device-container p-8 min-h-full relative select-none">
+    <div class="pb-device-container bg-white p-8 min-h-full relative select-none">
         <div class="mb-4 flex items-center">
             <div class="text-3xl font-bold flex-grow">
                 {{ $t('模型') }}

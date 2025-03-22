@@ -5,7 +5,6 @@ import {onMounted, ref, watch} from "vue";
 import {useServerStore} from "../../store/modules/server";
 import {Dialog} from "../../lib/dialog";
 import {StorageUtil} from "../../lib/storage";
-import {useSoundClonePromptStore} from "../../store/modules/soundClonePrompt";
 import {t} from "../../lang";
 import {EnumServerStatus} from "../../types/Server";
 import ParamForm from "../common/ParamForm.vue";
@@ -13,26 +12,28 @@ import {mapError} from "../../lib/error";
 import {PermissionService} from "../../service/PermissionService";
 import ServerContentInfoAction from "../Server/ServerContentInfoAction.vue";
 import {TaskRecord, TaskService} from "../../service/TaskService";
+import {StorageRecord, StorageService} from "../../service/StorageService";
 
 const modelConfig = ref(null)
 const paramForm = ref<InstanceType<typeof ParamForm> | null>(null)
-const soundClonePromptStore = useSoundClonePromptStore()
 const serverStore = useServerStore()
+const soundPrompts = ref<StorageRecord[]>([])
 
 const formData = ref({
     serverKey: '',
-    promptName: '',
+    promptId: 0,
     text: '',
     param: {}
 });
 const formDataParam = ref([])
 
-onMounted(() => {
+onMounted(async () => {
     const old = StorageUtil.getObject('SoundCloneCreate.formData')
     formData.value.serverKey = old.serverKey || ''
-    formData.value.promptName = old.promptName || ''
+    formData.value.promptId = old.promptName || 0
     formData.value.text = old.text || ''
     formData.value.param = old.param || {}
+    soundPrompts.value = await StorageService.list('SoundPrompt')
 })
 
 watch(() => formData.value, async (value) => {
@@ -61,13 +62,13 @@ const doSubmit = async () => {
         Dialog.tipError(t('请选择模型'))
         return
     }
-    if (!formData.value.promptName) {
-        Dialog.tipError(t('请选择声音角色'))
+    if (!formData.value.promptId) {
+        Dialog.tipError(t('请选择音色'))
         return
     }
-    const prompt = await soundClonePromptStore.getByName(formData.value.promptName)
+    const prompt = await StorageService.get(formData.value.promptId)
     if (!prompt) {
-        Dialog.tipError(t('声音角色不存在'))
+        Dialog.tipError(t('音色不存在'))
         return
     }
     if (!formData.value.text) {
@@ -84,14 +85,15 @@ const doSubmit = async () => {
         return
     }
     const record: TaskRecord = {
-        biz:'SoundClone',
+        biz: 'SoundClone',
         serverName: server.name,
         serverTitle: server.title,
         serverVersion: server.version,
         modelConfig: {
-            promptName: prompt.name,
-            promptWav: prompt.promptWav,
-            promptText: prompt.promptText,
+            promptId: prompt.id,
+            promptName: prompt.title,
+            promptWav: prompt.content.url,
+            promptText: prompt.content.promptText,
             text: formData.value.text,
         },
         param: formData.value.param,
@@ -123,15 +125,19 @@ const emit = defineEmits({
                 <ServerSelector v-model="formData.serverKey" functionName="soundClone"/>
             </div>
             <div class="mr-1">
-                <a-tooltip :content="$t('声音角色')">
+                <a-tooltip :content="$t('音色')">
                     <i class="iconfont icon-sound-prompt"></i>
                 </a-tooltip>
             </div>
             <div class="mr-3 w-48">
-                <a-select :placeholder="$t('声音角色')" size="small"
-                          v-model="formData.promptName">
-                    <a-option v-for="s in soundClonePromptStore.records">
-                        {{ s.name }}
+                <a-select :placeholder="$t('音色')" size="small"
+                          v-model="formData.promptId">
+                    <a-option :value="0">
+                        {{ $t('请选择') }}
+                    </a-option>
+                    <a-option v-for="s in soundPrompts"
+                              :value="s.id">
+                        {{ s.title }}
                     </a-option>
                 </a-select>
             </div>

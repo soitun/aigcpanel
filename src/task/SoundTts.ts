@@ -1,6 +1,7 @@
 import {TaskBiz} from "../store/modules/task";
 import {useServerStore} from "../store/modules/server";
 import {TaskService} from "../service/TaskService";
+import {DataService} from "../service/DataService";
 
 const serverStore = useServerStore()
 
@@ -88,7 +89,7 @@ export const SoundTts: TaskBiz = {
             status: 'success',
             endTime: Date.now(),
             result: {
-                url: await TaskService.saveFile(record.jobResult.data.data.filePath)
+                url: await DataService.saveFile(record.jobResult.data.data.filePath)
             }
         })
     },

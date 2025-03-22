@@ -1,7 +1,6 @@
 <script setup lang="ts">
 
 import AudioPlayer from "../../components/common/AudioPlayer.vue";
-import SoundClonePromptDialog from "../../components/Sound/SoundClonePromptDialog.vue";
 import {onBeforeUnmount, onMounted, ref} from "vue";
 import {TaskChangeType, useTaskStore} from "../../store/modules/task";
 import SoundCloneCreate from "../../components/Sound/SoundCloneCreate.vue";
@@ -11,8 +10,6 @@ import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
 import SoundDuration from "../../components/Sound/SoundDuration.vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
 import {TaskRecord, TaskService} from "../../service/TaskService";
-
-const soundClonePromptDialog = ref<InstanceType<typeof SoundClonePromptDialog>>()
 
 const records = ref<TaskRecord[]>([])
 const taskStore = useTaskStore()
@@ -42,12 +39,6 @@ const doRefresh = async () => {
                 {{ $t('声音克隆') }}
             </div>
             <div class="flex items-center">
-                <a-button class="ml-1" @click="soundClonePromptDialog?.show()">
-                    <template #icon>
-                        <i class="iconfont icon-sound-prompt"></i>
-                    </template>
-                    {{ $t('声音角色') }}
-                </a-button>
                 <a-tooltip v-if="0"
                            :content="$t('清空历史')" position="right">
                     <a-button class="ml-1">
@@ -60,7 +51,6 @@ const doRefresh = async () => {
         </div>
         <div>
             <SoundCloneCreate @submitted="doRefresh"/>
-
             <div>
                 <div v-for="r in records" :key="r.id">
                     <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
@@ -115,7 +105,6 @@ const doRefresh = async () => {
 
         </div>
     </div>
-    <SoundClonePromptDialog ref="soundClonePromptDialog"/>
 </template>
 
 <style scoped>

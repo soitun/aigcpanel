@@ -12,12 +12,11 @@ const setting = useSettingStore()
 
 const activeTab = computed(() => {
     switch (route.currentRoute.value.path) {
+        case '/':
         case '/home':
             return 'home'
         case '/server':
             return 'server'
-        // case '/sound':
-        //     return 'sound'
         case '/setting':
             return 'setting'
         case '/video':
@@ -59,6 +58,15 @@ const doUser = async () => {
         </div>
         <div class="flex-grow mt-2">
             <a class="page-nav-item block text-center py-3"
+               :class="activeTab==='home'?'active':''"
+               @click="$router.push('/')"
+               href="javascript:;">
+                <div>
+                    <icon-home class="text-xl" />
+                </div>
+                <div class="text-sm">{{ $t('首页') }}</div>
+            </a>
+            <a class="page-nav-item block text-center py-3"
                :class="activeTab==='video'?'active':''"
                @click="$router.push('/video')"
                href="javascript:;">
@@ -67,15 +75,6 @@ const doUser = async () => {
                 </div>
                 <div class="text-sm">{{ $t('数字人') }}</div>
             </a>
-<!--            <a class="page-nav-item block text-center py-3"-->
-<!--               :class="activeTab==='sound'?'active':''"-->
-<!--               @click="$router.push('/sound')"-->
-<!--               href="javascript:;">-->
-<!--                <div>-->
-<!--                    <icon-sound class="text-xl"/>-->
-<!--                </div>-->
-<!--                <div class="text-sm">{{ $t('声音') }}</div>-->
-<!--            </a>-->
             <a class="page-nav-item block text-center py-3"
                :class="activeTab==='server'?'active':''"
                @click="$router.push('/server')"

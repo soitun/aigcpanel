@@ -38,7 +38,7 @@ onBeforeUnmount(() => {
 </style>
 
 <template>
-    <div class="flex select-none">
+    <div class="flex select-none bg-white">
         <div ref="tabContainer"
              class="p-8 w-56 flex-shrink-0 border-r border-solid border-gray-100 dark:border-gray-600">
             <div data-section="basic" class="p-2 rounded-lg mr-2 mb-4 cursor-pointer menu-active">

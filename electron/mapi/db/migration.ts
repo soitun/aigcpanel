@@ -1,3 +1,5 @@
+import StorageMain from "../storage/main";
+
 const versions = [
     {
         version: 0,
@@ -81,7 +83,7 @@ const versions = [
         version:2,
         up: async (db: DB) => {
             await db.execute(`ALTER TABLE data_sound_tts ADD COLUMN result TEXT`);
-            await db.execute(`ALTER TABLE data_sound_clone_delete ADD COLUMN result TEXT`);
+            await db.execute(`ALTER TABLE data_sound_clone ADD COLUMN result TEXT`);
             await db.execute(`ALTER TABLE data_video_gen_delete ADD COLUMN result TEXT`);
         }
     },
@@ -96,6 +98,9 @@ const versions = [
         up: async (db: DB) => {
             await db.execute(`CREATE TABLE IF NOT EXISTS data_task (
                    id INTEGER PRIMARY KEY,
+
+                   createdAt INTEGER DEFAULT (strftime('%s', 'now')),
+                   updatedAt INTEGER DEFAULT (strftime('%s', 'now')),
 
                    biz TEXT,
 
@@ -121,7 +126,7 @@ const versions = [
         up: async (db: DB) => {
             // await db.execute(`DELETE FROM data_task where 1=1`);
             // SoundClone
-            let records = await db.select(`SELECT * FROM data_sound_clone_delete`);
+            let records = await db.select(`SELECT * FROM data_sound_clone`);
             for(const r of records){
                 const values = [
                     'SoundClone',
@@ -207,6 +212,42 @@ const versions = [
             }
         }
     },
+    {
+        version:6,
+        up: async (db: DB) => {
+            await db.execute(`CREATE TABLE IF NOT EXISTS data_storage (
+                   id INTEGER PRIMARY KEY,
+
+                   createdAt INTEGER DEFAULT (strftime('%s', 'now')),
+                   updatedAt INTEGER DEFAULT (strftime('%s', 'now')),
+
+                   biz TEXT,
+
+                   title TEXT,
+                   sort INTEGER,
+                   content TEXT
+
+            )`);
+        }
+    },
+    {
+        version:7,
+        up:async(db: DB) => {
+            const records = await StorageMain.get("soundClonePrompt", "records", []);
+            for(const r of records) {
+                const values = [
+                    'SoundPrompt',
+                    r.name,
+                    JSON.stringify({
+                        url: r.promptWav,
+                        promptText: r.promptText,
+                    }),
+                ]
+                await db.insert(`INSERT INTO data_storage (biz, title, content)
+                                 VALUES (?, ?, ?)`, values)
+            }
+        }
+    }
 ]
 
 export default {
