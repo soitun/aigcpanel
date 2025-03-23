@@ -25,6 +25,8 @@
   - 声音模型 `CosyVoice-300M`
   - 声音模型 `CosyVoice-300M-Instruct`
   - 声音模型 `CosyVoice2-0.5b`
+  - 声音模型 `FishSpeech`
+  - 声音模型 `SparkTTS`
   - 视频模型 `MuseTalk`
   - 视频模型 `LatentSync`
   - 视频模型 `Wav2Lip`
