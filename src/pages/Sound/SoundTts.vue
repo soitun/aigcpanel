@@ -99,7 +99,7 @@ const doRefresh = async () => {
                                 show-wave
                                 :url="'file://'+r.result.url"/>
                         </div>
-                        <div class="pt-4 flex">
+                        <div class="pt-4 flex items-center">
                             <div class="flex-grow">
                                 <SoundTtsActionDownload :record="r"/>
                                 <SoundTtsActionDelete :record="r" @update="doRefresh"/>

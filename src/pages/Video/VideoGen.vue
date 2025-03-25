@@ -140,10 +140,7 @@ onBeforeUnmount(() => {
                                 </div>
                             </div>
                         </div>
-                        <div v-if="0">
-                            <pre>{{ r }}</pre>
-                        </div>
-                        <div class="pt-4 flex">
+                        <div class="pt-4 flex items-center">
                             <div class="flex-grow">
                                 <VideoGenActionDownload :record="r"/>
                                 <VideoGenActionDelete :record="r" @update="doRefresh"/>
