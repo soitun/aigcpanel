@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
+import ServerCloudDemoDialog from "./ServerCloudDemoDialog.vue";
+
+const demoDialog = ref<InstanceType<typeof ServerCloudDemoDialog> | null>(null)
 
 const props = defineProps({
     config: {
@@ -30,7 +33,8 @@ const content = computed(() => {
 </script>
 
 <template>
-    <a-button v-if="content" @click="visible=true">
+    <a-button v-if="content" class="mr-2" @click="visible=true">
+        <icon-info-circle class="mr-1"/>
         {{ $t('使用说明') }}
     </a-button>
     <a-modal
@@ -45,4 +49,11 @@ const content = computed(() => {
             <div v-html="content"></div>
         </div>
     </a-modal>
+    <a-button class="mr-2"
+              @click="demoDialog?.show(props.config as any)"
+              v-if="config&&config.demo&&config.demo.length">
+        <icon-eye/>
+        {{ $t('效果查看') }}
+    </a-button>
+    <ServerCloudDemoDialog ref="demoDialog"/>
 </template>

@@ -138,7 +138,7 @@ const emit = defineEmits({
         <div class="pt-4">
             <a-textarea v-model="formData.text" :placeholder="$t('输入语音内容开始克隆')"></a-textarea>
         </div>
-        <div class="pt-2">
+        <div class="pt-2 flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 {{ $t('开始克隆') }}
             </a-button>
