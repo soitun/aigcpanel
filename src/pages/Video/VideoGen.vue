@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import VideoGenCreate from "../../components/Video/VideoGenCreate.vue";
 import {TaskChangeType, useTaskStore} from "../../store/modules/task";
 import VideoGenActionDownload from "../../components/Video/VideoGenActionDownload.vue";
@@ -17,6 +17,11 @@ const videoGenCreate = ref<InstanceType<typeof VideoGenCreate> | null>(null)
 
 const records = ref<TaskRecord[]>([])
 const taskStore = useTaskStore()
+
+const page = ref(1)
+const recordsForPage = computed(() => {
+    return records.value.slice((page.value - 1) * 10, page.value * 10)
+})
 
 const doRefresh = async () => {
     records.value = await TaskService.list('VideoGen')
@@ -55,9 +60,11 @@ onBeforeUnmount(() => {
         </div>
         <div>
             <VideoGenCreate ref="videoGenCreate" @submitted="doRefresh"/>
-
             <div>
-                <div v-for="r in records" :key="r.id">
+                <div v-if="records.length>10" class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
+                    <a-pagination v-model:current="page" :total="records.length" :page-size="10" show-total/>
+                </div>
+                <div v-for="r in recordsForPage" :key="r.id">
                     <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
                         <div class="flex items-center">
                             <div class="flex-grow flex items-center">
@@ -136,10 +143,15 @@ onBeforeUnmount(() => {
                         <div v-if="0">
                             <pre>{{ r }}</pre>
                         </div>
-                        <div class="pt-4">
-                            <VideoGenActionDownload :record="r"/>
-                            <VideoGenActionDelete :record="r" @update="doRefresh"/>
-                            <TaskCancelAction :record="r"/>
+                        <div class="pt-4 flex">
+                            <div class="flex-grow">
+                                <VideoGenActionDownload :record="r"/>
+                                <VideoGenActionDelete :record="r" @update="doRefresh"/>
+                                <TaskCancelAction :record="r"/>
+                            </div>
+                            <div class="text-gray-400">
+                                <timeago :datetime="r['createdAt']*1000"/>
+                            </div>
                         </div>
                     </div>
                 </div>

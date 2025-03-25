@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import AudioPlayer from "../../components/common/AudioPlayer.vue";
-import {onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {TaskChangeType, useTaskStore} from "../../store/modules/task";
 import SoundCloneCreate from "../../components/Sound/SoundCloneCreate.vue";
 import SoundCloneActionDownload from "../../components/Sound/SoundCloneActionDownload.vue";
@@ -14,6 +14,11 @@ import TaskCancelAction from "../../components/Server/TaskCancelAction.vue";
 
 const records = ref<TaskRecord[]>([])
 const taskStore = useTaskStore()
+
+const page = ref(1)
+const recordsForPage = computed(() => {
+    return records.value.slice((page.value - 1) * 10, page.value * 10)
+})
 
 const taskChangeCallback = (bizId: string, type: TaskChangeType) => {
     doRefresh()
@@ -53,7 +58,10 @@ const doRefresh = async () => {
         <div>
             <SoundCloneCreate @submitted="doRefresh"/>
             <div>
-                <div v-for="r in records" :key="r.id">
+                <div v-if="records.length>10" class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
+                    <a-pagination v-model:current="page" :total="records.length" :page-size="10" show-total/>
+                </div>
+                <div v-for="r in recordsForPage" :key="r.id">
                     <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
                         <div class="flex items-center">
                             <div class="flex-grow flex items-center">
@@ -96,10 +104,15 @@ const doRefresh = async () => {
                                 show-wave
                                 :url="'file://'+r.result.url"/>
                         </div>
-                        <div class="pt-4">
-                            <SoundCloneActionDownload :record="r"/>
-                            <SoundCloneActionDelete :record="r" @update="doRefresh"/>
-                            <TaskCancelAction :record="r"/>
+                        <div class="pt-4 flex">
+                            <div class="flex-grow">
+                                <SoundCloneActionDownload :record="r"/>
+                                <SoundCloneActionDelete :record="r" @update="doRefresh"/>
+                                <TaskCancelAction :record="r"/>
+                            </div>
+                            <div class="text-gray-400">
+                                <timeago :datetime="r['createdAt']*1000"/>
+                            </div>
                         </div>
                     </div>
                 </div>

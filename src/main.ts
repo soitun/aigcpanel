@@ -7,6 +7,9 @@ import ArcoVue, {Message} from '@arco-design/web-vue'
 import ArcoVueIcon from '@arco-design/web-vue/es/icon'
 import '@arco-design/web-vue/dist/arco.css'
 
+import {enUS, zhCN} from 'date-fns/locale';
+import timeago from 'vue-timeago3'
+
 import {i18n, t} from "./lang";
 
 import './style.less'
@@ -21,6 +24,12 @@ const settingStore = useSettingStore()
 const app = createApp(App)
 app.use(ArcoVue)
 app.use(ArcoVueIcon)
+app.use(timeago, {
+    converterOptions: {
+        includeSeconds: false,
+    },
+    locale: zhCN,
+})
 app.use(CommonComponents)
 app.use(i18n)
 app.use(store)

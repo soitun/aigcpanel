@@ -187,7 +187,25 @@ defineExpose({
                 </a-tooltip>
             </div>
             <div class="mr-3 w-96 flex-shrink-0">
-                <ServerSelector v-model="formData.serverKey"  @update="onServerUpdate" functionName="videoGen"/>
+                <ServerSelector v-model="formData.serverKey" @update="onServerUpdate" functionName="videoGen"/>
+            </div>
+        </div>
+        <div class="flex items-center h-12">
+            <div class="mr-1">
+                <a-tooltip :content="$t('视频')">
+                    <i class="iconfont icon-video-template"></i>
+                    {{ $t('视频') }}
+                </a-tooltip>
+            </div>
+            <div class="mr-3 w-56 flex-shrink-0">
+                <a-select v-model="formData.videoTemplateId">
+                    <a-option :value="0">{{ $t('请选择') }}</a-option>
+                    <a-option v-for="record in videoTemplateRecords" :key="record.id" :value="record.id">
+                        <div>
+                            {{ record.name }}
+                        </div>
+                    </a-option>
+                </a-select>
             </div>
         </div>
         <div class="flex items-center h-12">
@@ -240,24 +258,6 @@ defineExpose({
                     </div>
                     <div v-else>{{ $t('选择本地文件') }}</div>
                 </a-button>
-            </div>
-        </div>
-        <div class="flex items-center h-12">
-            <div class="mr-1">
-                <a-tooltip :content="$t('视频')">
-                    <i class="iconfont icon-video-template"></i>
-                    {{ $t('视频') }}
-                </a-tooltip>
-            </div>
-            <div class="mr-3 w-56 flex-shrink-0">
-                <a-select v-model="formData.videoTemplateId">
-                    <a-option :value="0">{{ $t('请选择') }}</a-option>
-                    <a-option v-for="record in videoTemplateRecords" :key="record.id" :value="record.id">
-                        <div>
-                            {{ record.name }}
-                        </div>
-                    </a-option>
-                </a-select>
             </div>
         </div>
         <div class="flex items-center min-h-12" v-if="formDataParam.length>0">
