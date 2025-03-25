@@ -118,29 +118,6 @@ export const ServerCosyvoice: ServerContext = {
                 `,
                         param: [
                             {
-                                name: "speed",
-                                type: "slider",
-                                title: "语速",
-                                icon: "iconfont icon-speed",
-                                defaultValue: 1.0,
-                                placeholder: "请输入语速",
-                                min: 0.5,
-                                max: 2,
-                                step: 0.1,
-                                sliderMarks: {'0.5': '慢', '1': '正常', '2': '快'},
-                            },
-                            {
-                                name: "seed",
-                                type: "inputNumber",
-                                title: "随机种子",
-                                icon: "iconfont icon-seed",
-                                defaultValue: 0,
-                                placeholder: "请输入随机种子",
-                                tips: '相同的种子可以确保每次生成结果数据一致',
-                                min: 0,
-                                max: 999999,
-                            },
-                            {
                                 name: "crossLingual",
                                 type: "switch",
                                 title: "跨语种复刻",
@@ -169,29 +146,6 @@ export const ServerCosyvoice: ServerContext = {
                                     {label: "韩语女", value: "韩语女"},
                                 ]
                             },
-                            {
-                                name: "speed",
-                                type: "slider",
-                                title: "语速",
-                                icon: "iconfont icon-speed",
-                                defaultValue: 1.0,
-                                placeholder: "请输入语速",
-                                min: 0.5,
-                                max: 2,
-                                step: 0.1,
-                                sliderMarks: {'0.5': '慢', '1': '正常', '2': '快'},
-                            },
-                            {
-                                name: "seed",
-                                type: "inputNumber",
-                                title: "随机种子",
-                                icon: "iconfont icon-seed",
-                                tips: '相同的种子可以确保每次生成结果数据一致',
-                                defaultValue: 0,
-                                placeholder: "请输入随机种子",
-                                min: 0,
-                                max: 999999,
-                            }
                         ],
                     }
                 }
@@ -228,8 +182,8 @@ export const ServerCosyvoice: ServerContext = {
                     mode: 'local',
                     modelConfig: {
                         type: 'tts',
-                        seed: parseInt(data.param.seed),
-                        speed: parseFloat(data.param.speed),
+                        seed: 1,
+                        speed: 1,
                         text: data.text,
                         speakerId: data.param.speaker,
                     }
@@ -246,9 +200,9 @@ export const ServerCosyvoice: ServerContext = {
                     prompt_wav_upload: null,
                     prompt_wav_record: null,
                     instruct_text: "",
-                    seed: parseInt(data.param.seed),
+                    seed: 1,
                     stream: "false",
-                    speed: parseFloat(data.param.speed),
+                    speed: 1,
                 });
                 resultData.end = Date.now()
                 resultData.data.filePath = await this.ServerApi.file.temp('wav')
@@ -295,8 +249,8 @@ export const ServerCosyvoice: ServerContext = {
                     mode: 'local',
                     modelConfig: {
                         type: 'soundClone',
-                        seed: parseInt(data.param.seed),
-                        speed: parseFloat(data.param.speed),
+                        seed: 1,
+                        speed: 1,
                         text: data.text,
                         promptAudio: data.promptAudio,
                         promptText: data.promptText,
@@ -323,9 +277,9 @@ export const ServerCosyvoice: ServerContext = {
                     prompt_wav_upload: this.ServerApi.GradioHandleFile(data.promptAudio),
                     prompt_wav_record: null,
                     instruct_text: "",
-                    seed: parseInt(data.param.seed),
+                    seed: 1,
                     stream: "false",
-                    speed: parseFloat(data.param.speed),
+                    speed: 1,
                 });
                 // console.log('soundClone.result', result)
                 resultData.end = Date.now()

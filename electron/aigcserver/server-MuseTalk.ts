@@ -101,17 +101,7 @@ export const ServerMuseTalk: ServerContext = {
                 "functions": {
                     "videoGen": {
                         "param": [
-                            {
-                                name: "box",
-                                type: "inputNumber",
-                                title: "嘴巴张开度",
-                                defaultValue: -7,
-                                placeholder: "",
-                                tips: '嘴巴张开度可以控制生成视频中嘴巴的张开程度',
-                                min: -9,
-                                max: 9,
-                                step: 1,
-                            }
+
                         ]
                     },
                 }
@@ -153,7 +143,7 @@ export const ServerMuseTalk: ServerContext = {
                     modelConfig: {
                         video: data.videoFile,
                         audio: data.soundFile,
-                        box: data.param.box
+                        box: -7
                     }
                 })
                 resultData.end = result.endTime
@@ -164,7 +154,7 @@ export const ServerMuseTalk: ServerContext = {
                     'task_0:',
                     `  video_path: ${data.videoFile}`,
                     `  audio_path: ${data.soundFile}`,
-                    `  bbox_shift: ${data.param.box}`,
+                    `  bbox_shift: -7`,
                     '',
                 ].join('\n'), {
                     isFullPath: true
@@ -224,7 +214,7 @@ export const ServerMuseTalk: ServerContext = {
                 const payload = []
                 payload.push(this.ServerApi.GradioHandleFile(data.videoFile))
                 payload.push(this.ServerApi.GradioHandleFile(data.soundFile))
-                payload.push(parseInt(data.param.box))
+                payload.push(-7)
                 const result = await client.predict("/predict", payload);
                 console.log('videoGen.result', JSON.stringify(result))
                 resultData.end = Date.now()
