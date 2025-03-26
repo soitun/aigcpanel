@@ -41,7 +41,6 @@ export const SoundTts: TaskBiz = {
             param: record.param,
             result: record.result,
         })
-        // console.log('SoundTts.runFunc.res', res)
         if (res.code) {
             throw res.msg || 'SoundTts run fail'
         }

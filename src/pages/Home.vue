@@ -13,6 +13,8 @@ const usageData = ref({
     soundCloneToday: undefined,
     videoGen: undefined,
     videoGenToday: undefined,
+    videoGenFlow: undefined,
+    videoGenFlowToday: undefined,
 })
 
 onMounted(async () => {
@@ -26,6 +28,8 @@ onMounted(async () => {
         usageData.value.soundCloneToday = await TaskService.count('SoundClone', todayStartTimestamp)
         usageData.value.videoGen = await TaskService.count('VideoGen')
         usageData.value.videoGenToday = await TaskService.count('VideoGen', todayStartTimestamp)
+        usageData.value.videoGenFlow = await TaskService.count('VideoGenFlow')
+        usageData.value.videoGenFlowToday = await TaskService.count('VideoGenFlow', todayStartTimestamp)
     })
 })
 
@@ -126,6 +130,23 @@ onMounted(async () => {
                                         fontSize: '14px'
                                      }"
                                      :value="usageData.videoGenToday as any"/>
+                    </div>
+                </div>
+                <div class="flex-grow w-0">
+                    <div class="mb-3">
+                        {{ $t('一键合成') }}
+                    </div>
+                    <div class="font-bold text-2xl mb-3">
+                        <a-statistic animation placeholder="-" :value="usageData.videoGenFlow as any"/>
+                    </div>
+                    <div>
+                        {{ $t('今日') }} +
+                        <a-statistic animation placeholder="-"
+                                     :value-style="{
+                                        color: usageData.videoGenFlowToday && usageData.videoGenFlowToday > 0 ? 'green' : 'gray',
+                                        fontSize: '14px'
+                                     }"
+                                     :value="usageData.videoGenFlowToday as any"/>
                     </div>
                 </div>
             </div>

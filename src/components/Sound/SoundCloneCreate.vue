@@ -12,6 +12,7 @@ import {PermissionService} from "../../service/PermissionService";
 import ServerContentInfoAction from "../Server/ServerContentInfoAction.vue";
 import {TaskRecord, TaskService} from "../../service/TaskService";
 import {StorageRecord, StorageService} from "../../service/StorageService";
+import BatchTextareaInputAction from "../BatchTextareaInputAction.vue";
 
 const modelConfig = ref(null)
 const paramForm = ref<InstanceType<typeof ParamForm> | null>(null)
@@ -97,6 +98,54 @@ const doSubmit = async () => {
     emit('submitted')
 }
 
+const doSubmitBatch = async (records: { text: string }[]) => {
+    formData.value.param = paramForm.value?.getValue() || {}
+    if (!formData.value.serverKey) {
+        Dialog.tipError(t('请选择模型'))
+        return
+    }
+    if (!formData.value.promptId) {
+        Dialog.tipError(t('请选择音色'))
+        return
+    }
+    const prompt = await StorageService.get(formData.value.promptId)
+    if (!prompt) {
+        Dialog.tipError(t('音色不存在'))
+        return
+    }
+    const server = await serverStore.getByKey(formData.value.serverKey)
+    if (!server) {
+        Dialog.tipError(t('模型不存在'))
+        return
+    }
+    if (server.status !== EnumServerStatus.RUNNING) {
+        Dialog.tipError(t('模型未启动'))
+        return
+    }
+    for (const r of records) {
+        const record: TaskRecord = {
+            biz: 'SoundClone',
+            serverName: server.name,
+            serverTitle: server.title,
+            serverVersion: server.version,
+            modelConfig: {
+                promptId: prompt.id,
+                promptName: prompt.title,
+                promptWav: prompt.content.url,
+                promptText: prompt.content.promptText,
+                text: r.text,
+            },
+            param: formData.value.param,
+        }
+        if (!await PermissionService.checkForTask('SoundClone', record)) {
+            return
+        }
+        await TaskService.submit(record)
+    }
+    Dialog.tipSuccess(t('任务已经提交成功，等待克隆完成'))
+    emit('submitted')
+}
+
 const emit = defineEmits({
     submitted: () => true
 })
@@ -112,7 +161,7 @@ const emit = defineEmits({
                 </a-tooltip>
             </div>
             <div class="mr-3 w-96 flex-shrink-0">
-                <ServerSelector v-model="formData.serverKey"  @update="onServerUpdate" functionName="soundClone"/>
+                <ServerSelector v-model="formData.serverKey" @update="onServerUpdate" functionName="soundClone"/>
             </div>
             <div class="mr-1">
                 <a-tooltip :content="$t('音色')">
@@ -142,6 +191,7 @@ const emit = defineEmits({
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 {{ $t('开始克隆') }}
             </a-button>
+            <BatchTextareaInputAction :text="$t('批量克隆')" :confirm-text="$t('开始克隆')" @submit="doSubmitBatch"/>
             <ServerContentInfoAction :config="modelConfig as any" func="soundClone"/>
         </div>
     </div>

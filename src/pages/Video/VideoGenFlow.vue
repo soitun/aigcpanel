@@ -138,7 +138,6 @@ onBeforeUnmount(() => {
                             <div class="flex-grow">
                                 <VideoGenActionDownload :record="r"/>
                                 <TaskDeleteAction :record="r" @update="doRefresh"/>
-                                <TaskCancelAction :record="r"/>
                             </div>
                             <div class="text-gray-400">
                                 <timeago :datetime="r['createdAt']*1000"/>

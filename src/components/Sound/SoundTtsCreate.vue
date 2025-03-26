@@ -11,6 +11,7 @@ import {EnumServerStatus} from "../../types/Server";
 import ParamForm from "../common/ParamForm.vue";
 import {PermissionService} from "../../service/PermissionService";
 import ServerContentInfoAction from "../Server/ServerContentInfoAction.vue";
+import BatchTextareaInputAction from "../BatchTextareaInputAction.vue";
 
 const serverStore = useServerStore()
 
@@ -47,10 +48,6 @@ const doSubmit = async () => {
         Dialog.tipError(t('请选择模型'))
         return
     }
-    if (!formData.value.text) {
-        Dialog.tipError(t('请输入合成内容'))
-        return
-    }
     const server = await serverStore.getByKey(formData.value.serverKey)
     if (!server) {
         Dialog.tipError(t('模型不存在'))
@@ -58,6 +55,10 @@ const doSubmit = async () => {
     }
     if (server.status !== EnumServerStatus.RUNNING) {
         Dialog.tipError(t('模型未启动'))
+        return
+    }
+    if (!formData.value.text) {
+        Dialog.tipError(t('请输入合成内容'))
         return
     }
     const record: TaskRecord = {
@@ -75,6 +76,41 @@ const doSubmit = async () => {
     }
     const id = await TaskService.submit(record)
     formData.value.text = ''
+    Dialog.tipSuccess(t('任务已经提交成功，等待合成完成'))
+    emit('submitted')
+}
+
+const doSubmitBatch = async (records: { text: string }[]) => {
+    formData.value.param = paramForm.value?.getValue() || {}
+    const server = await serverStore.getByKey(formData.value.serverKey)
+    if (!formData.value.serverKey) {
+        Dialog.tipError(t('请选择模型'))
+        return
+    }
+    if (!server) {
+        Dialog.tipError(t('模型不存在'))
+        return
+    }
+    if (server.status !== EnumServerStatus.RUNNING) {
+        Dialog.tipError(t('模型未启动'))
+        return
+    }
+    for (const r of records) {
+        const record: TaskRecord = {
+            biz: 'SoundTts',
+            serverName: server.name,
+            serverTitle: server.title,
+            serverVersion: server.version,
+            modelConfig: {
+                text: r.text,
+            },
+            param: formData.value.param,
+        }
+        if (!await PermissionService.checkForTask('SoundTts', record)) {
+            return
+        }
+        await TaskService.submit(record)
+    }
     Dialog.tipSuccess(t('任务已经提交成功，等待合成完成'))
     emit('submitted')
 }
@@ -113,6 +149,7 @@ const emit = defineEmits({
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 {{ $t('开始合成') }}
             </a-button>
+            <BatchTextareaInputAction :text="$t('批量合成')" :confirm-text="$t('开始合成')" @submit="doSubmitBatch"/>
             <ServerContentInfoAction :config="modelConfig as any" func="soundTts"/>
         </div>
     </div>
