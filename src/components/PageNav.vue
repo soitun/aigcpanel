@@ -21,6 +21,10 @@ const activeTab = computed(() => {
             return 'setting'
         case '/video':
             return 'video'
+        case '/live':
+            return 'live'
+        case '/tool':
+            return 'tool'
     }
 })
 
@@ -62,7 +66,7 @@ const doUser = async () => {
                @click="$router.push('/')"
                href="javascript:;">
                 <div>
-                    <icon-home class="text-xl" />
+                    <icon-home class="text-xl"/>
                 </div>
                 <div class="text-sm">{{ $t('首页') }}</div>
             </a>
@@ -74,6 +78,26 @@ const doUser = async () => {
                     <i class="iconfont icon-human text-xl"></i>
                 </div>
                 <div class="text-sm">{{ $t('数字人') }}</div>
+            </a>
+            <a class="page-nav-item block text-center py-3"
+               v-if="0"
+               :class="activeTab==='tool'?'active':''"
+               @click="$router.push('/tool')"
+               href="javascript:;">
+                <div>
+                    <icon-tool class="text-xl"/>
+                </div>
+                <div class="text-sm">{{ $t('工具箱') }}</div>
+            </a>
+            <a class="page-nav-item block text-center py-3"
+               v-if="0"
+               :class="activeTab==='live'?'active':''"
+               @click="$router.push('/live')"
+               href="javascript:;">
+                <div>
+                    <icon-live-broadcast class="text-xl"/>
+                </div>
+                <div class="text-sm">{{ $t('直播') }}</div>
             </a>
             <a class="page-nav-item block text-center py-3"
                :class="activeTab==='server'?'active':''"

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 
-import {t} from "../lang";
 import {onMounted, ref} from "vue";
 import SoundTts from "./Sound/SoundTts.vue";
 import SoundClone from "./Sound/SoundClone.vue";
@@ -15,7 +14,6 @@ const tab = ref('');
 onMounted(() => {
     tab.value = Router.currentRoute.value.query.tab as string || 'soundTts';
 });
-
 </script>
 
 <template>
@@ -26,7 +24,23 @@ onMounted(() => {
                  @click="tab = 'soundTts'">
                 <div class="text-base">
                     <i class="iconfont icon-sound-generate w-6 inline-block"></i>
-                    {{ t('声音合成') }}
+                    直播形象
+                </div>
+            </div>
+            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+                 :class="tab === 'soundTts2' ? 'bg-gray-200' : ''"
+                 @click="tab = 'soundTts2'">
+                <div class="text-base">
+                    <i class="iconfont icon-sound-generate w-6 inline-block"></i>
+                    音色控制
+                </div>
+            </div>
+            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+                 :class="tab === 'soundTts1' ? 'bg-gray-200' : ''"
+                 @click="tab = 'soundTts'">
+                <div class="text-base">
+                    <i class="iconfont icon-sound-generate w-6 inline-block"></i>
+                    知识库
                 </div>
             </div>
             <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
@@ -34,39 +48,7 @@ onMounted(() => {
                  @click="tab = 'soundPrompt'">
                 <div class="text-base">
                     <i class="iconfont icon-sound-prompt w-6 inline-block"></i>
-                    {{ t('我的音色') }}
-                </div>
-            </div>
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
-                 :class="tab === 'soundClone' ? 'bg-gray-200' : ''"
-                 @click="tab = 'soundClone'">
-                <div class="text-base">
-                    <i class="iconfont icon-sound-clone w-6 inline-block"></i>
-                    {{ t('声音克隆') }}
-                </div>
-            </div>
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
-                 :class="tab === 'videoTemplate' ? 'bg-gray-200' : ''"
-                 @click="tab = 'videoTemplate'">
-                <div class="text-base">
-                    <i class="iconfont icon-video-template w-6 inline-block"></i>
-                    {{ t('我的形象') }}
-                </div>
-            </div>
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
-                 :class="tab === 'videoGen' ? 'bg-gray-200' : ''"
-                 @click="tab = 'videoGen'">
-                <div class="text-base">
-                    <i class="iconfont icon-video w-6 inline-block"></i>
-                    {{ t('视频合成') }}
-                </div>
-            </div>
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
-                 :class="tab === 'videoGenFlow' ? 'bg-gray-200' : ''"
-                 @click="tab = 'videoGenFlow'">
-                <div class="text-base">
-                    <i class="iconfont icon-quick w-6 inline-block"></i>
-                    {{ $t('一键合成') }}
+                    直播控制
                 </div>
             </div>
         </div>

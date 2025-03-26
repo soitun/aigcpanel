@@ -440,11 +440,6 @@ npm run build
     </tbody>
 </table>
 
-## 本程序中使用到了以下开源项目，特此感谢
-
-- [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)
-- [MuseTalk](https://github.com/TMElyralab/MuseTalk)
-
 ## License
 
 AGPL-3.0
