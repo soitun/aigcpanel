@@ -3,6 +3,7 @@ import {SoundTts} from "./SoundTts";
 import {nextTick} from "vue";
 import {SoundClone} from "./SoundClone";
 import {VideoGen} from "./VideoGen";
+import {VideoGenFlow} from "./VideoGenFlow";
 
 const taskStore = useTaskStore()
 
@@ -10,6 +11,7 @@ export const tasks = {
     SoundTts,
     SoundClone,
     VideoGen,
+    VideoGenFlow,
 }
 
 export const TaskManager = {

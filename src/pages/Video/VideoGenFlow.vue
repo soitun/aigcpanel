@@ -1,19 +1,19 @@
 <script setup lang="ts">
 
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
-import VideoGenCreate from "../../components/Video/VideoGenCreate.vue";
+import VideoGenFlowCreate from "../../components/Video/VideoGenFlowCreate.vue";
 import {TaskChangeType, useTaskStore} from "../../store/modules/task";
 import VideoGenActionDownload from "../../components/Video/VideoGenActionDownload.vue";
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
-import VideoGenActionDelete from "../../components/Video/VideoGenActionDelete.vue";
 import VideoPlayer from "../../components/common/VideoPlayer.vue";
 import VideoDuration from "../../components/Video/VideoDuration.vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
 import AudioPlayer from "../../components/common/AudioPlayer.vue";
 import {TaskRecord, TaskService} from "../../service/TaskService";
 import TaskCancelAction from "../../components/Server/TaskCancelAction.vue";
+import TaskDeleteAction from "../../components/Server/TaskDeleteAction.vue";
 
-const videoGenCreate = ref<InstanceType<typeof VideoGenCreate> | null>(null)
+const videoGenFlowCreate = ref<InstanceType<typeof VideoGenFlowCreate> | null>(null)
 
 const records = ref<TaskRecord[]>([])
 const taskStore = useTaskStore()
@@ -24,7 +24,7 @@ const recordsForPage = computed(() => {
 })
 
 const doRefresh = async () => {
-    records.value = await TaskService.list('VideoGen')
+    records.value = await TaskService.list('VideoGenFlow')
 }
 
 const taskChangeCallback = (bizId: string, type: TaskChangeType) => {
@@ -33,10 +33,10 @@ const taskChangeCallback = (bizId: string, type: TaskChangeType) => {
 
 onMounted(async () => {
     await doRefresh()
-    taskStore.onChange('VideoGen', taskChangeCallback)
+    taskStore.onChange('VideoGenFlow', taskChangeCallback)
 })
 onBeforeUnmount(() => {
-    taskStore.offChange('VideoGen', taskChangeCallback)
+    taskStore.offChange('VideoGenFlow', taskChangeCallback)
 })
 
 </script>
@@ -45,7 +45,7 @@ onBeforeUnmount(() => {
     <div class="p-5">
         <div class="mb-4 flex items-center">
             <div class="text-3xl font-bold flex-grow">
-                {{ $t('视频合成') }}
+                {{ $t('一键合成') }}
             </div>
             <div class="flex items-center">
                 <a-tooltip v-if="0"
@@ -59,7 +59,7 @@ onBeforeUnmount(() => {
             </div>
         </div>
         <div>
-            <VideoGenCreate ref="videoGenCreate" @submitted="doRefresh"/>
+            <VideoGenFlowCreate ref="videoGenFlowCreate" @submitted="doRefresh"/>
             <div>
                 <div v-if="records.length>10" class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
                     <a-pagination v-model:current="page" :total="records.length" :page-size="10" show-total/>
@@ -106,7 +106,7 @@ onBeforeUnmount(() => {
                                         </div>
                                     </div>
                                     <div class="pt-1">
-                                        {{ r.modelConfig.soundTtsText }}
+                                        {{ r.modelConfig.text }}
                                     </div>
                                 </div>
                                 <div v-if="r.modelConfig.soundType==='soundClone'" class="flex items-center">
@@ -117,23 +117,17 @@ onBeforeUnmount(() => {
                                         </div>
                                     </div>
                                     <div>
-                                        {{ r.modelConfig.soundCloneText }}
+                                        {{ r.modelConfig.text }}
                                     </div>
                                 </div>
-                                <div v-if="r.modelConfig.soundType==='soundCustom'" class="flex items-start">
-                                    <div class="mr-2 flex-shrink-0">
-                                        <div class="bg-gray-100 px-3 py-1 leading-6 rounded">
-                                            <icon-file/>
-                                            {{ $t('本地文件') }}
-                                        </div>
-                                    </div>
-                                    <div class="flex-grow">
-                                        <AudioPlayer :url="`file://${r.modelConfig.soundCustomFile}`"/>
-                                    </div>
+                                <div class="mt-3" v-if="r.status==='success' && r.result.urlSound">
+                                    <AudioPlayer
+                                        show-wave
+                                        :url="'file://'+r.result.urlSound"/>
                                 </div>
                             </div>
                             <div class="flex-shrink-0 ml-8">
-                                <div class="p-2 rounded shadow bg-gray-300" v-if="r.result.url">
+                                <div class="p-2 rounded shadow bg-gray-300" v-if="r.status==='success' && r.result.url">
                                     <div class="w-48 h-48" v-if="r.result.url">
                                         <VideoPlayer :url="'file://'+r.result.url"/>
                                     </div>
@@ -143,7 +137,7 @@ onBeforeUnmount(() => {
                         <div class="pt-4 flex items-center">
                             <div class="flex-grow">
                                 <VideoGenActionDownload :record="r"/>
-                                <VideoGenActionDelete :record="r" @update="doRefresh"/>
+                                <TaskDeleteAction :record="r" @update="doRefresh"/>
                                 <TaskCancelAction :record="r"/>
                             </div>
                             <div class="text-gray-400">

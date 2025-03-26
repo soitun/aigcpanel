@@ -176,7 +176,7 @@ ipcMain.handle('server:config', async (event, serverInfo: ServerInfo) => {
     }
 })
 
-ipcMain.handle('server:callFunction', async (event, serverInfo: ServerInfo, method: string, data: any) => {
+ipcMain.handle('server:callFunction', async (event, serverInfo: ServerInfo, method: string, data: any, option: any) => {
     // console.log('getModule.before', serverInfo, method)
     const module = await getModule(serverInfo)
     // console.log('getModule.end', serverInfo, method, module)
@@ -185,7 +185,7 @@ ipcMain.handle('server:callFunction', async (event, serverInfo: ServerInfo, meth
         throw new Error(`MethodNotFound : ${method}`)
     }
     try {
-        return await func.bind(module)(data)
+        return await func.bind(module)(data, option)
     } catch (e) {
         const error = mapError(e)
         Log.error('mapi.server.callFunction.error', {

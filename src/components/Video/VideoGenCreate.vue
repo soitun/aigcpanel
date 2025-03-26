@@ -192,9 +192,9 @@ defineExpose({
         </div>
         <div class="flex items-center h-12">
             <div class="mr-1">
-                <a-tooltip :content="$t('视频')">
+                <a-tooltip :content="$t('形象')">
                     <i class="iconfont icon-video-template"></i>
-                    {{ $t('视频') }}
+                    {{ $t('形象') }}
                 </a-tooltip>
             </div>
             <div class="mr-3 w-56 flex-shrink-0">
@@ -271,22 +271,3 @@ defineExpose({
         </div>
     </div>
 </template>
-
-<style lang="less" scoped>
-:deep(.arco-slider) {
-    margin-bottom: 0 !important;
-
-    .arco-slider-mark {
-        font-size: 10px !important;
-    }
-}
-
-:deep(.pb-seed-input) {
-    padding-left: 0;
-    padding-right: 0;
-
-    .arco-input {
-        text-align: center;
-    }
-}
-</style>

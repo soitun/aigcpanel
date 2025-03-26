@@ -33,13 +33,13 @@ const config = async (serverInfo: ServerInfo) => {
     return ipcRenderer.invoke('server:config', serverInfo)
 }
 
-const callFunction = async (serverInfo: ServerInfo, method: string, data: any) => {
-    return ipcRenderer.invoke('server:callFunction', serverInfo, method, data)
+const callFunction = async (serverInfo: ServerInfo, method: string, data: any, option: any) => {
+    return ipcRenderer.invoke('server:callFunction', serverInfo, method, data, option)
 }
 
-const callFunctionWithException = async (serverInfo: ServerInfo, method: string, data: any) => {
+const callFunctionWithException = async (serverInfo: ServerInfo, method: string, data: any, option: any) => {
     try {
-        return ipcRenderer.invoke('server:callFunction', serverInfo, method, data)
+        return ipcRenderer.invoke('server:callFunction', serverInfo, method, data, option)
     } catch (e) {
         return {
             code: -1,

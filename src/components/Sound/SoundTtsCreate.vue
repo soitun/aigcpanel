@@ -105,11 +105,11 @@ const emit = defineEmits({
         <div class="flex items-center min-h-12" v-if="formDataParam.length>0">
             <ParamForm ref="paramForm" :param="formDataParam"/>
         </div>
-        <div class="pt-4">
+        <div class="pt-2">
             <a-textarea v-model="formData.text"
                         :placeholder="$t('输入语音内容开始合成')"></a-textarea>
         </div>
-        <div class="pt-2">
+        <div class="pt-2 flex items-center">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 {{ $t('开始合成') }}
             </a-button>

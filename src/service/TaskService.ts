@@ -3,7 +3,7 @@ import {useTaskStore} from "../store/modules/task";
 
 const taskStore = useTaskStore()
 
-export type TaskBiz = 'SoundClone' | 'SoundTts' | 'VideoGen'
+export type TaskBiz = 'SoundClone' | 'SoundTts' | 'VideoGen' | 'VideoGenFlow'
 
 export type TaskRecord = {
     id?: number;
@@ -88,6 +88,7 @@ export const TaskService = {
             await taskStore.dispatch(record.biz, record.id as any, {}, {
                 status: status,
                 runStart: record.startTime,
+                queryInterval: 5 * 1000,
             })
         }
     },
@@ -105,12 +106,19 @@ export const TaskService = {
         const valuesPlaceholder = fields.map(f => '?')
         const id = await window.$mapi.db.insert(`INSERT INTO ${this.tableName()} (${fields.join(',')})
                                                  VALUES (${valuesPlaceholder.join(',')})`, values)
-        await taskStore.dispatch(record.biz, id)
+        await taskStore.dispatch(record.biz, id, {}, {
+            queryInterval: 5 * 1000
+        })
     },
     async update(id: number, record: Partial<TaskRecord>) {
-        if ('result' in record) {
+        if ('result' in record || 'jobResult' in record) {
             const recordOld = await this.get(id)
-            record.result = Object.assign(recordOld?.result, record.result)
+            if ('result' in record) {
+                record.result = Object.assign(recordOld?.result, record.result)
+            }
+            if ('jobResult' in record) {
+                record.jobResult = Object.assign(recordOld?.jobResult, record.jobResult)
+            }
         }
         record = this.encodeRecord(record as TaskRecord)
         const fields = Object.keys(record)
@@ -125,6 +133,9 @@ export const TaskService = {
         if (record.result) {
             if (record.result.url) {
                 filesForClean.push(record.result.url)
+            }
+            if (record.result.urlSound) {
+                filesForClean.push(record.result.urlSound)
             }
         }
         if (record.modelConfig) {

@@ -16,7 +16,7 @@ import {preloadDefault, rendererLoadPath} from "../lib/env-main";
 import {Page} from "../page";
 import {ConfigTray} from "../config/tray";
 import {icnsLogoPath, icoLogoPath, logoPath} from "../config/icon";
-import {isMac, isPackaged} from "../lib/env";
+import {isDev, isMac, isPackaged} from "../lib/env";
 import {executeHooks} from "../lib/hooks";
 import {DevToolsManager} from "../lib/devtools";
 import {AppsMain} from "../mapi/app/main";
@@ -138,7 +138,7 @@ async function createWindow() {
     if (isMac) {
         AppRuntime.mainWindow.on('close', (event) => {
             // @ts-ignore
-            if (!app.quitForce) {
+            if (!app.quitForce && !isDev) {
                 executeHooks(AppRuntime.mainWindow, 'ShowQuitConfirmDialog')
                 event.preventDefault();
             }

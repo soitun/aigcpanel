@@ -8,6 +8,7 @@ import VideoGen from "./Video/VideoGen.vue";
 import Router from "../router";
 import SoundPrompt from "./Sound/SoundPrompt.vue";
 import VideoTemplate from "./Video/VideoTemplate.vue";
+import VideoGenFlow from "./Video/VideoGenFlow.vue";
 
 const platformName = ref<'win' | 'osx' | 'linux' | null>(null);
 const tab = ref('');
@@ -62,13 +63,22 @@ onMounted(() => {
                     {{ t('视频合成') }}
                 </div>
             </div>
+            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+                 :class="tab === 'videoGenFlow' ? 'bg-gray-200' : ''"
+                 @click="tab = 'videoGenFlow'">
+                <div class="text-base">
+                    <i class="iconfont icon-quick w-6 inline-block"></i>
+                    一键合成
+                </div>
+            </div>
         </div>
         <div class="flex-grow h-full overflow-y-auto">
-            <SoundClone v-if="tab === 'soundClone'"/>
-            <SoundTts v-else-if="tab === 'soundTts'"/>
-            <VideoGen v-else-if="tab === 'videoGen'"/>
+            <SoundTts v-if="tab === 'soundTts'"/>
             <SoundPrompt v-else-if="tab==='soundPrompt'"/>
+            <SoundClone v-else-if="tab === 'soundClone'"/>
             <VideoTemplate v-else-if="tab==='videoTemplate'"/>
+            <VideoGen v-else-if="tab === 'videoGen'"/>
+            <VideoGenFlow v-else-if="tab === 'videoGenFlow'"/>
         </div>
     </div>
 </template>

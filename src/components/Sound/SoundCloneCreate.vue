@@ -135,7 +135,7 @@ const emit = defineEmits({
         <div class="flex items-center min-h-12" v-if="formDataParam.length>0">
             <ParamForm ref="paramForm" :param="formDataParam"/>
         </div>
-        <div class="pt-4">
+        <div class="pt-2">
             <a-textarea v-model="formData.text" :placeholder="$t('输入语音内容开始克隆')"></a-textarea>
         </div>
         <div class="pt-2 flex">

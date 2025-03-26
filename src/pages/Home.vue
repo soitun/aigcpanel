@@ -34,7 +34,7 @@ onMounted(async () => {
 <template>
     <div class="page-narrow-container p-6 pb-home h-full overflow-hidden">
         <div class="text-3xl font-bold mb-5">
-            {{ $t('欢迎使用 AigcPanel!') }}
+            {{ $t('欢迎使用 AigcPanel !') }}
         </div>
         <div class="mb-5">
             <div class="flex gap-5 pb-top-area">

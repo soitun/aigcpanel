@@ -1,6 +1,9 @@
 export const DataService = {
-    async saveFile(file: string) {
+    async saveFile(file: string, option?: {
+        ext: string
+    }) {
         return await window.$mapi.file.hubSave(file, {
+            ...option,
             isFullPath: true,
             returnFullPath: true,
         })

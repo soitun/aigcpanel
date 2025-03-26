@@ -104,10 +104,10 @@ export const SoundTts: TaskBiz = {
     },
 
     update: async (bizId, update) => {
-        if ('result' in update) {
-            const record = await TaskService.get(bizId as any)
-            if (record) {
-                update.result = Object.assign({}, record.result, update.result)
+        if ('startTime' in update) {
+            const result = await TaskService.get(bizId as any)
+            if (result?.startTime) {
+                delete update.startTime
             }
         }
         await TaskService.update(bizId as any, update)
