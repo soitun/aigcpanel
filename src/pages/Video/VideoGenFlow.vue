@@ -12,6 +12,8 @@ import AudioPlayer from "../../components/common/AudioPlayer.vue";
 import {TaskRecord, TaskService} from "../../service/TaskService";
 import TaskCancelAction from "../../components/Server/TaskCancelAction.vue";
 import TaskDeleteAction from "../../components/Server/TaskDeleteAction.vue";
+import {useCheckAll} from "../../components/common/check-all";
+import TaskBatchDeleteAction from "../../components/Server/TaskBatchDeleteAction.vue";
 
 const videoGenFlowCreate = ref<InstanceType<typeof VideoGenFlowCreate> | null>(null)
 
@@ -23,8 +25,18 @@ const recordsForPage = computed(() => {
     return records.value.slice((page.value - 1) * 10, page.value * 10)
 })
 
+const {
+    mergeCheck,
+    isIndeterminate,
+    isAllChecked,
+    onCheckAll,
+    checkRecords
+} = useCheckAll({
+    records
+})
+
 const doRefresh = async () => {
-    records.value = await TaskService.list('VideoGenFlow')
+    records.value = mergeCheck(await TaskService.list('VideoGenFlow'))
 }
 
 const taskChangeCallback = (bizId: string, type: TaskChangeType) => {
@@ -61,13 +73,32 @@ onBeforeUnmount(() => {
         <div>
             <VideoGenFlowCreate ref="videoGenFlowCreate" @submitted="doRefresh"/>
             <div>
-                <div v-if="records.length>10" class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
-                    <a-pagination v-model:current="page" :total="records.length" :page-size="10" show-total/>
+                <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
+                    <div class="flex-grow flex items-center">
+                        <div class="mr-3">
+                            <a-checkbox :model-value="isAllChecked" :indeterminate="isIndeterminate"
+                                        @change="onCheckAll">
+                                {{ $t('全选') }}
+                            </a-checkbox>
+                        </div>
+                        <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh"/>
+                        <a-button v-if="0" :disabled="!checkRecords.length" class="mr-2">
+                            <template #icon>
+                                <icon-download/>
+                            </template>
+                        </a-button>
+                    </div>
+                    <div>
+                        <a-pagination v-model:current="page" :total="records.length" :page-size="10" show-total simple/>
+                    </div>
                 </div>
                 <div v-for="r in recordsForPage" :key="r.id">
                     <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
                         <div class="flex items-center">
                             <div class="flex-grow flex items-center">
+                                <div class="mr-2">
+                                    <a-checkbox v-model="r['_check']"/>
+                                </div>
                                 <div class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-8 h-8">
                                     #{{ r.id }}
                                 </div>
