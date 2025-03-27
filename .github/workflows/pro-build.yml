@@ -88,6 +88,8 @@ jobs:
       - name: Build Release Files
         working-directory: code
         run: |
+            pwd
+            ls -alh
             npm run build
         env:
           DEBUG: "electron-notarize:*"
