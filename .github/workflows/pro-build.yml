@@ -20,6 +20,9 @@ jobs:
                       arch: [arm64, amd64]
 
         steps:
+            -   name: Checkout Code
+                uses: actions/checkout@v4
+
             -   name: Git clone repo
                 if: runner.os == 'Linux' || runner.os == 'macOS'
                 env:
