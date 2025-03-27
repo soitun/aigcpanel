@@ -31,7 +31,7 @@ jobs:
           GIT_REPO_BASE: ${{ secrets.GIT_REPO_BASE }}
           GIT_HOST: ${{ secrets.GIT_HOST }}
         run: |
-          git clone "https://${GIT_USER}:${GIT_PASS}@${GIT_HOST}/${GIT_REPO_BASE}/aigcpanel-pro.git" code
+          git clone -b main "https://${GIT_USER}:${GIT_PASS}@${GIT_HOST}/${GIT_REPO_BASE}/aigcpanel-pro.git" code
           pwd
           cd code
           pwd
