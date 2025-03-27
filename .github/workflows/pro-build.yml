@@ -12,12 +12,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            arch: [ arm64, amd64 ]
+#          - os: ubuntu-latest
+#            arch: [ arm64, amd64 ]
           - os: macos-latest
             arch: [ arm64, amd64 ]
-          - os: windows-latest
-            arch: [ arm64, amd64 ]
+#          - os: windows-latest
+#            arch: [ arm64, amd64 ]
 
     steps:
       - name: Checkout Code
@@ -32,6 +32,7 @@ jobs:
           GIT_HOST: ${{ secrets.GIT_HOST }}
         run: |
           git clone "https://${GIT_USER}:${GIT_PASS}@${GIT_HOST}/${GIT_REPO_BASE}/aigcpanel-pro.git" code
+          ls -alh code
 
       - name: Git clone repo
         if: runner.os == 'Windows'
@@ -87,7 +88,10 @@ jobs:
 
       - name: Build Release Files
         working-directory: code
-        run: npm run build
+        run: |
+            ls -alh
+            pwd
+            npm run build
         env:
           DEBUG: "electron-notarize:*"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
