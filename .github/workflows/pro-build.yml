@@ -32,7 +32,6 @@ jobs:
           GIT_HOST: ${{ secrets.GIT_HOST }}
         run: |
           git clone "https://${GIT_USER}:${GIT_PASS}@${GIT_HOST}/${GIT_REPO_BASE}/aigcpanel-pro.git" code
-          ls -alh code
 
       - name: Git clone repo
         if: runner.os == 'Windows'
@@ -44,6 +43,13 @@ jobs:
         shell: pwsh
         run: |
           git clone "https://${env:GIT_USER}:${env:GIT_PASS}@${env:GIT_HOST}/${env:GIT_REPO_BASE}/aigcpanel-pro.git" code
+
+      - name: Set branch
+        working-directory: code
+        run: |
+          git fetch origin main:main
+          git checkout main
+          ls -alh
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -89,8 +95,6 @@ jobs:
       - name: Build Release Files
         working-directory: code
         run: |
-            ls -alh
-            pwd
             npm run build
         env:
           DEBUG: "electron-notarize:*"
