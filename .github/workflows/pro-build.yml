@@ -3,7 +3,7 @@ name: Build Pro
 on:
     push:
         tags:
-            - vx*.*.*
+            - xv*.*.*
 
 jobs:
     build:
