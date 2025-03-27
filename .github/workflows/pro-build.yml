@@ -89,6 +89,7 @@ jobs:
         working-directory: code
         run: |
             pwd
+            git status
             ls -alh
             npm run build
         env:
