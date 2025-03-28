@@ -158,28 +158,25 @@ export const EasyServer = function (config: any) {
                         env: envMap,
                         cwd: this.ServerInfo.localPath,
                         stdout: (_data) => {
-                            // console.log('easyServer.stdout', data)
-                            // regex AigcPanelRunResult[VideoGen_121][xxxxx=]
-                            const match = _data.match(/AigcPanelRunResult\[(\w+)\]\[(.*?)\]/)
-                            // console.log('match', {data, match})
-                            if (match && match[1] === data.id) {
-                                const result = JSON.parse(EncodeUtil.base64Decode(match[2]))
+                            // console.log('easyServer.stdout', _data)
+                            this.ServerApi.file.appendText(this.ServerInfo.logFile, _data)
+                            const result = this.ServerApi.extractResultFromLogs(data.id, _data)
+                            if (result) {
                                 launcherResult.result = Object.assign(launcherResult.result, result)
                                 this.send('taskResult', {id: data.id, result})
                             }
+                        },
+                        stderr: (_data) => {
+                            // console.log('easyServer.stderr', _data)
                             this.ServerApi.file.appendText(this.ServerInfo.logFile, _data)
                         },
-                        stderr: (data) => {
-                            // console.log('easyServer.stderr', data)
-                            this.ServerApi.file.appendText(this.ServerInfo.logFile, data)
-                        },
-                        success: (data) => {
-                            // console.log('easyServer.success', data)
+                        success: (_data) => {
+                            // console.log('easyServer.success', _data)
                             clearTimeout(timer)
                             resolve(undefined)
                         },
-                        error: (data, code) => {
-                            // console.log('easyServer.error', data)
+                        error: (_data, code) => {
+                            // console.log('easyServer.error', _data)
                             this.ServerApi.file.appendText(this.ServerInfo.logFile, `exit code ${code}`)
                             clearTimeout(timer)
                             resolve(undefined)

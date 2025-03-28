@@ -236,7 +236,7 @@ const sleep = async (ms) => {
 
 const launcherCancel = async (context: ServerContext) => {
     const ret = await requestPost(`${context.url()}cancel`, {}) as any
-    console.log('cancel', JSON.stringify(ret))
+    // console.log('cancel', JSON.stringify(ret))
     if (ret.code) {
         throw new Error(`cancel ${ret.msg}`)
     }
@@ -284,9 +284,8 @@ const launcherSubmitAndQuery = async (context: ServerContext, data: ServerFuncti
             logs = EncodeUtil.base64Decode(logs)
             if (logs) {
                 await Files.appendText(context.ServerInfo.logFile, logs)
-                const resultMat = logs.match(new RegExp(`AigcPanelRunResult\\[${data.id}\\]\\[(.*?)\\]`))
-                if (resultMat) {
-                    const result = JSON.parse(EncodeUtil.base64Decode(resultMat[1]))
+                const result = extractResultFromLogs(data.id, logs)
+                if (result) {
                     launcherResult.result = Object.assign(launcherResult.result, result)
                     context.send('taskResult', {id: data.id, result})
                 }
@@ -331,6 +330,20 @@ const launcherSubmitConfigJsonAndQuery = async (context: ServerContext, configDa
     return result
 }
 
+const extractResultFromLogs = (dataId: string, logs: string) => {
+    let result = null
+    logs.split("\n").forEach(line => {
+        // regex AigcPanelRunResult[VideoGen_121][xxxxx=]
+        const match = line.match(new RegExp(`AigcPanelRunResult\\[${dataId}\\]\\[(.*?)\\]`))
+        // console.log('match', {_data, match})
+        if (match) {
+            const matchResult = JSON.parse(EncodeUtil.base64Decode(match[1]))
+            result = Object.assign(result || {}, matchResult)
+        }
+    })
+    return result
+}
+
 export default {
     GradioClient: Client,
     GradioHandleFile: handle_file,
@@ -352,5 +365,6 @@ export default {
     launcherCancel,
     launcherSubmitAndQuery,
     launcherPrepareConfigJson,
-    launcherSubmitConfigJsonAndQuery
+    launcherSubmitConfigJsonAndQuery,
+    extractResultFromLogs
 }

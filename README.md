@@ -94,7 +94,7 @@ modelConfig = config['modelConfig']
 
 def printResult(key,value):
     global config
-    print(f'AigcPanelRunResult[{config['id']}][' + base64.b64encode(json.dumps(data).encode()).decode()+']')
+    print(f'AigcPanelRunResult[{config['id']}][' + base64.b64encode(json.dumps({key: value}).encode()).decode()+']')
 
 # 公共输出
 ## 输出给前端的是否是以 CUDA 运行
