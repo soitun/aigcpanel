@@ -35,6 +35,10 @@ const videoTemplateRecords = ref<VideoTemplateRecord[]>([])
 onMounted(() => {
     const old = StorageUtil.getObject('VideoGenCreate.formData')
     formData.value.serverKey = old.serverKey || ''
+    formData.value.videoTemplateId = old.videoTemplateId || 0
+    formData.value.soundType = old.soundType || 'soundTts'
+    formData.value.soundTtsId = old.soundTtsId || 0
+    formData.value.soundCloneId = old.soundCloneId || 0
 })
 
 watch(() => formData.value, async (value) => {

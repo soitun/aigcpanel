@@ -42,12 +42,15 @@ onMounted(async () => {
     formData.value.videoServerKey = old.videoServerKey || ''
     formData.value.soundTtsServerKey = old.soundTtsServerKey || ''
     formData.value.soundCloneServerKey = old.soundCloneServerKey || ''
+    formData.value.videoTemplateId = old.videoTemplateId || 0
+    formData.value.soundType = old.soundType || 'soundTts'
+    formData.value.soundPromptId = old.soundPromptId || 0
     formData.value.text = old.text || ''
     soundPrompts.value = await StorageService.list('SoundPrompt')
 })
 
 watch(() => formData.value, async (value) => {
-    StorageUtil.set('VideoGenCreate.formData', value)
+    StorageUtil.set('VideoGenFlowCreate.formData', value)
 }, {
     deep: true
 })
@@ -168,6 +171,7 @@ const doSubmit = async () => {
     // console.log('VideoGenFlow.submit',JSON.stringify(record))
     const id = await TaskService.submit(record)
     Dialog.tipSuccess(t('任务已经提交成功，等待视频生成完成'))
+    formData.value.text = ''
     emit('submitted')
 }
 
