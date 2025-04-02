@@ -77,6 +77,7 @@ const doSubmit = async () => {
     }
     const record: TaskRecord = {
         biz: 'SoundClone',
+        title: await window.$mapi.file.textToName(formData.value.text),
         serverName: server.name,
         serverTitle: server.title,
         serverVersion: server.version,

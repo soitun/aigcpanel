@@ -1,0 +1,41 @@
+<script setup lang="ts">
+
+import {TaskRecord, TaskService} from "../../service/TaskService";
+import InputInlineEditor from "../common/InputInlineEditor.vue";
+
+const props = defineProps({
+    record: {
+        type: Object as () => TaskRecord,
+        required: true
+    }
+})
+
+const emit = defineEmits({
+    update: (value: string) => true
+})
+
+const onEditTitle = async (value: string) => {
+    await TaskService.update(props.record.id as any, {
+        title: value
+    })
+    emit('update', value)
+}
+
+</script>
+
+<template>
+    <div class="flex items-center">
+        <div class="truncate flex-grow max-w-96">
+            {{ record.title }}
+        </div>
+        <InputInlineEditor :value="record.title" @change="onEditTitle">
+            <a class="ml-1 text-gray-400" href="javascript:;">
+                <icon-pen/>
+            </a>
+        </InputInlineEditor>
+    </div>
+</template>
+
+<style scoped>
+
+</style>

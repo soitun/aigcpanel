@@ -12,6 +12,7 @@ import ParamForm from "../common/ParamForm.vue";
 import {PermissionService} from "../../service/PermissionService";
 import ServerContentInfoAction from "../Server/ServerContentInfoAction.vue";
 import {TaskRecord, TaskService} from "../../service/TaskService";
+import {TimeUtil} from "../../lib/util";
 
 const serverStore = useServerStore()
 const paramForm = ref<InstanceType<typeof ParamForm> | null>(null)
@@ -126,6 +127,7 @@ const doSubmit = async () => {
     }
     const record: TaskRecord = {
         biz: 'VideoGen',
+        title: await window.$mapi.file.textToName(videoTemplate.name+'_'+TimeUtil.datetimeString()),
         serverName: server.name,
         serverTitle: server.title,
         serverVersion: server.version,

@@ -1,4 +1,5 @@
 import StorageMain from "../storage/main";
+import Files from "../file/main";
 
 const versions = [
     {
@@ -247,7 +248,37 @@ const versions = [
                                  VALUES (?, ?, ?)`, values)
             }
         }
-    }
+    },
+    {
+        version:8,
+        up: async (db: DB) => {
+            await db.execute(`ALTER TABLE data_task ADD COLUMN title TEXT`);
+            const records = await db.select(`SELECT * FROM data_task`);
+            for(const r of records) {
+                let modelConfig:any = {}
+                try {
+                    modelConfig = JSON.parse(r.modelConfig);
+                } catch (e) {
+                    modelConfig = {}
+                }
+                let title = '';
+                if(r.biz === 'SoundTts' || r.biz === 'SoundClone') {
+                    title = Files.textToName(modelConfig.text);
+                } else if(r.biz === 'VideoGen') {
+                    title = Files.textToName([
+                        modelConfig.videoTemplateName,
+                        modelConfig.soundTtsText
+                    ].join('_'));
+                } else if(r.biz === 'VideoGenFlow') {
+                    title = Files.textToName([
+                        modelConfig.videoTemplateName,
+                        modelConfig.text,
+                    ].join('_'));
+                }
+                await db.execute(`UPDATE data_task SET title = ? WHERE id = ?`, [title, r.id]);
+            }
+        }
+    },
 ]
 
 export default {

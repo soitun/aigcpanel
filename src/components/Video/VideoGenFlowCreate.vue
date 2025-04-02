@@ -138,6 +138,7 @@ const doSubmit = async () => {
     }
     const record: TaskRecord = {
         biz: 'VideoGenFlow',
+        title: await window.$mapi.file.textToName(formData.value.text),
         serverName: videoServer.name,
         serverTitle: videoServer.title,
         serverVersion: videoServer.version,

@@ -14,6 +14,7 @@ import {TaskRecord, TaskService} from "../../service/TaskService";
 import TaskCancelAction from "../../components/Server/TaskCancelAction.vue";
 import {useCheckAll} from "../../components/common/check-all";
 import TaskBatchDeleteAction from "../../components/Server/TaskBatchDeleteAction.vue";
+import TaskTitleField from "../../components/Server/TaskTitleField.vue";
 
 const videoGenCreate = ref<InstanceType<typeof VideoGenCreate> | null>(null)
 
@@ -95,20 +96,15 @@ onBeforeUnmount(() => {
                 <div v-for="r in recordsForPage" :key="r.id">
                     <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
                         <div class="flex items-center">
-                            <div class="flex-grow flex items-center">
-                                <div class="mr-2">
+                            <div class="inline-flex items-start bg-blue-100 rounded-lg px-2 leading-8 h-8 mr-2">
+                                <div class="mr-2 h-8">
                                     <a-checkbox v-model="r['_check']"/>
                                 </div>
-                                <div class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-8 h-8">
-                                    #{{ r.id }}
+                                <div class="">
+                                    <TaskTitleField :record="r" @update="v=>r.title=v" />
                                 </div>
-                                <div class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-8 h-8">
-                                    <i class="iconfont icon-server mr-1"></i>
-                                    {{ r.serverTitle }}
-                                    v{{ r.serverVersion }}
-                                </div>
-                                <ServerTaskResultParam :record="r as any"/>
                             </div>
+                            <div class="flex-grow"></div>
                             <div class="ml-1">
                                 <VideoDuration :start="r.startTime" :end="r.endTime"/>
                             </div>
@@ -116,33 +112,41 @@ onBeforeUnmount(() => {
                                 <TaskBizStatus :status="r.status" :status-msg="r.statusMsg"/>
                             </div>
                         </div>
+                        <div class="mt-3">
+                            <div class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
+                                <i class="iconfont icon-server mr-1"></i>
+                                {{ r.serverTitle }}
+                                v{{ r.serverVersion }}
+                            </div>
+                            <ServerTaskResultParam :record="r as any"/>
+                        </div>
                         <div class="pt-4 flex">
                             <div class="flex-grow">
                                 <div class="flex mb-3">
                                     <div class="mr-2 flex-shrink-0">
-                                        <div class="bg-gray-100 px-3 py-1 leading-6 rounded">
+                                        <div class="bg-gray-100 px-2 leading-6 rounded-lg">
                                             <i class="iconfont icon-video-template"></i>
                                             {{ $t('视频形象') }}
                                         </div>
                                     </div>
-                                    <div class="pt-1">
+                                    <div class="">
                                         {{ r.modelConfig.videoTemplateName }}
                                     </div>
                                 </div>
                                 <div v-if="r.modelConfig.soundType==='soundTts'" class="flex">
                                     <div class="mr-2 flex-shrink-0">
-                                        <div class="bg-gray-100 px-3 py-1 leading-6 rounded">
+                                        <div class="bg-gray-100 px-2 leading-6 rounded-lg">
                                             <i class="iconfont icon-sound"></i>
                                             {{ $t('声音合成') }}
                                         </div>
                                     </div>
-                                    <div class="pt-1">
+                                    <div class="">
                                         {{ r.modelConfig.soundTtsText }}
                                     </div>
                                 </div>
                                 <div v-if="r.modelConfig.soundType==='soundClone'" class="flex items-center">
                                     <div class="mr-2 flex-shrink-0">
-                                        <div class="bg-gray-100 px-3 py-1 leading-6 rounded">
+                                        <div class="bg-gray-100 px-2 leading-6 rounded-lg">
                                             <i class="iconfont icon-video-template"></i>
                                             {{ $t('声音克隆') }}
                                         </div>
@@ -153,7 +157,7 @@ onBeforeUnmount(() => {
                                 </div>
                                 <div v-if="r.modelConfig.soundType==='soundCustom'" class="flex items-start">
                                     <div class="mr-2 flex-shrink-0">
-                                        <div class="bg-gray-100 px-3 py-1 leading-6 rounded">
+                                        <div class="bg-gray-100 px-2 leading-6 rounded-lg">
                                             <icon-file/>
                                             {{ $t('本地文件') }}
                                         </div>

@@ -10,6 +10,8 @@ export type TaskRecord = {
 
     biz: TaskBiz;
 
+    title: string,
+
     status?: 'queue' | 'wait' | 'running' | 'success' | 'fail';
     statusMsg?: string;
     startTime?: number,

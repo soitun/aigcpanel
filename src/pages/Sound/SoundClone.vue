@@ -13,6 +13,7 @@ import {TaskRecord, TaskService} from "../../service/TaskService";
 import TaskCancelAction from "../../components/Server/TaskCancelAction.vue";
 import {useCheckAll} from "../../components/common/check-all";
 import TaskBatchDeleteAction from "../../components/Server/TaskBatchDeleteAction.vue";
+import TaskTitleField from "../../components/Server/TaskTitleField.vue";
 
 const records = ref<TaskRecord[]>([])
 const taskStore = useTaskStore()
@@ -92,40 +93,43 @@ const doRefresh = async () => {
                 <div v-for="r in recordsForPage" :key="r.id">
                     <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
                         <div class="flex items-center">
-                            <div class="flex-grow flex items-center">
-                                <div class="mr-2">
+                            <div class="inline-flex items-start bg-blue-100 rounded-lg px-2 leading-8 h-8 mr-2">
+                                <div class="mr-2 h-8">
                                     <a-checkbox v-model="r['_check']"/>
                                 </div>
-                                <div class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-8 h-8">
-                                    #{{ r.id }}
+                                <div class="">
+                                    <TaskTitleField :record="r" @update="v=>r.title=v" />
                                 </div>
-                                <div class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-8 h-8">
-                                    <i class="iconfont icon-server mr-1"></i>
-                                    {{ r.serverTitle }}
-                                    v{{ r.serverVersion }}
-                                </div>
-                                <div class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-8 h-8">
-                                    <i class="iconfont icon-sound-prompt mr-1"></i>
-                                    {{ r.modelConfig.promptName }}
-                                </div>
-                                <div v-if="r.param.speed"
-                                     class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-8 h-8">
-                                    <i class="iconfont icon-speed mr-1"></i>
-                                    <span class="">x{{ r.param.speed }}</span>
-                                </div>
-                                <div v-if="r.param.crossLingual"
-                                     class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-8 h-8">
-                                    <i class="iconfont icon-global mr-1"></i>
-                                    <span class="">{{ $t('跨语种') }}</span>
-                                </div>
-                                <ServerTaskResultParam :record="r as any"/>
                             </div>
+                            <div class="flex-grow"></div>
                             <div class="ml-1">
                                 <SoundDuration :start="r.startTime" :end="r.endTime"/>
                             </div>
                             <div class="ml-1">
                                 <TaskBizStatus :status="r.status" :status-msg="r.statusMsg"/>
                             </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
+                                <i class="iconfont icon-server mr-1"></i>
+                                {{ r.serverTitle }}
+                                v{{ r.serverVersion }}
+                            </div>
+                            <div class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
+                                <i class="iconfont icon-sound-prompt mr-1"></i>
+                                {{ r.modelConfig.promptName }}
+                            </div>
+                            <div v-if="r.param.speed"
+                                 class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
+                                <i class="iconfont icon-speed mr-1"></i>
+                                <span class="">x{{ r.param.speed }}</span>
+                            </div>
+                            <div v-if="r.param.crossLingual"
+                                 class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
+                                <i class="iconfont icon-global mr-1"></i>
+                                <span class="">{{ $t('跨语种') }}</span>
+                            </div>
+                            <ServerTaskResultParam :record="r as any"/>
                         </div>
                         <div class="pt-4">
                             {{ r.modelConfig.text }}
