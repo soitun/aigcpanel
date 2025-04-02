@@ -3,11 +3,8 @@
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import VideoGenCreate from "../../components/Video/VideoGenCreate.vue";
 import {TaskChangeType, useTaskStore} from "../../store/modules/task";
-import VideoGenActionDownload from "../../components/Video/VideoGenActionDownload.vue";
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
-import VideoGenActionDelete from "../../components/Video/VideoGenActionDelete.vue";
 import VideoPlayer from "../../components/common/VideoPlayer.vue";
-import VideoDuration from "../../components/Video/VideoDuration.vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
 import AudioPlayer from "../../components/common/AudioPlayer.vue";
 import {TaskRecord, TaskService} from "../../service/TaskService";
@@ -15,6 +12,10 @@ import TaskCancelAction from "../../components/Server/TaskCancelAction.vue";
 import {useCheckAll} from "../../components/common/check-all";
 import TaskBatchDeleteAction from "../../components/Server/TaskBatchDeleteAction.vue";
 import TaskTitleField from "../../components/Server/TaskTitleField.vue";
+import TaskBatchDownloadAction from "../../components/Server/TaskBatchDownloadAction.vue";
+import TaskDownloadAction from "../../components/Server/TaskDownloadAction.vue";
+import TaskDeleteAction from "../../components/Server/TaskDeleteAction.vue";
+import TaskDuration from "../../components/Server/TaskDuration.vue";
 
 const videoGenCreate = ref<InstanceType<typeof VideoGenCreate> | null>(null)
 
@@ -33,7 +34,7 @@ const {
     onCheckAll,
     checkRecords
 } = useCheckAll({
-    records
+    records: recordsForPage
 })
 
 const doRefresh = async () => {
@@ -83,11 +84,7 @@ onBeforeUnmount(() => {
                             </a-checkbox>
                         </div>
                         <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh"/>
-                        <a-button v-if="0" :disabled="!checkRecords.length" class="mr-2">
-                            <template #icon>
-                                <icon-download/>
-                            </template>
-                        </a-button>
+                        <TaskBatchDownloadAction :records="checkRecords"/>
                     </div>
                     <div>
                         <a-pagination v-model:current="page" :total="records.length" :page-size="10" show-total simple/>
@@ -96,17 +93,17 @@ onBeforeUnmount(() => {
                 <div v-for="r in recordsForPage" :key="r.id">
                     <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
                         <div class="flex items-center">
-                            <div class="inline-flex items-start bg-blue-100 rounded-lg px-2 leading-8 h-8 mr-2">
-                                <div class="mr-2 h-8">
+                            <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
+                                <div class="mr-2 h-8 pt-0.5">
                                     <a-checkbox v-model="r['_check']"/>
                                 </div>
                                 <div class="">
-                                    <TaskTitleField :record="r" @update="v=>r.title=v" />
+                                    <TaskTitleField :record="r" @title-click="r['_check']=!r['_check']" @update="v=>r.title=v"/>
                                 </div>
                             </div>
                             <div class="flex-grow"></div>
                             <div class="ml-1">
-                                <VideoDuration :start="r.startTime" :end="r.endTime"/>
+                                <TaskDuration :start="r.startTime" :end="r.endTime"/>
                             </div>
                             <div class="ml-1">
                                 <TaskBizStatus :status="r.status" :status-msg="r.statusMsg"/>
@@ -177,8 +174,8 @@ onBeforeUnmount(() => {
                         </div>
                         <div class="pt-4 flex items-center">
                             <div class="flex-grow">
-                                <VideoGenActionDownload :record="r"/>
-                                <VideoGenActionDelete :record="r" @update="doRefresh"/>
+                                <TaskDownloadAction :record="r"/>
+                                <TaskDeleteAction :record="r" @update="doRefresh"/>
                                 <TaskCancelAction :record="r"/>
                             </div>
                             <div class="text-gray-400">

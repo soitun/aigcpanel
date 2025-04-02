@@ -51,7 +51,7 @@ const doDelete = async (record: StorageRecord) => {
                     <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
                         <div class="flex mb-3">
                             <div class="flex-grow">
-                                <div class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-8 h-8">
+                                <div class="inline-block mr-2 bg-blue-100 rounded-full px-2 leading-8 h-8">
                                     {{ r.title }}
                                 </div>
                             </div>

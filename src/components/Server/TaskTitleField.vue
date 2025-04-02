@@ -11,7 +11,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits({
-    update: (value: string) => true
+    update: (value: string) => true,
+    titleClick: () => true
 })
 
 const onEditTitle = async (value: string) => {
@@ -25,7 +26,7 @@ const onEditTitle = async (value: string) => {
 
 <template>
     <div class="flex items-center">
-        <div class="truncate flex-grow max-w-96">
+        <div class="truncate flex-grow max-w-96 cursor-pointer" @click="emit('titleClick')">
             {{ record.title }}
         </div>
         <InputInlineEditor :value="record.title" @change="onEditTitle">
