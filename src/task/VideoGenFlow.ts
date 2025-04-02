@@ -151,7 +151,7 @@ export const VideoGenFlow: TaskBiz = {
         }
         const videoServerInfo = await serverStore.serverInfo(videoServer)
         const res = await window.$mapi.server.callFunctionWithException(videoServerInfo, 'videoGen', {
-            id: `VideoGen_${bizId}`,
+            id: `VideoGenFlow_${bizId}`,
             videoFile: videoTemplate?.video,
             soundFile: urlSound,
             param: record.param,
@@ -186,14 +186,14 @@ export const VideoGenFlow: TaskBiz = {
         if (record.result.videoGenTaskId) {
             const serverInfo = await serverStore.serverInfo(videoServer)
             const res = await window.$mapi.server.callFunctionWithException(serverInfo, 'query', {
-                id: `VideoGen_${bizId}`,
+                id: `VideoGenFlow_${bizId}`,
                 result: record.result,
             }, {
                 taskIdResultKey: 'videoGenTaskId'
             })
             // console.log('VideoGenFlow.queryFunc.videoGen.res', res)
             if (res.code) {
-                throw res.msg || 'VideoGen query fail'
+                throw res.msg || 'VideoGenFlow video query fail'
             }
             // console.log('VideoGen.queryFunc.res', res)
             switch (res.data.type) {
@@ -214,12 +214,15 @@ export const VideoGenFlow: TaskBiz = {
         if (record.result.soundTtsTaskId) {
             const serverInfo = await serverStore.serverInfo(soundTtsServer)
             const res = await window.$mapi.server.callFunctionWithException(serverInfo, 'query', {
-                id: `VideoGen_${bizId}`,
+                id: `VideoGenFlow_${bizId}`,
                 result: record.result,
             }, {
                 taskIdResultKey: 'soundTtsTaskId'
             })
             // console.log('VideoGenFlow.queryFunc.soundTts.res', res)
+            if (res.code) {
+                throw res.msg || 'VideoGenFlow soundTts query fail'
+            }
             switch (res.data.type) {
                 case 'success':
                     await TaskService.update(bizId as any, {
@@ -237,12 +240,15 @@ export const VideoGenFlow: TaskBiz = {
         } else if (record.result.soundCloneTaskId) {
             const serverInfo = await serverStore.serverInfo(soundCloneServer)
             const res = await window.$mapi.server.callFunctionWithException(serverInfo, 'query', {
-                id: `VideoGen_${bizId}`,
+                id: `VideoGenFlow_${bizId}`,
                 result: record.result,
             }, {
                 taskIdResultKey: 'soundCloneTaskId'
             })
             // console.log('VideoGenFlow.queryFunc.soundClone.res', res)
+            if (res.code) {
+                throw res.msg || 'VideoGenFlow soundClone query fail'
+            }
             switch (res.data.type) {
                 case 'success':
                     await TaskService.update(bizId as any, {
