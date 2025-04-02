@@ -126,6 +126,7 @@ const doSubmitBatch = async (records: { text: string }[]) => {
     for (const r of records) {
         const record: TaskRecord = {
             biz: 'SoundClone',
+            title: await window.$mapi.file.textToName(r.text),
             serverName: server.name,
             serverTitle: server.title,
             serverVersion: server.version,

@@ -98,7 +98,7 @@ export const TaskService = {
         record.status = 'queue'
         record.startTime = TimeUtil.timestampMS()
         const fields = [
-            'biz',
+            'biz', 'title',
             'status', 'statusMsg', 'startTime', 'endTime',
             'serverName', 'serverTitle', 'serverVersion',
             'param', 'modelConfig',

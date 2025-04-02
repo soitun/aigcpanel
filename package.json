@@ -4,7 +4,7 @@
     "main": "dist-electron/main/index.js",
     "description": "一站式AI数字人系统",
     "author": "ModStartLib",
-    "license": "AGPL-3.0",
+    "license": "Apache-2.0",
     "private": true,
     "keywords": [
         "electron",
