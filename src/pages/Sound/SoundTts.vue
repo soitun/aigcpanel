@@ -111,10 +111,10 @@ const doRefresh = async () => {
                                 {{ r.serverTitle }}
                                 v{{ r.serverVersion }}
                             </div>
-                            <div v-if="r.param.speaker"
+                            <div v-if="r.param.speakerTitle"
                                  class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
                                 <i class="iconfont icon-speaker mr-1"></i>
-                                {{ r.param.speaker }}
+                                {{ r.param.speakerTitle }}
                             </div>
                             <div v-if="r.param.speed"
                                  class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-6 h-6">

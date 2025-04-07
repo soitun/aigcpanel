@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import {ref, watch} from "vue";
 import {cloneDeep} from "lodash-es";
+import SpeakerSelector from "./SpeakerSelector.vue";
 
 type FieldBasicType = {
     name: string,
     title: string,
     icon: string,
-    type: 'select' | 'input' | 'inputNumber' | 'switch' | 'slider',
+    type: 'select' | 'input' | 'inputNumber' | 'switch' | 'slider' | 'speaker',
     defaultValue: any,
     placeholder: string,
     tips: string,
@@ -31,9 +32,13 @@ const formData = ref<Array<FieldBasicModelType>>([])
 watch(() => props.param, (value) => {
     formData.value = value?.map((item) => {
         const itemClone = cloneDeep(item)
+        if (itemClone.type === 'speaker') {
+            itemClone['speakerParam'] = []
+            itemClone['speakerParamValue'] = {}
+        }
         return {
             ...itemClone,
-            value: itemClone.defaultValue,
+            value: itemClone.defaultValue || null,
         }
     }) as any
 }, {
@@ -45,6 +50,12 @@ const getValue = () => {
     const result = {}
     formData.value.forEach((item) => {
         result[item.name] = item.value
+        if (item.type === 'speaker') {
+            for (const k in item['speakerParamValue']) {
+                result[k] = item['speakerParamValue'][k]
+            }
+            result[`${item.name}Title`] = item['speaker']?.['title'] || ''
+        }
     })
     return result
 }
@@ -53,6 +64,25 @@ const setValue = (value) => {
     formData.value.forEach((item) => {
         item.value = value[item.name] || item.defaultValue
     })
+}
+
+const onSpeakerDataUpdate = (name, data) => {
+    const {param, speaker} = data
+    const item = formData.value.find((item) => item.name === name)
+    if (item) {
+        item['speaker'] = speaker
+        item['speakerParam'] = param
+        const value = {}
+        param.forEach((paramItem) => {
+            value[paramItem.name] = null
+            if (!paramItem.type || paramItem.type === 'select') {
+                if (paramItem.option && paramItem.option.length > 0) {
+                    value[paramItem.name] = paramItem.option[0].value
+                }
+            }
+        })
+        item['speakerParamValue'] = value
+    }
 }
 
 defineExpose({
@@ -114,6 +144,22 @@ defineExpose({
                       :min="item.min"
                       :max="item.max"
                       :step="item.step"/>
+        </div>
+        <div v-else-if="item.type==='speaker'" class="w-48 mr-3">
+            <SpeakerSelector v-model="item.value" :speakers="item['speakers']"
+                             @on-data-update="onSpeakerDataUpdate(item.name,$event)"/>
+        </div>
+        <div v-for="speakerParam in item['speakerParam']">
+            <div v-if="!speakerParam.type||speakerParam.type==='select'" class="mr-3">
+                <a-select size="small"
+                          v-model="item['speakerParamValue'][speakerParam.name]">
+                    <a-option v-for="o in speakerParam.option"
+                              :key="o.value"
+                              :value="o.value">
+                        {{ o.title }}
+                    </a-option>
+                </a-select>
+            </div>
         </div>
     </div>
 </template>
