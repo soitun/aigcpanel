@@ -86,10 +86,10 @@ defineExpose({
                         </a-tag>
                     </div>
                 </div>
-                <div class="flex mb-4" v-if="record.type===EnumServerType.LOCAL_DIR">
+                <div class="flex mb-4" v-if="httpUrl">
                     <div class="w-20">{{ $t('服务') }}</div>
                     <div class="">
-                        <div v-if="httpUrl" class="font-mono">
+                        <div class="font-mono">
                             <div class="inline-block mr-2">
                                 {{ httpUrl }}
                             </div>
@@ -98,9 +98,6 @@ defineExpose({
                                     <icon-link/>
                                 </template>
                             </a-button>
-                        </div>
-                        <div v-else class="text-gray-400 text-sm leading-7">
-                            {{ $t('未启动') }}
                         </div>
                     </div>
                 </div>
