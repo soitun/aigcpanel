@@ -80,23 +80,24 @@ const doUser = async () => {
                 <div class="text-sm">{{ $t('数字人') }}</div>
             </a>
             <a class="page-nav-item block text-center py-3"
-               v-if="0"
-               :class="activeTab==='tool'?'active':''"
-               @click="$router.push('/tool')"
-               href="javascript:;">
-                <div>
-                    <icon-tool class="text-xl"/>
-                </div>
-                <div class="text-sm">{{ $t('工具箱') }}</div>
-            </a>
-            <a class="page-nav-item block text-center py-3"
                :class="activeTab==='live'?'active':''"
+               v-if="0"
                @click="$router.push('/live')"
                href="javascript:;">
                 <div>
                     <icon-live-broadcast class="text-xl"/>
                 </div>
                 <div class="text-sm">{{ $t('直播') }}</div>
+            </a>
+            <a class="page-nav-item block text-center py-3"
+               :class="activeTab==='tool'?'active':''"
+               v-if="0"
+               @click="$router.push('/tool')"
+               href="javascript:;">
+                <div>
+                    <icon-tool class="text-xl"/>
+                </div>
+                <div class="text-sm">{{ $t('工具箱') }}</div>
             </a>
             <a class="page-nav-item block text-center py-3"
                :class="activeTab==='server'?'active':''"
