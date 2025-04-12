@@ -203,7 +203,6 @@ const emit = defineEmits({
                         <div class="flex gap-4">
                             <a-button @click="doSelectLocalDir"
                                       class="block w-full"
-                                      type="primary"
                                       :loading="loading">
                                 <template #icon>
                                     <icon-folder/>
@@ -217,15 +216,17 @@ const emit = defineEmits({
                                 {{ t('模型市场') }}
                             </a>
                         </div>
-                        <div class="mt-5 text-sm bg-gray-100 p-5 rounded-lg text-gray-400 leading-6 text-center">
-                            <div>
-                                {{ $t('模型离线运行在本地，对电脑性能有要求') }}
-                            </div>
-                            <div>
-                                {{ '① ' + $t('访问官方模型市场，下载模型到本地') }}
-                            </div>
-                            <div>
-                                {{ '② ' + $t('解压模型压缩包，选择目录中的config.json文件') }}
+                        <div class="mt-2">
+                            <div class="text-sm bg-gray-100 p-5 rounded-lg text-gray-500 leading-6">
+                                <div>
+                                    {{ $t('模型运行在本地，对电脑性能有要求') }}
+                                </div>
+                                <div>
+                                    {{ '① ' + $t('访问模型市场，下载模型到本地') }}
+                                </div>
+                                <div>
+                                    {{ '② ' + $t('解压模型压缩包，选择目录中的config.json文件') }}
+                                </div>
                             </div>
                         </div>
                     </div>

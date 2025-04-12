@@ -419,11 +419,13 @@ npm run build
 
 ## 加入交流群
 
+> 添加好友请备注 AigcPanel
+
 <table width="100%">
     <thead>
         <tr>
-            <th width="50%">微信群</th>
-            <th>QQ群</th>
+            <th width="50%">微信交流群</th>
+            <th>QQ交流群</th>
         </tr>
     </thead>
     <tbody>
@@ -442,4 +444,4 @@ npm run build
 
 ## License
 
-AGPL-3.0
+Apache-2.0

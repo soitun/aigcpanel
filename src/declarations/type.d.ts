@@ -112,6 +112,8 @@ declare interface Window {
             all: () => Promise<any>,
             get: (group: string, key: string, defaultValue: any) => Promise<any>,
             set: (group: string, key: string, value: any) => Promise<void>,
+            write: (group: string, value: any) => Promise<void>,
+            read: (group: string, defaultValue: any = null) => Promise<any>,
         },
         db: {
             execute: (sql: string, params: any = []) => Promise<any>,

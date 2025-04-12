@@ -90,7 +90,6 @@ const doUser = async () => {
                 <div class="text-sm">{{ $t('工具箱') }}</div>
             </a>
             <a class="page-nav-item block text-center py-3"
-               v-if="0"
                :class="activeTab==='live'?'active':''"
                @click="$router.push('/live')"
                href="javascript:;">

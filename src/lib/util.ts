@@ -160,3 +160,9 @@ export const ShellUtil = {
         return `"${p}"`
     }
 }
+
+export const ObjectUtil = {
+    clone(obj: any) {
+        return JSON.parse(JSON.stringify(obj))
+    },
+}

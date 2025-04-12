@@ -1,4 +1,4 @@
-name: Build Main
+name: MainBuild
 
 on:
     push:
@@ -31,7 +31,7 @@ jobs:
       - name: Build Prepare (macOS)
         if: runner.os == 'macOS'
         run: |
-            brew install python-setuptools
+            brew install python-setup tools
 
       - name: Cert Prepare (macOS)
         if: runner.os == 'macOS'

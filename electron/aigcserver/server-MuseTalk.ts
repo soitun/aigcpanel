@@ -100,9 +100,7 @@ export const ServerMuseTalk: ServerContext = {
                 "httpUrl": shellController ? this.url() : null,
                 "functions": {
                     "videoGen": {
-                        "param": [
-
-                        ]
+                        "param": []
                     },
                 }
             }
@@ -141,6 +139,7 @@ export const ServerMuseTalk: ServerContext = {
                     id: data.id,
                     mode: 'local',
                     modelConfig: {
+                        type: 'videoGen',
                         video: data.videoFile,
                         audio: data.soundFile,
                         box: -7

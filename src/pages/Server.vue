@@ -3,7 +3,7 @@
 import ServerStatus from "../components/Server/ServerStatus.vue";
 import {EnumServerType} from "../types/Server";
 import ServerAddDialog from "../components/Server/ServerAddDialog.vue";
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import {useServerStore} from "../store/modules/server";
 import {AppConfig} from "../config";
 import {t} from "../lang";
@@ -14,8 +14,10 @@ import ServerStartTime from "../components/Server/ServerStartTime.vue";
 import ServerActionInfo from "../components/Server/ServerActionInfo.vue";
 import ServerActionSetting from "../components/Server/ServerActionSetting.vue";
 import {functionToLabels} from "../lib/aigcpanel";
+import ModelSettingDialog from "../module/Model/ModelSettingDialog.vue";
 
 const addDialog = ref<InstanceType<typeof ServerAddDialog> | null>(null)
+const modelSettingDialog = ref<InstanceType<typeof ModelSettingDialog> | null>(null)
 const serverStore = useServerStore()
 const helpShow = ref(false)
 
@@ -46,6 +48,13 @@ const typeName = (type: string) => {
                 {{ $t('模型') }}
             </div>
             <div class="flex items-center">
+                <a-button class="ml-1"
+                          @click="modelSettingDialog?.show()">
+                    <template #icon>
+                        <icon-command/>
+                    </template>
+                    {{ $t('大模型设置') }}
+                </a-button>
                 <a-button v-if="serverStore.records.length>0"
                           class="ml-1"
                           @click="addDialog?.show()">
@@ -87,7 +96,7 @@ const typeName = (type: string) => {
                 </div>
                 <div v-if="helpShow" class="pt-5 text-center">
                     <div class="inline-block bg-gray-100 text-left rounded-lg p-6 leading-8">
-                        <div>① {{ $t('访问官方模型市场，下载模型到本地') }}</div>
+                        <div>① {{ $t('访问模型市场，下载模型到本地') }}</div>
                         <div>② {{ $t('解压模型压缩包，选择目录中的config.json文件') }}</div>
                         <div class="pt-3">
                             {{ $t('更多内容，请查看') }}
@@ -150,6 +159,7 @@ const typeName = (type: string) => {
         </div>
     </div>
     <ServerAddDialog ref="addDialog" @update="doRefresh"/>
+    <ModelSettingDialog ref="modelSettingDialog"/>
 </template>
 
 <style scoped>
