@@ -160,6 +160,7 @@ declare interface Window {
                 ext?: string,
                 isFullPath?: boolean,
                 returnFullPath?: boolean,
+                ignoreWhenInHub?: boolean,
             }) => Promise<string>,
         },
         updater: {

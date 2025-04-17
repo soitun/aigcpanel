@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {computed, ref, watch} from "vue";
 import {useModelStore} from "../store/model";
-import {Dialog} from "../../../lib/dialog";
-import {mapError} from "../../../lib/error";
-import {t} from "../../../lang";
 
 const modelStore = useModelStore()
 const props = defineProps({
@@ -18,25 +15,36 @@ const visible = ref(false)
 const data = ref({
     modelId: '',
 })
-const show = () => {
-    data.value.modelId = ''
+const enabledModels = computed(() => {
     if (props.provider) {
-        if (props.provider.data.models.length > 0) {
-            data.value.modelId = props.provider.data.models[0].id
+        return props.provider.data.models.filter((model: any) => model.enabled)
+    }
+    return []
+})
+watch(enabledModels, (newVal) => {
+    let exists = false
+    for (const model of newVal) {
+        if (model.id === data.value.modelId) {
+            exists = true
+            break
         }
     }
+    if (!exists) {
+        if (newVal.length > 0) {
+            data.value.modelId = newVal[0].id
+        } else {
+            data.value.modelId = ''
+        }
+    }
+})
+const show = () => {
     visible.value = true
 }
 const doSubmit = async () => {
     if (!data.value.modelId) {
         return
     }
-    try {
-        await modelStore.test(props.provider.id, data.value.modelId)
-        Dialog.tipSuccess(t('测试成功'))
-    } catch (e) {
-        Dialog.tipError(mapError(e))
-    }
+    await modelStore.test(props.provider.id, data.value.modelId)
 }
 defineExpose({
     show,
@@ -65,7 +73,7 @@ defineExpose({
                 class="mt-4">
                 <a-form-item name="modelId">
                     <a-select v-model:model-value="data.modelId">
-                        <a-option v-for="model in props.provider.data.models" :key="model.id" :value="model.id">
+                        <a-option v-for="model in enabledModels" :key="model.id" :value="model.id">
                             {{ model.name }}
                         </a-option>
                     </a-select>

@@ -6,6 +6,10 @@ import {SystemModels} from "../models";
 import {Model, Provider} from "../types";
 import {ObjectUtil, StringUtil} from "../../../lib/util";
 import {debounce} from "lodash-es";
+import {ModelChatResult, ModelProvider} from "../provider/provider";
+import {mapError} from "../../../lib/error";
+import {Dialog} from "../../../lib/dialog";
+import {t} from "../../../lang";
 
 export const appStore = defineStore("model", {
     state() {
@@ -159,7 +163,61 @@ export const appStore = defineStore("model", {
             if (!m) {
                 return
             }
-            throw 'NotImplemented'
+            Dialog.loadingOn(t('测试中，请稍候...'))
+            try {
+                const ret = await ModelProvider.chat('你是什么模型，简短回答', {
+                    type: provider.type,
+                    modelId: m.id,
+                    apiUrl: provider.apiUrl,
+                    apiHost: provider.data.apiHost,
+                    apiKey: provider.data.apiKey,
+                })
+                if (ret.code) {
+                    throw ret.msg
+                }
+                Dialog.tipSuccess(t('测试成功'))
+            } catch (e) {
+                Dialog.tipError(t('测试失败') + ' ' + mapError(e))
+            } finally {
+                Dialog.loadingOff()
+            }
+        },
+        async chat(providerId: string, modelId: string, prompt: string, option?: {
+            loading: boolean
+        }): Promise<ModelChatResult> {
+            if (!providerId || !modelId) {
+                Dialog.tipError(t('请选择模型'))
+                return {code: -1, msg: t('请选择模型')}
+            }
+            option = Object.assign({
+                loading: false
+            }, option)
+            const provider = this.providers.find((p) => p.id === providerId)
+            if (!provider) {
+                return {code: -1, msg: 'provider not found'}
+            }
+            const m = provider.data.models.find((m) => m.id === modelId)
+            if (!m) {
+                return {code: -1, msg: 'model not found'}
+            }
+            if (option.loading) {
+                Dialog.loadingOn()
+            }
+            try {
+                return await ModelProvider.chat(prompt, {
+                    type: provider.type,
+                    modelId: m.id,
+                    apiUrl: provider.apiUrl,
+                    apiHost: provider.data.apiHost,
+                    apiKey: provider.data.apiKey,
+                })
+            } catch (e) {
+                return {code: -1, msg: 'ERROR:' + mapError(e)}
+            } finally {
+                if (option.loading) {
+                    Dialog.loadingOff()
+                }
+            }
         },
         async change(providerId: string,
                      key: ''

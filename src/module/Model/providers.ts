@@ -43,6 +43,7 @@ import XirangProviderLogo from './assets/image/providers/xirang.png'
 import ZeroOneProviderLogo from './assets/image/providers/zero-one.png'
 import ZhipuProviderLogo from './assets/image/providers/zhipu.png'
 import {Provider} from "./types";
+import {ModelProvider} from "./provider/provider";
 
 const ProviderLogoMap = {
     'openai': OpenAiProviderLogo,
@@ -97,11 +98,7 @@ export function getProviderLogo(providerId: string) {
 }
 
 export function getProviderUrl(provider: Provider) {
-    let url = provider.apiUrl
-    if (provider.data.apiHost) {
-        url = provider.data.apiHost
-    }
-    return `${url}/v1/chat/completions`
+    return ModelProvider.apiUrl(provider.type, provider.apiUrl, provider.data.apiHost)
 }
 
 export const getProviderTitle = (providerId: string) => {

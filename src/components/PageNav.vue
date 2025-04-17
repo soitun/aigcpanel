@@ -81,8 +81,8 @@ const doUser = async () => {
             </a>
             <a class="page-nav-item block text-center py-3"
                :class="activeTab==='live'?'active':''"
-               v-if="0"
                @click="$router.push('/live')"
+               v-if="0"
                href="javascript:;">
                 <div>
                     <icon-live-broadcast class="text-xl"/>

@@ -49,8 +49,7 @@ const doSave = async () => {
     }
     const wav = AudioUtil.audioBufferToWav(audioBuffer)
     formData.value.promptWav = await DataService.saveBuffer('wav', wav)
-    await StorageService.add({
-        biz: 'SoundPrompt',
+    await StorageService.add('SoundPrompt', {
         title: formData.value.name,
         content: {
             url: formData.value.promptWav,

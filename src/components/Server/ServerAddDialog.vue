@@ -40,7 +40,13 @@ const show = () => {
 }
 
 const platformInfo = computed(() => {
-    return `${modelInfo.value.platformName} ${modelInfo.value.platformArch}`
+    const platformNameMap = {
+        'win': 'Windows',
+        'osx': 'macOS',
+        'linux': 'Linux',
+    }
+    const platformName = platformNameMap[modelInfo.value.platformName] || modelInfo.value.platformName
+    return `${platformName} ${modelInfo.value.platformArch}`
 })
 const functionLabels = computed(() => {
     return functionToLabels(modelInfo.value.functions)
@@ -160,7 +166,17 @@ const doSelectLocalDir = async () => {
             localPath: serverPath,
             name: modelInfo.value.name,
         } as any)
-        logStatus.value = modelInfo.value.isSupport ? '' : t('模型不支持')
+        if (modelInfo.value.isSupport) {
+            logStatus.value = ''
+        } else {
+            logStatus.value = t('模型不支持')
+            if (modelInfo.value.platformName !== window.$mapi.app.platformName()) {
+                logStatus.value += `(${t('平台不匹配')})`
+            }
+            if (modelInfo.value.platformArch !== window.$mapi.app.platformArch()) {
+                logStatus.value += `(${t('芯片架构不匹配')})`
+            }
+        }
     } catch (e) {
         console.log('ServerImportLocalDialog.doSelectLocalDir.error', e)
         Dialog.tipError(t('模型目录识别失败，请选择正确的模型目录'))
@@ -291,7 +307,7 @@ const emit = defineEmits({
                                 {{ $t('重新选择') }}
                             </a-button>
                         </div>
-                        <div class="flex-grow pl-3 text-sm truncate">
+                        <div class="flex-grow pl-3 text-sm truncate text-red-600">
                             {{ logStatus }}
                         </div>
                     </div>

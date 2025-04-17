@@ -155,7 +155,7 @@ defineExpose({
                         <div class="mb-2 font-bold">{{ $t('API密钥') }}</div>
                         <div>
                             <a-input-password
-                                :value="provider.data.apiKey"
+                                :model-value="provider.data.apiKey"
                                 @input="modelStore.change(provider.id,'data.apiKey',$event)"
                                 class="w-full">
                                 <template #suffix>

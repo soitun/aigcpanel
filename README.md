@@ -432,11 +432,11 @@ npm run build
         <tr>
             <td>
                 <img style="width:100%;"
-                     src="https://aigcpanel.com/app_manager/image/wechat" />
+                     src="https://modstart.com/code_dynamic/modstart_wx" />
             </td>
             <td>
                 <img style="width:100%;" 
-                     src="https://aigcpanel.com/app_manager/image/qq" />
+                     src="https://modstart.com/code_dynamic/modstart_qq" />
             </td>
         </tr>
     </tbody>

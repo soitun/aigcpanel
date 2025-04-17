@@ -1,4 +1,4 @@
-export type StorageBiz = 'SoundPrompt'
+export type StorageBiz = 'SoundPrompt' | 'LiveAvatar' | 'LiveKnowledge'
 
 export type StorageRecord = {
     id?: number;
@@ -56,11 +56,12 @@ export const StorageService = {
                                           ORDER BY id DESC`, [biz])
         return records.map(this.decodeRecord) as StorageRecord[]
     },
-    async add(record: StorageRecord) {
+    async add(biz: StorageBiz, record: Partial<StorageRecord>) {
         const fields = [
             'biz', 'title', 'sort', 'content',
         ]
-        record = this.encodeRecord(record)
+        record['biz'] = biz
+        record = this.encodeRecord(record as StorageRecord)
         const values = fields.map(f => record[f])
         const valuesPlaceholder = fields.map(f => '?')
         const id = await window.$mapi.db.insert(`INSERT INTO ${this.tableName()} (${fields.join(',')})
@@ -74,6 +75,13 @@ export const StorageService = {
         return await window.$mapi.db.execute(`UPDATE ${this.tableName()}
                                               SET ${set}
                                               WHERE id = ?`, [...values, id])
+    },
+    async addOrUpdate(biz: StorageBiz, id: number, record: Partial<StorageRecord>) {
+        if (!id) {
+            await this.add(biz, record)
+        } else {
+            await this.update(id, record)
+        }
     },
     async delete(record: StorageRecord) {
         const filesForClean: string[] = []
