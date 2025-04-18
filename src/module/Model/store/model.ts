@@ -10,8 +10,19 @@ import {ModelChatResult, ModelProvider} from "../provider/provider";
 import {mapError} from "../../../lib/error";
 import {Dialog} from "../../../lib/dialog";
 import {t} from "../../../lang";
+import {useUserStore} from "../../../store/modules/user";
+import {watch} from "vue";
+import {AppConfig} from "../../../config";
 
-export const appStore = defineStore("model", {
+const userStore = useUserStore()
+
+watch(() => userStore.data, (newValue) => {
+    model.init().then()
+}, {
+    deep: true,
+})
+
+export const modelStore = defineStore("model", {
     state() {
         return {
             providers: [] as Provider[],
@@ -74,6 +85,40 @@ export const appStore = defineStore("model", {
                                 enabled: false,
                             }
                         })
+                    })
+                }
+                // 云端模型
+                if (userStore.data && userStore.data.lmApi && userStore.data.lmApi.models) {
+                    const lmApi = userStore.data.lmApi
+                    const models: Model[] = []
+                    for (const m of lmApi.models) {
+                        models.push({
+                            id: m,
+                            provider: 'buildIn',
+                            name: m,
+                            group: 'Default',
+                            types: ['text'],
+                            enabled: true,
+                        })
+                    }
+                    results.unshift({
+                        id: 'buildIn',
+                        type: 'openai',
+                        title: getProviderTitle('buildIn'),
+                        logo: getProviderLogo('buildIn'),
+                        isSystem: true,
+                        apiUrl: lmApi.apiUrl,
+                        websites: {
+                            official: AppConfig.website,
+                            docs: AppConfig.website,
+                            models: AppConfig.website,
+                        },
+                        data: {
+                            apiKey: lmApi.apiKey,
+                            apiHost: '',
+                            models: models,
+                            enabled: true,
+                        }
                     })
                 }
                 if (storageData.providerData) {
@@ -314,9 +359,8 @@ export const appStore = defineStore("model", {
     }
 })
 
-export const model = appStore(store)
-model.init().then(() => {
-})
+export const model = modelStore(store)
+model.init().then()
 
 export const useModelStore = () => {
     return model

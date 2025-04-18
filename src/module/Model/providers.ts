@@ -42,10 +42,12 @@ import VoyageAIProviderLogo from './assets/image/providers/voyageai.png'
 import XirangProviderLogo from './assets/image/providers/xirang.png'
 import ZeroOneProviderLogo from './assets/image/providers/zero-one.png'
 import ZhipuProviderLogo from './assets/image/providers/zhipu.png'
+import BuildInProviderLogo from './../../assets/image/logo.svg'
 import {Provider} from "./types";
 import {ModelProvider} from "./provider/provider";
 
 const ProviderLogoMap = {
+    'buildIn': BuildInProviderLogo,
     'openai': OpenAiProviderLogo,
     'silicon': SiliconFlowProviderLogo,
     'deepseek': DeepSeekProviderLogo,
@@ -103,6 +105,7 @@ export function getProviderUrl(provider: Provider) {
 
 export const getProviderTitle = (providerId: string) => {
     const map = {
+        "buildIn": "云端大模型",
         "aihubmix": "AiHubMix",
         "alayanew": "Alaya NeW",
         "anthropic": "Anthropic",

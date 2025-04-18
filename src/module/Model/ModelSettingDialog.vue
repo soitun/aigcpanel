@@ -8,7 +8,11 @@ import ModelAddDialog from "./components/ModelAddDialog.vue";
 import ModelEditDialog from "./components/ModelEditDialog.vue";
 import ProviderTestDialog from "./components/ProviderTestDialog.vue";
 import {getModelLogo} from "./models";
+import {useUserStore} from "../../store/modules/user";
+import {useSettingStore} from "../../store/modules/setting";
 
+const userStore = useUserStore()
+const setting = useSettingStore()
 const modelStore = useModelStore()
 const visible = ref(false)
 const providerAdd = ref<InstanceType<typeof ProviderAddDialog> | null>(null)
@@ -16,6 +20,12 @@ const providerEdit = ref<InstanceType<typeof ProviderEditDialog> | null>(null)
 const modelAdd = ref<InstanceType<typeof ModelAddDialog> | null>(null)
 const modelEdit = ref<InstanceType<typeof ModelEditDialog> | null>(null)
 const providerTest = ref<InstanceType<typeof ProviderTestDialog> | null>(null)
+const doUser = async () => {
+    if (!setting.basic.userEnable) {
+        return
+    }
+    await window.$mapi.user.open()
+}
 
 const keywords = ref('')
 const currentProviderId = ref('')
@@ -147,11 +157,11 @@ defineExpose({
                             </a>
                         </div>
                         <div>
-                            <a-switch :value="provider.data.enabled"
+                            <a-switch :model-value="provider.data.enabled"
                                       @change="modelStore.change(provider.id,'data.enabled',$event)"/>
                         </div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3" v-if="provider.id!=='buildIn'">
                         <div class="mb-2 font-bold">{{ $t('API密钥') }}</div>
                         <div>
                             <a-input-password
@@ -168,7 +178,7 @@ defineExpose({
                             </a-input-password>
                         </div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3" v-if="provider.id!=='buildIn'">
                         <div class="mb-2 font-bold">{{ $t('API地址') }}</div>
                         <div>
                             <a-input
@@ -183,9 +193,24 @@ defineExpose({
                             </div>
                         </div>
                     </div>
+                    <div class="mb-3 flex items-center" v-if="provider.id==='buildIn'">
+                        <div class="flex-grow">
+                            <icon-check/>
+                            {{ $t('内置模型无需配置可直接使用') }}
+                        </div>
+                        <div>
+                            {{ $t('可用Token') }}
+                            <span class="font-bold">{{ ((userStore.data.lmApi?.quota || 0) / 1000).toFixed(2) }}K</span>
+                        </div>
+                        <div>
+                            <a-button class="ml-2" @click="doUser">
+                                {{ $t('充值') }}
+                            </a-button>
+                        </div>
+                    </div>
                     <div class="mb-3">
                         <div class="mb-2 font-bold">{{ $t('模型') }}</div>
-                        <div class="mb-2 text-sm text-gray-400">
+                        <div class="mb-2 text-sm text-gray-400" v-if="provider.id!=='buildIn'">
                             {{ $t('查看') }}
                             <a :href="provider?.websites.docs"
                                target="_blank"
@@ -222,12 +247,14 @@ defineExpose({
                                                           @change="modelStore.changeModel(provider.id,m.id,'enabled',$event)"
                                                           class="mr-2"></a-switch>
                                                 <a-button @click="modelEdit?.show(m)"
+                                                          v-if="provider.id!=='buildIn'"
                                                           class="mr-2">
                                                     <template #icon>
                                                         <icon-settings/>
                                                     </template>
                                                 </a-button>
-                                                <a-button @click="modelStore.modelDelete(provider.id,m.id)">
+                                                <a-button @click="modelStore.modelDelete(provider.id,m.id)"
+                                                          v-if="provider.id!=='buildIn'">
                                                     <template #icon>
                                                         <icon-delete/>
                                                     </template>
@@ -238,7 +265,7 @@ defineExpose({
                                 </a-collapse-item>
                             </a-collapse>
                         </div>
-                        <div class="mb-2">
+                        <div class="mb-2" v-if="provider.id!=='buildIn'">
                             <a-button @click="modelAdd?.show()">
                                 <template #icon>
                                     <icon-plus/>
