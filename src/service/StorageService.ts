@@ -48,6 +48,16 @@ export const StorageService = {
                                          WHERE id = ?`, [id])
         return this.decodeRecord(record)
     },
+    async listByIds(ids: number[]): Promise<StorageRecord[]> {
+        if (!ids || ids.length === 0) {
+            return []
+        }
+        const records: StorageRecord[] =
+            await window.$mapi.db.select(`SELECT *
+                                          FROM ${this.tableName()}
+                                          WHERE id IN (${ids.join(',')})`, [])
+        return records.map(this.decodeRecord) as StorageRecord[]
+    },
     async list(biz: StorageBiz): Promise<StorageRecord[]> {
         const records: StorageRecord[] =
             await window.$mapi.db.select(`SELECT *

@@ -18,6 +18,10 @@ const props = defineProps({
     recordFilter: {
         type: Function,
         default: (r: StorageRecord) => true
+    },
+    disabled: {
+        type: Boolean,
+        default: false
     }
 });
 const emit = defineEmits<{
@@ -75,8 +79,8 @@ const onSelectChange = (keys: number[]) => {
 </script>
 
 <template>
-    <div>
-        <div v-if="recordsSelect.length>0">
+    <div class="w-full">
+        <div v-if="recordsSelect.length>0" class="border pt-2 pl-2 pr-1 pb-1 rounded-lg mb-2">
             <div v-for="r in recordsSelect"
                  class="inline-flex items-center mr-1 mb-1 bg-gray-100 rounded-full p-1 pl-3">
                 <div>
@@ -84,6 +88,7 @@ const onSelectChange = (keys: number[]) => {
                 </div>
                 <div>
                     <a-button size="mini" shape="round"
+                              :disabled="props.disabled"
                               @click="doDelete(r.id as number)">
                         <template #icon>
                             <icon-close/>
@@ -93,7 +98,7 @@ const onSelectChange = (keys: number[]) => {
             </div>
         </div>
         <div>
-            <a-button @click="doShow">
+            <a-button @click="doShow" :disabled="props.disabled">
                 <template #icon>
                     <icon-plus/>
                 </template>

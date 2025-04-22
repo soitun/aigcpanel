@@ -1,10 +1,10 @@
 export type LiveStatusType = 'stopped' | 'starting' | 'running' | 'stopping' | 'error'
 
-export type LiveKnowledgeSystemType = 'userEnter' | 'userLike' | 'userGift'
+export type LiveKnowledgeSystemType = 'UserEnter' | 'UserLike' | 'UserGift'
 
 export type LiveKnowledgeContentType = {
     enable: boolean,
-    type: 'flow' | 'user' | 'system',
+    type: 'flowVideo' | 'flowTalk' | 'user' | 'system',
     systemType: LiveKnowledgeSystemType,
     tags: [],
     keywords: string,
@@ -13,4 +13,5 @@ export type LiveKnowledgeContentType = {
         value: string
     }[],
     url: string,
+    durationMode: 'sound' | 'video',
 }

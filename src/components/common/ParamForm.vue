@@ -2,6 +2,7 @@
 import {ref, watch} from "vue";
 import {cloneDeep} from "lodash-es";
 import SpeakerSelector from "./SpeakerSelector.vue";
+import SoundPromptSelector from "../Sound/components/SoundPromptSelector.vue";
 
 type FieldBasicType = {
     name: string,
@@ -93,7 +94,7 @@ defineExpose({
 </script>
 
 <template>
-    <div v-for="item in formData" :key="item.name" class="mr-2 inline-flex items-center">
+    <div v-for="item in formData" :key="item.name" class="mr-2 mb-2 inline-flex items-center">
         <div class="mr-1">
             <a-popover position="bottom">
                 <i v-if="item.icon" :class="item.icon"></i>
@@ -126,6 +127,7 @@ defineExpose({
         <div v-else-if="item.type==='select'" class="mr-3">
             <a-select :placeholder="item.placeholder"
                       size="small"
+                      style="width:auto;"
                       v-model="item.value">
                 <a-option v-for="option in item.options"
                           :key="option.value"
@@ -148,6 +150,9 @@ defineExpose({
         <div v-else-if="item.type==='speaker'" class="w-48 mr-3">
             <SpeakerSelector v-model="item.value" :speakers="item['speakers']"
                              @on-data-update="onSpeakerDataUpdate(item.name,$event)"/>
+        </div>
+        <div v-else-if="item.type==='soundPromptId'" class="w-48 mr-3">
+            <SoundPromptSelector v-model="item.value"/>
         </div>
         <div v-for="speakerParam in item['speakerParam']">
             <div v-if="!speakerParam.type||speakerParam.type==='select'" class="mr-3">
