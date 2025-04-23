@@ -43,6 +43,7 @@ const EMPTY_RUNTIME = {
     audioFps: 0,
     audioRtmp: "",
     audioHls: "",
+    liveMonitor: false,
 }
 
 export const liveStore = defineStore("live", {
@@ -90,6 +91,7 @@ export const liveStore = defineStore("live", {
                 ttsProviderParam: {} as {
                     [key: string]: any
                 },
+                liveMonitorUrl: 'https://live.douyin.com/480755161895',
             }
         },
         status: 'stopped' as LiveStatusType,
@@ -352,6 +354,7 @@ export const liveStore = defineStore("live", {
             await window.$mapi.file.write('config-data-demo.json', configPostContent)
             // console.log('live.start', configPostContent)
             this.status = 'starting'
+            this.runtime.liveMonitor = false
             this.monitorData.status = 'starting'
             const res = await this.apiRequest('start', {config: ObjectUtil.clone(configPost)})
             // console.log('live.start', res)
@@ -374,6 +377,31 @@ export const liveStore = defineStore("live", {
                 return
             }
             this.statusMsg = ''
+        },
+        onMonitorBroadcast(data: any) {
+            console.log('MonitorEvent', JSON.stringify(data))
+        },
+        async startMonitor() {
+            if (!this.localConfig.config.liveMonitorUrl) {
+                Dialog.tipError('请先设置直播间地址')
+                return
+            }
+            window.__page.onBroadcast('MonitorEvent', this.onMonitorBroadcast)
+            window.$mapi.app.windowOpen('monitor', {
+                title: '直播监听',
+                width: 1300,
+                height: 800,
+                url: this.localConfig.config.liveMonitorUrl,
+                script: 'server/live_monitor_script',
+                openDevTools: false,
+                broadcastPages: ['main'],
+            })
+            this.runtime.liveMonitor = true
+        },
+        async stopMonitor() {
+            window.$mapi.app.windowClose('monitor')
+            window.__page.offBroadcast('MonitorEvent', this.onMonitorBroadcast)
+            this.runtime.liveMonitor = false
         }
     }
 })

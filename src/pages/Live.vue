@@ -46,6 +46,16 @@ onMounted(() => {
                     直播控制台
                 </div>
             </div>
+            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+                 :class="tab === 'comment' ? 'bg-gray-200' : ''"
+                 @click="tab = 'comment'">
+                <div class="text-base">
+                    <div class="inline-block w-6">
+                        <icon-message/>
+                    </div>
+                    直播评论
+                </div>
+            </div>
         </div>
         <div class="flex-grow h-full overflow-y-auto">
             <div class="text-center py-32 text-lg">
