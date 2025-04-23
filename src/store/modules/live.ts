@@ -44,6 +44,7 @@ const EMPTY_RUNTIME = {
     audioRtmp: "",
     audioHls: "",
     liveMonitor: false,
+    liveMonitorEvent: null,
 }
 
 export const liveStore = defineStore("live", {
@@ -378,8 +379,35 @@ export const liveStore = defineStore("live", {
             }
             this.statusMsg = ''
         },
+        fireEvent(type, data) {
+            this.apiRequest('event', {type, data})
+        },
         onMonitorBroadcast(data: any) {
             console.log('MonitorEvent', JSON.stringify(data))
+            this.runtime.liveMonitorEvent = data
+            // {"type":"Comment","data":{"source":"douyin","username":"老*****","content":"111"}}
+            StorageService.add('LiveComment', {
+                title: data.type,
+                content: data.data
+            })
+            if (data.type === 'Enter') {
+                this.fireEvent('UserEnter', {
+                    username: data.data.username,
+                })
+            } else if (data.type === 'Like') {
+                this.fireEvent('UserLike', {
+                    username: data.data.username,
+                })
+            } else if (data.type === 'Gift') {
+                this.fireEvent('UserGift', {
+                    username: data.data.username,
+                })
+            } else if (data.type === 'Comment') {
+                this.fireEvent('UserComment', {
+                    content: data.data.content,
+                    username: data.data.username,
+                })
+            }
         },
         async startMonitor() {
             if (!this.localConfig.config.liveMonitorUrl) {

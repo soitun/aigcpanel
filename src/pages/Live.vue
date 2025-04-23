@@ -2,9 +2,6 @@
 
 import {onMounted, ref} from "vue";
 import Router from "../router";
-import LiveKnowledge from "./Live/LiveKnowledge.vue";
-import LiveAvatar from "./Live/LiveAvatar.vue";
-import LiveMonitor from "./Live/LiveMonitor.vue";
 
 const tab = ref('');
 
@@ -53,7 +50,7 @@ onMounted(() => {
                     <div class="inline-block w-6">
                         <icon-message/>
                     </div>
-                    直播评论
+                    直播互动
                 </div>
             </div>
         </div>

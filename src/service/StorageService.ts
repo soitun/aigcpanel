@@ -1,4 +1,4 @@
-export type StorageBiz = 'SoundPrompt' | 'LiveAvatar' | 'LiveKnowledge'
+export type StorageBiz = 'SoundPrompt' | 'LiveAvatar' | 'LiveKnowledge' | 'LiveComment'
 
 export type StorageRecord = {
     id?: number;
@@ -107,6 +107,11 @@ export const StorageService = {
         await window.$mapi.db.delete(`DELETE
                                       FROM ${this.tableName()}
                                       WHERE id = ?`, [record.id])
+    },
+    async clear(biz: StorageBiz) {
+        await window.$mapi.db.delete(`DELETE
+                                      FROM ${this.tableName()}
+                                      WHERE biz = ?`, [biz])
     },
     async count(biz: StorageBiz, startTime: number = 0, endTime: number = 0) {
         let sql = `SELECT COUNT(*) as cnt
