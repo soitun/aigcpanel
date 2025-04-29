@@ -53,9 +53,8 @@ export const liveStore = defineStore("live", {
             return serverStore.records.find(item => item.functions.includes('live')) as ServerRecord | undefined
         }) as any,
         available: computed(() => {
-            //TODO
-            return true
-            return live.server && live.server.status === EnumServerStatus.RUNNING
+            const server = serverStore.records.find(item => item.functions.includes('live')) as ServerRecord | undefined
+            return server && server.status === EnumServerStatus.RUNNING
         }),
         serverConfig: [] as {
             ttsProviders: {
@@ -133,24 +132,23 @@ export const liveStore = defineStore("live", {
                     this.config = ObjectUtil.clone(EMPTY_CONFIG)
                     this.runtime = ObjectUtil.clone(EMPTY_RUNTIME)
                 }
-                this.statusUpdateTimer = setTimeout(this.update, 2000)
+                this.statusUpdateTimer = setTimeout(this.statusUpdate, 2000)
                 return
             }
             // console.log('server', {
             //     serverInfo,
             //     server: ObjectUtil.clone(this.server),
             // })
-            //TODO
-            if (0 && this.server.status !== EnumServerStatus.RUNNING) {
+            if (this.server.status !== EnumServerStatus.RUNNING) {
                 this.config = ObjectUtil.clone(EMPTY_CONFIG)
                 this.runtime = ObjectUtil.clone(EMPTY_RUNTIME)
-                this.statusUpdateTimer = setTimeout(this.update, 2000)
+                this.statusUpdateTimer = setTimeout(this.statusUpdate, 2000)
                 return
             }
             const res = await this.apiRequest('status', {})
             // console.log('res', JSON.stringify(res, null, 2))
             if (res.code) {
-                this.statusUpdateTimer = setTimeout(this.update, 2000)
+                this.statusUpdateTimer = setTimeout(this.statusUpdate, 2000)
                 return
             }
             const {config, runtime, monitor} = res.data
