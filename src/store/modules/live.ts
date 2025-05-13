@@ -389,19 +389,19 @@ export const liveStore = defineStore("live", {
                 content: data.data
             })
             if (data.type === 'Enter') {
-                this.fireEvent('UserEnter', {
+                this.fireEvent('Enter', {
                     username: data.data.username,
                 })
             } else if (data.type === 'Like') {
-                this.fireEvent('UserLike', {
+                this.fireEvent('Like', {
                     username: data.data.username,
                 })
-            } else if (data.type === 'Gift') {
-                this.fireEvent('UserGift', {
-                    username: data.data.username,
-                })
+                // } else if (data.type === 'Gift') {
+                //     this.fireEvent('Gift', {
+                //         username: data.data.username,
+                //     })
             } else if (data.type === 'Comment') {
-                this.fireEvent('UserComment', {
+                this.fireEvent('Comment', {
                     content: data.data.content,
                     username: data.data.username,
                 })
