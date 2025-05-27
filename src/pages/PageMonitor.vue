@@ -93,7 +93,16 @@ watch(web, (newVal) => {
                 pageStatusMsg.value = data.msg
             } else if ('event' === type) {
                 pageStatusType.value = 'info'
-                pageStatusMsg.value = JSON.stringify(data)
+                // {"type":"Enter","data":{"source":"douyin","username":"啊龟 ","content":"来了"}}
+                // Enter ( source: douyin, username: 啊龟 , content: 来了 )
+                const format = (data: any) => {
+                    const dataList: string[] = []
+                    for (const key in data.data) {
+                        dataList.push(`${key}:${data.data[key]}`)
+                    }
+                    return `<span class="bg-gray-200 leading-6 px-2 rounded">${data.type}</span> <span class="text-gray-600">( ${dataList.join(', ')} )</span>`
+                }
+                pageStatusMsg.value = format(data)
                 window.__page.ipcSend('MonitorEvent', data.type, data.data)
             }
         }
@@ -114,9 +123,7 @@ onMounted(async () => {
                 刷新
             </a-button>
             <div class="ml-2">
-                <div :style="{color:pageStatusColor}">
-                    {{ pageStatusMsg }}
-                </div>
+                <div :style="{color:pageStatusColor}" v-html="pageStatusMsg"></div>
             </div>
         </div>
         <div>

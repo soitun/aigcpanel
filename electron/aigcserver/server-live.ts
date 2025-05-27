@@ -63,6 +63,7 @@ export const ServerLive: ServerContext = {
             const res = await this.ServerApi.request(`${this.url()}ping`)
             return true
         } catch (e) {
+            console.log('ping error', e)
         }
         return false
     },
@@ -99,7 +100,7 @@ export const ServerLive: ServerContext = {
         url: string,
         param: any,
     }, option: any) {
-        serverRuntime.port = 60617
+        // serverRuntime.port = 60617
         // console.log('apiRequest', {url: this.url(), data, option})
         const {url, param} = data
         return this.ServerApi.request(`${this.url()}${url}`, param, {

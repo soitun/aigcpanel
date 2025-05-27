@@ -190,7 +190,11 @@ ipcMain.handle('server:callFunction', async (event, serverInfo: ServerInfo, meth
         const error = mapError(e)
         Log.error('mapi.server.callFunction.error', {
             type: typeof (e),
-            error
+            error,
+            serverInfo,
+            method,
+            data,
+            option
         })
         return {
             code: -1,

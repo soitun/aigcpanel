@@ -11,7 +11,11 @@ import {StorageService} from "../../service/StorageService";
 
 const serverStore = useServerStore()
 
-const EMPTY_CONFIG = {
+const SCENE_ID = 'live'
+const EMPTY_LIVE_STATUS = {
+    id: SCENE_ID,
+    status: 'stopped',
+    statusMsg: '',
     avatar: {
         enable: false,
         width: 0,
@@ -25,26 +29,32 @@ const EMPTY_CONFIG = {
     audio: {
         enable: false,
     },
-}
-
-const EMPTY_RUNTIME = {
-    status: "",
-    avatarStatus: "",
-    avatarVideoFps: 0,
-    avatarAudioFps: 0,
+    avatars: [] as {
+        id: string,
+        title: string,
+        url: string,
+        status: 'init',
+        statusMsg: '',
+    }[],
+    videoTitle: '',
+    talkTitle: '',
+    talkContent: '',
     avatarRtmp: "",
     avatarHls: "",
-    videoStatus: "",
-    videoVideoFps: 0,
-    videoAudioFps: 0,
     videoRtmp: "",
     videoHls: "",
-    audioStatus: "",
-    audioFps: 0,
     audioRtmp: "",
     audioHls: "",
-    liveMonitor: false,
-    liveMonitorEvent: null,
+    runtime: {
+        avatarStatus: "",
+        avatarVideoFps: 0,
+        avatarAudioFps: 0,
+        videoStatus: "",
+        videoVideoFps: 0,
+        videoAudioFps: 0,
+        audioStatus: "",
+        audioFps: 0,
+    },
 }
 
 export const liveStore = defineStore("live", {
@@ -56,8 +66,8 @@ export const liveStore = defineStore("live", {
             const server = serverStore.records.find(item => item.functions.includes('live')) as ServerRecord | undefined
             return server && server.status === EnumServerStatus.RUNNING
         }),
-        serverConfig: [] as {
-            ttsProviders: {
+        serverConfig: {
+            ttsProviders: [] as {
                 name: string,
                 title: string,
                 param: {
@@ -67,7 +77,7 @@ export const liveStore = defineStore("live", {
                     [key: string]: any
                 }[]
             }[]
-        }[],
+        },
         localConfig: {
             mode: 'avatar' as 'avatar' | 'audio',
             avatar: {
@@ -81,9 +91,7 @@ export const liveStore = defineStore("live", {
                 height: 480,
             },
             config: {
-                flowVideoIds: [],
                 flowVideoMode: 'order' as 'order' | 'random',
-                flowTalkIds: [],
                 flowTalkMode: 'order' as 'order' | 'random',
                 flowTalkDelayMin: 5,
                 flowTalkDelayMax: 10,
@@ -91,31 +99,26 @@ export const liveStore = defineStore("live", {
                 ttsProviderParam: {} as {
                     [key: string]: any
                 },
-                liveMonitorUrl: 'https://live.douyin.com/480755161895',
+                liveMonitorUrl: 'https://live.douyin.com/xxx',
             }
         },
         status: 'stopped' as LiveStatusType,
         statusMsg: '',
-        config: ObjectUtil.clone(EMPTY_CONFIG),
-        runtime: ObjectUtil.clone(EMPTY_RUNTIME),
-        monitor: {
-            videoTitle: '',
-            talkTitle: '',
-            talkContent: '',
+        liveStatusTimer: undefined as any,
+        liveStatus: ObjectUtil.clone(EMPTY_LIVE_STATUS),
+        liveRuntime: {
+            liveMonitor: false,
+            liveMonitorEvent: null as any,
         },
-        monitorData: {
-            status: 'starting' as 'starting' | 'preparing' | 'running' | 'stopped',
-            statusMsg: '',
-            avatars: [],
-            flowVideos: [],
-            flowTalks: [],
-            users: [],
-            systems: [],
-        },
-
-        statusUpdateTimer: undefined as any,
-        avatars: [],
-        knowledge: [],
+        // monitorData: {
+        //     status: 'starting' as 'starting' | 'preparing' | 'running' | 'stopped',
+        //     statusMsg: '',
+        //     avatars: [],
+        //     flowVideos: [],
+        //     flowTalks: [],
+        //     users: [],
+        //     systems: [],
+        // },
     }),
     actions: {
         async init() {
@@ -123,16 +126,15 @@ export const liveStore = defineStore("live", {
         },
         async statusUpdate() {
             // console.log('update live', JSON.stringify(this.server))
-            if (this.statusUpdateTimer) {
-                clearTimeout(this.statusUpdateTimer)
+            if (this.liveStatusTimer) {
+                clearTimeout(this.liveStatusTimer)
             }
             if (!this.server) {
                 if (this.status !== 'stopped') {
                     this.status = 'stopped'
-                    this.config = ObjectUtil.clone(EMPTY_CONFIG)
-                    this.runtime = ObjectUtil.clone(EMPTY_RUNTIME)
+                    this.liveStatus = ObjectUtil.clone(EMPTY_LIVE_STATUS)
                 }
-                this.statusUpdateTimer = setTimeout(this.statusUpdate, 2000)
+                this.liveStatusTimer = setTimeout(this.statusUpdate, 2000)
                 return
             }
             // console.log('server', {
@@ -140,72 +142,55 @@ export const liveStore = defineStore("live", {
             //     server: ObjectUtil.clone(this.server),
             // })
             if (this.server.status !== EnumServerStatus.RUNNING) {
-                this.config = ObjectUtil.clone(EMPTY_CONFIG)
-                this.runtime = ObjectUtil.clone(EMPTY_RUNTIME)
-                this.statusUpdateTimer = setTimeout(this.statusUpdate, 2000)
+                this.liveStatus = ObjectUtil.clone(EMPTY_LIVE_STATUS)
+                this.liveStatusTimer = setTimeout(this.statusUpdate, 2000)
                 return
             }
             const res = await this.apiRequest('status', {})
             // console.log('res', JSON.stringify(res, null, 2))
             if (res.code) {
-                this.statusUpdateTimer = setTimeout(this.statusUpdate, 2000)
+                this.liveStatusTimer = setTimeout(this.statusUpdate, 2000)
                 return
             }
-            const {config, runtime, monitor} = res.data
+            const data = res.data.scenes[0] || null
 
-            this.runtime.status = runtime.status
-            this.runtime.avatarStatus = runtime.avatarStatus
-            this.runtime.avatarVideoFps = runtime.avatarVideoFps
-            this.runtime.avatarAudioFps = runtime.avatarAudioFps
-            this.runtime.avatarRtmp = runtime.avatarRtmp
-            this.runtime.avatarHls = runtime.avatarHls
-            this.runtime.videoStatus = runtime.videoStatus
-            this.runtime.videoVideoFps = runtime.videoVideoFps
-            this.runtime.videoAudioFps = runtime.videoAudioFps
-            this.runtime.videoRtmp = runtime.videoRtmp
-            this.runtime.videoHls = runtime.videoHls
-            this.runtime.audioStatus = runtime.audioStatus
-            this.runtime.audioFps = runtime.audioFps
-            this.runtime.audioRtmp = runtime.audioRtmp
-            this.runtime.audioHls = runtime.audioHls
-
-            this.monitor.videoTitle = monitor.videoTitle
-            this.monitor.talkTitle = monitor.talkTitle
-            this.monitor.talkContent = monitor.talkContent
-
-            this.config.avatar.enable = config.avatar.enable
-            this.config.avatar.width = config.avatar.width
-            this.config.avatar.height = config.avatar.height
-            this.config.video.enable = config.video.enable
-            this.config.video.width = config.video.width
-            this.config.video.height = config.video.height
-            this.config.audio.enable = config.audio.enable
-
-            if (runtime.status === 'stopped') {
-                if (['running', 'stopping',].includes(this.status)) {
-                    this.status = 'stopped'
-                }
-            } else if (runtime.status === 'running') {
-                if (!['running', 'stopped'].includes(this.monitorData.status)) {
-                    const resMonitor = await this.apiRequest('monitor', {})
-                    if (resMonitor.code === 0) {
-                        const monitorData = resMonitor.data
-                        this.monitorData.status = monitorData.status
-                        this.monitorData.statusMsg = monitorData.statusMsg
-                        this.monitorData.avatars = monitorData.avatars
-                        this.monitorData.flowVideos = monitorData.flowVideos
-                        this.monitorData.flowTalks = monitorData.flowTalks
-                        this.monitorData.users = monitorData.users
-                        this.monitorData.systems = monitorData.systems
-                    }
-                }
-                if (['stopped', 'starting',].includes(this.status)) {
-                    this.status = 'running'
-                }
+            if (data) {
+                this.liveStatus.id = data.id || SCENE_ID
+                this.liveStatus.status = data.status || 'stopped'
+                this.liveStatus.statusMsg = data.statusMsg || ''
+                this.liveStatus.avatar.enable = data.avatar.enable
+                this.liveStatus.avatar.width = data.avatar.width
+                this.liveStatus.avatar.height = data.avatar.height
+                this.liveStatus.video.enable = data.video.enable
+                this.liveStatus.video.width = data.video.width
+                this.liveStatus.video.height = data.video.height
+                this.liveStatus.audio.enable = data.audio.enable
+                this.liveStatus.videoTitle = data.videoTitle
+                this.liveStatus.talkTitle = data.talkTitle
+                this.liveStatus.talkContent = data.talkContent
+                this.liveStatus.avatarRtmp = data.avatarRtmp || ''
+                this.liveStatus.avatarHls = data.avatarHls || ''
+                this.liveStatus.videoRtmp = data.videoRtmp || ''
+                this.liveStatus.videoHls = data.videoHls || ''
+                this.liveStatus.audioRtmp = data.audioRtmp || ''
+                this.liveStatus.audioHls = data.audioHls || ''
+                this.liveStatus.runtime.avatarStatus = data.runtime.avatarStatus || ''
+                this.liveStatus.runtime.avatarVideoFps = data.runtime.avatarVideoFps || 0
+                this.liveStatus.runtime.avatarAudioFps = data.runtime.avatarAudioFps || 0
+                this.liveStatus.runtime.videoStatus = data.runtime.videoStatus || ''
+                this.liveStatus.runtime.videoVideoFps = data.runtime.videoVideoFps || 0
+                this.liveStatus.runtime.videoAudioFps = data.runtime.videoAudioFps || 0
+                this.liveStatus.runtime.audioStatus = data.runtime.audioStatus || ''
+                this.liveStatus.runtime.audioFps = data.runtime.audioFps || 0
+            } else {
+                this.liveStatus = ObjectUtil.clone(EMPTY_LIVE_STATUS)
             }
-
-            this.statusUpdateTimer = setTimeout(this.statusUpdate, 5000)
-
+            if (this.liveStatus.status === 'stopped') {
+                this.status = 'stopped'
+            } else if (this.liveStatus.status === 'running') {
+                this.status = 'running'
+            }
+            this.liveStatusTimer = setTimeout(this.statusUpdate, 5000)
         },
         async apiRequest(
             url: string,
@@ -242,14 +227,13 @@ export const liveStore = defineStore("live", {
                 })
             }
             const flowVideos: any[] = []
-            const storageFlowVideos = await StorageService.listByIds(this.localConfig.config.flowVideoIds)
+            const storageFlowVideos = (await StorageService.list('LiveKnowledge')).filter(s => {
+                return s.content.type === 'flowVideo' && s.content.enable
+            })
             if (!(storageFlowVideos && storageFlowVideos.length > 0)) {
                 throw '没有选择循环素材'
             }
             for (const s of storageFlowVideos) {
-                if (s.content.type !== 'flowVideo' || !s.content.enable) {
-                    continue
-                }
                 flowVideos.push({
                     id: 'FlowVideo' + s.id,
                     title: s.title,
@@ -257,14 +241,13 @@ export const liveStore = defineStore("live", {
                 })
             }
             const flowTalks: any[] = []
-            const storageFlowTalks = await StorageService.listByIds(this.localConfig.config.flowTalkIds)
+            const storageFlowTalks = (await StorageService.list('LiveKnowledge')).filter(s => {
+                return s.content.type === 'flowTalk' && s.content.enable
+            })
             if (!(storageFlowTalks && storageFlowTalks.length > 0)) {
                 throw '没有选择循环素材'
             }
             for (const s of storageFlowTalks) {
-                if (s.content.type !== 'flowTalk' || !s.content.enable) {
-                    continue
-                }
                 s.content.replies = s.content.replies.map(r => {
                     return {
                         value: r.value,
@@ -326,6 +309,7 @@ export const liveStore = defineStore("live", {
         async start() {
             // console.log('live.start', this.localConfig)
             const configPost = {
+                id: SCENE_ID,
                 avatar: {
                     enable: this.localConfig.mode === 'avatar',
                     width: this.localConfig.avatar.width,
@@ -350,12 +334,15 @@ export const liveStore = defineStore("live", {
                 data: await this.buildData()
             }
             const configPostContent = JSON.stringify(configPost, null, 2)
-            await window.$mapi.file.write('config-data-demo.json', configPostContent)
+            await window.$mapi.file.write('data-live-last.json', configPostContent)
+            // return;
             // console.log('live.start', configPostContent)
             this.status = 'starting'
-            this.runtime.liveMonitor = false
-            this.monitorData.status = 'starting'
-            const res = await this.apiRequest('start', {config: ObjectUtil.clone(configPost)})
+            this.statusMsg = ''
+            this.liveRuntime.liveMonitor = false
+            const res = await this.apiRequest('scene/start', {
+                scene: ObjectUtil.clone(configPost)
+            })
             // console.log('live.start', res)
             if (res.code) {
                 this.status = 'error'
@@ -363,11 +350,10 @@ export const liveStore = defineStore("live", {
                 Dialog.tipError(t('启动失败') + ':' + res.msg)
                 return
             }
-            this.statusMsg = ''
         },
         async stop() {
             this.status = 'stopping'
-            const res = await this.apiRequest('stop', {})
+            const res = await this.apiRequest('scene/stop', {sceneId: SCENE_ID})
             // console.log('live.stop', res)
             if (res.code) {
                 this.status = 'error'
@@ -378,13 +364,13 @@ export const liveStore = defineStore("live", {
             this.statusMsg = ''
         },
         fireEvent(type, data) {
-            this.apiRequest('event', {type, data})
+            this.apiRequest('scene/event', {sceneId: SCENE_ID, type, data})
         },
         onMonitorBroadcast(data: any) {
             console.log('MonitorEvent', JSON.stringify(data))
-            this.runtime.liveMonitorEvent = data
+            this.liveRuntime.liveMonitorEvent = data
             // {"type":"Comment","data":{"source":"douyin","username":"老*****","content":"111"}}
-            StorageService.add('LiveComment', {
+            StorageService.add('LiveEvent', {
                 title: data.type,
                 content: data.data
             })
@@ -396,10 +382,6 @@ export const liveStore = defineStore("live", {
                 this.fireEvent('Like', {
                     username: data.data.username,
                 })
-                // } else if (data.type === 'Gift') {
-                //     this.fireEvent('Gift', {
-                //         username: data.data.username,
-                //     })
             } else if (data.type === 'Comment') {
                 this.fireEvent('Comment', {
                     content: data.data.content,
@@ -422,12 +404,12 @@ export const liveStore = defineStore("live", {
                 openDevTools: false,
                 broadcastPages: ['main'],
             })
-            this.runtime.liveMonitor = true
+            this.liveRuntime.liveMonitor = true
         },
         async stopMonitor() {
             window.$mapi.app.windowClose('monitor')
             window.__page.offBroadcast('MonitorEvent', this.onMonitorBroadcast)
-            this.runtime.liveMonitor = false
+            this.liveRuntime.liveMonitor = false
         }
     }
 })

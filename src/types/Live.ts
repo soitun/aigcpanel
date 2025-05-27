@@ -1,8 +1,8 @@
-import {UserCommentTypes} from "../pages/Live/util";
+import {EventTypes} from "../pages/Live/util";
 
 export type LiveStatusType = 'stopped' | 'starting' | 'running' | 'stopping' | 'error'
 
-export type LiveKnowledgeSystemType = typeof UserCommentTypes[number]['value']
+export type LiveKnowledgeSystemType = typeof EventTypes[number]['value']
 
 export type LiveKnowledgeContentType = {
     enable: boolean,
