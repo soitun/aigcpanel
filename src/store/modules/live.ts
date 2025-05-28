@@ -8,6 +8,7 @@ import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
 import {LiveStatusType} from "../../types/Live";
 import {StorageService} from "../../service/StorageService";
+import {VideoTemplateService} from "../../service/VideoTemplateService";
 
 const serverStore = useServerStore()
 
@@ -83,7 +84,7 @@ export const liveStore = defineStore("live", {
             avatar: {
                 width: 640,
                 height: 480,
-                avatarIds: [],
+                avatarId: 0,
             },
             audio: {},
             video: {
@@ -99,7 +100,8 @@ export const liveStore = defineStore("live", {
                 ttsProviderParam: {} as {
                     [key: string]: any
                 },
-                liveMonitorUrl: 'https://live.douyin.com/xxx',
+                liveMonitorType: 'douyin',
+                liveMonitorUrl: '',
             }
         },
         status: 'stopped' as LiveStatusType,
@@ -107,22 +109,43 @@ export const liveStore = defineStore("live", {
         liveStatusTimer: undefined as any,
         liveStatus: ObjectUtil.clone(EMPTY_LIVE_STATUS),
         liveRuntime: {
-            liveMonitor: false,
             liveMonitorEvent: null as any,
         },
-        // monitorData: {
-        //     status: 'starting' as 'starting' | 'preparing' | 'running' | 'stopped',
-        //     statusMsg: '',
-        //     avatars: [],
-        //     flowVideos: [],
-        //     flowTalks: [],
-        //     users: [],
-        //     systems: [],
-        // },
+        liveDataUpdateTimer: undefined as any,
     }),
     actions: {
         async init() {
+            const localConfig = await window.$mapi.storage.get('live', 'config', {})
+            this.localConfig.mode = localConfig.mode || this.localConfig.mode
+            this.localConfig.avatar.width = localConfig.avatar?.width || this.localConfig.avatar.width
+            this.localConfig.avatar.height = localConfig.avatar?.height || this.localConfig.avatar.height
+            this.localConfig.avatar.avatarId = localConfig.avatar?.avatarId || this.localConfig.avatar.avatarId
+            this.localConfig.video.width = localConfig.video?.width || this.localConfig.video.width
+            this.localConfig.video.height = localConfig.video?.height || this.localConfig.video.height
+            this.localConfig.config.flowVideoMode = localConfig.config?.flowVideoMode || this.localConfig.config.flowVideoMode
+            this.localConfig.config.flowTalkMode = localConfig.config?.flowTalkMode || this.localConfig.config.flowTalkMode
+            this.localConfig.config.flowTalkDelayMin = localConfig.config?.flowTalkDelayMin || this.localConfig.config.flowTalkDelayMin
+            this.localConfig.config.flowTalkDelayMax = localConfig.config?.flowTalkDelayMax || this.localConfig.config.flowTalkDelayMax
+            this.localConfig.config.ttsProvider = localConfig.config?.ttsProvider || this.localConfig.config.ttsProvider
+            this.localConfig.config.ttsProviderParam = localConfig.config?.ttsProviderParam || this.localConfig.config.ttsProviderParam
+            this.localConfig.config.liveMonitorType = localConfig.config?.liveMonitorType || this.localConfig.config.liveMonitorType
+            this.localConfig.config.liveMonitorUrl = localConfig.config?.liveMonitorUrl || this.localConfig.config.liveMonitorUrl
             await this.statusUpdate()
+        },
+        async saveLocalConfig() {
+            await window.$mapi.storage.set('live', 'config', ObjectUtil.clone(this.localConfig))
+        },
+        async onKnowledgeUpdate() {
+            if (this.status !== 'running') {
+                return
+            }
+            Dialog.tipSuccess(t('知识库更新，直播数据将会在30秒后更新'))
+            if (this.liveDataUpdateTimer) {
+                clearTimeout(this.liveDataUpdateTimer)
+            }
+            this.liveDataUpdateTimer = setTimeout(async () => {
+                await this.update()
+            }, 5 * 1000)
         },
         async statusUpdate() {
             // console.log('update live', JSON.stringify(this.server))
@@ -215,15 +238,15 @@ export const liveStore = defineStore("live", {
         },
         async buildData() {
             const avatars: any[] = []
-            const storageAvatars = await StorageService.listByIds(this.localConfig.avatar.avatarIds)
-            if (!(storageAvatars && storageAvatars.length > 0)) {
-                throw '没有选择播放的数字人'
-            }
-            for (const s of storageAvatars) {
+            if (this.localConfig.mode === 'avatar') {
+                const videoTemplate = await VideoTemplateService.get(this.localConfig.avatar.avatarId)
+                if (!videoTemplate) {
+                    throw '没有选择播放的数字人'
+                }
                 avatars.push({
-                    id: 'Avatar' + s.id,
-                    title: s.title,
-                    url: s.content.url,
+                    id: 'Avatar' + videoTemplate.id,
+                    title: videoTemplate.name,
+                    url: videoTemplate.video,
                 })
             }
             const flowVideos: any[] = []
@@ -306,7 +329,28 @@ export const liveStore = defineStore("live", {
             }
             return {avatars, flowVideos, flowTalks, users, systems}
         },
+        async update() {
+            const configPost = {
+                id: SCENE_ID,
+                config: {
+                    flowVideoMode: this.localConfig.config.flowVideoMode,
+                    flowTalkMode: this.localConfig.config.flowTalkMode,
+                    flowTalkDelayMin: this.localConfig.config.flowTalkDelayMin,
+                    flowTalkDelayMax: this.localConfig.config.flowTalkDelayMax,
+                },
+                data: await this.buildData()
+            }
+            const res = await this.apiRequest('scene/update', {
+                scene: ObjectUtil.clone(configPost)
+            })
+            if (res.code) {
+                Dialog.tipError(t('更新失败') + ':' + res.msg)
+            } else {
+                Dialog.tipSuccess(t('直播知识库已更新'))
+            }
+        },
         async start() {
+            await this.saveLocalConfig()
             // console.log('live.start', this.localConfig)
             const configPost = {
                 id: SCENE_ID,
@@ -339,7 +383,6 @@ export const liveStore = defineStore("live", {
             // console.log('live.start', configPostContent)
             this.status = 'starting'
             this.statusMsg = ''
-            this.liveRuntime.liveMonitor = false
             const res = await this.apiRequest('scene/start', {
                 scene: ObjectUtil.clone(configPost)
             })
@@ -367,7 +410,7 @@ export const liveStore = defineStore("live", {
             this.apiRequest('scene/event', {sceneId: SCENE_ID, type, data})
         },
         onMonitorBroadcast(data: any) {
-            console.log('MonitorEvent', JSON.stringify(data))
+            // console.log('MonitorEvent', JSON.stringify(data))
             this.liveRuntime.liveMonitorEvent = data
             // {"type":"Comment","data":{"source":"douyin","username":"老*****","content":"111"}}
             StorageService.add('LiveEvent', {
@@ -394,8 +437,10 @@ export const liveStore = defineStore("live", {
                 Dialog.tipError('请先设置直播间地址')
                 return
             }
+            await this.saveLocalConfig()
+            window.__page.offBroadcast('MonitorEvent', this.onMonitorBroadcast)
             window.__page.onBroadcast('MonitorEvent', this.onMonitorBroadcast)
-            window.$mapi.app.windowOpen('monitor', {
+            await window.$mapi.app.windowOpen('monitor', {
                 title: '直播监听',
                 width: 1300,
                 height: 800,
@@ -404,12 +449,9 @@ export const liveStore = defineStore("live", {
                 openDevTools: false,
                 broadcastPages: ['main'],
             })
-            this.liveRuntime.liveMonitor = true
         },
         async stopMonitor() {
-            window.$mapi.app.windowClose('monitor')
-            window.__page.offBroadcast('MonitorEvent', this.onMonitorBroadcast)
-            this.liveRuntime.liveMonitor = false
+            await window.$mapi.app.windowClose('monitor')
         }
     }
 })

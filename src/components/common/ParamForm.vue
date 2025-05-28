@@ -27,7 +27,11 @@ type FieldBasicModelType = FieldBasicType & {
 }
 
 const props = defineProps({
-    param: Array<FieldBasicType>
+    param: Array<FieldBasicType>,
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
 })
 const formData = ref<Array<FieldBasicModelType>>([])
 watch(() => props.param, (value) => {
@@ -113,6 +117,7 @@ defineExpose({
         <div v-if="item.type==='input'" class="w-48 mr-3">
             <a-input :placeholder="item.placeholder"
                      size="small"
+                     :disabled="props.disabled"
                      v-model="item.value">
             </a-input>
         </div>
@@ -120,6 +125,7 @@ defineExpose({
             <a-input-number :placeholder="item.placeholder"
                             size="small"
                             v-model="item.value"
+                            :disabled="props.disabled"
                             :min="item.min"
                             :max="item.max">
             </a-input-number>
@@ -128,6 +134,7 @@ defineExpose({
             <a-select :placeholder="item.placeholder"
                       size="small"
                       style="width:auto;"
+                      :disabled="props.disabled"
                       v-model="item.value">
                 <a-option v-for="option in item.options"
                           :key="option.value"
@@ -137,7 +144,7 @@ defineExpose({
             </a-select>
         </div>
         <div v-else-if="item.type==='switch'" class="w-48 mr-3">
-            <a-switch v-model="item.value" size="small"/>
+            <a-switch v-model="item.value" :disabled="props.disabled" size="small"/>
         </div>
         <div v-else-if="item.type==='slider'" class="w-48 mr-3">
             <a-slider v-model="item.value"
@@ -145,18 +152,21 @@ defineExpose({
                       show-tooltip
                       :min="item.min"
                       :max="item.max"
+                      :disabled="props.disabled"
                       :step="item.step"/>
         </div>
         <div v-else-if="item.type==='speaker'" class="w-48 mr-3">
             <SpeakerSelector v-model="item.value" :speakers="item['speakers']"
+                             :disabled="props.disabled"
                              @on-data-update="onSpeakerDataUpdate(item.name,$event)"/>
         </div>
         <div v-else-if="item.type==='soundPromptId'" class="w-48 mr-3">
-            <SoundPromptSelector v-model="item.value"/>
+            <SoundPromptSelector v-model="item.value" :disabled="props.disabled" />
         </div>
         <div v-for="speakerParam in item['speakerParam']">
             <div v-if="!speakerParam.type||speakerParam.type==='select'" class="mr-3">
                 <a-select size="small"
+                          :disabled="props.disabled"
                           v-model="item['speakerParamValue'][speakerParam.name]">
                     <a-option v-for="o in speakerParam.option"
                               :key="o.value"

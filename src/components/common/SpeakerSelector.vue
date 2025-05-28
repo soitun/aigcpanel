@@ -94,6 +94,10 @@ const props = defineProps({
         }>,
         default: () => [],
     },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 const modelValue = defineModel()
@@ -138,6 +142,7 @@ const filterRecords = computed(() => {
 })
 
 function doShow() {
+    if(props.disabled) return
     visible.value = true
 }
 

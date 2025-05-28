@@ -122,7 +122,7 @@ onMounted(async () => {
             <a-button shape="round" type="primary" @click="doRefresh">
                 刷新
             </a-button>
-            <div class="ml-2">
+            <div class="ml-2 select-none">
                 <div :style="{color:pageStatusColor}" v-html="pageStatusMsg"></div>
             </div>
         </div>

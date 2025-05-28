@@ -9,6 +9,8 @@ export type SendType = never
     | 'stopped'
     | 'success'
     | 'error'
+    // 其他
+    | 'action'
     // 任务
     | 'taskRunning'
     | 'taskResult'

@@ -74,6 +74,21 @@ const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime)
             case 'stopping':
             case 'stopped':
                 break
+            case 'action':
+                switch (data.type) {
+                    case 'LoginRequired':
+                    case 'VipRequired':
+                        const msgMap = {
+                            'LoginRequired': t('请先登录'),
+                            'VipRequired': t('请先开通会员'),
+                        }
+                        Dialog.tipError(msgMap[data.type])
+                        setTimeout(() => {
+                            window.$mapi.user.open().then()
+                        }, 2000)
+                        break
+                }
+                break;
             case 'taskRunning':
             case 'taskResult':
             case 'taskStatus':

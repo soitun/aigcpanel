@@ -6,23 +6,13 @@ import Router from "../router";
 const tab = ref('');
 
 onMounted(() => {
-    tab.value = Router.currentRoute.value.query.tab as string || 'avatar';
+    tab.value = Router.currentRoute.value.query.tab as string || 'knowledge';
 });
 </script>
 
 <template>
     <div class="pb-device-container bg-white h-full relative select-none flex">
         <div class="p-6 w-52 flex-shrink-0 border-r border-solid border-gray-100">
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
-                 :class="tab === 'avatar' ? 'bg-gray-200' : ''"
-                 @click="tab = 'avatar'">
-                <div class="text-base">
-                    <div class="inline-block w-6">
-                        <icon-user-group/>
-                    </div>
-                    直播数字人
-                </div>
-            </div>
             <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
                  :class="tab === 'knowledge' ? 'bg-gray-200' : ''"
                  @click="tab = 'knowledge'">
@@ -34,6 +24,16 @@ onMounted(() => {
                 </div>
             </div>
             <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+                 :class="tab === 'event' ? 'bg-gray-200' : ''"
+                 @click="tab = 'event'">
+                <div class="text-base">
+                    <div class="inline-block w-6">
+                        <icon-message/>
+                    </div>
+                    直播互动
+                </div>
+            </div>
+            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
                  :class="tab === 'monitor' ? 'bg-gray-200' : ''"
                  @click="tab = 'monitor'">
                 <div class="text-base">
@@ -41,16 +41,6 @@ onMounted(() => {
                         <icon-command/>
                     </div>
                     直播控制台
-                </div>
-            </div>
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
-                 :class="tab === 'comment' ? 'bg-gray-200' : ''"
-                 @click="tab = 'comment'">
-                <div class="text-base">
-                    <div class="inline-block w-6">
-                        <icon-message/>
-                    </div>
-                    直播互动
                 </div>
             </div>
         </div>
