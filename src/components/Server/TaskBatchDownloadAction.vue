@@ -62,7 +62,7 @@ const doDownload = async () => {
 </script>
 
 <template>
-    <a-tooltip :content="$t('下载')">
+    <a-tooltip :content="$t('下载')" mini>
         <a-button class="mr-2"
                   :disabled="!canDownload"
                   @click="doDownload()">

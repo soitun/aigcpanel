@@ -187,7 +187,7 @@ defineExpose({
     <div class="rounded-xl shadow border p-4">
         <div class="flex items-center h-12">
             <div class="mr-1">
-                <a-tooltip :content="$t('模型')">
+                <a-tooltip :content="$t('模型')" mini>
                     <i class="iconfont icon-server"></i>
                     {{ $t('模型') }}
                 </a-tooltip>
@@ -198,7 +198,7 @@ defineExpose({
         </div>
         <div class="flex items-center h-12">
             <div class="mr-1">
-                <a-tooltip :content="$t('形象')">
+                <a-tooltip :content="$t('形象')" mini>
                     <i class="iconfont icon-video-template"></i>
                     {{ $t('形象') }}
                 </a-tooltip>
@@ -216,7 +216,7 @@ defineExpose({
         </div>
         <div class="flex items-center h-12">
             <div class="mr-1">
-                <a-tooltip :content="$t('声音')">
+                <a-tooltip :content="$t('声音')" mini>
                     <i class="iconfont icon-sound"></i>
                     {{ $t('声音') }}
                 </a-tooltip>

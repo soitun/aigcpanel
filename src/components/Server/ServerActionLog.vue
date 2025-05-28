@@ -18,7 +18,7 @@ const logFile = computed(() => {
 </script>
 
 <template>
-    <a-tooltip :content="$t('日志')">
+    <a-tooltip :content="$t('日志')" mini>
         <a-button class="mr-2"
                   @click="viewerDialog?.show()"
                   :disabled="!logFile">

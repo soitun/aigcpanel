@@ -158,7 +158,7 @@ const emit = defineEmits({
     <div class="rounded-xl shadow border p-4">
         <div class="flex items-center h-12">
             <div class="mr-1">
-                <a-tooltip :content="$t('模型')">
+                <a-tooltip :content="$t('模型')" mini>
                     <i class="iconfont icon-server"></i>
                 </a-tooltip>
             </div>
@@ -166,7 +166,7 @@ const emit = defineEmits({
                 <ServerSelector v-model="formData.serverKey" @update="onServerUpdate" functionName="soundClone"/>
             </div>
             <div class="mr-1">
-                <a-tooltip :content="$t('音色')">
+                <a-tooltip :content="$t('音色')" mini>
                     <i class="iconfont icon-sound-prompt"></i>
                 </a-tooltip>
             </div>

@@ -6,6 +6,7 @@ import {Dialog} from "../../lib/dialog";
 import VideoTemplateEditDialog from "../../components/Video/VideoTemplateEditDialog.vue";
 import {VideoTemplateRecord, VideoTemplateService} from "../../service/VideoTemplateService";
 import VideoPlayer from "../../components/common/VideoPlayer.vue";
+import InputInlineEditor from "../../components/common/InputInlineEditor.vue";
 
 const editDialog = ref<InstanceType<typeof VideoTemplateEditDialog>>()
 const records = ref<VideoTemplateRecord[]>([])
@@ -24,6 +25,12 @@ onMounted(async () => {
 const doDelete = async (record: VideoTemplateRecord) => {
     await Dialog.confirm(t('确认删除？'))
     await VideoTemplateService.delete(record)
+    await doRefresh()
+}
+
+const onChangeTitle = async (record: VideoTemplateRecord, value: string) => {
+    record.name = value
+    await VideoTemplateService.update(record)
     await doRefresh()
 }
 
@@ -54,9 +61,17 @@ const onUpdate = async () => {
                 <div v-for="r in records" :key="r.id" class="w-1/3 flex-shrink-0 p-2">
                     <div class="rounded-xl shadow border p-4 hover:shadow-lg">
                         <div class="flex mb-3">
-                            <div class="flex-grow">
-                                <div class="inline-block mr-2 bg-blue-100 rounded-full px-2 leading-8 h-8">
-                                    {{ r.name }}
+                            <div class="flex-grow w-0 mr-2">
+                                <div
+                                    class="inline-flex max-w-full items-center bg-blue-100 rounded-full px-2 leading-8 h-8">
+                                    <div class="truncate overflow-hidden flex-grow cursor-pointer">
+                                        {{ r.name }}
+                                    </div>
+                                    <InputInlineEditor :value="r.name" @change="onChangeTitle(r, $event)">
+                                        <a class="ml-1 text-gray-400" href="javascript:;">
+                                            <icon-pen/>
+                                        </a>
+                                    </InputInlineEditor>
                                 </div>
                             </div>
                             <div>

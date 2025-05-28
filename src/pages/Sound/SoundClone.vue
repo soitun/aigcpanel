@@ -15,6 +15,7 @@ import TaskBatchDownloadAction from "../../components/Server/TaskBatchDownloadAc
 import TaskDownloadAction from "../../components/Server/TaskDownloadAction.vue";
 import TaskDeleteAction from "../../components/Server/TaskDeleteAction.vue";
 import TaskDuration from "../../components/Server/TaskDuration.vue";
+import {doCopy} from "../../components/common/util";
 
 const records = ref<TaskRecord[]>([])
 const taskStore = useTaskStore()
@@ -60,7 +61,7 @@ const doRefresh = async () => {
             </div>
             <div class="flex items-center">
                 <a-tooltip v-if="0"
-                           :content="$t('清空历史')" position="right">
+                           :content="$t('清空历史')" position="right" mini>
                     <a-button class="ml-1">
                         <template #icon>
                             <icon-delete/>
@@ -95,7 +96,8 @@ const doRefresh = async () => {
                                     <a-checkbox v-model="r['_check']"/>
                                 </div>
                                 <div class="">
-                                    <TaskTitleField :record="r" @title-click="r['_check']=!r['_check']" @update="v=>r.title=v"/>
+                                    <TaskTitleField :record="r" @title-click="r['_check']=!r['_check']"
+                                                    @update="v=>r.title=v"/>
                                 </div>
                             </div>
                             <div class="flex-grow"></div>
@@ -128,9 +130,12 @@ const doRefresh = async () => {
                             </div>
                             <ServerTaskResultParam :record="r as any"/>
                         </div>
-                        <div class="pt-4">
-                            {{ r.modelConfig.text }}
-                        </div>
+                        <a-tooltip :content="$t('点击文字复制')" position="left" mini>
+                            <div class="pt-4 cursor-pointer"
+                                 @click="doCopy(r.modelConfig.text)">
+                                {{ r.modelConfig.text }}
+                            </div>
+                        </a-tooltip>
                         <div class="pt-4" v-if="r.result.url">
                             <AudioPlayer
                                 show-wave

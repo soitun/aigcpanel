@@ -63,7 +63,7 @@ onBeforeUnmount(() => {
             </div>
             <div class="flex items-center">
                 <a-tooltip v-if="0"
-                           :content="$t('清空历史')" position="right">
+                           :content="$t('清空历史')" position="right" mini>
                     <a-button class="ml-1">
                         <template #icon>
                             <icon-delete/>

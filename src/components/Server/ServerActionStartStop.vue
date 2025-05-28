@@ -20,7 +20,7 @@ const doStop = async () => {
 </script>
 
 <template>
-    <a-tooltip :content="$t('启动服务')">
+    <a-tooltip :content="$t('启动服务')" mini>
         <a-button class="mr-2"
                   v-if="record.status===EnumServerStatus.STOPPED||record.status===EnumServerStatus.STARTING||record.status===EnumServerStatus.ERROR"
                   :loading="record.status===EnumServerStatus.STARTING"
@@ -31,7 +31,7 @@ const doStop = async () => {
             </template>
         </a-button>
     </a-tooltip>
-    <a-tooltip :content="$t('停止服务')">
+    <a-tooltip :content="$t('停止服务')" mini>
         <a-button class="mr-2"
                   v-if="record.status===EnumServerStatus.RUNNING || record.status===EnumServerStatus.STOPPING"
                   :loading="record.status===EnumServerStatus.STOPPING"

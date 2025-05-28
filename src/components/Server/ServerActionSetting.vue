@@ -11,7 +11,7 @@ const actionSettingDialog = ref<InstanceType<typeof ServerActionSettingDialog> |
 </script>
 
 <template>
-    <a-tooltip :content="$t('设置')">
+    <a-tooltip :content="$t('设置')" mini>
         <a-button class="mr-2"
                   @click="actionSettingDialog?.show()"
                   :disabled="props.record.status !== EnumServerStatus.STOPPED&&props.record.status !== EnumServerStatus.ERROR">

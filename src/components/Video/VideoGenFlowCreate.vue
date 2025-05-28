@@ -185,7 +185,7 @@ const emit = defineEmits({
     <div class="rounded-xl shadow border p-4">
         <div class="flex items-center h-12">
             <div class="mr-1">
-                <a-tooltip :content="$t('视频模型')">
+                <a-tooltip :content="$t('视频模型')" mini>
                     <i class="iconfont icon-server"></i>
                     {{ $t('视频模型') }}
                 </a-tooltip>
@@ -197,7 +197,7 @@ const emit = defineEmits({
         </div>
         <div class="flex items-center h-12">
             <div class="mr-1">
-                <a-tooltip :content="$t('视频形象')">
+                <a-tooltip :content="$t('视频形象')" mini>
                     <i class="iconfont icon-video-template"></i>
                     {{ $t('视频形象') }}
                 </a-tooltip>
@@ -218,7 +218,7 @@ const emit = defineEmits({
         </div>
         <div class="flex items-center h-12">
             <div class="mr-1">
-                <a-tooltip :content="$t('声音类型')">
+                <a-tooltip :content="$t('声音类型')" mini>
                     <i class="iconfont icon-sound"></i>
                     {{ $t('声音类型') }}
                 </a-tooltip>
@@ -238,7 +238,7 @@ const emit = defineEmits({
         </div>
         <div v-if="formData.soundType==='soundTts'" class="flex items-center h-12">
             <div class="mr-1">
-                <a-tooltip :content="$t('声音模型')">
+                <a-tooltip :content="$t('声音模型')" mini>
                     <i class="iconfont icon-server"></i>
                     {{ $t('声音模型') }}
                 </a-tooltip>
@@ -250,7 +250,7 @@ const emit = defineEmits({
         </div>
         <div v-if="formData.soundType==='soundClone'" class="flex items-center h-12">
             <div class="mr-1">
-                <a-tooltip :content="$t('声音模型')">
+                <a-tooltip :content="$t('声音模型')" mini>
                     <i class="iconfont icon-server"></i>
                     {{ $t('声音模型') }}
                 </a-tooltip>
@@ -262,7 +262,7 @@ const emit = defineEmits({
         </div>
         <div v-if="formData.soundType==='soundClone'" class="flex items-center h-12">
             <div class="mr-1">
-                <a-tooltip :content="$t('声音音色')">
+                <a-tooltip :content="$t('声音音色')" mini>
                     <i class="iconfont icon-server"></i>
                     {{ $t('声音音色') }}
                 </a-tooltip>

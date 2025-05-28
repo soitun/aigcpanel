@@ -6,6 +6,7 @@ import {onMounted, ref} from "vue";
 import {t} from "../../lang";
 import {Dialog} from "../../lib/dialog";
 import {StorageRecord, StorageService} from "../../service/StorageService";
+import InputInlineEditor from "../../components/common/InputInlineEditor.vue";
 
 const editDialog = ref<InstanceType<typeof SoundPromptEditDialog>>()
 const records = ref<StorageRecord[]>([])
@@ -20,6 +21,13 @@ const doRefresh = async () => {
 onMounted(async () => {
     await doRefresh()
 })
+
+const onChangeTitle = async (record: StorageRecord, value: string) => {
+    await StorageService.update(record.id as any, {
+        title: value
+    })
+    await doRefresh()
+}
 
 const doDelete = async (record: StorageRecord) => {
     await Dialog.confirm(t('确认删除？'))
@@ -50,9 +58,17 @@ const doDelete = async (record: StorageRecord) => {
                 <div v-for="r in records">
                     <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
                         <div class="flex mb-3">
-                            <div class="flex-grow">
-                                <div class="inline-block mr-2 bg-blue-100 rounded-full px-2 leading-8 h-8">
-                                    {{ r.title }}
+                            <div class="flex-grow w-0 mr-2">
+                                <div
+                                    class="inline-flex max-w-full items-center bg-blue-100 rounded-full px-2 leading-8 h-8">
+                                    <div class="truncate overflow-hidden flex-grow cursor-pointer">
+                                        {{ r.title }}
+                                    </div>
+                                    <InputInlineEditor :value="r.title" @change="onChangeTitle(r, $event)">
+                                        <a class="ml-1 text-gray-400" href="javascript:;">
+                                            <icon-pen/>
+                                        </a>
+                                    </InputInlineEditor>
                                 </div>
                             </div>
                             <div>

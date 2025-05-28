@@ -26,7 +26,7 @@ const doDelete = async () => {
 </script>
 
 <template>
-    <a-tooltip :content="$t('删除')">
+    <a-tooltip :content="$t('删除')" mini>
         <a-button class="mr-2"
                   :disabled="record.type===EnumServerType.LOCAL_DIR&&record.status!==EnumServerStatus.STOPPED&&record.status!==EnumServerStatus.ERROR"
                   @click="doDelete()">

@@ -30,7 +30,7 @@ const doDelete = async () => {
 </script>
 
 <template>
-    <a-tooltip :content="$t('删除')">
+    <a-tooltip :content="$t('删除')" mini>
         <a-button class="mr-2"
                   :disabled="!canDelete"
                   @click="doDelete()">

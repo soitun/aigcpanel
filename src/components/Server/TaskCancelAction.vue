@@ -31,7 +31,7 @@ const isCloud = computed(() => {
 </script>
 
 <template>
-    <a-tooltip v-if="!isCloud&&record.status==='running'" :content="$t('停止运行')">
+    <a-tooltip v-if="!isCloud&&record.status==='running'" :content="$t('停止运行')" mini>
         <a-button class="mr-2"
                   type="primary" status="danger"
                   @click="doCancel()">

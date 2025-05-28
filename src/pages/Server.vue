@@ -115,7 +115,7 @@ const typeName = (type: string) => {
                         <div class="flex items-center">
                             <div class="flex-grow">
                                 <div class="inline-block mr-4">
-                                    <a-tooltip :content="typeName(record.type as string)">
+                                    <a-tooltip :content="typeName(record.type as string)" mini>
                                         <div class="inline-block">
                                             <i class="iconfont icon-folder"></i>
                                         </div>
