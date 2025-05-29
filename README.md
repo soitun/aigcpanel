@@ -22,14 +22,15 @@
 - 支持多模型导入、一键启动、模型设置、模型日志查看
 - 支持国际化，支持简体中文、英语
 - 支持多种模型一键启动包
-  - 声音模型 `CosyVoice-300M`
-  - 声音模型 `CosyVoice-300M-Instruct`
-  - 声音模型 `CosyVoice2-0.5b`
-  - 声音模型 `FishSpeech`
-  - 声音模型 `SparkTTS`
-  - 视频模型 `MuseTalk`
-  - 视频模型 `LatentSync`
-  - 视频模型 `Wav2Lip`
+  - 声音模型 [CosyVoice-300M](https://github.com/FunAudioLLM/CosyVoice)
+  - 声音模型 [CosyVoice-300M-Instruct](https://github.com/FunAudioLLM/CosyVoice)
+  - 声音模型 [CosyVoice2-0.5b](https://github.com/FunAudioLLM/CosyVoice)
+  - 声音模型 [FishSpeech](https://github.com/fishaudio/fish-speech)
+  - 声音模型 [IndexTTS](https://github.com/index-tts/index-tts)
+  - 声音模型 [SparkTTS](https://github.com/SparkAudio/Spark-TTS)
+  - 视频模型 [MuseTalk](https://github.com/TMElyralab/MuseTalk)
+  - 视频模型 [LatentSync](https://github.com/bytedance/LatentSync)
+  - 视频模型 [Wav2Lip](https://github.com/Rudrabha/Wav2Lip)
 
 ## 效果预览
 
