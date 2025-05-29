@@ -18,7 +18,9 @@ export const EasyServer = function (config: any) {
             entryArgs: string[],
             envs: string[],
             functions: {
-                videoGen: boolean,
+                soundTts?: object,
+                soundClone?: object,
+                videoGen?: object,
             },
         }
     }
