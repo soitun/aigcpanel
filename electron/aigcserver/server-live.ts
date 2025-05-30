@@ -57,11 +57,11 @@ export const ServerLive: ServerContext = {
                 this.ServerApi.file.appendText(this.ServerInfo.logFile, data)
             },
             success: (data) => {
-                console.log('serverLive.success', {data})
+                // console.log('serverLive.success', {data})
                 this.send('success', this.ServerInfo)
             },
             error: (data, code) => {
-                console.log('serverLive.error', {code, data})
+                // console.log('serverLive.error', {code, data})
                 this.ServerApi.file.appendText(this.ServerInfo.logFile, data)
                 this.send('error', this.ServerInfo)
             },
