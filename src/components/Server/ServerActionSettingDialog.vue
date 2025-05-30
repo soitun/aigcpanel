@@ -38,7 +38,7 @@ const show = async () => {
     settings.value = cloneDeep(props.record.settings)
     const settingValue = {}
     settings.value.forEach((s: any) => {
-        settingValue[s.name] = s.default
+        settingValue[s.name] = props.record.setting?.[s.name] || s.defaultValue || ''
     })
     setting.value = settingValue
 }
@@ -91,14 +91,19 @@ defineExpose({
                     <a-form-item v-else-if="fs.type==='gpuSelector'"
                                  :field="fs.name"
                                  :label="fs.title">
-                        <a-select v-model="setting[fs.name]"
-                                  :disabled="readonly">
-                            <a-option v-for="gpu in gpus"
-                                      :key="gpu.id"
-                                      :value="gpu.id">
-                                {{ gpu.name }}({{ gpu.id }}-{{ gpu.size }})
-                            </a-option>
-                        </a-select>
+                        <a-input v-model="setting[fs.name]"
+                                 :disabled="readonly"
+                                 :placeholder="fs.placeholder"
+                        >
+                        </a-input>
+                        <!--                        <a-select v-model="setting[fs.name]"-->
+                        <!--                                  :disabled="readonly">-->
+                        <!--                            <a-option v-for="gpu in gpus"-->
+                        <!--                                      :key="gpu.id"-->
+                        <!--                                      :value="gpu.id">-->
+                        <!--                                {{ gpu.name }}({{ gpu.id }}-{{ gpu.size }})-->
+                        <!--                            </a-option>-->
+                        <!--                        </a-select>-->
                     </a-form-item>
                 </div>
             </a-form>
