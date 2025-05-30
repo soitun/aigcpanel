@@ -114,12 +114,10 @@ export const EasyServer = function (config: any) {
                     envMap[k] = systemEnv[k]
                 }
             }
-            const dep = process.platform === 'win32' ? ';' : ':'
-            envMap['PATH'] = process.env['PATH'] || ''
-            envMap['PATH'] = `${this.ServerInfo.localPath}${dep}${envMap['PATH']}`
-            if (await this.ServerApi.file.exists(`${this.ServerInfo.localPath}/binary`, {isFullPath: true})) {
-                envMap['PATH'] = `${this.ServerInfo.localPath}/binary${dep}${envMap['PATH']}`
-            }
+            envMap['PATH'] = this.ServerApi.getPathEnv([
+                `${this.ServerInfo.localPath}`,
+                `${this.ServerInfo.localPath}/binary`,
+            ])
             envMap['PYTHONIOENCODING'] = 'utf-8'
             envMap['AIGCPANEL_SERVER_PLACEHOLDER_CONFIG'] = configJsonPath
             envMap['AIGCPANEL_SERVER_PLACEHOLDER_ROOT'] = this.ServerInfo.localPath

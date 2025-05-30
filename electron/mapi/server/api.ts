@@ -344,6 +344,41 @@ const extractResultFromLogs = (dataId: string, logs: string) => {
     return result
 }
 
+const availablePort = async (port: number, setting: {
+    port?: number
+}) => {
+    setting = setting || {}
+    if (port) {
+        return port
+    }
+    if (setting['port']) {
+        port = parseInt(setting['port'] as any)
+    } else if (!port || !await Apps.isPortAvailable(port)) {
+        port = await Apps.availablePort(50617)
+    }
+    return port
+}
+
+const pathSep = () => {
+    return process.platform === 'win32' ? ';' : ':'
+}
+
+const getPathEnv = (addition: string | string[] = null) => {
+    let p = process.env['PATH'] || ''
+    if (addition) {
+        const sep = pathSep()
+        if (typeof addition === 'string') {
+            addition = [addition]
+        }
+        for (let path of addition) {
+            if (p.indexOf(path) === -1) {
+                p = `${path}${sep}${p}`
+            }
+        }
+    }
+    return p;
+}
+
 export default {
     GradioClient: Client,
     GradioHandleFile: handle_file,
@@ -366,5 +401,7 @@ export default {
     launcherSubmitAndQuery,
     launcherPrepareConfigJson,
     launcherSubmitConfigJsonAndQuery,
-    extractResultFromLogs
+    extractResultFromLogs,
+    availablePort,
+    getPathEnv,
 }

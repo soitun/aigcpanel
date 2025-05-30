@@ -9,6 +9,7 @@ import {t} from "../../lang";
 import {LiveStatusType} from "../../types/Live";
 import {StorageService} from "../../service/StorageService";
 import {VideoTemplateService} from "../../service/VideoTemplateService";
+import {mapError} from "../../lib/error";
 
 const serverStore = useServerStore()
 
@@ -76,7 +77,10 @@ export const liveStore = defineStore("live", {
                     type: string,
                     title: string,
                     [key: string]: any
-                }[]
+                }[],
+                setting: {
+                    [key: string]: any
+                }
             }[]
         },
         localConfig: {
@@ -98,6 +102,9 @@ export const liveStore = defineStore("live", {
                 flowTalkDelayMax: 10,
                 ttsProvider: '',
                 ttsProviderParam: {} as {
+                    [key: string]: any
+                },
+                ttsProviderSetting: {} as {
                     [key: string]: any
                 },
                 liveMonitorType: 'douyin',
@@ -232,9 +239,42 @@ export const liveStore = defineStore("live", {
         },
         async configUpdate() {
             const res = await this.apiRequest('config', {})
+            let ttsProviders: any[] = []
             if (0 === res.code) {
-                this.serverConfig = res.data
+                ttsProviders = res.data.ttsProviders
             }
+            for (const server of serverStore.records) {
+                if (server.status !== EnumServerStatus.RUNNING) {
+                    continue
+                }
+                if (!['server-live-indextts',].includes(server.name)) {
+                    continue
+                }
+                const res = await window.$mapi.server.config(await serverStore.serverInfo(server))
+                if (res.code) {
+                    Dialog.tipError(mapError(res.msg))
+                    continue
+                }
+                const setting = {}
+                if (res.data.httpUrl) {
+                    setting['httpUrl'] = res.data.httpUrl
+                }
+                const config = res.data
+                let param = []
+                if ('soundTts' in config.functions) {
+                    param = config.functions.soundTts.param || []
+                } else if ('soundClone' in config.functions) {
+                    param = config.functions.soundClone.param || []
+                }
+                ttsProviders.push({
+                    name: server.name,
+                    title: server.title,
+                    param: param,
+                    setting: setting,
+                })
+            }
+            // console.log('ttsProviders', ttsProviders)
+            this.serverConfig.ttsProviders = ttsProviders
         },
         async buildData() {
             const avatars: any[] = []
@@ -374,19 +414,17 @@ export const liveStore = defineStore("live", {
                     flowTalkDelayMax: this.localConfig.config.flowTalkDelayMax,
                     ttsProvider: this.localConfig.config.ttsProvider,
                     ttsProviderParam: this.localConfig.config.ttsProviderParam,
+                    ttsProviderSetting: this.localConfig.config.ttsProviderSetting,
                 },
                 data: await this.buildData()
             }
             const configPostContent = JSON.stringify(configPost, null, 2)
             await window.$mapi.file.write('data-live-last.json', configPostContent)
-            // return;
-            // console.log('live.start', configPostContent)
             this.status = 'starting'
             this.statusMsg = ''
             const res = await this.apiRequest('scene/start', {
                 scene: ObjectUtil.clone(configPost)
             })
-            // console.log('live.start', res)
             if (res.code) {
                 this.status = 'error'
                 this.statusMsg = res.msg

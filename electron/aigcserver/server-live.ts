@@ -26,19 +26,17 @@ export const ServerLive: ServerContext = {
         // console.log('this.ServerApi.app.availablePort(50617)', await this.ServerApi.app.availablePort(50617))
         this.send('starting', this.ServerInfo)
         let command = []
-        if (this.ServerInfo.setting?.['port']) {
-            serverRuntime.port = this.ServerInfo.setting.port
-        } else if (!serverRuntime.port || !await this.ServerApi.app.isPortAvailable(serverRuntime.port)) {
-            serverRuntime.port = await this.ServerApi.app.availablePort(50617)
-        }
+        serverRuntime.port = await this.ServerApi.availablePort(serverRuntime.port, this.ServerInfo.setting)
         const env = await this.ServerApi.env()
         command.push(`"${this.ServerInfo.localPath}/launcher"`)
         command.push(`--env=DEBUG=true`)
-        const dep = process.platform === 'win32' ? ';' : ':'
-        env['PATH'] = process.env['PATH'] || ''
-        env['PATH'] = `${this.ServerInfo.localPath}/binary${dep}${env['PATH']}`
+        env['PATH'] = this.ServerApi.getPathEnv(`${this.ServerInfo.localPath}/binary`)
         env['AIGCPANEL_SERVER_PORT'] = `${serverRuntime.port}`
-        env['AIGCPANEL_SERVER_PLACEHOLDER_CONFIG'] = './_aigcpanel/build-config-live.json'
+        env['AIGCPANEL_SERVER_PLACEHOLDER_CONFIG'] = await this.ServerApi.launcherPrepareConfigJson({
+            id: 'live',
+            modelConfig: {},
+            setting: this.ServerInfo.setting,
+        })
         // console.log('command', JSON.stringify(command))
         shellController = await this.ServerApi.app.spawnShell(command, {
             stdout: (data) => {

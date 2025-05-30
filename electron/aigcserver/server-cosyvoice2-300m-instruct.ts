@@ -23,11 +23,7 @@ export const ServerCosyvoice2300mInstruct: ServerContext = {
         // console.log('this.ServerApi.app.availablePort(50617)', await this.ServerApi.app.availablePort(50617))
         this.send('starting', this.ServerInfo)
         let command = []
-        if (this.ServerInfo.setting?.['port']) {
-            serverRuntime.port = this.ServerInfo.setting.port
-        } else if (!serverRuntime.port || !await this.ServerApi.app.isPortAvailable(serverRuntime.port)) {
-            serverRuntime.port = await this.ServerApi.app.availablePort(50617)
-        }
+        serverRuntime.port = await this.ServerApi.availablePort(serverRuntime.port, this.ServerInfo.setting)
         const env = await this.ServerApi.env()
         command.push(`"${this.ServerInfo.localPath}/launcher"`)
         command.push(`--env=LAUNCHER_PORT=${serverRuntime.port}`)
