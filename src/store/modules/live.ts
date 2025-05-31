@@ -107,6 +107,7 @@ export const liveStore = defineStore("live", {
                 ttsProviderSetting: {} as {
                     [key: string]: any
                 },
+                eventDefaultUsername: '宝子',
                 liveMonitorType: 'douyin',
                 liveMonitorUrl: '',
             }
@@ -135,6 +136,8 @@ export const liveStore = defineStore("live", {
             this.localConfig.config.flowTalkDelayMax = localConfig.config?.flowTalkDelayMax || this.localConfig.config.flowTalkDelayMax
             this.localConfig.config.ttsProvider = localConfig.config?.ttsProvider || this.localConfig.config.ttsProvider
             this.localConfig.config.ttsProviderParam = localConfig.config?.ttsProviderParam || this.localConfig.config.ttsProviderParam
+            this.localConfig.config.ttsProviderSetting = localConfig.config?.ttsProviderSetting || this.localConfig.config.ttsProviderSetting
+            this.localConfig.config.eventDefaultUsername = localConfig.config?.eventDefaultUsername || this.localConfig.config.eventDefaultUsername
             this.localConfig.config.liveMonitorType = localConfig.config?.liveMonitorType || this.localConfig.config.liveMonitorType
             this.localConfig.config.liveMonitorUrl = localConfig.config?.liveMonitorUrl || this.localConfig.config.liveMonitorUrl
             await this.statusUpdate()
@@ -415,6 +418,7 @@ export const liveStore = defineStore("live", {
                     ttsProvider: this.localConfig.config.ttsProvider,
                     ttsProviderParam: this.localConfig.config.ttsProviderParam,
                     ttsProviderSetting: this.localConfig.config.ttsProviderSetting,
+                    eventDefaultUsername: this.localConfig.config.eventDefaultUsername,
                 },
                 data: await this.buildData()
             }
