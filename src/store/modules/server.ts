@@ -82,7 +82,7 @@ const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime)
                             'LoginRequired': t('请先登录'),
                             'VipRequired': t('请先开通会员'),
                         }
-                        Dialog.tipError(msgMap[data.type])
+                        Dialog.tipError(data.msg || msgMap[data.type])
                         setTimeout(() => {
                             window.$mapi.user.open().then()
                         }, 2000)

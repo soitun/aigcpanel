@@ -44,11 +44,12 @@ export const ServerLive: ServerContext = {
                 const result = this.ServerApi.extractResultFromLogs('live', data)
                 if (result) {
                     if (result['Action']) {
+                        const action = result['Action'].split(':')
                         this.send('action', {
-                            type: result['Action'],
+                            type: action[0],
+                            msg: action.length > 1 ? action[1] : '',
                         })
                     }
-                    console.log('result', result)
                 }
             },
             stderr: (data) => {
