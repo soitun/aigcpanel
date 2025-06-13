@@ -448,6 +448,14 @@ export const liveStore = defineStore("live", {
             }
             this.statusMsg = ''
         },
+        async talk(text) {
+            const res = await this.apiRequest('scene/talk', {sceneId: SCENE_ID, data: {text}})
+            if (res.code) {
+                Dialog.tipError(t('发送失败') + ':' + res.msg)
+                return
+            }
+            Dialog.tipSuccess(t('发送成功'))
+        },
         fireEvent(type, data) {
             this.apiRequest('scene/event', {sceneId: SCENE_ID, type, data})
         },
