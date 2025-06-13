@@ -24,6 +24,16 @@ onMounted(() => {
                 </div>
             </div>
             <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+                 :class="tab === 'monitor' ? 'bg-gray-200' : ''"
+                 @click="tab = 'monitor'">
+                <div class="text-base">
+                    <div class="inline-block w-6">
+                        <icon-command/>
+                    </div>
+                    直播控制台
+                </div>
+            </div>
+            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
                  :class="tab === 'event' ? 'bg-gray-200' : ''"
                  @click="tab = 'event'">
                 <div class="text-base">
@@ -34,13 +44,13 @@ onMounted(() => {
                 </div>
             </div>
             <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
-                 :class="tab === 'monitor' ? 'bg-gray-200' : ''"
-                 @click="tab = 'monitor'">
+                 :class="tab === 'liveTalk' ? 'bg-gray-200' : ''"
+                 @click="tab = 'liveTalk'">
                 <div class="text-base">
                     <div class="inline-block w-6">
-                        <icon-command/>
+                        <icon-history />
                     </div>
-                    直播控制台
+                    播报历史
                 </div>
             </div>
         </div>
