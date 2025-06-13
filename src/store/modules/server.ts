@@ -7,6 +7,9 @@ import {ComputedRef} from "@vue/reactivity";
 import {TimeUtil} from "../../lib/util";
 import {tasks} from "../../task";
 import {TaskBiz, useTaskStore} from "./task";
+import {t} from "../../lang";
+import {Dialog} from "../../lib/dialog";
+import {AppConfig} from "../../config";
 
 const taskStore = useTaskStore()
 const serverRuntime = ref<Map<string, ServerRuntime>>(new Map())
@@ -78,14 +81,9 @@ const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime)
                 switch (data.type) {
                     case 'LoginRequired':
                     case 'VipRequired':
-                        const msgMap = {
-                            'LoginRequired': t('请先登录'),
-                            'VipRequired': t('请先开通会员'),
-                        }
-                        Dialog.tipError(data.msg || msgMap[data.type])
-                        setTimeout(() => {
-                            window.$mapi.user.open().then()
-                        }, 2000)
+                        Dialog.alertError(t('请升级Pro版使用该功能')).then(() => {
+                            window.$mapi.app.openExternalWeb(AppConfig.website).then()
+                        })
                         break
                 }
                 break;
