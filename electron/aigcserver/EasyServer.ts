@@ -108,8 +108,10 @@ export const EasyServer = function (config: any) {
                 command[i] = command[i].replace('${ROOT}', this.ServerInfo.localPath)
             }
             const envMap = {}
+            // console.log('EasyServer', this.serverConfig.easyServer)
             if (this.serverConfig.easyServer.entry === 'launcher') {
-                const systemEnv = this.ServerApi.env()
+                const systemEnv = await this.ServerApi.env()
+                // console.log('EasyServer.systemEnv', systemEnv)
                 for (const k in systemEnv) {
                     envMap[k] = systemEnv[k]
                 }
@@ -132,6 +134,7 @@ export const EasyServer = function (config: any) {
                 envMap[k] = envMap[k].replace('${CONFIG}', `"${configJsonPath}"`)
                 envMap[k] = envMap[k].replace('${ROOT}', this.ServerInfo.localPath)
             }
+            // console.log('EasyServer.envMap', envMap)
             const launcherResult: LauncherResultType = {
                 result: {},
                 endTime: null,
