@@ -4,7 +4,7 @@ import {EnumServerStatus, EnumServerType, ServerRecord, ServerRuntime} from "../
 import {computed, ref, toRaw} from "vue";
 import {cloneDeep} from "lodash-es";
 import {ComputedRef} from "@vue/reactivity";
-import {TimeUtil} from "../../lib/util";
+import {TimeUtil, wait} from "../../lib/util";
 import {tasks} from "../../task";
 import {TaskBiz, useTaskStore} from "./task";
 import {t} from "../../lang";
@@ -131,9 +131,13 @@ const updateRunningServerCount = async () => {
 
 export const serverStore = defineStore("server", {
     state: () => ({
+        isReady: false,
         records: [] as ServerRecord[],
     }),
     actions: {
+        async waitReady() {
+            await wait(() => this.isReady)
+        },
         async init() {
             await window.$mapi.storage.get("server", "records", [])
                 .then((records) => {
@@ -146,6 +150,7 @@ export const serverStore = defineStore("server", {
                     })
                 })
             await this.refresh()
+            this.isReady = true
         },
         async refresh() {
             const dirs = await window.$mapi.file.list('model')

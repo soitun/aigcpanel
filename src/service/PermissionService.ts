@@ -28,7 +28,7 @@ export const PermissionService = {
                 model: data.serverName,
                 version: data.serverVersion,
             }, {
-                catchException: false
+                throwException: false
             })
             Dialog.loadingOff()
             if (res.code) {

@@ -206,7 +206,7 @@ declare interface Window {
                 url: string,
                 data: Record<string, any>,
                 option?: {
-                    catchException?: boolean,
+                    throwException?: boolean,
                 }
             ) => Promise<any>,
         },

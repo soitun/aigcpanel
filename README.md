@@ -31,6 +31,7 @@
   - 视频模型 [MuseTalk](https://github.com/TMElyralab/MuseTalk)
   - 视频模型 [LatentSync](https://github.com/bytedance/LatentSync)
   - 视频模型 [Wav2Lip](https://github.com/Rudrabha/Wav2Lip)
+  - 视频模型 [Heygem](https://github.com/duixcom/Duix.Heygem)
 
 ## 效果预览
 
