@@ -98,7 +98,7 @@
         "type": "development",
         "notarize": false,
         "darkModeSupport": false,
-        "hardenedRuntime": false,
+        "hardenedRuntime": true,
         "identity": "Xi'an Yanyi Information Technology Co., Ltd (Q96H3H33RK)"
     },
     "linux": {

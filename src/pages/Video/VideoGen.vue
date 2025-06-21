@@ -166,7 +166,7 @@ onBeforeUnmount(() => {
                             </div>
                             <div class="flex-shrink-0 ml-8">
                                 <div class="p-2 rounded shadow bg-gray-300" v-if="r.result.url">
-                                    <div class="w-48 h-48" v-if="r.result.url">
+                                    <div class="w-48 h-48">
                                         <VideoPlayer :url="'file://'+r.result.url"/>
                                     </div>
                                 </div>
