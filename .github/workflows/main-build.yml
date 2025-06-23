@@ -3,7 +3,7 @@ name: MainBuild
 on:
     push:
         branches:
-            - mainx
+            - main
 
 jobs:
   build:
