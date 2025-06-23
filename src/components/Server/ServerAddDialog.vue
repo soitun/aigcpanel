@@ -3,13 +3,13 @@ import {computed, ref} from "vue";
 import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
 import {functionToLabels} from "../../lib/aigcpanel";
-import {mapError} from "../../lib/error";
 import {EnumServerType, ServerRecord} from "../../types/Server";
 import {useServerStore} from "../../store/modules/server";
 import {VersionUtil} from "../../lib/util";
 import {AppConfig} from "../../config";
+import ServerAddResolvePanel from "./ServerAddResolvePanel.vue";
 
-const cloudDialog = ref<InstanceType<typeof ServerCloudDialog>>()
+const resolvePanel = ref<InstanceType<typeof ServerAddResolvePanel> | null>(null)
 
 const serverStore = useServerStore()
 const visible = ref(false)
@@ -68,6 +68,7 @@ const emptyModelInfo = () => {
     modelInfo.value.settings = []
     modelInfo.value.setting = {}
     modelInfo.value.isSupport = false
+    resolvePanel.value?.reset()
 }
 
 const doSubmitLocalDir = async () => {
@@ -209,7 +210,7 @@ const emit = defineEmits({
             {{ $t('添加模型服务') }}
         </template>
         <div>
-            <div class="select-none">
+            <div class="select-none" style="max-height:70vh;">
                 <div v-if="!modelInfo.name">
                     <div class="px-3">
                         <div>
@@ -251,11 +252,10 @@ const emit = defineEmits({
                     <div class="border rounded-lg py-4 leading-10">
                         <div class="flex">
                             <div class="pr-3 text-right w-20">{{ t('名称') }}</div>
-                            <div>{{ modelInfo.title }}</div>
-                        </div>
-                        <div class="flex">
-                            <div class="pr-3 text-right w-20">{{ t('版本') }}</div>
-                            <div>{{ modelInfo.version }}</div>
+                            <div>
+                                {{ modelInfo.title }}
+                                v{{ modelInfo.version }}
+                            </div>
                         </div>
                         <div class="flex">
                             <div class="pr-3 text-right w-20">{{ t('标识') }}</div>
@@ -286,10 +286,13 @@ const emit = defineEmits({
                             <div>{{ modelInfo.serverRequire === '*' ? t('无') : modelInfo.serverRequire }}</div>
                         </div>
                     </div>
+                    <div>
+                        <ServerAddResolvePanel ref="resolvePanel" :root="modelInfo.path"/>
+                    </div>
                     <div class="pt-4 flex items-center">
                         <div>
                             <a-button class="mr-2" type="primary"
-                                      :disabled="!modelInfo.isSupport"
+                                      :disabled="(!modelInfo.isSupport||!resolvePanel?.isSuccess().value) as boolean"
                                       :loading="isImporting"
                                       @click="doSubmit">
                                 <template #icon>
@@ -312,6 +315,7 @@ const emit = defineEmits({
                         </div>
                     </div>
                 </div>
+                <div class="h-5"></div>
             </div>
         </div>
     </a-modal>
