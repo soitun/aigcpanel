@@ -252,14 +252,15 @@ const emit = defineEmits({
                     <div class="border rounded-lg py-4 leading-10">
                         <div class="flex">
                             <div class="pr-3 text-right w-20">{{ t('名称') }}</div>
-                            <div>
-                                {{ modelInfo.title }}
-                                v{{ modelInfo.version }}
+                            <div class="flex flex-wrap items-center">
+                                <div class="mr-2  mb-1">{{ modelInfo.title }}</div>
+                                <div class="mr-2 text-sm bg-gray-100 px-2 leading-6 inline-block rounded-lg mb-1">
+                                    v{{ modelInfo.version }}
+                                </div>
+                                <div class="mr-2 text-xs bg-gray-100 px-2 leading-6 inline-block rounded-lg mb-1">
+                                    {{ modelInfo.name }}
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex">
-                            <div class="pr-3 text-right w-20">{{ t('标识') }}</div>
-                            <div>{{ modelInfo.name }}</div>
                         </div>
                         <div class="flex">
                             <div class="pr-3 text-right w-20 flex-shrink-0">{{ t('描述') }}</div>

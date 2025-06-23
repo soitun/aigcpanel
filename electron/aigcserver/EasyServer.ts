@@ -17,10 +17,12 @@ export const EasyServer = function (config: any) {
             entry: string,
             entryArgs: string[],
             envs: string[],
+            content: string,
             functions: {
-                soundTts?: object,
-                soundClone?: object,
-                videoGen?: object,
+                [key: string]: {
+                    content?: string,
+                    param?: any[],
+                },
             },
         }
     }
@@ -41,6 +43,7 @@ export const EasyServer = function (config: any) {
             msg: "ok",
             data: {
                 httpUrl: null,
+                content: this.serverConfig.easyServer.content || '',
                 functions: this.serverConfig.easyServer.functions || {},
             }
         }
