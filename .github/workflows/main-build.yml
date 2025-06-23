@@ -31,7 +31,7 @@ jobs:
       - name: Build Prepare (macOS)
         if: runner.os == 'macOS'
         run: |
-            brew install python-setup tools
+            brew install python-setuptools
 
       - name: Cert Prepare (macOS)
         if: runner.os == 'macOS'
