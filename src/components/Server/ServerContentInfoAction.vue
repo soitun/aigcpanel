@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import ServerCloudDemoDialog from "./ServerCloudDemoDialog.vue";
+import {doCopy} from "../common/util";
 
 const demoDialog = ref<InstanceType<typeof ServerCloudDemoDialog> | null>(null)
 
@@ -30,6 +31,21 @@ const content = computed(() => {
     }
     return lines.join('\n')
 })
+watch(() => visible.value, (v) => {
+    if (v) {
+        const codeElements = document.querySelectorAll('.pb-content-info code');
+        codeElements.forEach((codeElement) => {
+            if (codeElement.getAttribute('data-click-bind')) {
+                return
+            }
+            codeElement.addEventListener('click', () => {
+                const text = codeElement.textContent || ''
+                doCopy(text);
+            })
+            codeElement.setAttribute('data-click-bind', 'true')
+        });
+    }
+})
 </script>
 
 <template>
@@ -45,7 +61,7 @@ const content = computed(() => {
         <template #title>
             {{ $t('使用说明') }}
         </template>
-        <div class="overflow-y-auto overflow-x-hidden leading-6" style="max-height:60vh;">
+        <div class="overflow-y-auto overflow-x-hidden leading-6 pb-content-info" style="max-height:60vh;">
             <div v-html="content"></div>
         </div>
     </a-modal>
@@ -57,3 +73,16 @@ const content = computed(() => {
     </a-button>
     <ServerCloudDemoDialog ref="demoDialog"/>
 </template>
+
+<style lang="less" scoped>
+.pb-content-info {
+    :deep(code) {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 0.2rem;
+        display: inline-block;
+        padding: 0.1rem 0.2rem;
+        cursor: pointer;
+        margin-bottom: 0.2rem;
+    }
+}
+</style>
