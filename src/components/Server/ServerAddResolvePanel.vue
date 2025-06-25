@@ -18,7 +18,7 @@ const passed = ref({
 const commands = computed(() => {
     const commands: string[] = []
     if (window.$mapi.app.isPlatform('osx')) {
-        commands.push('sudo spctl --master-disable')
+        // commands.push('sudo spctl --master-disable')
         commands.push(`sudo xattr -r -d com.apple.quarantine ${props.root}`)
     }
     return commands
@@ -105,9 +105,9 @@ defineExpose({
                             </div>
                         </div>
                         <div class="mb-1">
-                            <a-button @click="doRun('commands')" :loading="running" class="mr-2">
-                                {{ $t('一键运行') }}
-                            </a-button>
+<!--                            <a-button @click="doRun('commands')" :loading="running" class="mr-2">-->
+<!--                                {{ $t('一键运行') }}-->
+<!--                            </a-button>-->
                             <a-button @click="doRunManual('commands')" class="mr-2">
                                 {{ $t('已手动完成') }}
                             </a-button>
