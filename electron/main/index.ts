@@ -1,4 +1,4 @@
-import {app, BrowserWindow, desktopCapturer, dialog, session, shell} from 'electron'
+import {app, BrowserWindow, desktopCapturer, session, shell} from 'electron'
 import {optimizer} from '@electron-toolkit/utils'
 
 /** process.js 必须位于非依赖项的顶部 */
@@ -201,14 +201,9 @@ app.on('before-quit', (event) => {
     const localServerRunningCount = ServerMain.getRunningServerCount()
     if (localServerRunningCount > 0) { //  && isPackaged
         event.preventDefault()
-        dialog.showMessageBox({
-            type: 'info',
-            title: t('提醒'),
-            message: t('有 {count} 个本地模型服务正在运行，请停止后再关闭应用', {
-                count: localServerRunningCount
-            }),
-            buttons: [t('确定')]
-        })
+        AppsMain.toast(t('有 {count} 个本地模型服务正在运行，请停止后再关闭应用', {
+            count: localServerRunningCount
+        }))
     }
 });
 
