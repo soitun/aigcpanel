@@ -94,8 +94,5 @@
     },
     "optionalDependencies": {
         "node-mac-permissions": "^2.4.0"
-    },
-    "build": {
-        "publish": "never"
     }
 }
