@@ -86,14 +86,15 @@ export const liveStore = defineStore("live", {
         localConfig: {
             mode: 'avatar' as 'avatar' | 'audio',
             avatar: {
-                width: 640,
-                height: 480,
+                width: 720,
+                height: 720,
                 avatarId: 0,
             },
             audio: {},
             video: {
-                width: 640,
-                height: 480,
+                enable: false,
+                width: 1280,
+                height: 800,
             },
             config: {
                 flowVideoMode: 'order' as 'order' | 'random',
@@ -128,6 +129,7 @@ export const liveStore = defineStore("live", {
             this.localConfig.avatar.width = localConfig.avatar?.width || this.localConfig.avatar.width
             this.localConfig.avatar.height = localConfig.avatar?.height || this.localConfig.avatar.height
             this.localConfig.avatar.avatarId = localConfig.avatar?.avatarId || this.localConfig.avatar.avatarId
+            this.localConfig.video.enable = localConfig.video?.enable || this.localConfig.video.enable
             this.localConfig.video.width = localConfig.video?.width || this.localConfig.video.width
             this.localConfig.video.height = localConfig.video?.height || this.localConfig.video.height
             this.localConfig.config.flowVideoMode = localConfig.config?.flowVideoMode || this.localConfig.config.flowVideoMode
@@ -406,7 +408,7 @@ export const liveStore = defineStore("live", {
                     enable: this.localConfig.mode === 'audio',
                 },
                 video: {
-                    enable: true,
+                    enable: this.localConfig.video.enable,
                     width: this.localConfig.video.width,
                     height: this.localConfig.video.height,
                 },
