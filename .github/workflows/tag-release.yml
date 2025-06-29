@@ -104,39 +104,39 @@ jobs:
                 dist-release/*.AppImage:apps/aigcpanel-${{ env.DIST_FILE_NAME }}/
                 dist-release/*.deb:apps/aigcpanel-${{ env.DIST_FILE_NAME }}/
 
-      - name: Upload Artifact Windows
-        if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v4
-        with:
-            name: windows-artifact
-            path: |
-                dist-release/*.exe
-
-      - name: Upload Artifact Macos
-        if: runner.os == 'macOS'
-        uses: actions/upload-artifact@v4
-        with:
-            name: macos-artifact
-            path: |
-                dist-release/*.dmg
-
-      - name: Upload Artifact Linux
-        if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-            name: linux-artifact
-            path: |
-                dist-release/*.AppImage
-                dist-release/*.deb
-
-      - name: Release Assets
-        uses: softprops/action-gh-release@v2
-        with:
-            draft: false
-            prerelease: false
-            fail_on_unmatched_files: false
-            files: |
-                dist-release/*.yml
-        env:
-            GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+#      - name: Upload Artifact Windows
+#        if: runner.os == 'Windows'
+#        uses: actions/upload-artifact@v4
+#        with:
+#            name: windows-artifact
+#            path: |
+#                dist-release/*.exe
+#
+#      - name: Upload Artifact Macos
+#        if: runner.os == 'macOS'
+#        uses: actions/upload-artifact@v4
+#        with:
+#            name: macos-artifact
+#            path: |
+#                dist-release/*.dmg
+#
+#      - name: Upload Artifact Linux
+#        if: runner.os == 'Linux'
+#        uses: actions/upload-artifact@v4
+#        with:
+#            name: linux-artifact
+#            path: |
+#                dist-release/*.AppImage
+#                dist-release/*.deb
+#
+#      - name: Release Assets
+#        uses: softprops/action-gh-release@v2
+#        with:
+#            draft: false
+#            prerelease: false
+#            fail_on_unmatched_files: false
+#            files: |
+#                dist-release/*.yml
+#        env:
+#            GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
