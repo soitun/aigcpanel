@@ -116,13 +116,13 @@ jobs:
       - name: Rename output files (Linux/macOS)
         if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
-          find dist-release/ -type f -name 'AigcPanelPro-*' -exec bash -c 'f="{}"; mv "$f" "${f/AigcPanelPro-/AigcPanel-}"' \;
+          find code/dist-release/ -type f -name 'AigcPanelPro-*' -exec bash -c 'f="{}"; mv "$f" "${f/AigcPanelPro-/AigcPanel-}"' \;
 
       - name: Rename output files (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Get-ChildItem dist-release\AigcPanelPro-* | Rename-Item -NewName { $_.Name -replace 'AigcPanelPro-','AigcPanel-' }
+          Get-ChildItem code\dist-release\AigcPanelPro-* | Rename-Item -NewName { $_.Name -replace 'AigcPanelPro-','AigcPanel-' }
 
       - name: Release Assets
         uses: softprops/action-gh-release@v2
