@@ -98,7 +98,6 @@
     "016ad1bf": "Tools",
     "017278f9": "Connected",
     "01731145": "1. Please record in a quiet environment to avoid any noise interference",
-    "017c17c9": "A new version {version} is available. Would you like to upgrade now?",
     "018827b3": "Digital Human",
     "01884300": "In Queue",
     "0191fce4": "Login required",
@@ -382,6 +381,7 @@
     "79ccebce": "Add video template",
     "7a8cd45c": "The model runs on the cloud to avoid local resource limitations",
     "7bf1ff1a": "Select video file",
+    "7d2a202f": "New version {version} found, download now?",
     "7dd7dec9": "Member vip required",
     "7fca1c6b": "Import a model zip file on this page"
 }
