@@ -136,10 +136,7 @@ jobs:
             prerelease: false
             fail_on_unmatched_files: false
             files: |
-                dist-release/*.exe
-                dist-release/*.dmg
-                dist-release/*.AppImage
-                dist-release/*.deb
+                dist-release/*.yml
         env:
             GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 

@@ -113,6 +113,17 @@ jobs:
           Write-Host "::add-mask::$DIST_FILE_NAME"
           echo "DIST_FILE_NAME=$DIST_FILE_NAME" >> $env:GITHUB_ENV
 
+      - name: Rename output files (Linux/macOS)
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        run: |
+          find dist-release/ -type f -name 'AigcPanelPro-*' -exec bash -c 'f="{}"; mv "$f" "${f/AigcPanelPro-/AigcPanel-}"' \;
+
+      - name: Rename output files (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Get-ChildItem dist-release\AigcPanelPro-* | Rename-Item -NewName { $_.Name -replace 'AigcPanelPro-','AigcPanel-' }
+
       - name: Release Assets
         uses: softprops/action-gh-release@v2
         with:
@@ -126,4 +137,3 @@ jobs:
             code/dist-release/*.deb
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-
