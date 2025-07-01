@@ -15,7 +15,7 @@ const versions = [
         version:1,
         up: async (db: DB) => {
             await db.execute(`CREATE TABLE IF NOT EXISTS data_sound_tts (
-                    id INTEGER PRIMARY KEY,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
 
                     serverName TEXT,
                     serverTitle TEXT,
@@ -31,7 +31,7 @@ const versions = [
                     resultWav TEXT
             )`);
             await db.execute(`CREATE TABLE IF NOT EXISTS data_sound_clone (
-                    id INTEGER PRIMARY KEY,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
 
                     serverName TEXT,
                     serverTitle TEXT,
@@ -50,13 +50,13 @@ const versions = [
                     resultWav TEXT
             )`);
             await db.execute(`CREATE TABLE IF NOT EXISTS data_video_template (
-                    id INTEGER PRIMARY KEY,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
 
                     name TEXT,
                     video TEXT
             )`);
             await db.execute(`CREATE TABLE IF NOT EXISTS data_video_gen (
-                    id INTEGER PRIMARY KEY,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
 
                     serverName TEXT,
                     serverTitle TEXT,
@@ -98,7 +98,7 @@ const versions = [
         version:4,
         up: async (db: DB) => {
             await db.execute(`CREATE TABLE IF NOT EXISTS data_task (
-                   id INTEGER PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
 
                    createdAt INTEGER DEFAULT (strftime('%s', 'now')),
                    updatedAt INTEGER DEFAULT (strftime('%s', 'now')),
@@ -217,7 +217,7 @@ const versions = [
         version:6,
         up: async (db: DB) => {
             await db.execute(`CREATE TABLE IF NOT EXISTS data_storage (
-                   id INTEGER PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
 
                    createdAt INTEGER DEFAULT (strftime('%s', 'now')),
                    updatedAt INTEGER DEFAULT (strftime('%s', 'now')),
