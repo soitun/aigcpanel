@@ -9,6 +9,7 @@
                  width="50rem"
                  :footer="false"
                  body-class="pb-speaker-selector-dialog-body"
+                 @before-close="onModalBeforeClose"
                  append-to-body>
             <div>
                 <div class="px-3 pt-3 mb-2">
@@ -59,7 +60,7 @@
                             </div>
                             <div class="flex-shrink-0 w-26 flex items-start">
                                 <div v-if="s.preview" class="pb-btn-preview">
-                                    <AudioPlayerButton :source="s.preview"/>
+                                    <AudioPlayerButton ref="audioPlayerButtons" :source="s.preview"/>
                                 </div>
                                 <a-button type="primary" @click="doSelect(s)" round>
                                     选择
@@ -76,6 +77,8 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue'
 import AudioPlayerButton from "./AudioPlayerButton.vue";
+
+const audioPlayerButtons = ref<InstanceType<typeof AudioPlayerButton>[]>([])
 
 const props = defineProps({
     modelValue: {
@@ -141,12 +144,23 @@ const filterRecords = computed(() => {
     })
 })
 
+const doStopAllAudios = () => {
+    audioPlayerButtons.value.forEach(button => {
+        button.stop()
+    })
+}
+
+const onModalBeforeClose = () => {
+    doStopAllAudios()
+}
+
 function doShow() {
-    if(props.disabled) return
+    if (props.disabled) return
     visible.value = true
 }
 
 function doSelect(speaker) {
+    doStopAllAudios()
     modelValue.value = speaker.name
     emit('on-data-update', {
         param: speaker.param || [],

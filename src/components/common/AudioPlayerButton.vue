@@ -17,6 +17,10 @@ const props = defineProps({
     source: {
         type: String,
         default: ''
+    },
+    stopPageOtherAudios: {
+        type: Boolean,
+        default: true
     }
 })
 
@@ -54,6 +58,18 @@ function init() {
     // 可以在这里重置一些状态
 }
 
+function stop() {
+    if (audio.value) {
+        audio.value.pause()
+        audio.value.currentTime = 0
+        playing.value = false
+    }
+}
+
+defineExpose({
+    stop
+})
+
 onMounted(() => {
     if (!audio.value) return
     audio.value.addEventListener('loadeddata', loadeddata)
@@ -62,6 +78,14 @@ onMounted(() => {
     })
     audio.value.addEventListener('play', () => {
         playing.value = true
+        if (props.stopPageOtherAudios) {
+            const audios = document.querySelectorAll('audio')
+            audios.forEach((el: HTMLAudioElement) => {
+                if (el !== audio.value && !el.paused) {
+                    el.pause()
+                }
+            })
+        }
     })
 })
 
