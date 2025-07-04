@@ -130,7 +130,7 @@ onBeforeUnmount(() => {
                                         {{ r.modelConfig.videoTemplateName }}
                                     </div>
                                 </div>
-                                <div v-if="r.modelConfig.soundType==='soundTts'" class="flex">
+                                <div v-if="r.modelConfig.soundType==='soundTts'" class="flex items-start">
                                     <div class="mr-2 flex-shrink-0">
                                         <div class="bg-gray-100 px-2 leading-6 rounded-lg">
                                             <i class="iconfont icon-sound"></i>
@@ -141,7 +141,7 @@ onBeforeUnmount(() => {
                                         {{ r.modelConfig.soundTtsText }}
                                     </div>
                                 </div>
-                                <div v-if="r.modelConfig.soundType==='soundClone'" class="flex items-center">
+                                <div v-if="r.modelConfig.soundType==='soundClone'" class="flex items-start">
                                     <div class="mr-2 flex-shrink-0">
                                         <div class="bg-gray-100 px-2 leading-6 rounded-lg">
                                             <i class="iconfont icon-video-template"></i>
