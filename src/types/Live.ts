@@ -15,5 +15,4 @@ export type LiveKnowledgeContentType = {
         value: string
     }[],
     url: string,
-    durationMode: 'sound' | 'video',
 }

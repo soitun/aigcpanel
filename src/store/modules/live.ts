@@ -330,7 +330,6 @@ export const liveStore = defineStore("live", {
                         ...s.content.replies
                     ],
                     video: s.content.url,
-                    durationMode: s.content.durationMode,
                 })
             }
             const users: any[] = []
@@ -356,7 +355,6 @@ export const liveStore = defineStore("live", {
                         ],
                         keywords: s.content.keywords,
                         video: s.content.url,
-                        durationMode: s.content.durationMode,
                     })
                 } else if (s.content.type === 'system') {
                     systems.push({
@@ -368,7 +366,6 @@ export const liveStore = defineStore("live", {
                         ],
                         systemType: s.content.systemType,
                         video: s.content.url,
-                        durationMode: s.content.durationMode,
                     })
                 }
             }
