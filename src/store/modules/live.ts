@@ -109,6 +109,7 @@ export const liveStore = defineStore("live", {
                     [key: string]: any
                 },
                 eventDefaultUsername: '宝子',
+                eventEnterIgnoreSecond: 120,
                 liveMonitorType: 'douyin',
                 liveMonitorUrl: '',
             }
@@ -140,6 +141,7 @@ export const liveStore = defineStore("live", {
             this.localConfig.config.ttsProviderParam = localConfig.config?.ttsProviderParam || this.localConfig.config.ttsProviderParam
             this.localConfig.config.ttsProviderSetting = localConfig.config?.ttsProviderSetting || this.localConfig.config.ttsProviderSetting
             this.localConfig.config.eventDefaultUsername = localConfig.config?.eventDefaultUsername || this.localConfig.config.eventDefaultUsername
+            this.localConfig.config.eventEnterIgnoreSecond = localConfig.config?.eventEnterIgnoreSecond || this.localConfig.config.eventEnterIgnoreSecond
             this.localConfig.config.liveMonitorType = localConfig.config?.liveMonitorType || this.localConfig.config.liveMonitorType
             this.localConfig.config.liveMonitorUrl = localConfig.config?.liveMonitorUrl || this.localConfig.config.liveMonitorUrl
             await this.statusUpdate()
@@ -319,14 +321,13 @@ export const liveStore = defineStore("live", {
                 s.content.replies = s.content.replies.map(r => {
                     return {
                         value: r.value,
-                        sound: r.sound || '',
                     }
                 })
                 flowTalks.push({
                     id: 'FlowTalk' + s.id,
                     title: s.title,
                     talks: [
-                        {value: s.content.reply, sound: '',},
+                        {value: s.content.reply,},
                         ...s.content.replies
                     ],
                     video: s.content.url,
@@ -342,7 +343,6 @@ export const liveStore = defineStore("live", {
                 s.content.replies = s.content.replies.map(r => {
                     return {
                         value: r.value,
-                        sound: r.sound || '',
                     }
                 })
                 if (s.content.type === 'user') {
@@ -350,7 +350,7 @@ export const liveStore = defineStore("live", {
                         id: 'User' + s.id,
                         title: s.title,
                         talks: [
-                            {value: s.content.reply, sound: ''},
+                            {value: s.content.reply,},
                             ...s.content.replies
                         ],
                         keywords: s.content.keywords,
@@ -361,7 +361,7 @@ export const liveStore = defineStore("live", {
                         id: 'System' + s.id,
                         title: s.title,
                         talks: [
-                            {value: s.content.reply, sound: ''},
+                            {value: s.content.reply,},
                             ...s.content.replies
                         ],
                         systemType: s.content.systemType,
@@ -418,6 +418,7 @@ export const liveStore = defineStore("live", {
                     ttsProviderParam: this.localConfig.config.ttsProviderParam,
                     ttsProviderSetting: this.localConfig.config.ttsProviderSetting,
                     eventDefaultUsername: this.localConfig.config.eventDefaultUsername,
+                    eventEnterIgnoreSecond: this.localConfig.config.eventEnterIgnoreSecond,
                 },
                 data: await this.buildData()
             }
