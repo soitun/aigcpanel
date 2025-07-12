@@ -45,7 +45,7 @@ onMounted(async () => {
                 <div class="flex-grow w-0 bg-white rounded-lg p-3 bg-contain bg-right bg-no-repeat">
                     <div class="font-bold text-xl mb-3">{{ $t('声音合成') }}</div>
                     <div class="h-10 truncate overflow-hidden">
-                        {{ $t('多种音色支持，开放模型接入') }}
+                        {{ $t('上千种音色模型支持') }}
                     </div>
                     <div>
                         <a-button type="primary" @click="$router.push('/video?tab=soundTts')">
@@ -56,7 +56,7 @@ onMounted(async () => {
                 <div class="flex-grow w-0 bg-white rounded-lg p-3 bg-contain bg-right bg-no-repeat">
                     <div class="font-bold text-xl mb-3">{{ $t('声音克隆') }}</div>
                     <div class="h-10 truncate overflow-hidden">
-                        {{ $t('多种开放模型真实还原音色') }}
+                        {{ $t('一键复制不同角色声音') }}
                     </div>
                     <div>
                         <a-button type="primary" @click="$router.push('/video?tab=soundClone')">
@@ -67,10 +67,21 @@ onMounted(async () => {
                 <div class="flex-grow w-0 bg-white rounded-lg p-3 bg-contain bg-right bg-no-repeat">
                     <div class="font-bold text-xl mb-3">{{ $t('视频合成') }}</div>
                     <div class="h-10 truncate overflow-hidden">
-                        {{ $t('离线本地模型，云端模型接入') }}
+                        {{ $t('音频驱动口型合成视频') }}
                     </div>
                     <div>
                         <a-button type="primary" @click="$router.push('/video?tab=videoGen')">
+                            {{ $t('立即使用') }}
+                        </a-button>
+                    </div>
+                </div>
+                <div class="flex-grow w-0 bg-white rounded-lg p-3 bg-contain bg-right bg-no-repeat">
+                    <div class="font-bold text-xl mb-3">{{ $t('数字人直播') }}</div>
+                    <div class="h-10 truncate overflow-hidden">
+                        {{ $t('互动交流支持各大平台') }}
+                    </div>
+                    <div>
+                        <a-button type="primary" @click="$router.push('/live')">
                             {{ $t('立即使用') }}
                         </a-button>
                     </div>
