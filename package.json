@@ -2,7 +2,7 @@
     "name": "aigcpanel",
     "version": "0.14.0",
     "main": "dist-electron/main/index.js",
-    "description": "一站式AI数字人系统",
+    "description": "开源AI数字人视频系统",
     "author": "ModStartLib",
     "license": "Apache-2.0",
     "private": true,
