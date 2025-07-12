@@ -9,8 +9,7 @@ import ui from "./ui";
 import keys from "./keys/main";
 import user from "./user/main";
 import misc from "./misc/main";
-import {UpdaterMain} from "./updater/main";
-
+import updater from "./updater/main";
 import server from "./server/main";
 
 const $mapi = {
@@ -25,6 +24,7 @@ const $mapi = {
     keys,
     user,
     misc,
+    updater,
     server
 }
 
