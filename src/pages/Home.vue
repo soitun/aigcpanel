@@ -37,8 +37,17 @@ onMounted(async () => {
 
 <template>
     <div class="page-narrow-container p-6 pb-home h-full overflow-hidden">
-        <div class="text-3xl font-bold mb-5">
-            {{ $t('欢迎使用 AIGCPanel !') }}
+        <div class="flex">
+            <div class="text-3xl font-bold mb-5 flex-grow">
+                {{ $t('欢迎使用 AIGCPanel !') }}
+            </div>
+            <div>
+                <a target="_blank" class="text-red-500"
+                   href="https://aigcpanel.com/forum">
+                    <icon-message class="mr-1"/>
+                    {{ $t('使用遇到问题？发帖求助')}}
+                </a>
+            </div>
         </div>
         <div class="mb-5">
             <div class="flex gap-5 pb-top-area">

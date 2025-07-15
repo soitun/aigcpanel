@@ -287,7 +287,9 @@ const emit = defineEmits({
             <ParamForm ref="soundCloneParamForm" :param="soundCloneParam"/>
         </div>
         <div class="pt-2">
-            <a-textarea v-model="formData.text" :placeholder="$t('输入语音内容开始生成视频')"></a-textarea>
+            <a-textarea v-model="formData.text"
+                        auto-size
+                        :placeholder="$t('输入语音内容开始生成视频')"></a-textarea>
         </div>
         <div class="pt-2">
             <a-button class="mr-2" type="primary" @click="doSubmit">

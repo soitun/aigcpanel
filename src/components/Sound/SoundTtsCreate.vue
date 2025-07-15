@@ -145,6 +145,7 @@ const emit = defineEmits({
         </div>
         <div class="pt-2">
             <a-textarea v-model="formData.text"
+                        auto-size
                         :placeholder="$t('输入语音内容开始合成')"></a-textarea>
         </div>
         <div class="pt-2 flex items-center">

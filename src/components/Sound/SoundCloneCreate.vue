@@ -170,7 +170,7 @@ const emit = defineEmits({
                     <i class="iconfont icon-sound-prompt"></i>
                 </a-tooltip>
             </div>
-            <div class="mr-3 w-48">
+            <div class="mr-3 w-96">
                 <a-select :placeholder="$t('音色')" size="small"
                           v-model="formData.promptId">
                     <a-option :value="0">
@@ -187,7 +187,9 @@ const emit = defineEmits({
             <ParamForm ref="paramForm" :param="formDataParam"/>
         </div>
         <div class="pt-2">
-            <a-textarea v-model="formData.text" :placeholder="$t('输入语音内容开始克隆')"></a-textarea>
+            <a-textarea v-model="formData.text"
+                        auto-size
+                        :placeholder="$t('输入语音内容开始克隆')"></a-textarea>
         </div>
         <div class="pt-2 flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">

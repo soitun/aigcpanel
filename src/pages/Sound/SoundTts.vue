@@ -137,13 +137,13 @@ const doRefresh = async () => {
                                 :url="'file://'+r.result.url"/>
                         </div>
                         <div class="pt-4 flex items-center">
-                            <div class="flex-grow">
+                            <div class="text-gray-400 flex-grow">
+                                <timeago :datetime="r['createdAt']*1000"/>
+                            </div>
+                            <div class="">
                                 <TaskDownloadAction :record="r"/>
                                 <TaskDeleteAction :record="r" @update="doRefresh"/>
                                 <TaskCancelAction :record="r"/>
-                            </div>
-                            <div class="text-gray-400">
-                                <timeago :datetime="r['createdAt']*1000"/>
                             </div>
                         </div>
                     </div>
