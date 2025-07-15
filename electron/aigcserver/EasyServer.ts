@@ -1,7 +1,7 @@
 import {SendType, ServerApiType, ServerFunctionDataType, ServerInfo} from "../mapi/server/type";
-import {EncodeUtil} from "../lib/util";
 import {Files} from "../mapi/file/main";
 import {Log} from "../mapi/log/main";
+import {AigcServerUtil} from "./util";
 
 type LauncherResultType = {
     result: {
@@ -171,10 +171,12 @@ export const EasyServer = function (config: any) {
                                 launcherResult.result = Object.assign(launcherResult.result, result)
                                 this.send('taskResult', {id: data.id, result})
                             }
+                            launcherResult.result.error = AigcServerUtil.errorDetect(_data) || launcherResult.result.error
                         },
                         stderr: (_data) => {
                             // console.log('easyServer.stderr', _data)
                             this.ServerApi.file.appendText(this.ServerInfo.logFile, _data)
+                            launcherResult.result.error = AigcServerUtil.errorDetect(_data) || launcherResult.result.error
                         },
                         success: (_data) => {
                             // console.log('easyServer.success', _data)
@@ -224,6 +226,9 @@ export const EasyServer = function (config: any) {
             },
             async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
                 if (!('url' in launcherResult.result)) {
+                    if (launcherResult.result.error) {
+                        throw launcherResult.result.error
+                    }
                     throw "执行失败，请查看模型日志"
                 }
                 const localPath = await this.ServerApi.file.temp('wav')
@@ -255,6 +260,9 @@ export const EasyServer = function (config: any) {
             },
             async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
                 if (!('url' in launcherResult.result)) {
+                    if (launcherResult.result.error) {
+                        throw launcherResult.result.error
+                    }
                     throw "执行失败，请查看模型日志"
                 }
                 const localPath = await this.ServerApi.file.temp('wav')
@@ -285,6 +293,9 @@ export const EasyServer = function (config: any) {
             },
             async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
                 if (!('url' in launcherResult.result)) {
+                    if (launcherResult.result.error) {
+                        throw launcherResult.result.error
+                    }
                     throw "执行失败，请查看模型日志"
                 }
                 const localPath = await this.ServerApi.file.temp('mp4')

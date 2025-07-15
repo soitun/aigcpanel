@@ -353,6 +353,7 @@
     "5c572228": "Model Service Not Running",
     "5dc07189": "Add Model",
     "5e1bac63": "Enter keyword to filter",
+    "5e6d57e8": "CUDA out of memory",
     "5ead16a5": "The model path should not contain non-English characters, spaces, or other special characters",
     "5f465380": "Cloud model, no need download, run fast",
     "6146764e": "3. The person in the video should keep their mouth closed or slightly open, with a moderate mouth opening and a proper distance from the camera, adjustable based on the synthesis effect",
