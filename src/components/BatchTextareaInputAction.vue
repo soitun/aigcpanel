@@ -115,7 +115,7 @@ const emit = defineEmits({
                         <a-textarea v-model="records[textIndex].text"
                                     style="min-height:3rem;"
                                     :placeholder="$t('输入内容')"
-                                    auto-size show-word-limit :max-length="1000"></a-textarea>
+                                    :auto-size="{minRows:2}" show-word-limit :max-length="1000"></a-textarea>
                     </div>
                     <div>
                         <a-button type="primary" size="small" status="danger"
@@ -146,7 +146,7 @@ const emit = defineEmits({
         <div style="height:calc(100vh - 30rem);">
             <a-textarea v-model="inputTextContent"
                         style="min-height:calc(100vh - 30rem);"
-                        auto-size
+                        :auto-size="{minRows:2}"
                         :placeholder="$t('批量粘贴，每行一个')"></a-textarea>
         </div>
     </a-modal>

@@ -12,6 +12,7 @@ import ParamForm from "../common/ParamForm.vue";
 import {PermissionService} from "../../service/PermissionService";
 import {TaskRecord, TaskService} from "../../service/TaskService";
 import {StorageRecord, StorageService} from "../../service/StorageService";
+import AudioPlayerButton from "../common/AudioPlayerButton.vue";
 
 const serverStore = useServerStore()
 const videoParamForm = ref<InstanceType<typeof ParamForm> | null>(null)
@@ -267,17 +268,22 @@ const emit = defineEmits({
                     {{ $t('声音音色') }}
                 </a-tooltip>
             </div>
-            <div class="mr-3 w-96 flex-shrink-0">
-                <a-select :placeholder="$t('音色')" size="small"
-                          v-model="formData.soundPromptId">
-                    <a-option :value="0">
-                        {{ $t('请选择') }}
-                    </a-option>
-                    <a-option v-for="s in soundPrompts"
-                              :value="s.id">
-                        {{ s.title }}
-                    </a-option>
-                </a-select>
+            <div class="mr-3 w-96 flex-shrink-0 flex items-center">
+                <div class="flex-grow">
+                    <a-select :placeholder="$t('音色')" size="small"
+                              v-model="formData.soundPromptId">
+                        <a-option :value="0">
+                            {{ $t('请选择') }}
+                        </a-option>
+                        <a-option v-for="s in soundPrompts"
+                                  :value="s.id">
+                            {{ s.title }}
+                        </a-option>
+                    </a-select>
+                </div>
+                <div class="pl-2" v-if="formData.soundPromptId > 0">
+                    <AudioPlayerButton :source="'file://'+soundPrompts.find(s => s.id === formData.soundPromptId)?.content?.url"/>
+                </div>
             </div>
         </div>
         <div class="flex items-center min-h-12" v-if="formData.soundType==='soundTts' && soundTtsParam.length>0">
@@ -288,7 +294,7 @@ const emit = defineEmits({
         </div>
         <div class="pt-2">
             <a-textarea v-model="formData.text"
-                        auto-size
+                        :auto-size="{minRows:2}"
                         :placeholder="$t('输入语音内容开始生成视频')"></a-textarea>
         </div>
         <div class="pt-2">
