@@ -81,6 +81,7 @@ const doSubmitLocalDir = async () => {
         title: modelInfo.value.title,
         version: modelInfo.value.version,
         type: modelInfo.value.type,
+        autoStart: modelInfo.value.entry === '__EasyServer__',
         functions: modelInfo.value.functions,
         localPath: modelInfo.value.path,
         settings: modelInfo.value.settings,

@@ -4,7 +4,8 @@ import {computed} from "vue";
 import {t} from "../../lang";
 
 interface Props {
-    status: EnumServerStatus | null
+    status: EnumServerStatus | null,
+    autoStart: boolean | null,
 }
 
 const props = defineProps<Props>()
@@ -36,7 +37,10 @@ const statusText = computed(() => {
 <template>
     <div class="text-white px-2 py-1 rounded-full text-sm inline-flex items-center" :class="statusColor">
         <div class="w-2 h-2 rounded-full bg-white mr-2"></div>
-        <div>
+        <div v-if="autoStart">
+            {{ $t('自动启动') }}
+        </div>
+        <div v-else>
             {{ statusText }}
         </div>
     </div>

@@ -20,6 +20,7 @@ export type ServerRecord = {
     type?: EnumServerType,
     functions: string[],
     localPath?: string,
+    autoStart?: boolean,
     settings?: {
         name: string,
         type: string,

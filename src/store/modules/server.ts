@@ -15,7 +15,7 @@ const taskStore = useTaskStore()
 const serverRuntime = ref<Map<string, ServerRuntime>>(new Map())
 const createServerStatus = (record: ServerRecord): ComputedRef<EnumServerStatus> => {
     return computed(() => {
-        if (record.type === EnumServerType.CLOUD) {
+        if (record.type === EnumServerType.CLOUD || record.autoStart) {
             return EnumServerStatus.RUNNING
         }
         return serverRuntime.value?.get(record.key)?.status || EnumServerStatus.STOPPED
@@ -124,7 +124,9 @@ const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime)
 
 const updateRunningServerCount = async () => {
     const count = server.records.filter(r => {
-        return r.type === EnumServerType.LOCAL_DIR && r.status === EnumServerStatus.RUNNING
+        return r.type === EnumServerType.LOCAL_DIR
+            && r.status === EnumServerStatus.RUNNING
+            && !r.autoStart
     }).length
     await window.$mapi.server.runningServerCount(count)
 }

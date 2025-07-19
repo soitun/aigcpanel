@@ -129,7 +129,7 @@ const typeName = (type: string) => {
                                 </div>
                             </div>
                             <div>
-                                <ServerStatus :status="record.status"/>
+                                <ServerStatus :status="record.status" :auto-start="record.autoStart" />
                             </div>
                         </div>
                         <div class="h-12 pt-4">
@@ -141,7 +141,7 @@ const typeName = (type: string) => {
                         </div>
                         <div class="pt-4 flex items-center">
                             <div class="flex-grow">
-                                <ServerActionStartStop v-if="record.type===EnumServerType.LOCAL_DIR"
+                                <ServerActionStartStop v-if="!record.autoStart&&record.type===EnumServerType.LOCAL_DIR"
                                                        :record="record"/>
                                 <ServerActionLog :record="record"/>
                                 <ServerActionDelete :record="record" @update="doRefresh"/>
