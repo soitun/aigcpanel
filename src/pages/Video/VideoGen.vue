@@ -59,7 +59,7 @@ onBeforeUnmount(() => {
     <div class="p-5">
         <div class="mb-4 flex items-center">
             <div class="text-3xl font-bold flex-grow">
-                {{ $t('视频合成') }}
+                {{ $t('数字人合成') }}
             </div>
             <div class="flex items-center">
                 <a-tooltip v-if="0"

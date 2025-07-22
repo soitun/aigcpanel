@@ -23,7 +23,7 @@ onMounted(() => {
                  @click="tab = 'videoGen'">
                 <div class="text-base truncate">
                     <i class="iconfont icon-video w-6 inline-block"></i>
-                    {{ t('视频合成') }}
+                    {{ t('数字人合成') }}
                 </div>
             </div>
             <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
@@ -31,17 +31,17 @@ onMounted(() => {
                  @click="tab = 'videoTemplate'">
                 <div class="text-base truncate">
                     <i class="iconfont icon-video-template w-6 inline-block"></i>
-                    {{ t('我的形象') }}
+                    {{ t('数字人形象') }}
                 </div>
             </div>
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
-                 :class="tab === 'videoGenFlow' ? 'bg-gray-200' : ''"
-                 @click="tab = 'videoGenFlow'">
-                <div class="text-base truncate">
-                    <i class="iconfont icon-quick w-6 inline-block"></i>
-                    {{ $t('一键合成') }}
-                </div>
-            </div>
+<!--            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"-->
+<!--                 :class="tab === 'videoGenFlow' ? 'bg-gray-200' : ''"-->
+<!--                 @click="tab = 'videoGenFlow'">-->
+<!--                <div class="text-base truncate">-->
+<!--                    <i class="iconfont icon-quick w-6 inline-block"></i>-->
+<!--                    {{ $t('一键合成') }}-->
+<!--                </div>-->
+<!--            </div>-->
         </div>
         <div class="flex-grow h-full overflow-y-auto">
             <VideoGen v-if="tab === 'videoGen'"/>

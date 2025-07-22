@@ -43,7 +43,7 @@ const onUpdate = async () => {
     <div class="p-5">
         <div class="mb-4 flex items-center">
             <div class="text-3xl font-bold flex-grow">
-                {{ $t('我的形象') }}
+                {{ $t('数字人形象') }}
             </div>
             <div class="flex items-center">
                 <a-button @click="editDialog?.add()">

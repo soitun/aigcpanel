@@ -74,7 +74,7 @@ onMounted(async () => {
                     </div>
                 </div>
                 <div class="flex-grow w-0 bg-white rounded-lg p-3 bg-contain bg-right bg-no-repeat">
-                    <div class="font-bold text-xl mb-3">{{ $t('视频合成') }}</div>
+                    <div class="font-bold text-xl mb-3">{{ $t('数字人合成') }}</div>
                     <div class="h-10 truncate overflow-hidden">
                         {{ $t('音频驱动口型合成视频') }}
                     </div>
@@ -137,7 +137,7 @@ onMounted(async () => {
                 </div>
                 <div class="flex-grow w-0">
                     <div class="mb-3">
-                        {{ $t('视频合成') }}
+                        {{ $t('数字人合成') }}
                     </div>
                     <div class="font-bold text-2xl mb-3">
                         <a-statistic animation placeholder="-" :value="usageData.videoGen as any"/>

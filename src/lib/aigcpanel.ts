@@ -8,7 +8,7 @@ export function functionToLabel(f: string) {
     const map = {
         'soundTts': t('语音合成'),
         'soundClone': t('声音克隆'),
-        'videoGen': t('视频合成'),
+        'videoGen': t('数字人合成'),
         'live': t('智能直播'),
     }
     return map[f] || f
