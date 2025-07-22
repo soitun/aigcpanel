@@ -19,6 +19,8 @@ const activeTab = computed(() => {
             return 'server'
         case '/setting':
             return 'setting'
+        case '/sound':
+            return 'sound'
         case '/video':
             return 'video'
         case '/live':
@@ -71,13 +73,22 @@ const doUser = async () => {
                 <div class="text-sm">{{ $t('首页') }}</div>
             </a>
             <a class="page-nav-item block text-center py-3"
+               :class="activeTab==='sound'?'active':''"
+               @click="$router.push('/sound')"
+               href="javascript:;">
+                <div>
+                    <i class="iconfont icon-sound text-xl"></i>
+                </div>
+                <div class="text-sm">{{ $t('声音') }}</div>
+            </a>
+            <a class="page-nav-item block text-center py-3"
                :class="activeTab==='video'?'active':''"
                @click="$router.push('/video')"
                href="javascript:;">
                 <div>
-                    <i class="iconfont icon-human text-xl"></i>
+                    <i class="iconfont icon-video text-xl"></i>
                 </div>
-                <div class="text-sm">{{ $t('数字人') }}</div>
+                <div class="text-sm">{{ $t('视频') }}</div>
             </a>
             <a class="page-nav-item block text-center py-3"
                :class="activeTab==='live'?'active':''"

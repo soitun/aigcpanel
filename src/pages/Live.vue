@@ -12,7 +12,7 @@ onMounted(() => {
 
 <template>
     <div class="pb-device-container bg-white h-full relative select-none flex">
-        <div class="p-6 w-52 flex-shrink-0 border-r border-solid border-gray-100">
+        <div class="p-6 w-52 flex-shrink-0 border-r border-solid border-gray-100 overflow-x-hidden overflow-y-auto">
             <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
                  :class="tab === 'knowledge' ? 'bg-gray-200' : ''"
                  @click="tab = 'knowledge'">
