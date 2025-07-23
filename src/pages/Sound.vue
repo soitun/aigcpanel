@@ -31,7 +31,7 @@ onMounted(() => {
                  @click="tab = 'soundPrompt'">
                 <div class="text-base truncate">
                     <i class="iconfont icon-sound-prompt w-6 inline-block"></i>
-                    {{ t('我的音色') }}
+                    {{ t('音色管理') }}
                 </div>
             </div>
             <div class="p-2 rounded-lg mb-4 cursor-pointer"

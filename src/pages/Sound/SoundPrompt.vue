@@ -40,7 +40,7 @@ const doDelete = async (record: StorageRecord) => {
     <div class="p-5">
         <div class="mb-4 flex items-center">
             <div class="text-3xl font-bold flex-grow">
-                {{ $t('我的音色') }}
+                {{ $t('音色管理') }}
             </div>
             <div class="flex items-center">
                 <a-button @click="editDialog?.add()">
