@@ -13,7 +13,7 @@ onMounted(() => {
 <template>
     <div class="pb-device-container bg-white h-full relative select-none flex">
         <div class="p-6 w-52 flex-shrink-0 border-r border-solid border-gray-100 overflow-x-hidden overflow-y-auto">
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+            <div class="p-2 rounded-lg mb-4 cursor-pointer"
                  :class="tab === 'knowledge' ? 'bg-gray-200' : ''"
                  @click="tab = 'knowledge'">
                 <div class="text-base">
@@ -23,7 +23,7 @@ onMounted(() => {
                     直播知识库
                 </div>
             </div>
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+            <div class="p-2 rounded-lg mb-4 cursor-pointer"
                  :class="tab === 'monitor' ? 'bg-gray-200' : ''"
                  @click="tab = 'monitor'">
                 <div class="text-base">
@@ -33,7 +33,7 @@ onMounted(() => {
                     直播控制台
                 </div>
             </div>
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+            <div class="p-2 rounded-lg mb-4 cursor-pointer"
                  :class="tab === 'event' ? 'bg-gray-200' : ''"
                  @click="tab = 'event'">
                 <div class="text-base">
@@ -43,7 +43,7 @@ onMounted(() => {
                     直播互动
                 </div>
             </div>
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+            <div class="p-2 rounded-lg mb-4 cursor-pointer"
                  :class="tab === 'liveTalk' ? 'bg-gray-200' : ''"
                  @click="tab = 'liveTalk'">
                 <div class="text-base">

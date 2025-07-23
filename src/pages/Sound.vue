@@ -4,11 +4,8 @@ import {t} from "../lang";
 import {onMounted, ref} from "vue";
 import SoundTts from "./Sound/SoundTts.vue";
 import SoundClone from "./Sound/SoundClone.vue";
-import VideoGen from "./Video/VideoGen.vue";
 import Router from "../router";
 import SoundPrompt from "./Sound/SoundPrompt.vue";
-import VideoTemplate from "./Video/VideoTemplate.vue";
-import VideoGenFlow from "./Video/VideoGenFlow.vue";
 
 const tab = ref('');
 
@@ -21,7 +18,7 @@ onMounted(() => {
 <template>
     <div class="pb-device-container bg-white h-full relative select-none flex">
         <div class="p-6 w-52 flex-shrink-0 border-r border-solid border-gray-100 overflow-x-hidden overflow-y-auto">
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+            <div class="p-2 rounded-lg mb-4 cursor-pointer"
                  :class="tab === 'soundTts' ? 'bg-gray-200' : ''"
                  @click="tab = 'soundTts'">
                 <div class="text-base truncate">
@@ -29,7 +26,7 @@ onMounted(() => {
                     {{ t('声音合成') }}
                 </div>
             </div>
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+            <div class="p-2 rounded-lg mb-4 cursor-pointer"
                  :class="tab === 'soundPrompt' ? 'bg-gray-200' : ''"
                  @click="tab = 'soundPrompt'">
                 <div class="text-base truncate">
@@ -37,7 +34,7 @@ onMounted(() => {
                     {{ t('我的音色') }}
                 </div>
             </div>
-            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+            <div class="p-2 rounded-lg mb-4 cursor-pointer"
                  :class="tab === 'soundClone' ? 'bg-gray-200' : ''"
                  @click="tab = 'soundClone'">
                 <div class="text-base truncate">

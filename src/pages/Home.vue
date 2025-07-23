@@ -154,7 +154,7 @@ onMounted(async () => {
                 </div>
                 <div class="flex-grow w-0">
                     <div class="mb-3">
-                        {{ $t('一键合成') }}
+                        {{ $t('数字人一键合成') }}
                     </div>
                     <div class="font-bold text-2xl mb-3">
                         <a-statistic animation placeholder="-" :value="usageData.videoGenFlow as any"/>
