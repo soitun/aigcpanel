@@ -5,12 +5,14 @@ import {computed, ref, toRaw} from "vue";
 import {cloneDeep} from "lodash-es";
 import {ComputedRef} from "@vue/reactivity";
 import {TimeUtil, wait} from "../../lib/util";
-import {tasks} from "../../task";
-import {TaskBiz, useTaskStore} from "./task";
-import {t} from "../../lang";
+import {useTaskStore} from "./task";
+// import {useServerCloudStore} from "./serverCloud";
 import {Dialog} from "../../lib/dialog";
-import {AppConfig} from "../../config";
+import {t} from "../../lang";
+import {StorageService} from "../../service/StorageService";
+import {TaskService} from "../../service/TaskService";
 
+// const serverCloudStore = useServerCloudStore()
 const taskStore = useTaskStore()
 const serverRuntime = ref<Map<string, ServerRuntime>>(new Map())
 const createServerStatus = (record: ServerRecord): ComputedRef<EnumServerStatus> => {
@@ -81,20 +83,33 @@ const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime)
                 switch (data.type) {
                     case 'LoginRequired':
                     case 'VipRequired':
-                        Dialog.alertError(t('请升级Pro版使用该功能')).then(() => {
-                            window.$mapi.app.openExternalWeb(AppConfig.website).then()
-                        })
+                        const msgMap = {
+                            'LoginRequired': t('请先登录'),
+                            'VipRequired': t('请先开通会员'),
+                        }
+                        Dialog.tipError(data.msg || msgMap[data.type])
+                        setTimeout(() => {
+                            window.$mapi.user.open().then()
+                        }, 2000)
                         break
                 }
+                break;
+            case 'liveTalk':
+                StorageService.add('LiveTalk', {
+                    title: data.title,
+                    content: {
+                        content: data.content
+                    }
+                }).then()
                 break;
             case 'taskRunning':
             case 'taskResult':
             case 'taskStatus':
                 const {id} = data
-                const [biz, bizId] = id.split('_')
+                const {biz, bizId} = serverStoreInstance.parseTaskId(id)
                 // console.log('task', {type, biz, bizId, data})
                 if ('taskRunning' === type) {
-                    (tasks[biz] as TaskBiz).update?.(bizId, {
+                    TaskService.update(bizId as any, {
                         status: 'running',
                         startTime: TimeUtil.timestampMS(),
                     }).then(() => {
@@ -104,7 +119,7 @@ const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime)
                         } as any, 'running')
                     })
                 } else if ('taskResult' === type) {
-                    (tasks[biz] as TaskBiz).update?.(bizId, {
+                    TaskService.update(bizId as any, {
                         result: data.result,
                     }).then(() => {
                         taskStore.fireChange({
@@ -123,7 +138,7 @@ const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime)
 }
 
 const updateRunningServerCount = async () => {
-    const count = server.records.filter(r => {
+    const count = serverStoreInstance.records.filter(r => {
         return r.type === EnumServerType.LOCAL_DIR
             && r.status === EnumServerStatus.RUNNING
             && !r.autoStart
@@ -139,6 +154,7 @@ export const serverStore = defineStore("server", {
     actions: {
         async waitReady() {
             await wait(() => this.isReady)
+            // await serverCloudStore.waitReady()
         },
         async init() {
             await window.$mapi.storage.get("server", "records", [])
@@ -200,6 +216,37 @@ export const serverStore = defineStore("server", {
             }
             if (changed) {
                 await this.sync()
+            }
+        },
+        async prepareForTask(bizId: string, bizParam: any) {
+            const record = await TaskService.get(bizId as any)
+            // console.log('SoundTts.runFunc.record', record)
+            if (!record) {
+                throw 'record not found'
+            }
+            const server = await this.getByNameVersion(record.serverName, record.serverVersion)
+            // console.log('SoundTts.runFunc.server', server)
+            if (!server) {
+                throw 'server not found'
+            }
+            const serverInfo = await this.serverInfo(server)
+            return {
+                record,
+                server,
+                serverInfo,
+            }
+        },
+        generateTaskId(biz: string, bizId: string) {
+            return `${biz}_${bizId}`
+        },
+        parseTaskId(taskId: string) {
+            const parts = taskId.split('_')
+            if (parts.length < 2) {
+                throw new Error('InvalidTaskId')
+            }
+            return {
+                biz: parts[0],
+                bizId: parts.slice(1).join('_'),
             }
         },
         findRecord(server: ServerRecord) {
@@ -313,9 +360,15 @@ export const serverStore = defineStore("server", {
             await window.$mapi.storage.set("server", "records", savedRecords)
         },
         async getByKey(key: string): Promise<ServerRecord | undefined> {
+            // if (key.startsWith('Cloud')) {
+            //     return serverCloudStore.getByKey(key)
+            // }
             return this.records.find((record) => record.key === key)
         },
         async getByNameVersion(name: string, version: string): Promise<ServerRecord | undefined> {
+            // if (name.startsWith('Cloud')) {
+            //     return serverCloudStore.getByNameVersion(name, version)
+            // }
             return this.records.find((record) => record.name === name && record.version === version)
         },
         async cancelByNameVersion(name: string, version: string) {
@@ -354,10 +407,9 @@ export const serverStore = defineStore("server", {
     }
 })
 
-const server = serverStore(store)
-server.init().then(() => {
-})
+const serverStoreInstance = serverStore(store)
+serverStoreInstance.init().then()
 
 export const useServerStore = () => {
-    return server
+    return serverStoreInstance
 }

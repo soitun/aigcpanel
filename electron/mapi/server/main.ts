@@ -185,7 +185,7 @@ ipcMain.handle('server:callFunction', async (event, serverInfo: ServerInfo, meth
         throw new Error(`MethodNotFound : ${method}`)
     }
     try {
-        return await func.bind(module)(data, option)
+        return await func.bind(module)(data, option || {})
     } catch (e) {
         const error = mapError(e)
         Log.error('mapi.server.callFunction.error', {

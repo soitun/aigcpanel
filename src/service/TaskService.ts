@@ -86,9 +86,8 @@ export const TaskService = {
                                           ORDER BY id DESC`, [biz])
         // console.log('TaskService.restoreForTask', records.length)
         for (let record of records) {
-            let status = record.status === 'running' ? 'querying' : 'queue'
             await taskStore.dispatch(record.biz, record.id as any, {}, {
-                status: status,
+                status: 'queue',
                 runStart: record.startTime,
                 queryInterval: 5 * 1000,
             })
@@ -113,13 +112,18 @@ export const TaskService = {
         })
     },
     async update(id: number, record: Partial<TaskRecord>) {
-        if ('result' in record || 'jobResult' in record) {
+        if ('result' in record || 'jobResult' in record || 'startTime' in record) {
             const recordOld = await this.get(id)
             if ('result' in record) {
                 record.result = Object.assign(recordOld?.result, record.result)
             }
             if ('jobResult' in record) {
                 record.jobResult = Object.assign(recordOld?.jobResult, record.jobResult)
+            }
+            if ('startTime' in record) {
+                if (recordOld?.startTime) {
+                    delete record.startTime
+                }
             }
         }
         record = this.encodeRecord(record as TaskRecord)

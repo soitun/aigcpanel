@@ -34,14 +34,14 @@ onMounted(() => {
                     {{ t('数字人形象') }}
                 </div>
             </div>
-<!--            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"-->
-<!--                 :class="tab === 'videoGenFlow' ? 'bg-gray-200' : ''"-->
-<!--                 @click="tab = 'videoGenFlow'">-->
-<!--                <div class="text-base truncate">-->
-<!--                    <i class="iconfont icon-quick w-6 inline-block"></i>-->
-<!--                    {{ $t('一键合成') }}-->
-<!--                </div>-->
-<!--            </div>-->
+            <div class="p-2 rounded-lg mr-2 mb-4 cursor-pointer"
+                 :class="tab === 'videoGenFlow' ? 'bg-gray-200' : ''"
+                 @click="tab = 'videoGenFlow'">
+                <div class="text-base truncate">
+                    <i class="iconfont icon-quick w-6 inline-block"></i>
+                    {{ $t('一键合成') }}
+                </div>
+            </div>
         </div>
         <div class="flex-grow h-full overflow-y-auto">
             <VideoGen v-if="tab === 'videoGen'"/>

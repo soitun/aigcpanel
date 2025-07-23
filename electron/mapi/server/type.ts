@@ -47,5 +47,12 @@ export type ServerContext = {
 
 export type ServerFunctionDataType = {
     id: string,
+    result: {
+        [key: string]: any,
+    },
+    [key: string]: any,
+}
+
+export type ServerFunctionOptionType = {
     [key: string]: any,
 }

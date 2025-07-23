@@ -321,6 +321,7 @@ const launcherSubmitConfigJsonAndQuery = async (context: ServerContext, configDa
     const configJsonPath = await launcherPrepareConfigJson(configData)
     const result = await launcherSubmitAndQuery(context, {
         id: configData.id,
+        result: {},
         entryPlaceholders: {
             'CONFIG': configJsonPath
         },

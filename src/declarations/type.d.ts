@@ -237,6 +237,9 @@ declare interface Window {
                 method: string,
                 data: {
                     id: string,
+                    result: {
+                        [key: string]: any
+                    },
                     [key: string]: any
                 }
             ) => Promise<any>,
@@ -245,6 +248,9 @@ declare interface Window {
                 method: string,
                 data: {
                     id: string,
+                    result: {
+                        [key: string]: any
+                    },
                     [key: string]: any
                 },
                 option?: {

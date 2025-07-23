@@ -231,12 +231,8 @@ export const EasyServer = function (config: any) {
                     }
                     throw "执行失败，请查看模型日志"
                 }
-                const localPath = await this.ServerApi.file.temp('wav')
-                await this.ServerApi.file.rename(launcherResult.result.url, localPath, {
-                    isFullPath: true
-                })
                 return {
-                    filePath: localPath
+                    url: launcherResult.result.url
                 }
             }
         )
@@ -265,12 +261,8 @@ export const EasyServer = function (config: any) {
                     }
                     throw "执行失败，请查看模型日志"
                 }
-                const localPath = await this.ServerApi.file.temp('wav')
-                await this.ServerApi.file.rename(launcherResult.result.url, localPath, {
-                    isFullPath: true
-                })
                 return {
-                    filePath: localPath
+                    url: launcherResult.result.url
                 }
             }
         )
@@ -298,12 +290,8 @@ export const EasyServer = function (config: any) {
                     }
                     throw "执行失败，请查看模型日志"
                 }
-                const localPath = await this.ServerApi.file.temp('mp4')
-                await this.ServerApi.file.rename(launcherResult.result.url, localPath, {
-                    isFullPath: true
-                })
                 return {
-                    filePath: localPath
+                    url: launcherResult.result.url
                 }
             }
         )
