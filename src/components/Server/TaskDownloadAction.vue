@@ -17,22 +17,17 @@ const canDownload = computed(() => {
 })
 
 const doDownload = async () => {
+    const fileExt = await window.$mapi.file.ext(props.record.result.url)
     let filePath = await window.$mapi.file.openSave({
-        defaultPath: props.record.title + '.wav'
+        defaultPath: props.record.title + `.${fileExt}`
     })
     if (!filePath) {
         return
     }
-    let fromPath = props.record.result.url
-    if (props.record.biz === 'SoundTts' || props.record.biz === 'SoundClone') {
-        if (!filePath.endsWith('.wav')) {
-            filePath = filePath + '.wav'
-        }
-    } else if (props.record.biz === 'VideoGen' || props.record.biz === 'VideoGenFlow') {
-        if (!filePath.endsWith('.mp4')) {
-            filePath = filePath + '.mp4'
-        }
+    if (!filePath.endsWith(`.${fileExt}`)) {
+        filePath = filePath + `.${fileExt}`
     }
+    let fromPath = props.record.result.url
     try {
         await window.$mapi.file.copy(fromPath, filePath, {
             isFullPath: true,

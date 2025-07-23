@@ -33,11 +33,8 @@ const doDownload = async () => {
         }))
         let fromPath = r.result.url
         let targetPath: string = ''
-        if (r.biz === 'SoundTts' || r.biz === 'SoundClone') {
-            targetPath = `${pathDir}/${r.title}.wav`
-        } else if (r.biz === 'VideoGen' || r.biz === 'VideoGenFlow') {
-            targetPath = `${pathDir}/${r.title}.mp4`
-        }
+        const fileExt = await window.$mapi.file.ext(fromPath)
+        targetPath = `${pathDir}/${r.title}.${fileExt}`
         await sleep(100)
         if (await window.$mapi.file.exists(targetPath, {
             isFullPath: true,
