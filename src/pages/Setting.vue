@@ -47,7 +47,7 @@ onBeforeUnmount(() => {
                     {{ t('基础设置') }}
                 </div>
             </div>
-            <div v-if="0" data-section="env" class="p-2 rounded-lg mr-2 mb-4 cursor-pointer">
+            <div data-section="env" class="p-2 rounded-lg mr-2 mb-4 cursor-pointer">
                 <div class="text-base">
                     <icon-code/>
                     {{ t('环境设置') }}
@@ -70,8 +70,8 @@ onBeforeUnmount(() => {
                         <SettingBasic/>
                     </div>
                 </div>
-                <div v-if="0" class="border-b border-solid border-gray-200 my-6"></div>
-                <div v-if="0" data-section="env" class="scroll-mt-4">
+                <div class="border-b border-solid border-gray-200 my-6"></div>
+                <div data-section="env" class="scroll-mt-4">
                     <div class="text-base font-bold mb-4">{{ t('环境设置') }}</div>
                     <div>
                         <SettingEnv/>
