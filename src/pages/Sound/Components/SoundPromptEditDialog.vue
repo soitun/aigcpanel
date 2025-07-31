@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import AudioPlayer from "../common/AudioPlayer.vue";
-import {AudioUtil} from "../../lib/audio";
-import WebFileSelectButton from "../common/WebFileSelectButton.vue";
-import {Dialog} from "../../lib/dialog";
-import {t} from "../../lang";
-import {StorageService} from "../../service/StorageService";
-import {DataService} from "../../service/DataService";
+import AudioPlayer from "../../../components/common/AudioPlayer.vue";
+import {AudioUtil} from "../../../lib/audio";
+import WebFileSelectButton from "../../../components/common/WebFileSelectButton.vue";
+import {Dialog} from "../../../lib/dialog";
+import {t} from "../../../lang";
+import {StorageService} from "../../../service/StorageService";
+import {DataService} from "../../../service/DataService";
 
 const visible = ref(false)
 const audioPlayer = ref<InstanceType<typeof AudioPlayer>>()

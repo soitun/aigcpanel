@@ -2,7 +2,6 @@
 import {ref, watch} from "vue";
 import {cloneDeep} from "lodash-es";
 import SpeakerSelector from "./SpeakerSelector.vue";
-import SoundPromptSelector from "../Sound/components/SoundPromptSelector.vue";
 
 type FieldBasicType = {
     name: string,
@@ -159,9 +158,6 @@ defineExpose({
             <SpeakerSelector v-model="item.value" :speakers="item['speakers']"
                              :disabled="props.disabled"
                              @on-data-update="onSpeakerDataUpdate(item.name,$event)"/>
-        </div>
-        <div v-else-if="item.type==='soundPromptId'" class="w-48 mr-3">
-            <SoundPromptSelector v-model="item.value" :disabled="props.disabled" />
         </div>
         <div v-for="speakerParam in item['speakerParam']">
             <div v-if="!speakerParam.type||speakerParam.type==='select'" class="mr-3">

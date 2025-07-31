@@ -3,10 +3,10 @@
 import {onMounted, ref} from "vue";
 import {t} from "../../lang";
 import {Dialog} from "../../lib/dialog";
-import VideoTemplateEditDialog from "../../components/Video/VideoTemplateEditDialog.vue";
 import {VideoTemplateRecord, VideoTemplateService} from "../../service/VideoTemplateService";
 import VideoPlayer from "../../components/common/VideoPlayer.vue";
 import InputInlineEditor from "../../components/common/InputInlineEditor.vue";
+import VideoTemplateEditDialog from "./components/VideoTemplateEditDialog.vue";
 
 const editDialog = ref<InstanceType<typeof VideoTemplateEditDialog>>()
 const records = ref<VideoTemplateRecord[]>([])

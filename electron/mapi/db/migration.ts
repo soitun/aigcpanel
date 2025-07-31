@@ -279,6 +279,41 @@ const versions = [
             }
         }
     },
+    {
+        version:9,
+        up: async (db: DB) => {
+            const records = await db.select(`SELECT * FROM data_task where biz in ('SoundTts', 'SoundClone')`);
+            for(const r of records) {
+                const modelConfigOld = JSON.parse(r.modelConfig);
+                const paramOld = JSON.parse(r.param);
+                const modelConfig: any = {
+                    type: r.biz,
+                    ttsParam: r.biz ==='SoundTts'? paramOld : undefined,
+                    cloneParam: r.biz === 'SoundClone' ? paramOld : undefined,
+                    ...modelConfigOld,
+                }
+                const values = [
+                    'SoundGenerate',
+                    r.title,
+                    r.status,
+                    r.statusMsg,
+                    r.startTime,
+                    r.endTime,
+                    r.serverName,
+                    r.serverTitle,
+                    r.serverVersion,
+                    JSON.stringify({}),
+                    r.jobResult,
+                    JSON.stringify(modelConfig),
+                    r.result,
+                ]
+                await db.insert(`INSERT INTO data_task
+                                 (biz, title, status, statusMsg, startTime, endTime, serverName, serverTitle, serverVersion, param, jobResult, modelConfig,  result)
+                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, values)
+                await db.execute(`DELETE FROM data_task WHERE id = ?`, [r.id]);
+            }
+        }
+    },
 ]
 
 export default {

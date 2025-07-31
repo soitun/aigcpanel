@@ -1,44 +1,40 @@
 import {TaskBiz} from "../store/modules/task";
 import {useServerStore} from "../store/modules/server";
-import {VideoTemplateService} from "../service/VideoTemplateService";
 import {TaskService} from "../service/TaskService";
 import {DataService} from "../service/DataService";
 
 const serverStore = useServerStore()
 
-export const VideoGen: TaskBiz = {
+export const SoundGenerate: TaskBiz = {
 
     runFunc: async (bizId, bizParam) => {
-        // console.log('VideoGen.runFunc', {bizId, bizParam})
+        // console.log('SoundClone.runFunc', {bizId, bizParam})
         const {record, server, serverInfo} = await serverStore.prepareForTask(bizId, bizParam)
-        // console.log('VideoGen.runFunc.serverInfo', serverInfo)
+        // console.log('runFunc', serverInfo, record)
         await TaskService.update(bizId as any, {
             status: 'wait',
         })
-        const videoTemplateRecord = await VideoTemplateService.get(record.modelConfig.videoTemplateId)
-        if (!videoTemplateRecord) {
-            throw new Error('VideoTemplateEmpty')
+        let res
+        if (record.modelConfig.type === 'SoundTts') {
+            // {"type":"SoundTts","ttsServerKey":"server-cosyvoice|0.6.0","ttsParam":{"speaker":"中文女","speed":1},"text":"你好"}
+            res = await window.$mapi.server.callFunctionWithException(serverInfo, 'soundTts', {
+                id: serverStore.generateTaskId(record.modelConfig.type, bizId),
+                result: record.result,
+                param: record.modelConfig.ttsParam,
+                text: record.modelConfig.text,
+            })
+        } else {
+            res = await window.$mapi.server.callFunctionWithException(serverInfo, 'soundClone', {
+                id: serverStore.generateTaskId(record.modelConfig.type, bizId),
+                result: record.result,
+                param: record.modelConfig.cloneParam,
+                text: record.modelConfig.text,
+                promptAudio: record.modelConfig.promptUrl,
+                promptText: record.modelConfig.promptText,
+            })
         }
-        let audioFile: string | null = null
-        if (record.modelConfig.soundType === 'soundGenerate') {
-            const soundRecord = await TaskService.get(record.modelConfig.soundGenerateId)
-            audioFile = soundRecord?.result.url as string
-        } else if (record.modelConfig.soundType === 'soundCustom') {
-            audioFile = record.modelConfig.soundCustomFile
-        }
-        if (!audioFile) {
-            throw new Error('AudioFileEmpty')
-        }
-        const res = await window.$mapi.server.callFunctionWithException(serverInfo, 'videoGen', {
-            id: serverStore.generateTaskId('VideoGen', bizId),
-            result: record.result,
-            param: record.param,
-            video: videoTemplateRecord?.video,
-            audio: audioFile,
-        })
-        // console.log('VideoGen.runFunc.res', res)
         if (res.code) {
-            throw res.msg || 'apiRequest videoGen fail'
+            throw res.msg || 'SoundGenerate fail'
         }
         switch (res.data.type) {
             case 'success':
@@ -54,9 +50,7 @@ export const VideoGen: TaskBiz = {
         }
     },
     successFunc: async (bizId, bizParam) => {
-        // console.log('VideoGen.successFunc', {bizId, bizParam})
         const {record} = await serverStore.prepareForTask(bizId, bizParam)
-        // console.log('VideoGen.successFunc.record', {record, server})
         await TaskService.update(bizId as any, {
             status: 'success',
             endTime: Date.now(),
@@ -66,7 +60,7 @@ export const VideoGen: TaskBiz = {
         })
     },
     failFunc: async (bizId, msg, bizParam) => {
-        // console.log('VideoGen.failFunc', {bizId, bizParam, msg})
+        // console.log('SoundClone.failFunc', {bizId, bizParam, msg})
         // const {record, server} = await prepareData(bizId, bizParam)
         await TaskService.update(bizId as any, {
             status: 'fail',

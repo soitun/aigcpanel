@@ -3,7 +3,12 @@ import {useTaskStore} from "../store/modules/task";
 
 const taskStore = useTaskStore()
 
-export type TaskBiz = 'SoundClone' | 'SoundTts' | 'VideoGen' | 'VideoGenFlow'
+export type TaskBiz = never
+    | 'SoundClone'
+    | 'SoundTts'
+    | 'SoundGenerate'
+    | 'VideoGen'
+    | 'VideoGenFlow'
 
 export type TaskRecord = {
     id?: number;
@@ -75,6 +80,18 @@ export const TaskService = {
                                           FROM ${this.tableName()}
                                           WHERE biz = ?
                                           ORDER BY id DESC`, [biz])
+        return records.map(this.decodeRecord) as TaskRecord[]
+    },
+    async listByStatus(biz: TaskBiz, statusList: ('queue' | 'wait' | 'running' | 'success' | 'fail')[]): Promise<TaskRecord[]> {
+        if (!statusList || statusList.length === 0) {
+            return []
+        }
+        const records: TaskRecord[] =
+            await window.$mapi.db.select(`SELECT *
+                                          FROM ${this.tableName()}
+                                          WHERE biz = ?
+                                            AND status IN (${statusList.map(() => '?').join(',')})
+                                          ORDER BY id DESC`, [biz, ...statusList])
         return records.map(this.decodeRecord) as TaskRecord[]
     },
     async restoreForTask(biz: TaskBiz) {

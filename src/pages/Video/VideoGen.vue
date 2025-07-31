@@ -1,7 +1,6 @@
 <script setup lang="ts">
 
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
-import VideoGenCreate from "../../components/Video/VideoGenCreate.vue";
 import {TaskChangeType, useTaskStore} from "../../store/modules/task";
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
 import VideoPlayer from "../../components/common/VideoPlayer.vue";
@@ -16,6 +15,7 @@ import TaskBatchDownloadAction from "../../components/Server/TaskBatchDownloadAc
 import TaskDownloadAction from "../../components/Server/TaskDownloadAction.vue";
 import TaskDeleteAction from "../../components/Server/TaskDeleteAction.vue";
 import TaskDuration from "../../components/Server/TaskDuration.vue";
+import VideoGenCreate from "./components/VideoGenCreate.vue";
 
 const videoGenCreate = ref<InstanceType<typeof VideoGenCreate> | null>(null)
 
@@ -98,7 +98,8 @@ onBeforeUnmount(() => {
                                     <a-checkbox v-model="r['_check']"/>
                                 </div>
                                 <div class="">
-                                    <TaskTitleField :record="r" @title-click="r['_check']=!r['_check']" @update="v=>r.title=v"/>
+                                    <TaskTitleField :record="r" @title-click="r['_check']=!r['_check']"
+                                                    @update="v=>r.title=v"/>
                                 </div>
                             </div>
                             <div class="flex-grow"></div>
@@ -130,7 +131,7 @@ onBeforeUnmount(() => {
                                         {{ r.modelConfig.videoTemplateName }}
                                     </div>
                                 </div>
-                                <div v-if="r.modelConfig.soundType==='soundTts'" class="flex items-start">
+                                <div v-if="r.modelConfig.soundType==='soundGenerate'" class="flex items-start">
                                     <div class="mr-2 flex-shrink-0">
                                         <div class="bg-gray-100 px-2 leading-6 rounded-lg">
                                             <i class="iconfont icon-sound"></i>
@@ -138,18 +139,7 @@ onBeforeUnmount(() => {
                                         </div>
                                     </div>
                                     <div class="">
-                                        {{ r.modelConfig.soundTtsText }}
-                                    </div>
-                                </div>
-                                <div v-if="r.modelConfig.soundType==='soundClone'" class="flex items-start">
-                                    <div class="mr-2 flex-shrink-0">
-                                        <div class="bg-gray-100 px-2 leading-6 rounded-lg">
-                                            <i class="iconfont icon-video-template"></i>
-                                            {{ $t('声音克隆') }}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        {{ r.modelConfig.soundCloneText }}
+                                        {{ r.modelConfig.soundGenerateText }}
                                     </div>
                                 </div>
                                 <div v-if="r.modelConfig.soundType==='soundCustom'" class="flex items-start">

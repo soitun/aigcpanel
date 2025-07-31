@@ -1,11 +1,11 @@
 <template>
     <div>
         <div @click="doShow"
-             class="leading-7 px-3 rounded-lg text-center cursor-pointer bg-gray-100 hover:bg-gray-200">
-            {{ speakerTitle || '选择音色' }}
+             class="leading-8 h-8 px-3 rounded-lg text-left cursor-pointer bg-gray-100 hover:bg-gray-200">
+            {{ speakerTitle || $t('选择音色') }}
         </div>
         <a-modal v-model:visible="visible"
-                 title="选择音色"
+                 :title="$t('选择音色')"
                  width="50rem"
                  :footer="false"
                  body-class="pb-speaker-selector-dialog-body"

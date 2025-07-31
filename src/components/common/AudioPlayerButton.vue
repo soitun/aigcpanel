@@ -1,9 +1,9 @@
 <template>
-  <span>
-    <a v-if="!playing" class="play" href="javascript:;" @click="playing = true">
+  <span @click="playing = !playing">
+    <a v-if="!playing" class="play" href="javascript:;">
         <icon-play-circle/>
     </a>
-    <a v-if="playing" class="pause" href="javascript:;" @click="playing = false">
+    <a v-if="playing" class="pause" href="javascript:;">
       <icon-pause-circle/>
     </a>
     <audio ref="audio" :src="source" preload="none"></audio>

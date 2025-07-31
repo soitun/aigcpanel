@@ -1,0 +1,38 @@
+<script setup lang="ts">
+import AudioPlayerButton from "../../../components/common/AudioPlayerButton.vue";
+import SoundGenerateDialog from "./SoundGenerateDialog.vue";
+import {ref} from "vue";
+import {TaskRecord} from "../../../service/TaskService";
+
+const soundGenerateDialog = ref<InstanceType<typeof SoundGenerateDialog> | null>(null)
+const props = defineProps({
+    modelValue: {
+        type: Number,
+        required: true,
+        default: 0
+    }
+})
+const soundTitle = ref('')
+const soundUrl = ref('')
+const emit = defineEmits(['update:modelValue'])
+const onSelect = (record: TaskRecord) => {
+    soundTitle.value = record.title
+    soundUrl.value = record.result?.url || ''
+    emit('update:modelValue', record.id)
+}
+
+</script>
+
+<template>
+    <div class="flex items-center">
+        <div @click="soundGenerateDialog?.show()"
+             class="w-96 mr-2 h-8 leading-8 px-3 rounded-lg cursor-pointer truncate bg-gray-100 hover:bg-gray-200">
+            {{ soundTitle || '选择声音' }}
+        </div>
+        <AudioPlayerButton
+            v-if="soundUrl"
+            class="mr-2 arco-btn arco-btn-secondary arco-btn-shape-square arco-btn-size-medium arco-btn-status-normal"
+            :source="'file://'+soundUrl"/>
+    </div>
+    <SoundGenerateDialog ref="soundGenerateDialog" @select="onSelect"/>
+</template>

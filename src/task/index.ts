@@ -2,6 +2,7 @@ import {useTaskStore} from "../store/modules/task";
 import {SoundTts} from "./SoundTts";
 import {nextTick} from "vue";
 import {SoundClone} from "./SoundClone";
+import {SoundGenerate} from "./SoundGenerate";
 import {VideoGen} from "./VideoGen";
 import {VideoGenFlow} from "./VideoGenFlow";
 import {useServerStore} from "../store/modules/server";
@@ -13,6 +14,7 @@ const serverStore = useServerStore()
 export const tasks = {
     SoundTts,
     SoundClone,
+    SoundGenerate,
     VideoGen,
     VideoGenFlow,
 }

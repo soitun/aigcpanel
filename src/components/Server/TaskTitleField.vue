@@ -7,6 +7,10 @@ const props = defineProps({
     record: {
         type: Object as () => TaskRecord,
         required: true
+    },
+    disabled: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -22,14 +26,22 @@ const onEditTitle = async (value: string) => {
     emit('update', value)
 }
 
+const onTitleClick = () => {
+    if (!props.disabled) {
+        emit('titleClick')
+    }
+}
+
 </script>
 
 <template>
     <div class="flex items-center">
-        <div class="truncate flex-grow max-w-96 cursor-pointer" @click="emit('titleClick')">
+        <div class="truncate flex-grow max-w-96 cursor-pointer"
+             @click="onTitleClick">
             {{ record.title }}
         </div>
-        <InputInlineEditor :value="record.title" @change="onEditTitle">
+        <InputInlineEditor v-if="!disabled"
+                           :value="record.title" @change="onEditTitle">
             <a class="ml-1 text-gray-400" href="javascript:;">
                 <icon-pen/>
             </a>

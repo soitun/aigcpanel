@@ -2,9 +2,8 @@
 
 import AudioPlayer from "../../components/common/AudioPlayer.vue";
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
-import {TaskChangeType, useTaskStore} from "../../store/modules/task";
-import SoundCloneCreate from "../../components/Sound/SoundCloneCreate.vue";
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
+import {TaskChangeType, useTaskStore} from "../../store/modules/task";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
 import {TaskRecord, TaskService} from "../../service/TaskService";
 import TaskCancelAction from "../../components/Server/TaskCancelAction.vue";
@@ -16,6 +15,7 @@ import TaskDownloadAction from "../../components/Server/TaskDownloadAction.vue";
 import TaskDeleteAction from "../../components/Server/TaskDeleteAction.vue";
 import TaskDuration from "../../components/Server/TaskDuration.vue";
 import {doCopy} from "../../components/common/util";
+import SoundGenerateCreate from "./Components/SoundGenerateCreate.vue";
 
 const records = ref<TaskRecord[]>([])
 const taskStore = useTaskStore()
@@ -31,10 +31,10 @@ const taskChangeCallback = (bizId: string, type: TaskChangeType) => {
 
 onMounted(async () => {
     await doRefresh()
-    taskStore.onChange('SoundClone', taskChangeCallback)
+    taskStore.onChange('SoundGenerate', taskChangeCallback)
 })
 onBeforeUnmount(() => {
-    taskStore.offChange('SoundClone', taskChangeCallback)
+    taskStore.offChange('SoundGenerate', taskChangeCallback)
 })
 
 const {
@@ -48,7 +48,7 @@ const {
 })
 
 const doRefresh = async () => {
-    records.value = mergeCheck(await TaskService.list('SoundClone'))
+    records.value = mergeCheck(await TaskService.list('SoundGenerate'))
 }
 
 </script>
@@ -57,11 +57,10 @@ const doRefresh = async () => {
     <div class="p-5">
         <div class="mb-4 flex items-center">
             <div class="text-3xl font-bold flex-grow">
-                {{ $t('声音克隆') }}
+                {{ $t('声音合成') }}
             </div>
-            <div class="flex items-center">
-                <a-tooltip v-if="0"
-                           :content="$t('清空历史')" position="right" mini>
+            <div class="flex items-center" v-if="0">
+                <a-tooltip :content="$t('清空历史')" position="right" mini>
                     <a-button class="ml-1">
                         <template #icon>
                             <icon-delete/>
@@ -71,7 +70,7 @@ const doRefresh = async () => {
             </div>
         </div>
         <div>
-            <SoundCloneCreate @submitted="doRefresh"/>
+            <SoundGenerateCreate @submitted="doRefresh"/>
             <div>
                 <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
                     <div class="flex-grow flex items-center">
@@ -109,21 +108,42 @@ const doRefresh = async () => {
                             </div>
                         </div>
                         <div class="mt-3">
-                            <div class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
+                            <div v-if="r.modelConfig.type==='SoundTts'"
+                                 class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
+                                <i class="iconfont icon-sound-generate"></i>
+                                {{ $t('声音合成') }}
+                            </div>
+                            <div v-else-if="r.modelConfig.type==='SoundClone'"
+                                 class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
+                                <i class="iconfont icon-sound-clone"></i>
+                                {{ $t('声音克隆') }}
+                            </div>
+                            <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
                                 <i class="iconfont icon-server mr-1"></i>
                                 {{ r.serverTitle }}
                                 v{{ r.serverVersion }}
                             </div>
-                            <div class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
-                                <i class="iconfont icon-sound-prompt mr-1"></i>
-                                {{ r.modelConfig.promptName }}
+                            <div v-if="r.modelConfig.type==='SoundTts'&&r.modelConfig?.ttsParam?.speakerTitle"
+                                 class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
+                                <i class="iconfont icon-speaker mr-1"></i>
+                                {{ r.modelConfig?.ttsParam?.speakerTitle }}
                             </div>
-                            <div v-if="r.param.speed"
+                            <div v-if="r.modelConfig.type==='SoundTts'&&r.param?.ttsParam?.speed"
+                                 class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-6 h-6">
+                                <i class="iconfont icon-speed mr-1"></i>
+                                <span class="">x{{ r.param?.ttsParam?.speed }}</span>
+                            </div>
+                            <div v-if="r.modelConfig.type==='SoundClone'"
+                                 class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
+                                <i class="iconfont icon-sound-prompt mr-1"></i>
+                                {{ r.modelConfig.promptTitle }}
+                            </div>
+                            <div v-if="r.modelConfig.type==='SoundClone'&&r.modelConfig?.cloneParam?.speed"
                                  class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
                                 <i class="iconfont icon-speed mr-1"></i>
-                                <span class="">x{{ r.param.speed }}</span>
+                                <span class="">x{{ r.modelConfig?.cloneParam?.speed }}</span>
                             </div>
-                            <div v-if="r.param.crossLingual"
+                            <div v-if="r.modelConfig.type==='SoundClone'&&r.modelConfig?.cloneParam?.crossLingual"
                                  class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
                                 <i class="iconfont icon-global mr-1"></i>
                                 <span class="">{{ $t('跨语种') }}</span>
@@ -136,7 +156,7 @@ const doRefresh = async () => {
                                 {{ r.modelConfig.text }}
                             </div>
                         </a-tooltip>
-                        <div class="pt-4" v-if="r.result.url">
+                        <div class="pt-4" v-if="r.result && r.result.url">
                             <AudioPlayer
                                 show-wave
                                 :url="'file://'+r.result.url"/>
@@ -154,7 +174,6 @@ const doRefresh = async () => {
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </template>

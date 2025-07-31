@@ -1,18 +1,18 @@
 <script setup lang="ts">
-
-import ServerSelector from "../Server/ServerSelector.vue";
+import ServerSelector from "../../../components/Server/ServerSelector.vue";
 import {onMounted, ref, watch} from "vue";
-import {useServerStore} from "../../store/modules/server";
-import {Dialog} from "../../lib/dialog";
-import {StorageUtil} from "../../lib/storage";
-import {t} from "../../lang";
-import {VideoTemplateRecord, VideoTemplateService} from "../../service/VideoTemplateService";
-import {EnumServerStatus} from "../../types/Server";
-import ParamForm from "../common/ParamForm.vue";
-import {PermissionService} from "../../service/PermissionService";
-import ServerContentInfoAction from "../Server/ServerContentInfoAction.vue";
-import {TaskRecord, TaskService} from "../../service/TaskService";
-import {TimeUtil} from "../../lib/util";
+import {useServerStore} from "../../../store/modules/server";
+import {Dialog} from "../../../lib/dialog";
+import {StorageUtil} from "../../../lib/storage";
+import {t} from "../../../lang";
+import {VideoTemplateRecord, VideoTemplateService} from "../../../service/VideoTemplateService";
+import {EnumServerStatus} from "../../../types/Server";
+import ParamForm from "../../../components/common/ParamForm.vue";
+import {PermissionService} from "../../../service/PermissionService";
+import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
+import {TaskRecord, TaskService} from "../../../service/TaskService";
+import {TimeUtil} from "../../../lib/util";
+import SoundGenerateSelector from "../../Sound/Components/SoundGenerateSelector.vue";
 
 const serverStore = useServerStore()
 const paramForm = ref<InstanceType<typeof ParamForm> | null>(null)
@@ -21,9 +21,8 @@ const modelConfig = ref(null)
 const formData = ref({
     serverKey: '',
     videoTemplateId: 0,
-    soundType: 'soundTts',
-    soundTtsId: 0,
-    soundCloneId: 0,
+    soundType: 'soundGenerate',
+    soundGenerateId: 0,
     soundCustomFile: '',
     param: {},
 });
@@ -37,9 +36,9 @@ onMounted(() => {
     const old = StorageUtil.getObject('VideoGenCreate.formData')
     formData.value.serverKey = old.serverKey || ''
     formData.value.videoTemplateId = old.videoTemplateId || 0
-    formData.value.soundType = old.soundType || 'soundTts'
-    formData.value.soundTtsId = old.soundTtsId || 0
-    formData.value.soundCloneId = old.soundCloneId || 0
+    formData.value.soundType = old.soundType || 'soundGenerate'
+    formData.value.soundGenerateId = old.soundGenerateId || 0
+    formData.value.soundCustomFile = old.soundCustomFile || ''
 })
 
 watch(() => formData.value, async (value) => {
@@ -73,26 +72,15 @@ const doSubmit = async () => {
         Dialog.tipError(t('请选择模型'))
         return
     }
-    let soundTtsRecord: TaskRecord | null = null
-    let soundCloneRecord: TaskRecord | null = null
+    let soundRecord: TaskRecord | null = null
     let soundCustomFile: string | null = null
-    if (formData.value.soundType === 'soundTts') {
-        if (!formData.value.soundTtsId) {
+    if (formData.value.soundType === 'soundGenerate') {
+        if (!formData.value.soundGenerateId) {
             Dialog.tipError(t('请选择声音'))
             return
         }
-        soundTtsRecord = await TaskService.get(formData.value.soundTtsId)
-        if (!soundTtsRecord) {
-            Dialog.tipError(t('请选择声音'))
-            return
-        }
-    } else if (formData.value.soundType === 'soundClone') {
-        if (!formData.value.soundCloneId) {
-            Dialog.tipError(t('请选择声音'))
-            return
-        }
-        soundCloneRecord = await TaskService.get(formData.value.soundCloneId)
-        if (!soundCloneRecord) {
+        soundRecord = await TaskService.get(formData.value.soundGenerateId)
+        if (!soundRecord) {
             Dialog.tipError(t('请选择声音'))
             return
         }
@@ -127,7 +115,7 @@ const doSubmit = async () => {
     }
     const record: TaskRecord = {
         biz: 'VideoGen',
-        title: await window.$mapi.file.textToName(videoTemplate.name+'_'+TimeUtil.datetimeString()),
+        title: await window.$mapi.file.textToName(videoTemplate.name + '_' + TimeUtil.datetimeString()),
         serverName: server.name,
         serverTitle: server.title,
         serverVersion: server.version,
@@ -135,10 +123,8 @@ const doSubmit = async () => {
             videoTemplateId: videoTemplate.id as number,
             videoTemplateName: videoTemplate.name,
             soundType: formData.value.soundType,
-            soundTtsId: formData.value.soundTtsId as number,
-            soundTtsText: soundTtsRecord ? soundTtsRecord.modelConfig.text : '',
-            soundCloneId: formData.value.soundCloneId,
-            soundCloneText: soundCloneRecord ? soundCloneRecord.modelConfig.text : '',
+            soundGenerateId: formData.value.soundGenerateId as number,
+            soundGenerateText: soundRecord ? soundRecord.modelConfig.text : '',
             soundCustomFile: soundCustomFile || '',
         },
         param: formData.value.param,
@@ -161,6 +147,7 @@ const doSoundCustomSelect = async () => {
     const path = await window.$mapi.file.openFile({
         filters: [
             {name: '*.wav', extensions: ['wav']},
+            {name: '*.mp3', extensions: ['mp3']},
         ],
     })
     if (!path) {
@@ -223,13 +210,9 @@ defineExpose({
             </div>
             <div class="mr-1">
                 <a-radio-group v-model="formData.soundType">
-                    <a-radio value="soundTts">
+                    <a-radio value="soundGenerate">
                         <i class="iconfont icon-sound-generate"></i>
                         {{ $t('声音合成') }}
-                    </a-radio>
-                    <a-radio value="soundClone">
-                        <i class="iconfont icon-sound-clone"></i>
-                        {{ $t('声音克隆') }}
                     </a-radio>
                     <a-radio value="soundCustom">
                         <icon-file/>
@@ -237,27 +220,10 @@ defineExpose({
                     </a-radio>
                 </a-radio-group>
             </div>
-            <div class="mr-3 w-56 flex-shrink-0" v-if="formData.soundType==='soundTts'">
-                <a-select v-model="formData.soundTtsId">
-                    <a-option :value="0">{{ $t('请选择') }}</a-option>
-                    <a-option v-for="record in soundTtsRecords" :key="record.id" :value="record.id">
-                        <div>
-                            #{{ record.id }} {{ record.modelConfig.text }}
-                        </div>
-                    </a-option>
-                </a-select>
+            <div class="mr-3 w-96 flex-shrink-0" v-if="formData.soundType==='soundGenerate'">
+                <SoundGenerateSelector v-model="formData.soundGenerateId"/>
             </div>
-            <div class="mr-3 w-56 flex-shrink-0" v-if="formData.soundType==='soundClone'">
-                <a-select v-model="formData.soundCloneId">
-                    <a-option :value="0">{{ $t('请选择') }}</a-option>
-                    <a-option v-for="record in soundCloneRecords" :key="record.id" :value="record.id">
-                        <div>
-                            #{{ record.id }} {{ record.modelConfig.text }}
-                        </div>
-                    </a-option>
-                </a-select>
-            </div>
-            <div class="mr-3 w-56 flex-shrink-0" v-if="formData.soundType==='soundCustom'">
+            <div class="mr-3 w-96 flex-shrink-0" v-if="formData.soundType==='soundCustom'">
                 <a-button @click="doSoundCustomSelect">
                     <div v-if="formData.soundCustomFile">
                         {{ fileName(formData.soundCustomFile) }}
