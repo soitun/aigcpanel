@@ -1,15 +1,15 @@
-import packageJson from '../package.json';
+import packageJson from "../package.json";
 import {TimeUtil} from "../electron/lib/util";
 
-const BASE_URL = 'https://aigcpanel.com';
+const BASE_URL = "https://aigcpanel.com";
 
 export const AppConfig = {
-    name: 'AIGCPanel',
-    slogan: '一站式AI数字人系统',
+    name: "AIGCPanel",
+    slogan: "一站式AI数字人系统",
     version: packageJson.version,
     website: `${BASE_URL}`,
-    websiteGithub: 'https://github.com/modstart-lib/aigcpanel',
-    websiteGitee: 'https://gitee.com/modstart-lib/aigcpanel',
+    websiteGithub: "https://github.com/modstart-lib/aigcpanel",
+    websiteGitee: "https://gitee.com/modstart-lib/aigcpanel",
     apiBaseUrl: `${BASE_URL}/api`,
     updaterUrl: `${BASE_URL}/app_manager/updater/open`,
     downloadUrl: `${BASE_URL}/app_manager/download`,
@@ -21,5 +21,4 @@ export const AppConfig = {
     basic: {
         userEnable: false,
     },
-}
-
+};

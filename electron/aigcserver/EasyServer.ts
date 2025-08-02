@@ -5,210 +5,216 @@ import {AigcServerUtil} from "./util";
 
 type LauncherResultType = {
     result: {
-        [key: string]: any,
-    },
-    endTime: number | null,
-}
+        [key: string]: any;
+    };
+    endTime: number | null;
+};
 
 export const EasyServer = function (config: any) {
-    let controller: any = null
+    let controller: any = null;
     this.serverConfig = config as {
         easyServer: {
-            entry: string,
-            entryArgs: string[],
-            envs: string[],
-            content: string,
+            entry: string;
+            entryArgs: string[];
+            envs: string[];
+            content: string;
             functions: {
                 [key: string]: {
-                    content?: string,
-                    param?: any[],
-                },
-            },
-        }
-    }
-    this.isRunning = false
-    this.ServerApi = null as ServerApiType | null
-    this.ServerInfo = null as ServerInfo | null
+                    content?: string;
+                    param?: any[];
+                };
+            };
+        };
+    };
+    this.isRunning = false;
+    this.ServerApi = null as ServerApiType | null;
+    this.ServerInfo = null as ServerInfo | null;
     this.serverRuntime = {
         startTime: 0,
-    }
-    this.send = function (type: SendType, data: any) {
-        this.ServerApi.event.sendChannel(this.ServerInfo.eventChannelName, {type, data})
-    }
-    this.init = async function () {
     };
+    this.send = function (type: SendType, data: any) {
+        this.ServerApi.event.sendChannel(this.ServerInfo.eventChannelName, {type, data});
+    };
+    this.init = async function () {};
     this.config = async function () {
         return {
             code: 0,
             msg: "ok",
             data: {
                 httpUrl: null,
-                content: this.serverConfig.easyServer.content || '',
+                content: this.serverConfig.easyServer.content || "",
                 functions: this.serverConfig.easyServer.functions || {},
-            }
-        }
+            },
+        };
     };
     this.start = async function () {
         // console.log('start', this.ServerInfo)
-        this.serverRuntime.startTime = Date.now()
-        this.send('starting', this.ServerInfo)
-    }
+        this.serverRuntime.startTime = Date.now();
+        this.send("starting", this.ServerInfo);
+    };
     this.ping = async function (): Promise<boolean> {
         // console.log('ping', this.ServerInfo)
-        return this.serverRuntime.startTime > 0
-    }
+        return this.serverRuntime.startTime > 0;
+    };
     this.stop = async function () {
         // console.log('stop', this.ServerInfo)
-        this.send('stopping', this.ServerInfo)
-        this.serverRuntime.startTime = 0
-        this.send('stopped', this.ServerInfo)
-        this.send('success', this.ServerInfo)
-    }
+        this.send("stopping", this.ServerInfo);
+        this.serverRuntime.startTime = 0;
+        this.send("stopped", this.ServerInfo);
+        this.send("success", this.ServerInfo);
+    };
     this.cancel = async function () {
-        controller.stop()
-    }
+        controller.stop();
+    };
     this._callFunc = async function (
         data: ServerFunctionDataType,
         configCalculator: (data: ServerFunctionDataType) => Promise<any>,
         resultDataCalculator: (data: ServerFunctionDataType, launcherResult: LauncherResultType) => Promise<any>,
         option: {
-            timeout: number,
+            timeout: number;
         }
     ) {
-        option = Object.assign({
-            timeout: 24 * 3600,
-        }, option)
+        option = Object.assign(
+            {
+                timeout: 24 * 3600,
+            },
+            option
+        );
         const resultData = {
             // success, querying, retry
-            type: 'success',
+            type: "success",
             start: 0,
             end: 0,
-            data: {}
-        }
+            data: {},
+        };
         if (this.isRunning) {
-            resultData.type = 'retry'
+            resultData.type = "retry";
             return {
                 code: 0,
-                msg: 'ok',
-                data: resultData
-            }
+                msg: "ok",
+                data: resultData,
+            };
         }
-        this.isRunning = true
-        resultData.start = Date.now()
-        let configJsonPath = null
+        this.isRunning = true;
+        resultData.start = Date.now();
+        let configJsonPath = null;
         try {
-            this.send('taskRunning', {id: data.id})
-            const configData = await configCalculator(data)
-            configData.setting = this.ServerInfo.setting
-            configJsonPath = await this.ServerApi.launcherPrepareConfigJson(configData)
-            let command = []
-            command.push(this.serverConfig.easyServer.entry)
+            this.send("taskRunning", {id: data.id});
+            const configData = await configCalculator(data);
+            configData.setting = this.ServerInfo.setting;
+            configJsonPath = await this.ServerApi.launcherPrepareConfigJson(configData);
+            let command = [];
+            command.push(this.serverConfig.easyServer.entry);
             if (this.serverConfig.easyServer.entryArgs) {
-                command = command.concat(this.serverConfig.easyServer.entryArgs)
+                command = command.concat(this.serverConfig.easyServer.entryArgs);
             }
             for (let i = 0; i < command.length; i++) {
-                command[i] = command[i].replace('${CONFIG}', `"${configJsonPath}"`)
-                command[i] = command[i].replace('${ROOT}', this.ServerInfo.localPath)
+                command[i] = command[i].replace("${CONFIG}", `"${configJsonPath}"`);
+                command[i] = command[i].replace("${ROOT}", this.ServerInfo.localPath);
             }
-            const envMap = {}
+            const envMap = {};
             // console.log('EasyServer', this.serverConfig.easyServer)
-            if (this.serverConfig.easyServer.entry === 'launcher') {
-                const systemEnv = await this.ServerApi.env()
+            if (this.serverConfig.easyServer.entry === "launcher") {
+                const systemEnv = await this.ServerApi.env();
                 // console.log('EasyServer.systemEnv', systemEnv)
                 for (const k in systemEnv) {
-                    envMap[k] = systemEnv[k]
+                    envMap[k] = systemEnv[k];
                 }
             }
-            envMap['PATH'] = this.ServerApi.getPathEnv([
+            envMap["PATH"] = this.ServerApi.getPathEnv([
                 `${this.ServerInfo.localPath}`,
                 `${this.ServerInfo.localPath}/binary`,
-            ])
-            envMap['PYTHONIOENCODING'] = 'utf-8'
-            envMap['AIGCPANEL_SERVER_PLACEHOLDER_CONFIG'] = configJsonPath
-            envMap['AIGCPANEL_SERVER_PLACEHOLDER_ROOT'] = this.ServerInfo.localPath
+            ]);
+            envMap["PYTHONIOENCODING"] = "utf-8";
+            envMap["AIGCPANEL_SERVER_PLACEHOLDER_CONFIG"] = configJsonPath;
+            envMap["AIGCPANEL_SERVER_PLACEHOLDER_ROOT"] = this.ServerInfo.localPath;
             if (this.serverConfig.easyServer.envs) {
                 for (const e of this.serverConfig.easyServer.envs) {
-                    let pcs = e.split('=')
-                    const key = pcs.shift()
-                    envMap[key] = pcs.join('=')
+                    let pcs = e.split("=");
+                    const key = pcs.shift();
+                    envMap[key] = pcs.join("=");
                 }
             }
             for (const k in envMap) {
-                envMap[k] = envMap[k].replace('${CONFIG}', `"${configJsonPath}"`)
-                envMap[k] = envMap[k].replace('${ROOT}', this.ServerInfo.localPath)
+                envMap[k] = envMap[k].replace("${CONFIG}", `"${configJsonPath}"`);
+                envMap[k] = envMap[k].replace("${ROOT}", this.ServerInfo.localPath);
             }
             // console.log('EasyServer.envMap', envMap)
             const launcherResult: LauncherResultType = {
                 result: {},
                 endTime: null,
-            }
+            };
             // console.log('easyServer.start', JSON.stringify({command, envMap, configData}))
             await (async () => {
                 return new Promise((resolve, reject) => {
-                    let timer = null
-                    controller = null
+                    let timer = null;
+                    controller = null;
                     if (option.timeout > 0) {
                         timer = setTimeout(() => {
                             if (controller) {
                                 try {
-                                    controller.stop()
+                                    controller.stop();
                                 } catch (e) {
-                                    Log.error('easyServer.timeout.stop.error', e)
+                                    Log.error("easyServer.timeout.stop.error", e);
                                 }
                             }
-                            this.ServerApi.file.appendText(this.ServerInfo.logFile, 'timeout')
-                            resolve(undefined)
-                        }, option.timeout * 1000)
+                            this.ServerApi.file.appendText(this.ServerInfo.logFile, "timeout");
+                            resolve(undefined);
+                        }, option.timeout * 1000);
                     }
-                    this.ServerApi.app.spawnShell(command, {
-                        env: envMap,
-                        cwd: this.ServerInfo.localPath,
-                        stdout: (_data) => {
-                            // console.log('easyServer.stdout', _data)
-                            this.ServerApi.file.appendText(this.ServerInfo.logFile, _data)
-                            const result = this.ServerApi.extractResultFromLogs(data.id, _data)
-                            if (result) {
-                                launcherResult.result = Object.assign(launcherResult.result, result)
-                                this.send('taskResult', {id: data.id, result})
-                            }
-                            launcherResult.result.error = AigcServerUtil.errorDetect(_data) || launcherResult.result.error
-                        },
-                        stderr: (_data) => {
-                            // console.log('easyServer.stderr', _data)
-                            this.ServerApi.file.appendText(this.ServerInfo.logFile, _data)
-                            launcherResult.result.error = AigcServerUtil.errorDetect(_data) || launcherResult.result.error
-                        },
-                        success: (_data) => {
-                            // console.log('easyServer.success', _data)
-                            clearTimeout(timer)
-                            resolve(undefined)
-                        },
-                        error: (_data, code) => {
-                            // console.log('easyServer.error', _data)
-                            this.ServerApi.file.appendText(this.ServerInfo.logFile, `exit code ${code}`)
-                            clearTimeout(timer)
-                            resolve(undefined)
-                        },
-                    }).then(c => {
-                        controller = c
-                    })
-                })
-            })()
-            resultData.end = Date.now()
-            resultData.data = await resultDataCalculator(data, launcherResult)
+                    this.ServerApi.app
+                        .spawnShell(command, {
+                            env: envMap,
+                            cwd: this.ServerInfo.localPath,
+                            stdout: _data => {
+                                // console.log('easyServer.stdout', _data)
+                                this.ServerApi.file.appendText(this.ServerInfo.logFile, _data);
+                                const result = this.ServerApi.extractResultFromLogs(data.id, _data);
+                                if (result) {
+                                    launcherResult.result = Object.assign(launcherResult.result, result);
+                                    this.send("taskResult", {id: data.id, result});
+                                }
+                                launcherResult.result.error =
+                                    AigcServerUtil.errorDetect(_data) || launcherResult.result.error;
+                            },
+                            stderr: _data => {
+                                // console.log('easyServer.stderr', _data)
+                                this.ServerApi.file.appendText(this.ServerInfo.logFile, _data);
+                                launcherResult.result.error =
+                                    AigcServerUtil.errorDetect(_data) || launcherResult.result.error;
+                            },
+                            success: _data => {
+                                // console.log('easyServer.success', _data)
+                                clearTimeout(timer);
+                                resolve(undefined);
+                            },
+                            error: (_data, code) => {
+                                // console.log('easyServer.error', _data)
+                                this.ServerApi.file.appendText(this.ServerInfo.logFile, `exit code ${code}`);
+                                clearTimeout(timer);
+                                resolve(undefined);
+                            },
+                        })
+                        .then(c => {
+                            controller = c;
+                        });
+                });
+            })();
+            resultData.end = Date.now();
+            resultData.data = await resultDataCalculator(data, launcherResult);
             // console.log('easyServer.end', launcherResult)
-            await Files.deletes(configJsonPath, {isFullPath: true})
+            await Files.deletes(configJsonPath, {isFullPath: true});
             return {
                 code: 0,
-                msg: 'ok',
-                data: resultData
-            }
+                msg: "ok",
+                data: resultData,
+            };
         } catch (e) {
-            throw e
+            throw e;
         } finally {
-            this.isRunning = false
+            this.isRunning = false;
         }
-    }
+    };
     this.soundTts = async function (data: ServerFunctionDataType) {
         // console.log('soundTts', {data, serverInfo: this.ServerInfo})
         return this._callFunc(
@@ -216,27 +222,27 @@ export const EasyServer = function (config: any) {
             async (data: ServerFunctionDataType) => {
                 return {
                     id: data.id,
-                    mode: 'local',
+                    mode: "local",
                     modelConfig: {
-                        type: 'soundTts',
+                        type: "soundTts",
                         param: data.param,
                         text: data.text,
-                    }
-                }
+                    },
+                };
             },
             async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
-                if (!('url' in launcherResult.result)) {
+                if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
-                        throw launcherResult.result.error
+                        throw launcherResult.result.error;
                     }
-                    throw "执行失败，请查看模型日志"
+                    throw "执行失败，请查看模型日志";
                 }
                 return {
-                    url: launcherResult.result.url
-                }
+                    url: launcherResult.result.url,
+                };
             }
-        )
-    }
+        );
+    };
     this.soundClone = async function (data: ServerFunctionDataType) {
         // console.log('soundClone', {data, serverInfo: this.ServerInfo})
         return this._callFunc(
@@ -244,29 +250,29 @@ export const EasyServer = function (config: any) {
             async (data: ServerFunctionDataType) => {
                 return {
                     id: data.id,
-                    mode: 'local',
+                    mode: "local",
                     modelConfig: {
-                        type: 'soundClone',
+                        type: "soundClone",
                         param: data.param,
                         text: data.text,
                         promptAudio: data.promptAudio,
                         promptText: data.promptText,
-                    }
-                }
+                    },
+                };
             },
             async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
-                if (!('url' in launcherResult.result)) {
+                if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
-                        throw launcherResult.result.error
+                        throw launcherResult.result.error;
                     }
-                    throw "执行失败，请查看模型日志"
+                    throw "执行失败，请查看模型日志";
                 }
                 return {
-                    url: launcherResult.result.url
-                }
+                    url: launcherResult.result.url,
+                };
             }
-        )
-    }
+        );
+    };
     this.videoGen = async function (data: ServerFunctionDataType) {
         // console.log('videoGen', JSON.stringify({data, serverInfo: this.ServerInfo}))
         return this._callFunc(
@@ -274,26 +280,26 @@ export const EasyServer = function (config: any) {
             async (data: ServerFunctionDataType) => {
                 return {
                     id: data.id,
-                    mode: 'local',
+                    mode: "local",
                     modelConfig: {
-                        type: 'videoGen',
+                        type: "videoGen",
                         param: data.param,
                         video: data.videoFile,
                         audio: data.soundFile,
-                    }
-                }
+                    },
+                };
             },
             async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
-                if (!('url' in launcherResult.result)) {
+                if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
-                        throw launcherResult.result.error
+                        throw launcherResult.result.error;
                     }
-                    throw "执行失败，请查看模型日志"
+                    throw "执行失败，请查看模型日志";
                 }
                 return {
-                    url: launcherResult.result.url
-                }
+                    url: launcherResult.result.url,
+                };
             }
-        )
-    }
-}
+        );
+    };
+};

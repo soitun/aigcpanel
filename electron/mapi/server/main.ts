@@ -1,4 +1,4 @@
-import ServerApi from './api'
+import ServerApi from "./api";
 import {ipcMain} from "electron";
 import {Log} from "../log/main";
 import {mapError} from "./error";
@@ -7,206 +7,215 @@ import {SendType, ServerContext, ServerInfo} from "./type";
 import {Files} from "../file/main";
 import {getGpuInfo} from "../../lib/env-main";
 
-ipcMain.handle('server:listGpus', async (event) => {
-    return await getGpuInfo()
-})
+ipcMain.handle("server:listGpus", async event => {
+    return await getGpuInfo();
+});
 
-let runningServerCount = 0
-ipcMain.handle('server:runningServerCount', async (event, count: number | null) => {
+let runningServerCount = 0;
+ipcMain.handle("server:runningServerCount", async (event, count: number | null) => {
     if (count === null) {
-        return runningServerCount
+        return runningServerCount;
     }
     // console.log('runningServerCount', count)
-    runningServerCount = count
-    return runningServerCount
-})
+    runningServerCount = count;
+    return runningServerCount;
+});
 const getRunningServerCount = () => {
-    return runningServerCount
-}
+    return runningServerCount;
+};
 
 const serverModule: {
-    [key: string]: ServerContext
-} = {}
+    [key: string]: ServerContext;
+} = {};
 
-const init = () => {
+const init = () => {};
 
-}
-
-const getModule = async (serverInfo: ServerInfo, option?: {
-    throwException: boolean
-}): Promise<ServerContext> => {
-    option = Object.assign({
-        throwException: true
-    }, option)
+const getModule = async (
+    serverInfo: ServerInfo,
+    option?: {
+        throwException: boolean;
+    }
+): Promise<ServerContext> => {
+    option = Object.assign(
+        {
+            throwException: true,
+        },
+        option
+    );
     // console.log('getModule', serverInfo)
     if (!serverModule[serverInfo.localPath]) {
         try {
-            if (serverInfo.name.startsWith('Cloud')) {
-                const server = new AigcServer['Cloud']()
-                server.type = 'buildIn'
-                server.ServerApi = ServerApi
-                await server.init()
-                serverModule[serverInfo.localPath] = server
+            if (serverInfo.name.startsWith("Cloud")) {
+                const server = new AigcServer["Cloud"]();
+                server.type = "buildIn";
+                server.ServerApi = ServerApi;
+                await server.init();
+                serverModule[serverInfo.localPath] = server;
             } else if (serverInfo.name in AigcServer) {
-                const server = AigcServer[serverInfo.name] as ServerContext
-                server.type = 'buildIn'
-                server.ServerApi = ServerApi
-                await server.init()
-                serverModule[serverInfo.localPath] = server
+                const server = AigcServer[serverInfo.name] as ServerContext;
+                server.type = "buildIn";
+                server.ServerApi = ServerApi;
+                await server.init();
+                serverModule[serverInfo.localPath] = server;
             } else {
-                const serverPath = `${serverInfo.localPath}/server.js`
-                const configPath = `${serverInfo.localPath}/config.json`
+                const serverPath = `${serverInfo.localPath}/server.js`;
+                const configPath = `${serverInfo.localPath}/config.json`;
 
-                let server = null
-                if (await Files.exists(serverPath, {
-                    isFullPath: true
-                })) {
-                    const module = await import(`file://${serverPath}`)
-                    server = module.default
+                let server = null;
+                if (
+                    await Files.exists(serverPath, {
+                        isFullPath: true,
+                    })
+                ) {
+                    const module = await import(`file://${serverPath}`);
+                    server = module.default;
                 }
-                if (!server && await Files.exists(configPath, {
-                    isFullPath: true
-                })) {
-                    const configContent = await Files.read(configPath, {isFullPath: true})
+                if (
+                    !server &&
+                    (await Files.exists(configPath, {
+                        isFullPath: true,
+                    }))
+                ) {
+                    const configContent = await Files.read(configPath, {isFullPath: true});
                     try {
-                        const config = JSON.parse(configContent)
-                        if (config.entry === '__EasyServer__') {
-                            server = new AigcServer['EasyServer'](config)
+                        const config = JSON.parse(configContent);
+                        if (config.entry === "__EasyServer__") {
+                            server = new AigcServer["EasyServer"](config);
                         } else {
-                            throw `ServerEntryNotFound : ${config.entry}`
+                            throw `ServerEntryNotFound : ${config.entry}`;
                         }
                     } catch (e) {
-                        throw `ConfigParseError : ${configPath}`
+                        throw `ConfigParseError : ${configPath}`;
                     }
                 }
                 if (!server) {
-                    throw `ServerFileNotFound : ${serverPath}`
+                    throw `ServerFileNotFound : ${serverPath}`;
                 }
-                server.type = 'custom'
-                server.ServerApi = ServerApi
+                server.type = "custom";
+                server.ServerApi = ServerApi;
                 if (server.init) {
-                    await server.init()
+                    await server.init();
                 }
                 server.send = (type: SendType, data: any) => {
-                    server.ServerApi.event.sendChannel(server.ServerInfo.eventChannelName, {type, data})
-                }
+                    server.ServerApi.event.sendChannel(server.ServerInfo.eventChannelName, {type, data});
+                };
                 server.sendLog = (data: any) => {
-                    server.ServerApi.file.appendText(server.ServerInfo.logFile, data)
-                }
-                serverModule[serverInfo.localPath] = server
+                    server.ServerApi.file.appendText(server.ServerInfo.logFile, data);
+                };
+                serverModule[serverInfo.localPath] = server;
             }
         } catch (e) {
             if (!option.throwException) {
-                return null
+                return null;
             }
-            const error = mapError(e)
-            Log.error('mapi.server.getModule.error', error)
-            throw error
+            const error = mapError(e);
+            Log.error("mapi.server.getModule.error", error);
+            throw error;
         }
     }
     // console.log('getModule', serverInfo, serverModule[serverInfo.localPath])
-    serverModule[serverInfo.localPath].ServerInfo = serverInfo
-    return serverModule[serverInfo.localPath]
-}
+    serverModule[serverInfo.localPath].ServerInfo = serverInfo;
+    return serverModule[serverInfo.localPath];
+};
 
-ipcMain.handle('server:isSupport', async (event, serverInfo: ServerInfo) => {
+ipcMain.handle("server:isSupport", async (event, serverInfo: ServerInfo) => {
     try {
         const module = await getModule(serverInfo, {
-            throwException: false
-        })
-        return !!module
+            throwException: false,
+        });
+        return !!module;
     } catch (e) {
-        return false
+        return false;
     }
-})
+});
 
-ipcMain.handle('server:start', async (event, serverInfo: ServerInfo) => {
-    const module = await getModule(serverInfo)
+ipcMain.handle("server:start", async (event, serverInfo: ServerInfo) => {
+    const module = await getModule(serverInfo);
     try {
-        return await module.start()
+        return await module.start();
     } catch (e) {
-        const error = mapError(e)
-        Log.error('mapi.server.start.error', error)
-        throw error
+        const error = mapError(e);
+        Log.error("mapi.server.start.error", error);
+        throw error;
     }
-})
+});
 
-ipcMain.handle('server:ping', async (event, serverInfo: ServerInfo) => {
-    const module = await getModule(serverInfo)
+ipcMain.handle("server:ping", async (event, serverInfo: ServerInfo) => {
+    const module = await getModule(serverInfo);
     try {
-        return await module.ping()
+        return await module.ping();
     } catch (e) {
-        const error = mapError(e)
-        Log.error('mapi.server.ping.error', error)
-        throw error
+        const error = mapError(e);
+        Log.error("mapi.server.ping.error", error);
+        throw error;
     }
-    return false
-})
+    return false;
+});
 
-ipcMain.handle('server:stop', async (event, serverInfo: ServerInfo) => {
-    const module = await getModule(serverInfo)
+ipcMain.handle("server:stop", async (event, serverInfo: ServerInfo) => {
+    const module = await getModule(serverInfo);
     try {
-        return await module.stop()
+        return await module.stop();
     } catch (e) {
-        const error = mapError(e)
-        Log.error('mapi.server.stop.error', error)
-        throw error
+        const error = mapError(e);
+        Log.error("mapi.server.stop.error", error);
+        throw error;
     }
-})
+});
 
-ipcMain.handle('server:cancel', async (event, serverInfo: ServerInfo) => {
-    const module = await getModule(serverInfo)
+ipcMain.handle("server:cancel", async (event, serverInfo: ServerInfo) => {
+    const module = await getModule(serverInfo);
     try {
-        return await module.cancel()
+        return await module.cancel();
     } catch (e) {
-        const error = mapError(e)
-        Log.error('mapi.server.cancel.error', error)
-        throw error
+        const error = mapError(e);
+        Log.error("mapi.server.cancel.error", error);
+        throw error;
     }
-})
+});
 
-ipcMain.handle('server:config', async (event, serverInfo: ServerInfo) => {
-    const module = await getModule(serverInfo)
+ipcMain.handle("server:config", async (event, serverInfo: ServerInfo) => {
+    const module = await getModule(serverInfo);
     try {
-        return await module.config()
+        return await module.config();
     } catch (e) {
-        const error = mapError(e)
-        Log.error('mapi.server.config.error', error)
-        throw error
+        const error = mapError(e);
+        Log.error("mapi.server.config.error", error);
+        throw error;
     }
-})
+});
 
-ipcMain.handle('server:callFunction', async (event, serverInfo: ServerInfo, method: string, data: any, option: any) => {
+ipcMain.handle("server:callFunction", async (event, serverInfo: ServerInfo, method: string, data: any, option: any) => {
     // console.log('getModule.before', serverInfo, method)
-    const module = await getModule(serverInfo)
+    const module = await getModule(serverInfo);
     // console.log('getModule.end', serverInfo, method, module)
-    const func = module[method]
+    const func = module[method];
     if (!func) {
-        throw new Error(`MethodNotFound : ${method}`)
+        throw new Error(`MethodNotFound : ${method}`);
     }
     try {
-        return await func.bind(module)(data, option || {})
+        return await func.bind(module)(data, option || {});
     } catch (e) {
-        const error = mapError(e)
-        Log.error('mapi.server.callFunction.error', {
-            type: typeof (e),
+        const error = mapError(e);
+        Log.error("mapi.server.callFunction.error", {
+            type: typeof e,
             error,
             serverInfo,
             method,
             data,
-            option
-        })
+            option,
+        });
         return {
             code: -1,
-            msg: error
-        }
+            msg: error,
+        };
     }
-})
+});
 
 export default {
     init,
-}
+};
 
 export const ServerMain = {
-    getRunningServerCount
-}
+    getRunningServerCount,
+};

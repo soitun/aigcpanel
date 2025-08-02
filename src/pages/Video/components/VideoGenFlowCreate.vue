@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import ServerSelector from "../../../components/Server/ServerSelector.vue";
 import {onMounted, ref, watch} from "vue";
 import {useServerStore} from "../../../store/modules/server";
@@ -14,67 +13,71 @@ import {TaskRecord, TaskService} from "../../../service/TaskService";
 import VideoTemplateSelector from "./VideoTemplateSelector.vue";
 import SoundGenerateForm from "../../Sound/Components/SoundGenerateForm.vue";
 
-const serverStore = useServerStore()
-const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(null)
-const videoParamForm = ref<InstanceType<typeof ParamForm> | null>(null)
+const serverStore = useServerStore();
+const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(null);
+const videoParamForm = ref<InstanceType<typeof ParamForm> | null>(null);
 
-const videoModelConfig = ref(null)
-const videoParam = ref([])
+const videoModelConfig = ref(null);
+const videoParam = ref([]);
 
 const formData = ref({
-    videoServerKey: '',
+    videoServerKey: "",
     videoTemplateId: 0,
-    text: '',
+    text: "",
 });
 
 onMounted(async () => {
-    const old = StorageUtil.getObject('VideoGenFlowCreate.formData')
-    formData.value.videoServerKey = old.videoServerKey || ''
-    formData.value.videoTemplateId = old.videoTemplateId || 0
-    formData.value.text = old.text || ''
-})
+    const old = StorageUtil.getObject("VideoGenFlowCreate.formData");
+    formData.value.videoServerKey = old.videoServerKey || "";
+    formData.value.videoTemplateId = old.videoTemplateId || 0;
+    formData.value.text = old.text || "";
+});
 
-watch(() => formData.value, async (value) => {
-    StorageUtil.set('VideoGenFlowCreate.formData', value)
-}, {
-    deep: true
-})
+watch(
+    () => formData.value,
+    async value => {
+        StorageUtil.set("VideoGenFlowCreate.formData", value);
+    },
+    {
+        deep: true,
+    }
+);
 
 const onVideoServerUpdate = async (config: any) => {
-    videoParam.value = config.functions.videoGen?.param || []
-    videoModelConfig.value = config
-}
+    videoParam.value = config.functions.videoGen?.param || [];
+    videoModelConfig.value = config;
+};
 
 const doSubmit = async () => {
-    let videoParam = videoParamForm.value?.getValue() || {}
-    let soundValue = await soundGenerateForm.value?.getValue()
+    let videoParam = videoParamForm.value?.getValue() || {};
+    let soundValue = await soundGenerateForm.value?.getValue();
     if (!soundValue) {
-        return
+        return;
     }
     if (!formData.value.videoServerKey) {
-        Dialog.tipError(t('请选择模型'))
-        return
+        Dialog.tipError(t("请选择模型"));
+        return;
     }
-    const videoServer = await serverStore.getByKey(formData.value.videoServerKey)
+    const videoServer = await serverStore.getByKey(formData.value.videoServerKey);
     if (!videoServer) {
-        Dialog.tipError(t('模型不存在'))
-        return
+        Dialog.tipError(t("模型不存在"));
+        return;
     }
     if (videoServer.status !== EnumServerStatus.RUNNING) {
-        Dialog.tipError(t('模型未启动'))
-        return
+        Dialog.tipError(t("模型未启动"));
+        return;
     }
     if (!formData.value.videoTemplateId) {
-        Dialog.tipError(t('请选择视频'))
-        return
+        Dialog.tipError(t("请选择视频"));
+        return;
     }
-    const videoTemplate = await VideoTemplateService.get(formData.value.videoTemplateId)
+    const videoTemplate = await VideoTemplateService.get(formData.value.videoTemplateId);
     if (!videoTemplate) {
-        Dialog.tipError(t('请选择视频'))
-        return
+        Dialog.tipError(t("请选择视频"));
+        return;
     }
     const record: TaskRecord = {
-        biz: 'VideoGenFlow',
+        biz: "VideoGenFlow",
         title: await window.$mapi.file.textToName(formData.value.text),
         serverName: videoServer.name,
         serverTitle: videoServer.title,
@@ -85,16 +88,16 @@ const doSubmit = async () => {
             videoUrl: videoTemplate?.video,
             soundType: soundValue.type,
             soundTts: {
-                serverName: soundValue.type === 'SoundTts' ? soundValue.serverName : undefined,
-                serverTitle: soundValue.type === 'SoundTts' ? soundValue.serverTitle : undefined,
-                serverVersion: soundValue.type === 'SoundTts' ? soundValue.serverVersion : undefined,
-                param: soundValue.type === 'SoundTts' ? soundValue.ttsParam : undefined,
+                serverName: soundValue.type === "SoundTts" ? soundValue.serverName : undefined,
+                serverTitle: soundValue.type === "SoundTts" ? soundValue.serverTitle : undefined,
+                serverVersion: soundValue.type === "SoundTts" ? soundValue.serverVersion : undefined,
+                param: soundValue.type === "SoundTts" ? soundValue.ttsParam : undefined,
             },
             soundClone: {
-                serverName: soundValue.type === 'SoundClone' ? soundValue.serverName : undefined,
-                serverTitle: soundValue.type === 'SoundClone' ? soundValue.serverTitle : undefined,
-                serverVersion: soundValue.type === 'SoundClone' ? soundValue.serverVersion : undefined,
-                param: soundValue.type === 'SoundClone' ? soundValue.cloneParam : undefined,
+                serverName: soundValue.type === "SoundClone" ? soundValue.serverName : undefined,
+                serverTitle: soundValue.type === "SoundClone" ? soundValue.serverTitle : undefined,
+                serverVersion: soundValue.type === "SoundClone" ? soundValue.serverVersion : undefined,
+                param: soundValue.type === "SoundClone" ? soundValue.cloneParam : undefined,
                 promptId: soundValue.promptId,
                 promptTitle: soundValue.promptTitle,
                 promptUrl: soundValue.promptUrl,
@@ -103,20 +106,20 @@ const doSubmit = async () => {
             text: formData.value.text,
         },
         param: videoParam,
-    }
-    if (!await PermissionService.checkForTask('VideoGenFlow', record)) {
-        return
+    };
+    if (!(await PermissionService.checkForTask("VideoGenFlow", record))) {
+        return;
     }
     // console.log('VideoGenFlow.submit',JSON.stringify(record))
-    const id = await TaskService.submit(record)
-    Dialog.tipSuccess(t('任务已经提交成功，等待视频生成完成'))
-    formData.value.text = ''
-    emit('submitted')
-}
+    const id = await TaskService.submit(record);
+    Dialog.tipSuccess(t("任务已经提交成功，等待视频生成完成"));
+    formData.value.text = "";
+    emit("submitted");
+};
 
 const emit = defineEmits({
-    submitted: () => true
-})
+    submitted: () => true,
+});
 </script>
 
 <template>
@@ -132,8 +135,11 @@ const emit = defineEmits({
                 </a-tooltip>
             </div>
             <div class="mr-3 w-96 flex-shrink-0">
-                <ServerSelector v-model="formData.videoServerKey" @update="onVideoServerUpdate"
-                                functionName="videoGen"/>
+                <ServerSelector
+                    v-model="formData.videoServerKey"
+                    @update="onVideoServerUpdate"
+                    functionName="videoGen"
+                />
             </div>
         </div>
         <div class="flex items-center h-12">
@@ -143,25 +149,27 @@ const emit = defineEmits({
                 </a-tooltip>
             </div>
             <div class="mr-3 w-56 flex-shrink-0">
-                <VideoTemplateSelector v-model="formData.videoTemplateId"/>
+                <VideoTemplateSelector v-model="formData.videoTemplateId" />
             </div>
         </div>
-        <div class="flex items-center min-h-12" v-if="videoParam.length>0">
-            <ParamForm ref="videoParamForm" :param="videoParam"/>
+        <div class="flex items-center min-h-12" v-if="videoParam.length > 0">
+            <ParamForm ref="videoParamForm" :param="videoParam" />
         </div>
         <div class="font-bold pt-4">
             <i class="iconfont icon-video"></i>
             声音设置
         </div>
-        <SoundGenerateForm ref="soundGenerateForm"/>
+        <SoundGenerateForm ref="soundGenerateForm" />
         <div class="pt-2">
-            <a-textarea v-model="formData.text"
-                        :auto-size="{minRows:2}"
-                        :placeholder="$t('输入语音内容开始生成视频')"></a-textarea>
+            <a-textarea
+                v-model="formData.text"
+                :auto-size="{minRows: 2}"
+                :placeholder="$t('输入语音内容开始生成视频')"
+            ></a-textarea>
         </div>
         <div class="pt-2">
             <a-button class="mr-2" type="primary" @click="doSubmit">
-                {{ $t('开始生成视频') }}
+                {{ $t("开始生成视频") }}
             </a-button>
         </div>
     </div>

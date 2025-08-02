@@ -1,4 +1,4 @@
-import {defineStore} from "pinia"
+import {defineStore} from "pinia";
 import store from "../../../store/index";
 
 import {getProviderLogo, getProviderTitle, SystemProviders} from "../providers";
@@ -14,28 +14,32 @@ import {useUserStore} from "../../../store/modules/user";
 import {watch} from "vue";
 import {AppConfig} from "../../../config";
 
-const userStore = useUserStore()
+const userStore = useUserStore();
 
-watch(() => userStore.data, (newValue) => {
-    model.init().then()
-}, {
-    deep: true,
-})
+watch(
+    () => userStore.data,
+    newValue => {
+        model.init().then();
+    },
+    {
+        deep: true,
+    }
+);
 
 export const modelStore = defineStore("model", {
     state() {
         return {
             providers: [] as Provider[],
-        }
+        };
     },
     actions: {
         async init() {
-            const results: Provider[] = []
+            const results: Provider[] = [];
             for (const providerId in SystemProviders) {
-                const provider = SystemProviders[providerId]
+                const provider = SystemProviders[providerId];
                 results.push({
                     id: providerId,
-                    type: 'openai',
+                    type: "openai",
                     title: getProviderTitle(providerId),
                     logo: getProviderLogo(providerId),
                     isSystem: true,
@@ -43,69 +47,69 @@ export const modelStore = defineStore("model", {
                     websites: {
                         official: provider.websites?.official,
                         docs: provider.websites?.docs,
-                        models: provider.websites?.models
+                        models: provider.websites?.models,
                     },
                     data: {
-                        apiKey: '',
-                        apiHost: '',
+                        apiKey: "",
+                        apiHost: "",
                         models: (SystemModels[providerId] || []).map(m => {
                             return {
                                 id: m.id,
                                 provider: providerId,
                                 name: m.name,
                                 group: m.group,
-                                types: ['text'],
-                                enabled: false
-                            } as any
+                                types: ["text"],
+                                enabled: false,
+                            } as any;
                         }),
                         enabled: false,
-                    }
-                })
+                    },
+                });
             }
-            const storageData = await window.$mapi.storage.read('models')
+            const storageData = await window.$mapi.storage.read("models");
             if (storageData) {
                 if (storageData.userProviders) {
-                    storageData.userProviders.forEach((provider) => {
+                    storageData.userProviders.forEach(provider => {
                         results.unshift({
                             id: provider.id,
                             type: provider.type,
                             title: provider.title,
                             logo: null,
                             isSystem: false,
-                            apiUrl: '',
+                            apiUrl: "",
                             websites: {
-                                official: '',
-                                docs: '',
-                                models: ''
+                                official: "",
+                                docs: "",
+                                models: "",
                             },
                             data: {
-                                apiKey: '',
-                                apiHost: '',
+                                apiKey: "",
+                                apiHost: "",
                                 models: [],
                                 enabled: false,
-                            }
-                        })
-                    })
+                            },
+                        });
+                    });
                 }
                 // 云端模型
                 if (userStore.data && userStore.data.lmApi && userStore.data.lmApi.models) {
-                    const lmApi = userStore.data.lmApi
-                    const models: Model[] = []
+                    const lmApi = userStore.data.lmApi;
+                    const models: Model[] = [];
                     for (const m of lmApi.models) {
                         models.push({
                             id: m,
-                            provider: 'buildIn',
+                            provider: "buildIn",
                             name: m,
-                            group: 'Default',
-                            types: ['text'],
+                            group: "Default",
+                            types: ["text"],
                             enabled: true,
-                        })
+                        });
                     }
                     results.unshift({
-                        id: 'buildIn',
-                        type: 'openai',
-                        title: getProviderTitle('buildIn'),
-                        logo: getProviderLogo('buildIn'),
+                        id: "buildIn",
+                        type: "openai",
+                        title: getProviderTitle("buildIn"),
+                        logo: getProviderLogo("buildIn"),
                         isSystem: true,
                         apiUrl: lmApi.apiUrl,
                         websites: {
@@ -115,44 +119,43 @@ export const modelStore = defineStore("model", {
                         },
                         data: {
                             apiKey: lmApi.apiKey,
-                            apiHost: '',
+                            apiHost: "",
                             models: models,
                             enabled: true,
-                        }
-                    })
+                        },
+                    });
                 }
                 if (storageData.providerData) {
                     for (const providerId in storageData.providerData) {
-                        const provider = results.find((p) => p.id === providerId)
+                        const provider = results.find(p => p.id === providerId);
                         if (provider) {
-                            provider.data.apiKey = storageData.providerData[providerId].apiKey || ''
+                            provider.data.apiKey = storageData.providerData[providerId].apiKey || "";
                             provider.data.apiHost = storageData.providerData[providerId].apiHost;
-                            (storageData.providerData[providerId].models || []).forEach((model) => {
-                                const existingModel = provider.data.models.find((m) => m.id === model.id)
+                            (storageData.providerData[providerId].models || []).forEach(model => {
+                                const existingModel = provider.data.models.find(m => m.id === model.id);
                                 if (existingModel) {
-                                    existingModel.name = model.name
-                                    existingModel.group = model.group
-                                    existingModel.types = model.types
-                                    existingModel.enabled = model.enabled || false
+                                    existingModel.name = model.name;
+                                    existingModel.group = model.group;
+                                    existingModel.types = model.types;
+                                    existingModel.enabled = model.enabled || false;
                                 } else {
                                     provider.data.models.push({
                                         id: model.id,
                                         provider: providerId,
                                         name: model.name,
                                         group: model.group,
-                                        types: ['text'],
-                                        enabled: model.enabled || false
-                                    })
+                                        types: ["text"],
+                                        enabled: model.enabled || false,
+                                    });
                                 }
-                            })
-                            provider.data.enabled = storageData.providerData[providerId].enabled || false
+                            });
+                            provider.data.enabled = storageData.providerData[providerId].enabled || false;
                         }
                     }
                 }
             }
-            results.forEach((provider) => {
-            })
-            this.providers = results
+            results.forEach(provider => {});
+            this.providers = results;
         },
         async add(provider: Partial<Provider>) {
             const p = {
@@ -162,91 +165,99 @@ export const modelStore = defineStore("model", {
                 logo: null,
                 isSystem: false,
                 websites: {
-                    official: '',
-                    docs: '',
-                    models: ''
+                    official: "",
+                    docs: "",
+                    models: "",
                 },
                 data: {
-                    apiKey: '',
-                    apiHost: '',
+                    apiKey: "",
+                    apiHost: "",
                     models: [],
                     enabled: false,
-                }
-            }
-            this.providers.unshift(p as any)
-            await this.sync()
+                },
+            };
+            this.providers.unshift(p as any);
+            await this.sync();
         },
         async edit(provider: Partial<Provider>) {
-            const p = this.providers.find((p) => p.id === provider.id)
+            const p = this.providers.find(p => p.id === provider.id);
             if (p) {
-                if ('title' in provider) {
-                    p.title = provider.title || ''
+                if ("title" in provider) {
+                    p.title = provider.title || "";
                 }
-                if ('type' in provider) {
-                    p.type = provider.type || 'openai'
+                if ("type" in provider) {
+                    p.type = provider.type || "openai";
                 }
                 if (provider.data) {
-                    if ('apiKey' in provider.data) {
-                        p.data.apiKey = provider.data.apiKey
+                    if ("apiKey" in provider.data) {
+                        p.data.apiKey = provider.data.apiKey;
                     }
-                    if ('apiHost' in provider.data) {
-                        p.data.apiHost = provider.data.apiHost
+                    if ("apiHost" in provider.data) {
+                        p.data.apiHost = provider.data.apiHost;
                     }
-                    if ('enabled' in provider.data) {
-                        p.data.enabled = provider.data.enabled
+                    if ("enabled" in provider.data) {
+                        p.data.enabled = provider.data.enabled;
                     }
                 }
-                await this.sync()
+                await this.sync();
             }
         },
         async test(providerId: string, modelId: string) {
-            const provider = this.providers.find((p) => p.id === providerId)
+            const provider = this.providers.find(p => p.id === providerId);
             if (!provider) {
-                return
+                return;
             }
-            const m = provider.data.models.find((m) => m.id === modelId)
+            const m = provider.data.models.find(m => m.id === modelId);
             if (!m) {
-                return
+                return;
             }
-            Dialog.loadingOn(t('测试中，请稍候...'))
+            Dialog.loadingOn(t("测试中，请稍候..."));
             try {
-                const ret = await ModelProvider.chat('你是什么模型，简短回答', {
+                const ret = await ModelProvider.chat("你是什么模型，简短回答", {
                     type: provider.type,
                     modelId: m.id,
                     apiUrl: provider.apiUrl,
                     apiHost: provider.data.apiHost,
                     apiKey: provider.data.apiKey,
-                })
+                });
                 if (ret.code) {
-                    throw ret.msg
+                    throw ret.msg;
                 }
-                Dialog.tipSuccess(t('测试成功'))
+                Dialog.tipSuccess(t("测试成功"));
             } catch (e) {
-                Dialog.tipError(t('测试失败') + ' ' + mapError(e))
+                Dialog.tipError(t("测试失败") + " " + mapError(e));
             } finally {
-                Dialog.loadingOff()
+                Dialog.loadingOff();
             }
         },
-        async chat(providerId: string, modelId: string, prompt: string, option?: {
-            loading: boolean
-        }): Promise<ModelChatResult> {
+        async chat(
+            providerId: string,
+            modelId: string,
+            prompt: string,
+            option?: {
+                loading: boolean;
+            }
+        ): Promise<ModelChatResult> {
             if (!providerId || !modelId) {
-                Dialog.tipError(t('请选择模型'))
-                return {code: -1, msg: t('请选择模型')}
+                Dialog.tipError(t("请选择模型"));
+                return {code: -1, msg: t("请选择模型")};
             }
-            option = Object.assign({
-                loading: false
-            }, option)
-            const provider = this.providers.find((p) => p.id === providerId)
+            option = Object.assign(
+                {
+                    loading: false,
+                },
+                option
+            );
+            const provider = this.providers.find(p => p.id === providerId);
             if (!provider) {
-                return {code: -1, msg: 'provider not found'}
+                return {code: -1, msg: "provider not found"};
             }
-            const m = provider.data.models.find((m) => m.id === modelId)
+            const m = provider.data.models.find(m => m.id === modelId);
             if (!m) {
-                return {code: -1, msg: 'model not found'}
+                return {code: -1, msg: "model not found"};
             }
             if (option.loading) {
-                Dialog.loadingOn()
+                Dialog.loadingOn();
             }
             try {
                 return await ModelProvider.chat(prompt, {
@@ -255,113 +266,105 @@ export const modelStore = defineStore("model", {
                     apiUrl: provider.apiUrl,
                     apiHost: provider.data.apiHost,
                     apiKey: provider.data.apiKey,
-                })
+                });
             } catch (e) {
-                return {code: -1, msg: 'ERROR:' + mapError(e)}
+                return {code: -1, msg: "ERROR:" + mapError(e)};
             } finally {
                 if (option.loading) {
-                    Dialog.loadingOff()
+                    Dialog.loadingOff();
                 }
             }
         },
-        async change(providerId: string,
-                     key: ''
-                         | 'data.apiKey'
-                         | 'data.apiHost'
-                         | 'data.enabled',
-                     value: any) {
-            const provider = model.providers.find((p) => p.id === providerId)
+        async change(providerId: string, key: "" | "data.apiKey" | "data.apiHost" | "data.enabled", value: any) {
+            const provider = model.providers.find(p => p.id === providerId);
             if (!provider) {
-                return
+                return;
             }
-            const keys = key.split('.')
-            let obj = provider
+            const keys = key.split(".");
+            let obj = provider;
             for (let i = 0; i < keys.length - 1; i++) {
-                obj = obj[keys[i]]
+                obj = obj[keys[i]];
             }
-            const lastKey = keys[keys.length - 1]
+            const lastKey = keys[keys.length - 1];
             if (obj && lastKey in obj) {
-                obj[lastKey] = value
+                obj[lastKey] = value;
             }
-            await this.sync()
+            await this.sync();
         },
         async modelAdd(providerId: string, model: Partial<Model>) {
-            const provider = this.providers.find((p) => p.id === providerId)
+            const provider = this.providers.find(p => p.id === providerId);
             if (!provider) {
-                return
+                return;
             }
             const m = {
                 id: model.id,
                 provider: providerId,
-                name: model.name || '',
-                group: model.group || '',
-                types: model.types || ['text'],
-                enabled: true
-            }
-            provider.data.models.unshift(m as any)
-            await this.sync()
+                name: model.name || "",
+                group: model.group || "",
+                types: model.types || ["text"],
+                enabled: true,
+            };
+            provider.data.models.unshift(m as any);
+            await this.sync();
         },
         async modelDelete(providerId: string, modelId: string) {
-            const provider = this.providers.find((p) => p.id === providerId)
+            const provider = this.providers.find(p => p.id === providerId);
             if (!provider) {
-                return
+                return;
             }
-            const m = provider.data.models.find((m) => m.id === modelId)
+            const m = provider.data.models.find(m => m.id === modelId);
             if (m) {
-                provider.data.models.splice(provider.data.models.indexOf(m), 1)
+                provider.data.models.splice(provider.data.models.indexOf(m), 1);
             }
-            await this.sync()
+            await this.sync();
         },
         async modelEdit(providerId: string, model: Partial<Model>) {
-            const provider = this.providers.find((p) => p.id === providerId)
+            const provider = this.providers.find(p => p.id === providerId);
             if (!provider) {
-                return
+                return;
             }
-            const m = provider.data.models.find((m) => m.id === model.id)
+            const m = provider.data.models.find(m => m.id === model.id);
             if (m) {
-                if ('name' in model) {
-                    m.name = model.name || ''
+                if ("name" in model) {
+                    m.name = model.name || "";
                 }
-                if ('group' in model) {
-                    m.group = model.group || ''
+                if ("group" in model) {
+                    m.group = model.group || "";
                 }
-                if ('types' in model) {
-                    m.types = model.types || ['text']
+                if ("types" in model) {
+                    m.types = model.types || ["text"];
                 }
-                if ('enabled' in model) {
-                    m.enabled = model.enabled as boolean
+                if ("enabled" in model) {
+                    m.enabled = model.enabled as boolean;
                 }
             }
-            await this.sync()
+            await this.sync();
         },
-        async changeModel(providerId: string,
-                          modelId: string,
-                          key: 'enabled',
-                          value: any) {
-            const provider = this.providers.find((p) => p.id === providerId)
+        async changeModel(providerId: string, modelId: string, key: "enabled", value: any) {
+            const provider = this.providers.find(p => p.id === providerId);
             if (!provider) {
-                return
+                return;
             }
-            const m = provider.data.models.find((m) => m.id === modelId)
+            const m = provider.data.models.find(m => m.id === modelId);
             if (m) {
-                m[key] = value
+                m[key] = value;
             }
-            await this.sync()
+            await this.sync();
         },
         sync: debounce(async () => {
-            const providerData = {}
-            model.providers.forEach((provider) => {
-                providerData[provider.id] = provider.data
-            })
-            const userProviders = model.providers.filter((provider) => !provider.isSystem)
-            await window.$mapi.storage.write('models', ObjectUtil.clone({providerData, userProviders}))
+            const providerData = {};
+            model.providers.forEach(provider => {
+                providerData[provider.id] = provider.data;
+            });
+            const userProviders = model.providers.filter(provider => !provider.isSystem);
+            await window.$mapi.storage.write("models", ObjectUtil.clone({providerData, userProviders}));
         }, 200),
-    }
-})
+    },
+});
 
-export const model = modelStore(store)
-model.init().then()
+export const model = modelStore(store);
+model.init().then();
 
 export const useModelStore = () => {
-    return model
-}
+    return model;
+};

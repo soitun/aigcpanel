@@ -1,4 +1,4 @@
-import {defineStore} from "pinia"
+import {defineStore} from "pinia";
 import store from "../index";
 import {EnumServerStatus, EnumServerType, ServerRecord, ServerRuntime} from "../../types/Server";
 import {computed, ref, toRaw} from "vue";
@@ -13,138 +13,145 @@ import {StorageService} from "../../service/StorageService";
 import {TaskService} from "../../service/TaskService";
 
 // const serverCloudStore = useServerCloudStore()
-const taskStore = useTaskStore()
-const serverRuntime = ref<Map<string, ServerRuntime>>(new Map())
+const taskStore = useTaskStore();
+const serverRuntime = ref<Map<string, ServerRuntime>>(new Map());
 const createServerStatus = (record: ServerRecord): ComputedRef<EnumServerStatus> => {
     return computed(() => {
         if (record.type === EnumServerType.CLOUD || record.autoStart) {
-            return EnumServerStatus.RUNNING
+            return EnumServerStatus.RUNNING;
         }
-        return serverRuntime.value?.get(record.key)?.status || EnumServerStatus.STOPPED
-    })
-}
+        return serverRuntime.value?.get(record.key)?.status || EnumServerStatus.STOPPED;
+    });
+};
 const getServerRuntimeComputedValue = (record: ServerRecord): ComputedRef<ServerRuntime> => {
     return computed(() => {
-        let defaultStatus = EnumServerStatus.STOPPED
+        let defaultStatus = EnumServerStatus.STOPPED;
         if (record.type === EnumServerType.CLOUD) {
-            defaultStatus = EnumServerStatus.RUNNING
+            defaultStatus = EnumServerStatus.RUNNING;
         }
-        return serverRuntime.value?.get(record.key) || {
-            status: defaultStatus,
-        } as ServerRuntime
-    })
-}
+        return (
+            serverRuntime.value?.get(record.key) ||
+            ({
+                status: defaultStatus,
+            } as ServerRuntime)
+        );
+    });
+};
 const getOrCreateServerRuntime = (record: ServerRecord): ServerRuntime => {
-    const value = serverRuntime.value?.get(record.key)
+    const value = serverRuntime.value?.get(record.key);
     if (value) {
-        return value
+        return value;
     }
     const defaultValue = {
         status: EnumServerStatus.STOPPED,
         eventChannelName: undefined,
-        logFile: '',
-    } as ServerRuntime
+        logFile: "",
+    } as ServerRuntime;
     if (record.type === EnumServerType.CLOUD) {
-        defaultValue.status = EnumServerStatus.RUNNING
-        defaultValue.eventChannelName = createEventChannel(record, defaultValue)
-        defaultValue.logFile = `logs/${record.name}_${record.version}_${TimeUtil.dateString()}.log`
+        defaultValue.status = EnumServerStatus.RUNNING;
+        defaultValue.eventChannelName = createEventChannel(record, defaultValue);
+        defaultValue.logFile = `logs/${record.name}_${record.version}_${TimeUtil.dateString()}.log`;
     }
-    serverRuntime.value?.set(record.key, defaultValue)
-    return serverRuntime.value?.get(record.key) as ServerRuntime
-}
+    serverRuntime.value?.set(record.key, defaultValue);
+    return serverRuntime.value?.get(record.key) as ServerRuntime;
+};
 const deleteServerRuntime = (record: ServerRecord) => {
-    serverRuntime.value?.delete(record.key)
-}
+    serverRuntime.value?.delete(record.key);
+};
 
 const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime) => {
     if (!serverRuntime) {
-        serverRuntime = getOrCreateServerRuntime(server)
+        serverRuntime = getOrCreateServerRuntime(server);
     }
     const eventChannel = window.__page.createChannel(function (channelData) {
-        const {type, data} = channelData
+        const {type, data} = channelData;
         switch (type) {
-            case 'success':
-                clearTimeout(serverRuntime.pingCheckTimer)
-                serverRuntime.status = EnumServerStatus.STOPPED
-                window.__page.destroyChannel(eventChannel)
-                updateRunningServerCount().then()
-                break
-            case 'error':
-                clearTimeout(serverRuntime.pingCheckTimer)
-                serverRuntime.status = EnumServerStatus.ERROR
-                window.__page.destroyChannel(eventChannel)
-                updateRunningServerCount().then()
-                break
-            case 'starting':
-            case 'stopping':
-            case 'stopped':
-                break
-            case 'action':
+            case "success":
+                clearTimeout(serverRuntime.pingCheckTimer);
+                serverRuntime.status = EnumServerStatus.STOPPED;
+                window.__page.destroyChannel(eventChannel);
+                updateRunningServerCount().then();
+                break;
+            case "error":
+                clearTimeout(serverRuntime.pingCheckTimer);
+                serverRuntime.status = EnumServerStatus.ERROR;
+                window.__page.destroyChannel(eventChannel);
+                updateRunningServerCount().then();
+                break;
+            case "starting":
+            case "stopping":
+            case "stopped":
+                break;
+            case "action":
                 switch (data.type) {
-                    case 'LoginRequired':
-                    case 'VipRequired':
+                    case "LoginRequired":
+                    case "VipRequired":
                         const msgMap = {
-                            'LoginRequired': t('请先登录'),
-                            'VipRequired': t('请先开通会员'),
-                        }
-                        Dialog.tipError(data.msg || msgMap[data.type])
+                            LoginRequired: t("请先登录"),
+                            VipRequired: t("请先开通会员"),
+                        };
+                        Dialog.tipError(data.msg || msgMap[data.type]);
                         setTimeout(() => {
-                            window.$mapi.user.open().then()
-                        }, 2000)
-                        break
+                            window.$mapi.user.open().then();
+                        }, 2000);
+                        break;
                 }
                 break;
-            case 'liveTalk':
-                StorageService.add('LiveTalk', {
+            case "liveTalk":
+                StorageService.add("LiveTalk", {
                     title: data.title,
                     content: {
-                        content: data.content
-                    }
-                }).then()
+                        content: data.content,
+                    },
+                }).then();
                 break;
-            case 'taskRunning':
-            case 'taskResult':
-            case 'taskStatus':
-                const {id} = data
-                const {biz, bizId} = serverStoreInstance.parseTaskId(id)
+            case "taskRunning":
+            case "taskResult":
+            case "taskStatus":
+                const {id} = data;
+                const {biz, bizId} = serverStoreInstance.parseTaskId(id);
                 // console.log('task', {type, biz, bizId, data})
-                if ('taskRunning' === type) {
+                if ("taskRunning" === type) {
                     TaskService.update(bizId as any, {
-                        status: 'running',
+                        status: "running",
                         startTime: TimeUtil.timestampMS(),
                     }).then(() => {
-                        taskStore.fireChange({
-                            biz,
-                            bizId,
-                        } as any, 'running')
-                    })
-                } else if ('taskResult' === type) {
+                        taskStore.fireChange(
+                            {
+                                biz,
+                                bizId,
+                            } as any,
+                            "running"
+                        );
+                    });
+                } else if ("taskResult" === type) {
                     TaskService.update(bizId as any, {
                         result: data.result,
                     }).then(() => {
-                        taskStore.fireChange({
-                            biz,
-                            bizId,
-                        } as any, 'running')
-                    })
+                        taskStore.fireChange(
+                            {
+                                biz,
+                                bizId,
+                            } as any,
+                            "running"
+                        );
+                    });
                 }
-                break
+                break;
             default:
-                console.log('eventChannel.unknown', type, data)
-                break
+                console.log("eventChannel.unknown", type, data);
+                break;
         }
-    })
-    return eventChannel
-}
+    });
+    return eventChannel;
+};
 
 const updateRunningServerCount = async () => {
     const count = serverStoreInstance.records.filter(r => {
-        return r.type === EnumServerType.LOCAL_DIR
-            && r.status === EnumServerStatus.RUNNING
-            && !r.autoStart
-    }).length
-    await window.$mapi.server.runningServerCount(count)
-}
+        return r.type === EnumServerType.LOCAL_DIR && r.status === EnumServerStatus.RUNNING && !r.autoStart;
+    }).length;
+    await window.$mapi.server.runningServerCount(count);
+};
 
 export const serverStore = defineStore("server", {
     state: () => ({
@@ -153,36 +160,35 @@ export const serverStore = defineStore("server", {
     }),
     actions: {
         async waitReady() {
-            await wait(() => this.isReady)
+            await wait(() => this.isReady);
             // await serverCloudStore.waitReady()
         },
         async init() {
-            await window.$mapi.storage.get("server", "records", [])
-                .then((records) => {
-                    records.forEach((record: ServerRecord) => {
-                        record.status = createServerStatus(record)
-                        record.runtime = getServerRuntimeComputedValue(record)
-                    })
-                    this.records = records.filter((record: ServerRecord) => {
-                        return record.type !== EnumServerType.CLOUD
-                    })
-                })
-            await this.refresh()
-            this.isReady = true
+            await window.$mapi.storage.get("server", "records", []).then(records => {
+                records.forEach((record: ServerRecord) => {
+                    record.status = createServerStatus(record);
+                    record.runtime = getServerRuntimeComputedValue(record);
+                });
+                this.records = records.filter((record: ServerRecord) => {
+                    return record.type !== EnumServerType.CLOUD;
+                });
+            });
+            await this.refresh();
+            this.isReady = true;
         },
         async refresh() {
-            const dirs = await window.$mapi.file.list('model')
-            const localRecords: ServerRecord[] = []
+            const dirs = await window.$mapi.file.list("model");
+            const localRecords: ServerRecord[] = [];
             for (let dir of dirs) {
-                const config = await window.$mapi.file.read(`model/${dir.name}/config.json`)
-                let json
+                const config = await window.$mapi.file.read(`model/${dir.name}/config.json`);
+                let json;
                 try {
-                    json = JSON.parse(config)
+                    json = JSON.parse(config);
                 } catch (e) {
-                    continue
+                    continue;
                 }
                 if (!json) {
-                    continue
+                    continue;
                 }
                 localRecords.push({
                     key: this.generateServerKey({
@@ -191,225 +197,227 @@ export const serverStore = defineStore("server", {
                     } as any),
                     name: json.name || dir.name,
                     title: json.title || dir.name,
-                    version: json.version || '1.0.0',
+                    version: json.version || "1.0.0",
                     type: EnumServerType.LOCAL,
                     functions: json.functions || [],
                     localPath: `model/${dir.name}`,
                     settings: json.settings || [],
                     setting: json.setting || {},
-                } as ServerRecord)
+                } as ServerRecord);
             }
-            let changed = false
+            let changed = false;
             for (let lr of localRecords) {
-                const record = this.records.find((record) => record.key === lr.key)
+                const record = this.records.find(record => record.key === lr.key);
                 if (!record) {
-                    lr.status = createServerStatus(lr)
-                    lr.runtime = getServerRuntimeComputedValue(lr)
-                    this.records.unshift(lr as any)
-                    changed = true
+                    lr.status = createServerStatus(lr);
+                    lr.runtime = getServerRuntimeComputedValue(lr);
+                    this.records.unshift(lr as any);
+                    changed = true;
                 } else {
                     if (!record.settings && lr.settings) {
-                        record.settings = lr.settings
-                        changed = true
+                        record.settings = lr.settings;
+                        changed = true;
                     }
                 }
             }
             if (changed) {
-                await this.sync()
+                await this.sync();
             }
         },
         async prepareForTask(bizId: string, bizParam: any) {
-            const record = await TaskService.get(bizId as any)
+            const record = await TaskService.get(bizId as any);
             // console.log('SoundTts.runFunc.record', record)
             if (!record) {
-                throw 'record not found'
+                throw "record not found";
             }
-            const server = await this.getByNameVersion(record.serverName, record.serverVersion)
+            const server = await this.getByNameVersion(record.serverName, record.serverVersion);
             // console.log('SoundTts.runFunc.server', server)
             if (!server) {
-                throw 'server not found'
+                throw "server not found";
             }
-            const serverInfo = await this.serverInfo(server)
+            const serverInfo = await this.serverInfo(server);
             return {
                 record,
                 server,
                 serverInfo,
-            }
+            };
         },
         generateTaskId(biz: string, bizId: string) {
-            return `${biz}_${bizId}`
+            return `${biz}_${bizId}`;
         },
         parseTaskId(taskId: string) {
-            const parts = taskId.split('_')
+            const parts = taskId.split("_");
             if (parts.length < 2) {
-                throw new Error('InvalidTaskId')
+                throw new Error("InvalidTaskId");
             }
             return {
                 biz: parts[0],
-                bizId: parts.slice(1).join('_'),
-            }
+                bizId: parts.slice(1).join("_"),
+            };
         },
         findRecord(server: ServerRecord) {
-            return this.records.find((record) => record.key === server.key)
+            return this.records.find(record => record.key === server.key);
         },
         start: async function (server: ServerRecord) {
-            const record = this.findRecord(server)
+            const record = this.findRecord(server);
             if (record?.status === EnumServerStatus.STOPPED || record?.status === EnumServerStatus.ERROR) {
             } else {
-                throw new Error('StatusError')
+                throw new Error("StatusError");
             }
-            const serverRuntime = getOrCreateServerRuntime(server)
-            serverRuntime.status = EnumServerStatus.STARTING
-            serverRuntime.startTimestampMS = TimeUtil.timestampMS()
-            serverRuntime.logFile = `logs/${server.name}_${server.version}_${TimeUtil.dateString()}_${serverRuntime.startTimestampMS}.log`
-            serverRuntime.eventChannelName = createEventChannel(server)
-            const serverInfo = await this.serverInfo(server)
-            await window.$mapi.server.start(serverInfo)
-            let pingTimeout = 60 * 5 * 1000
-            let pingStart = TimeUtil.timestampMS()
+            const serverRuntime = getOrCreateServerRuntime(server);
+            serverRuntime.status = EnumServerStatus.STARTING;
+            serverRuntime.startTimestampMS = TimeUtil.timestampMS();
+            serverRuntime.logFile = `logs/${server.name}_${server.version}_${TimeUtil.dateString()}_${
+                serverRuntime.startTimestampMS
+            }.log`;
+            serverRuntime.eventChannelName = createEventChannel(server);
+            const serverInfo = await this.serverInfo(server);
+            await window.$mapi.server.start(serverInfo);
+            let pingTimeout = 60 * 5 * 1000;
+            let pingStart = TimeUtil.timestampMS();
             const pingCheck = () => {
-                const now = TimeUtil.timestampMS()
+                const now = TimeUtil.timestampMS();
                 if (now - pingStart > pingTimeout) {
                     // console.log('ping.timeout')
-                    serverRuntime.status = EnumServerStatus.ERROR
-                    window.$mapi.server.stop(serverInfo)
-                    return
+                    serverRuntime.status = EnumServerStatus.ERROR;
+                    window.$mapi.server.stop(serverInfo);
+                    return;
                 }
-                window.$mapi.server.ping(serverInfo)
+                window.$mapi.server
+                    .ping(serverInfo)
                     .then(success => {
                         if (success) {
-                            serverRuntime.status = EnumServerStatus.RUNNING
-                            updateRunningServerCount().then()
+                            serverRuntime.status = EnumServerStatus.RUNNING;
+                            updateRunningServerCount().then();
                         } else {
-                            serverRuntime.pingCheckTimer = setTimeout(pingCheck, 2000)
+                            serverRuntime.pingCheckTimer = setTimeout(pingCheck, 2000);
                         }
                     })
                     .catch(err => {
-                        serverRuntime.pingCheckTimer = setTimeout(pingCheck, 2000)
-                    })
-            }
-            serverRuntime.pingCheckTimer = setTimeout(pingCheck, 2 * 1000)
+                        serverRuntime.pingCheckTimer = setTimeout(pingCheck, 2000);
+                    });
+            };
+            serverRuntime.pingCheckTimer = setTimeout(pingCheck, 2 * 1000);
         },
         async stop(server: ServerRecord) {
-            const record = this.findRecord(server)
+            const record = this.findRecord(server);
             if (record?.status === EnumServerStatus.RUNNING) {
             } else {
-                throw new Error('StatusError')
+                throw new Error("StatusError");
             }
-            const serverRuntime = getOrCreateServerRuntime(server)
-            serverRuntime.status = EnumServerStatus.STOPPING
-            const serverInfo = await this.serverInfo(server)
-            serverInfo.logFile = serverRuntime.logFile
-            await window.$mapi.server.stop(serverInfo)
+            const serverRuntime = getOrCreateServerRuntime(server);
+            serverRuntime.status = EnumServerStatus.STOPPING;
+            const serverInfo = await this.serverInfo(server);
+            serverInfo.logFile = serverRuntime.logFile;
+            await window.$mapi.server.stop(serverInfo);
         },
         async cancel(server: ServerRecord) {
-            const record = this.findRecord(server)
+            const record = this.findRecord(server);
             if (record?.status === EnumServerStatus.RUNNING) {
             } else {
-                throw new Error('StatusError')
+                throw new Error("StatusError");
             }
-            const serverRuntime = getOrCreateServerRuntime(server)
-            const serverInfo = await this.serverInfo(server)
-            serverInfo.logFile = serverRuntime.logFile
-            await window.$mapi.server.cancel(serverInfo)
+            const serverRuntime = getOrCreateServerRuntime(server);
+            const serverInfo = await this.serverInfo(server);
+            serverInfo.logFile = serverRuntime.logFile;
+            await window.$mapi.server.cancel(serverInfo);
         },
         async updateSetting(key: string, setting: any) {
-            const record = this.records.find((record) => record.key === key)
+            const record = this.records.find(record => record.key === key);
             if (!record) {
-                return
+                return;
             }
-            record.setting = Object.assign(record.setting || {}, setting)
-            await this.sync()
+            record.setting = Object.assign(record.setting || {}, setting);
+            await this.sync();
         },
         async delete(server: ServerRecord) {
-            const index = this.records.findIndex((record) => record.key === server.key)
+            const index = this.records.findIndex(record => record.key === server.key);
             if (index === -1) {
-                return
+                return;
             }
-            const record = this.records[index]
-            if (record.status === EnumServerStatus.STOPPED
-                || record.status === EnumServerStatus.ERROR) {
+            const record = this.records[index];
+            if (record.status === EnumServerStatus.STOPPED || record.status === EnumServerStatus.ERROR) {
             } else {
                 if (record.type === EnumServerType.LOCAL_DIR) {
-                    throw new Error('StatusError')
+                    throw new Error("StatusError");
                 }
             }
             if (record.type === EnumServerType.LOCAL) {
-                await window.$mapi.file.deletes(record.localPath as string)
+                await window.$mapi.file.deletes(record.localPath as string);
             }
-            this.records.splice(index, 1)
-            deleteServerRuntime(server)
-            await this.sync()
+            this.records.splice(index, 1);
+            deleteServerRuntime(server);
+            await this.sync();
         },
         async add(server: ServerRecord) {
-            let record = this.records.find((record) => record.key === server.key)
+            let record = this.records.find(record => record.key === server.key);
             if (record) {
-                return
+                return;
             }
-            server.status = createServerStatus(server)
-            server.runtime = getServerRuntimeComputedValue(server)
-            this.records.unshift(server)
-            await this.sync()
+            server.status = createServerStatus(server);
+            server.runtime = getServerRuntimeComputedValue(server);
+            this.records.unshift(server);
+            await this.sync();
         },
         async sync() {
-            const savedRecords = toRaw(cloneDeep(this.records))
-            savedRecords.forEach((record) => {
-                record.status = undefined
-                record.runtime = undefined
-            })
-            await window.$mapi.storage.set("server", "records", savedRecords)
+            const savedRecords = toRaw(cloneDeep(this.records));
+            savedRecords.forEach(record => {
+                record.status = undefined;
+                record.runtime = undefined;
+            });
+            await window.$mapi.storage.set("server", "records", savedRecords);
         },
         async getByKey(key: string): Promise<ServerRecord | undefined> {
             // if (key.startsWith('Cloud')) {
             //     return serverCloudStore.getByKey(key)
             // }
-            return this.records.find((record) => record.key === key)
+            return this.records.find(record => record.key === key);
         },
         async getByNameVersion(name: string, version: string): Promise<ServerRecord | undefined> {
             // if (name.startsWith('Cloud')) {
             //     return serverCloudStore.getByNameVersion(name, version)
             // }
-            return this.records.find((record) => record.name === name && record.version === version)
+            return this.records.find(record => record.name === name && record.version === version);
         },
         async cancelByNameVersion(name: string, version: string) {
-            const record = await this.getByNameVersion(name, version)
+            const record = await this.getByNameVersion(name, version);
             if (record) {
-                await this.cancel(record)
+                await this.cancel(record);
             }
         },
         generateServerKey(server: ServerRecord) {
-            return `${server.name}|${server.version}`
+            return `${server.name}|${server.version}`;
         },
         async serverInfo(server: ServerRecord) {
             const result = {
-                localPath: '',
+                localPath: "",
                 name: server.name,
                 version: server.version,
                 setting: toRaw(server.setting),
-                logFile: '',
-                eventChannelName: '',
+                logFile: "",
+                eventChannelName: "",
                 config: JSON.parse(JSON.stringify(server)),
-            }
+            };
             if (server.type === EnumServerType.LOCAL) {
-                result.localPath = await window.$mapi.file.fullPath(server.localPath as string)
+                result.localPath = await window.$mapi.file.fullPath(server.localPath as string);
             } else if (server.type === EnumServerType.LOCAL_DIR) {
-                result.localPath = server.localPath as string
+                result.localPath = server.localPath as string;
             } else if (server.type === EnumServerType.CLOUD) {
-                result.localPath = server.localPath as string
+                result.localPath = server.localPath as string;
             }
-            const serverRuntime = getOrCreateServerRuntime(server)
+            const serverRuntime = getOrCreateServerRuntime(server);
             if (serverRuntime) {
-                result.logFile = serverRuntime.logFile
-                result.eventChannelName = serverRuntime.eventChannelName as string
+                result.logFile = serverRuntime.logFile;
+                result.eventChannelName = serverRuntime.eventChannelName as string;
             }
-            return result
-        }
-    }
-})
+            return result;
+        },
+    },
+});
 
-const serverStoreInstance = serverStore(store)
-serverStoreInstance.init().then()
+const serverStoreInstance = serverStore(store);
+serverStoreInstance.init().then();
 
 export const useServerStore = () => {
-    return serverStoreInstance
-}
+    return serverStoreInstance;
+};

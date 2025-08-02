@@ -11,7 +11,7 @@ const currentTime = ref(Date.now());
 
 const duration = computed(() => {
     if (!props.start) {
-        return null
+        return null;
     }
     let end = props.end;
     if (!end) {
@@ -22,7 +22,7 @@ const duration = computed(() => {
     return TimeUtil.secondsToHuman(durationSeconds);
 });
 
-let interval = null as any
+let interval = null as any;
 onMounted(() => {
     interval = setInterval(() => {
         currentTime.value = Date.now();
@@ -32,7 +32,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
     clearInterval(interval);
 });
-
 </script>
 
 <template>
@@ -41,6 +40,4 @@ onBeforeUnmount(() => {
     </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

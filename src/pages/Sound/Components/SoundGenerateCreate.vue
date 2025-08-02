@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import {onMounted, ref} from "vue";
 import {StorageUtil} from "../../../lib/storage";
 import SoundGenerateForm from "./SoundGenerateForm.vue";
@@ -9,27 +8,27 @@ import {t} from "../../../lang";
 import {TaskRecord, TaskService} from "../../../service/TaskService";
 import {PermissionService} from "../../../service/PermissionService";
 
-const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm>>()
+const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm>>();
 const formData = ref({
-    text: '',
-})
+    text: "",
+});
 
 onMounted(async () => {
-    const old = StorageUtil.getObject('SoundGenerateCreate.formData')
-    formData.value.text = old.text || ''
-})
+    const old = StorageUtil.getObject("SoundGenerateCreate.formData");
+    formData.value.text = old.text || "";
+});
 
 const doSubmit = async () => {
-    const value = await soundGenerateForm.value?.getValue()
+    const value = await soundGenerateForm.value?.getValue();
     if (!value) {
-        return
+        return;
     }
     if (!formData.value.text) {
-        Dialog.tipError(t('请输入合成内容'))
-        return
+        Dialog.tipError(t("请输入合成内容"));
+        return;
     }
     const record: TaskRecord = {
-        biz: 'SoundGenerate',
+        biz: "SoundGenerate",
         title: await window.$mapi.file.textToName(formData.value.text),
         serverName: value.serverName,
         serverTitle: value.serverTitle,
@@ -46,24 +45,24 @@ const doSubmit = async () => {
             promptText: value.promptText,
             text: formData.value.text,
         },
+    };
+    if (!(await PermissionService.checkForTask(value.type, record))) {
+        return;
     }
-    if (!await PermissionService.checkForTask(value.type, record)) {
-        return
-    }
-    const id = await TaskService.submit(record)
-    formData.value.text = ''
-    Dialog.tipSuccess(t('任务已经提交成功，等待克隆完成'))
-    emit('submitted')
-}
+    const id = await TaskService.submit(record);
+    formData.value.text = "";
+    Dialog.tipSuccess(t("任务已经提交成功，等待克隆完成"));
+    emit("submitted");
+};
 
-const doSubmitBatch = async (records: { text: string }[]) => {
-    const value = await soundGenerateForm.value?.getValue()
+const doSubmitBatch = async (records: {text: string}[]) => {
+    const value = await soundGenerateForm.value?.getValue();
     if (!value) {
-        return
+        return;
     }
     for (const r of records) {
         const record: TaskRecord = {
-            biz: 'SoundGenerate',
+            biz: "SoundGenerate",
             title: await window.$mapi.file.textToName(r.text),
             serverName: value.serverName,
             serverTitle: value.serverTitle,
@@ -80,36 +79,36 @@ const doSubmitBatch = async (records: { text: string }[]) => {
                 promptText: value.promptText,
                 text: r.text,
             },
+        };
+        if (!(await PermissionService.checkForTask(value.type, record))) {
+            return;
         }
-        if (!await PermissionService.checkForTask(value.type, record)) {
-            return
-        }
-        await TaskService.submit(record)
+        await TaskService.submit(record);
     }
-    Dialog.tipSuccess(t('任务已经提交成功，等待克隆完成'))
-    emit('submitted')
-}
+    Dialog.tipSuccess(t("任务已经提交成功，等待克隆完成"));
+    emit("submitted");
+};
 
 const emit = defineEmits({
-    submitted: () => true
-})
-
+    submitted: () => true,
+});
 </script>
 
 <template>
     <div class="rounded-xl shadow border p-4">
-        <SoundGenerateForm ref="soundGenerateForm"/>
+        <SoundGenerateForm ref="soundGenerateForm" />
         <div class="pt-2">
-            <a-textarea v-model="formData.text"
-                        :auto-size="{minRows:2}"
-                        :placeholder="$t('输入语音内容开始合成')"></a-textarea>
+            <a-textarea
+                v-model="formData.text"
+                :auto-size="{minRows: 2}"
+                :placeholder="$t('输入语音内容开始合成')"
+            ></a-textarea>
         </div>
         <div class="pt-2 flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
-                {{ $t('开始合成') }}
+                {{ $t("开始合成") }}
             </a-button>
-            <BatchTextareaInputAction :text="$t('批量克隆')" :confirm-text="$t('开始克隆')" @submit="doSubmitBatch"/>
+            <BatchTextareaInputAction :text="$t('批量克隆')" :confirm-text="$t('开始克隆')" @submit="doSubmitBatch" />
         </div>
     </div>
 </template>
-

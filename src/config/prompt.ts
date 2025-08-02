@@ -10,5 +10,5 @@ export const LivePrompt = {
     {"content": "内容1"},
     {"content": "内容2"}
 ]
-`
-}
+`,
+};

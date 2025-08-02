@@ -11,12 +11,9 @@ onMounted(async () => {
 <template>
     <a-select allow-search>
         <a-option :value="0">
-            {{ $t('请选择形象') }}
+            {{ $t("请选择形象") }}
         </a-option>
-        <a-option
-            v-for="record in records"
-            :key="record.id"
-            :value="record.id">
+        <a-option v-for="record in records" :key="record.id" :value="record.id">
             {{ record.name }}
         </a-option>
     </a-select>

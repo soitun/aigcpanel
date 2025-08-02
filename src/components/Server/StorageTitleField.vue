@@ -1,27 +1,25 @@
 <script setup lang="ts">
-
 import {StorageRecord, StorageService} from "../../service/StorageService";
 import InputInlineEditor from "../common/InputInlineEditor.vue";
 
 const props = defineProps({
     record: {
         type: Object as () => StorageRecord,
-        required: true
-    }
-})
+        required: true,
+    },
+});
 
 const emit = defineEmits({
     update: (value: string) => true,
-    titleClick: () => true
-})
+    titleClick: () => true,
+});
 
 const onEditTitle = async (value: string) => {
     await StorageService.update(props.record.id as any, {
-        title: value
-    })
-    emit('update', value)
-}
-
+        title: value,
+    });
+    emit("update", value);
+};
 </script>
 
 <template>
@@ -31,12 +29,10 @@ const onEditTitle = async (value: string) => {
         </div>
         <InputInlineEditor :value="record.title" @change="onEditTitle">
             <a class="ml-1 text-gray-400" href="javascript:;">
-                <icon-pen/>
+                <icon-pen />
             </a>
         </InputInlineEditor>
     </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

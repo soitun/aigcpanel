@@ -2,43 +2,52 @@
 import {useServerStore} from "../../store/modules/server";
 import {EnumServerStatus, ServerRecord} from "../../types/Server";
 
-const serverStore = useServerStore()
+const serverStore = useServerStore();
 
 const props = defineProps<{
-    record: ServerRecord,
-}>()
+    record: ServerRecord;
+}>();
 
 const doStart = async () => {
-    const record = props.record
-    await serverStore.start(record)
-}
+    const record = props.record;
+    await serverStore.start(record);
+};
 const doStop = async () => {
-    const record = props.record
-    await serverStore.stop(record)
-}
-
+    const record = props.record;
+    await serverStore.stop(record);
+};
 </script>
 
 <template>
     <a-tooltip :content="$t('启动服务')" mini>
-        <a-button class="mr-2"
-                  v-if="record.status===EnumServerStatus.STOPPED||record.status===EnumServerStatus.STARTING||record.status===EnumServerStatus.ERROR"
-                  :loading="record.status===EnumServerStatus.STARTING"
-                  type="primary" status="success"
-                  @click="doStart()">
+        <a-button
+            class="mr-2"
+            v-if="
+                record.status === EnumServerStatus.STOPPED ||
+                record.status === EnumServerStatus.STARTING ||
+                record.status === EnumServerStatus.ERROR
+            "
+            :loading="record.status === EnumServerStatus.STARTING"
+            type="primary"
+            status="success"
+            @click="doStart()"
+        >
             <template #icon>
-                <icon-play-arrow/>
+                <icon-play-arrow />
             </template>
         </a-button>
     </a-tooltip>
     <a-tooltip :content="$t('停止服务')" mini>
-        <a-button class="mr-2"
-                  v-if="record.status===EnumServerStatus.RUNNING || record.status===EnumServerStatus.STOPPING"
-                  :loading="record.status===EnumServerStatus.STOPPING"
-                  type="primary" status="danger"
-                  @click="doStop()">
+        <a-button
+            class="mr-2"
+            v-if="record.status === EnumServerStatus.RUNNING || record.status === EnumServerStatus.STOPPING"
+            :loading="record.status === EnumServerStatus.STOPPING"
+            type="primary"
+            status="danger"
+            @click="doStop()"
+        >
             <template #icon>
-                <icon-pause/>
+                <icon-pause />
             </template>
         </a-button>
     </a-tooltip>

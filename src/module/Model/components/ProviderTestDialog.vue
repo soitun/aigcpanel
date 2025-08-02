@@ -2,75 +2,66 @@
 import {computed, ref, watch} from "vue";
 import {useModelStore} from "../store/model";
 
-const modelStore = useModelStore()
+const modelStore = useModelStore();
 const props = defineProps({
     provider: {
         type: Object,
         default: () => {
-            return null
-        }
-    }
-})
-const visible = ref(false)
+            return null;
+        },
+    },
+});
+const visible = ref(false);
 const data = ref({
-    modelId: '',
-})
+    modelId: "",
+});
 const enabledModels = computed(() => {
     if (props.provider) {
-        return props.provider.data.models.filter((model: any) => model.enabled)
+        return props.provider.data.models.filter((model: any) => model.enabled);
     }
-    return []
-})
-watch(enabledModels, (newVal) => {
-    let exists = false
+    return [];
+});
+watch(enabledModels, newVal => {
+    let exists = false;
     for (const model of newVal) {
         if (model.id === data.value.modelId) {
-            exists = true
-            break
+            exists = true;
+            break;
         }
     }
     if (!exists) {
         if (newVal.length > 0) {
-            data.value.modelId = newVal[0].id
+            data.value.modelId = newVal[0].id;
         } else {
-            data.value.modelId = ''
+            data.value.modelId = "";
         }
     }
-})
+});
 const show = () => {
-    visible.value = true
-}
+    visible.value = true;
+};
 const doSubmit = async () => {
     if (!data.value.modelId) {
-        return
+        return;
     }
-    await modelStore.test(props.provider.id, data.value.modelId)
-}
+    await modelStore.test(props.provider.id, data.value.modelId);
+};
 defineExpose({
     show,
-})
-
+});
 </script>
 
 <template>
-    <a-modal
-        v-model:visible="visible"
-        width="20rem"
-        :esc-to-close="false"
-        :mask-closable="false"
-        title-align="start">
+    <a-modal v-model:visible="visible" width="20rem" :esc-to-close="false" :mask-closable="false" title-align="start">
         <template #title>
-            {{ $t('请选择要检测的模型') }}
+            {{ $t("请选择要检测的模型") }}
         </template>
         <template #footer>
-            <a-button type="primary" @click="doSubmit">{{ $t('测试') }}</a-button>
-            <a-button @click="visible = false">{{ $t('关闭') }}</a-button>
+            <a-button type="primary" @click="doSubmit">{{ $t("测试") }}</a-button>
+            <a-button @click="visible = false">{{ $t("关闭") }}</a-button>
         </template>
-        <div style="max-height:50vh;" class="overflow-y-auto" v-if="props.provider">
-            <a-form
-                :model="data"
-                layout="vertical"
-                class="mt-4">
+        <div style="max-height: 50vh" class="overflow-y-auto" v-if="props.provider">
+            <a-form :model="data" layout="vertical" class="mt-4">
                 <a-form-item name="modelId">
                     <a-select v-model:model-value="data.modelId">
                         <a-option v-for="model in enabledModels" :key="model.id" :value="model.id">
@@ -83,6 +74,4 @@ defineExpose({
     </a-modal>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

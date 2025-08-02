@@ -22,7 +22,7 @@ export const MAPI = {
     init(env: typeof AppEnv = null) {
         if (!env) {
             // expose context
-            exposeContext('$mapi', {
+            exposeContext("$mapi", {
                 app,
                 log,
                 config,
@@ -39,16 +39,16 @@ export const MAPI = {
 
                 ffmpeg,
                 server,
-            })
-            db.init()
-            event.init()
-            ui.init()
+            });
+            db.init();
+            event.init();
+            ui.init();
         } else {
             // init context
-            AppEnv.appRoot = env.appRoot
-            AppEnv.appData = env.appData
-            AppEnv.userData = env.userData
-            AppEnv.isInit = true
+            AppEnv.appRoot = env.appRoot;
+            AppEnv.appData = env.appData;
+            AppEnv.userData = env.userData;
+            AppEnv.isInit = true;
         }
     },
-}
+};

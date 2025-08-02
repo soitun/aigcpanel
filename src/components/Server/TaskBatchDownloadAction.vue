@@ -7,64 +7,66 @@ import {sleep} from "../../lib/util";
 import {mapError} from "../../lib/error";
 
 const props = defineProps<{
-    records: TaskRecord[],
-}>()
+    records: TaskRecord[];
+}>();
 
 const canDownload = computed(() => {
-    return props.records.filter(record => record.status === 'success').length > 0
-})
+    return props.records.filter(record => record.status === "success").length > 0;
+});
 
 const doDownload = async () => {
-    const recordsDownload = props.records.filter(record => record.status === 'success')
+    const recordsDownload = props.records.filter(record => record.status === "success");
     if (recordsDownload.length === 0) {
-        Dialog.tipError(t('没有可以下载的记录'))
-        return
+        Dialog.tipError(t("没有可以下载的记录"));
+        return;
     }
-    const pathDir = await window.$mapi.file.openDirectory()
+    const pathDir = await window.$mapi.file.openDirectory();
     if (!pathDir) {
-        return
+        return;
     }
-    Dialog.loadingOn(t('正在下载'))
-    let errors: any = []
+    Dialog.loadingOn(t("正在下载"));
+    let errors: any = [];
     for (const r of recordsDownload) {
-        Dialog.loadingUpdate(t('正在下载 {index}/{total}', {
-            index: recordsDownload.indexOf(r) + 1,
-            total: recordsDownload.length
-        }))
-        let fromPath = r.result.url
-        let targetPath: string = ''
-        const fileExt = await window.$mapi.file.ext(fromPath)
-        targetPath = `${pathDir}/${r.title}.${fileExt}`
-        await sleep(100)
-        if (await window.$mapi.file.exists(targetPath, {
-            isFullPath: true,
-        })) {
-            continue
+        Dialog.loadingUpdate(
+            t("正在下载 {index}/{total}", {
+                index: recordsDownload.indexOf(r) + 1,
+                total: recordsDownload.length,
+            })
+        );
+        let fromPath = r.result.url;
+        let targetPath: string = "";
+        const fileExt = await window.$mapi.file.ext(fromPath);
+        targetPath = `${pathDir}/${r.title}.${fileExt}`;
+        await sleep(100);
+        if (
+            await window.$mapi.file.exists(targetPath, {
+                isFullPath: true,
+            })
+        ) {
+            continue;
         }
         try {
             await window.$mapi.file.copy(fromPath, targetPath, {
                 isFullPath: true,
-            })
+            });
         } catch (e) {
-            errors.push(mapError(e))
+            errors.push(mapError(e));
         }
     }
-    Dialog.loadingOff()
+    Dialog.loadingOff();
     if (errors.length > 0) {
-        Dialog.tipError(t('下载失败') + '\n' + errors.join('\n'))
-        return
+        Dialog.tipError(t("下载失败") + "\n" + errors.join("\n"));
+        return;
     }
-    Dialog.tipSuccess(t('下载成功'))
-}
+    Dialog.tipSuccess(t("下载成功"));
+};
 </script>
 
 <template>
     <a-tooltip :content="$t('下载')" mini>
-        <a-button class="mr-2"
-                  :disabled="!canDownload"
-                  @click="doDownload()">
+        <a-button class="mr-2" :disabled="!canDownload" @click="doDownload()">
             <template #icon>
-                <icon-download/>
+                <icon-download />
             </template>
         </a-button>
     </a-tooltip>

@@ -5,29 +5,27 @@ import {sleep} from "../../lib/util";
 import {TaskRecord, TaskService} from "../../service/TaskService";
 
 const props = defineProps<{
-    record: TaskRecord,
-}>()
+    record: TaskRecord;
+}>();
 const emit = defineEmits({
-    update: () => true
-})
+    update: () => true,
+});
 
 const doDelete = async () => {
-    const record = props.record
-    Dialog.loadingOn(t('正在删除'))
-    await sleep(500)
-    await TaskService.delete(record)
-    Dialog.loadingOff()
-    emit('update')
-}
+    const record = props.record;
+    Dialog.loadingOn(t("正在删除"));
+    await sleep(500);
+    await TaskService.delete(record);
+    Dialog.loadingOff();
+    emit("update");
+};
 </script>
 
 <template>
     <a-tooltip :content="$t('删除')" mini>
-        <a-button class="mr-2"
-                  :disabled="record.status!=='success'&&record.status!=='fail'"
-                  @click="doDelete()">
+        <a-button class="mr-2" :disabled="record.status !== 'success' && record.status !== 'fail'" @click="doDelete()">
             <template #icon>
-                <icon-delete/>
+                <icon-delete />
             </template>
         </a-button>
     </a-tooltip>

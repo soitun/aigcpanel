@@ -25,19 +25,19 @@ const $mapi = {
     user,
     misc,
     updater,
-    server
-}
+    server,
+};
 
 export const MAPI = {
     init() {
-        $mapi.user.init()
-        $mapi.db.init()
-        $mapi.event.init()
+        $mapi.user.init();
+        $mapi.db.init();
+        $mapi.event.init();
     },
     ready() {
-        $mapi.keys.ready()
+        $mapi.keys.ready();
     },
     destroy() {
-        $mapi.keys.destroy()
-    }
-}
+        $mapi.keys.destroy();
+    },
+};

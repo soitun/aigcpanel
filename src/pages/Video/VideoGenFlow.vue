@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {TaskChangeType, useTaskStore} from "../../store/modules/task";
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
@@ -17,77 +16,78 @@ import TaskDuration from "../../components/Server/TaskDuration.vue";
 import {doCopy} from "../../components/common/util";
 import VideoGenFlowCreate from "./components/VideoGenFlowCreate.vue";
 
-const videoGenFlowCreate = ref<InstanceType<typeof VideoGenFlowCreate> | null>(null)
+const videoGenFlowCreate = ref<InstanceType<typeof VideoGenFlowCreate> | null>(null);
 
-const records = ref<TaskRecord[]>([])
-const taskStore = useTaskStore()
+const records = ref<TaskRecord[]>([]);
+const taskStore = useTaskStore();
 
-const page = ref(1)
+const page = ref(1);
 const recordsForPage = computed(() => {
-    return records.value.slice((page.value - 1) * 10, page.value * 10)
-})
+    return records.value.slice((page.value - 1) * 10, page.value * 10);
+});
 
-const {
-    mergeCheck,
-    isIndeterminate,
-    isAllChecked,
-    onCheckAll,
-    checkRecords
-} = useCheckAll({
-    records: recordsForPage
-})
+const {mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords} = useCheckAll({
+    records: recordsForPage,
+});
 
 const doRefresh = async () => {
-    records.value = mergeCheck(await TaskService.list('VideoGenFlow'))
-}
+    records.value = mergeCheck(await TaskService.list("VideoGenFlow"));
+};
 
 const taskChangeCallback = (bizId: string, type: TaskChangeType) => {
-    setTimeout(doRefresh, 1000)
-}
+    setTimeout(doRefresh, 1000);
+};
 
 onMounted(async () => {
-    await doRefresh()
-    taskStore.onChange('VideoGenFlow', taskChangeCallback)
-})
+    await doRefresh();
+    taskStore.onChange("VideoGenFlow", taskChangeCallback);
+});
 onBeforeUnmount(() => {
-    taskStore.offChange('VideoGenFlow', taskChangeCallback)
-})
-
+    taskStore.offChange("VideoGenFlow", taskChangeCallback);
+});
 </script>
 
 <template>
     <div class="p-5">
         <div class="mb-4 flex items-center">
             <div class="text-3xl font-bold flex-grow">
-                {{ $t('数字人一键合成') }}
+                {{ $t("数字人一键合成") }}
             </div>
             <div class="flex items-center">
-                <a-tooltip v-if="0"
-                           :content="$t('清空历史')" position="right" mini>
+                <a-tooltip v-if="0" :content="$t('清空历史')" position="right" mini>
                     <a-button class="ml-1">
                         <template #icon>
-                            <icon-delete/>
+                            <icon-delete />
                         </template>
                     </a-button>
                 </a-tooltip>
             </div>
         </div>
         <div>
-            <VideoGenFlowCreate ref="videoGenFlowCreate" @submitted="doRefresh"/>
+            <VideoGenFlowCreate ref="videoGenFlowCreate" @submitted="doRefresh" />
             <div>
                 <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
                     <div class="flex-grow flex items-center">
                         <div class="mr-3">
-                            <a-checkbox :model-value="isAllChecked" :indeterminate="isIndeterminate"
-                                        @change="onCheckAll">
-                                {{ $t('全选') }}
+                            <a-checkbox
+                                :model-value="isAllChecked"
+                                :indeterminate="isIndeterminate"
+                                @change="onCheckAll"
+                            >
+                                {{ $t("全选") }}
                             </a-checkbox>
                         </div>
-                        <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh"/>
-                        <TaskBatchDownloadAction :records="checkRecords"/>
+                        <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh" />
+                        <TaskBatchDownloadAction :records="checkRecords" />
                     </div>
                     <div>
-                        <a-pagination v-model:current="page" :total="records.length" :page-size="10" show-total simple/>
+                        <a-pagination
+                            v-model:current="page"
+                            :total="records.length"
+                            :page-size="10"
+                            show-total
+                            simple
+                        />
                     </div>
                 </div>
                 <div v-for="r in recordsForPage" :key="r.id">
@@ -95,19 +95,22 @@ onBeforeUnmount(() => {
                         <div class="flex items-center">
                             <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
                                 <div class="mr-2 h-8 pt-0.5">
-                                    <a-checkbox v-model="r['_check']"/>
+                                    <a-checkbox v-model="r['_check']" />
                                 </div>
                                 <div class="">
-                                    <TaskTitleField :record="r" @title-click="r['_check']=!r['_check']"
-                                                    @update="v=>r.title=v"/>
+                                    <TaskTitleField
+                                        :record="r"
+                                        @title-click="r['_check'] = !r['_check']"
+                                        @update="v => (r.title = v)"
+                                    />
                                 </div>
                             </div>
                             <div class="flex-grow"></div>
                             <div class="ml-1">
-                                <TaskDuration :start="r.startTime" :end="r.endTime"/>
+                                <TaskDuration :start="r.startTime" :end="r.endTime" />
                             </div>
                             <div class="ml-1">
-                                <TaskBizStatus :status="r.status" :status-msg="r.statusMsg"/>
+                                <TaskBizStatus :status="r.status" :status-msg="r.statusMsg" />
                             </div>
                         </div>
                         <div class="mt-3">
@@ -116,7 +119,7 @@ onBeforeUnmount(() => {
                                 {{ r.serverTitle }}
                                 v{{ r.serverVersion }}
                             </div>
-                            <ServerTaskResultParam :record="r as any"/>
+                            <ServerTaskResultParam :record="r as any" />
                         </div>
                         <div class="pt-4 flex">
                             <div class="flex-grow flex flex-col">
@@ -125,64 +128,63 @@ onBeforeUnmount(() => {
                                         <div class="mr-2 flex-shrink-0">
                                             <div class="bg-gray-100 px-2 leading-6 rounded-lg">
                                                 <i class="iconfont icon-video-template"></i>
-                                                {{ $t('视频形象') }}
+                                                {{ $t("视频形象") }}
                                             </div>
                                         </div>
                                         <div>
                                             {{ r.modelConfig.videoTemplateName }}
                                         </div>
                                     </div>
-                                    <div v-if="r.modelConfig.soundType==='SoundTts'" class="flex items-start">
+                                    <div v-if="r.modelConfig.soundType === 'SoundTts'" class="flex items-start">
                                         <div class="mr-2 flex-shrink-0">
                                             <div class="bg-gray-100 px-2 leading-6 rounded-lg">
                                                 <i class="iconfont icon-sound"></i>
-                                                {{ $t('声音合成') }}
+                                                {{ $t("声音合成") }}
                                             </div>
                                         </div>
                                         <a-tooltip :content="$t('点击文字复制')" position="left" mini>
-                                            <div class="cursor-pointer"
-                                                 @click="doCopy(r.modelConfig.text)">
+                                            <div class="cursor-pointer" @click="doCopy(r.modelConfig.text)">
                                                 {{ r.modelConfig.text }}
                                             </div>
                                         </a-tooltip>
                                     </div>
-                                    <div v-if="r.modelConfig.soundType==='SoundClone'" class="flex items-start">
+                                    <div v-if="r.modelConfig.soundType === 'SoundClone'" class="flex items-start">
                                         <div class="mr-2 flex-shrink-0">
                                             <div class="bg-gray-100 px-2 leading-6 rounded-lg">
                                                 <i class="iconfont icon-video-template"></i>
-                                                {{ $t('声音克隆') }}
+                                                {{ $t("声音克隆") }}
                                             </div>
                                         </div>
                                         <a-tooltip :content="$t('点击文字复制')" position="left" mini>
-                                            <div class="cursor-pointer"
-                                                 @click="doCopy(r.modelConfig.text)">
+                                            <div class="cursor-pointer" @click="doCopy(r.modelConfig.text)">
                                                 {{ r.modelConfig.text }}
                                             </div>
                                         </a-tooltip>
                                     </div>
                                 </div>
                                 <div class="flex-grow"></div>
-                                <div class="mt-3" v-if="r.status==='success' && r.result.urlSound">
-                                    <AudioPlayer
-                                        show-wave
-                                        :url="'file://'+r.result.urlSound"/>
+                                <div class="mt-3" v-if="r.status === 'success' && r.result.urlSound">
+                                    <AudioPlayer show-wave :url="'file://' + r.result.urlSound" />
                                 </div>
                             </div>
                             <div class="flex-shrink-0 ml-8">
-                                <div class="p-2 rounded shadow bg-gray-300" v-if="r.status==='success' && r.result.url">
+                                <div
+                                    class="p-2 rounded shadow bg-gray-300"
+                                    v-if="r.status === 'success' && r.result.url"
+                                >
                                     <div class="w-48 h-48" v-if="r.result.url">
-                                        <VideoPlayer :url="'file://'+r.result.url"/>
+                                        <VideoPlayer :url="'file://' + r.result.url" />
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="pt-4 flex items-center">
                             <div class="text-gray-400 flex-grow">
-                                <timeago :datetime="r['createdAt']*1000"/>
+                                <timeago :datetime="r['createdAt'] * 1000" />
                             </div>
                             <div class="">
-                                <TaskDownloadAction :record="r"/>
-                                <TaskDeleteAction :record="r" @update="doRefresh"/>
+                                <TaskDownloadAction :record="r" />
+                                <TaskDeleteAction :record="r" @update="doRefresh" />
                             </div>
                         </div>
                     </div>

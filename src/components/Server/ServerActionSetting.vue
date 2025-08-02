@@ -4,21 +4,24 @@ import ServerActionSettingDialog from "./ServerActionSettingDialog.vue";
 import {ref} from "vue";
 
 const props = defineProps<{
-    record: ServerRecord,
-}>()
-const actionSettingDialog = ref<InstanceType<typeof ServerActionSettingDialog> | null>(null)
-
+    record: ServerRecord;
+}>();
+const actionSettingDialog = ref<InstanceType<typeof ServerActionSettingDialog> | null>(null);
 </script>
 
 <template>
     <a-tooltip :content="$t('设置')" mini>
-        <a-button class="mr-2"
-                  @click="actionSettingDialog?.show()"
-                  :disabled="props.record.status !== EnumServerStatus.STOPPED&&props.record.status !== EnumServerStatus.ERROR">
+        <a-button
+            class="mr-2"
+            @click="actionSettingDialog?.show()"
+            :disabled="
+                props.record.status !== EnumServerStatus.STOPPED && props.record.status !== EnumServerStatus.ERROR
+            "
+        >
             <template #icon>
-                <icon-settings/>
+                <icon-settings />
             </template>
         </a-button>
     </a-tooltip>
-    <ServerActionSettingDialog :record="props.record" ref="actionSettingDialog"/>
+    <ServerActionSettingDialog :record="props.record" ref="actionSettingDialog" />
 </template>
