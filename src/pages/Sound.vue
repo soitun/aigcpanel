@@ -27,7 +27,7 @@ onMounted(() => {
             <div class="p-2 rounded-lg mb-4 cursor-pointer" :class="tab === 'soundAsr' ? 'bg-gray-200' : ''"
                 @click="tab = 'soundAsr'">
                 <div class="text-base truncate">
-                    <i class="iconfont icon-sound w-6 inline-block"></i>
+                    <i class="iconfont icon-asr w-6 inline-block"></i>
                     {{ t('语音识别') }}
                 </div>
             </div>
