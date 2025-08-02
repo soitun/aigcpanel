@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import {t} from "../../../lang";
-import {contentToFilenamePathPart} from "../../../lib/aigcpanel";
-import {Dialog} from "../../../lib/dialog";
-import {PermissionService} from "../../../service/PermissionService";
-import {TaskRecord, TaskService} from "../../../service/TaskService";
+import { onMounted, ref } from "vue";
+import { t } from "../../../lang";
+import { contentToFilenamePathPart } from "../../../lib/aigcpanel";
+import { Dialog } from "../../../lib/dialog";
+import { PermissionService } from "../../../service/PermissionService";
+import { TaskRecord, TaskService } from "../../../service/TaskService";
 import SoundAsrForm from "./SoundAsrForm.vue";
 
 const emit = defineEmits<{
@@ -22,13 +22,12 @@ onMounted(async () => {
 
 const onSelectAudioFile = async () => {
     try {
-        const result = await window.$mapi.file.openFile({
+        const filePath = await window.$mapi.file.openFile({
             title: t("选择音频文件"),
-            filters: [{name: t("音频文件"), extensions: ["mp3", "wav", "m4a", "aac", "ogg", "flac"]}],
+            filters: [{ name: t("音频文件"), extensions: ["mp3", "wav", "m4a", "aac", "ogg", "flac"] }],
         });
 
-        if (result && result.filePaths && result.filePaths.length > 0) {
-            const filePath = result.filePaths[0];
+        if (filePath) {
             formData.value.audioFilePath = filePath;
         }
     } catch (error) {
@@ -101,21 +100,21 @@ const isSubmitting = ref(false);
 <template>
     <div class="rounded-xl shadow border p-4">
         <SoundAsrForm ref="soundAsrForm" />
-        <div class="pt-2">
+        <div class="pt-4">
             <div v-if="formData.audioFilePath" class="mb-2 text-sm text-gray-600">
                 <i class="iconfont icon-file mr-1"></i>
                 {{ formData.audioFilePath.split("/").pop() || formData.audioFilePath.split("\\").pop() }}
             </div>
-            <div class="flex items-center space-x-2">
-                <a-button type="outline" @click="onSelectAudioFile">
-                    <i class="iconfont icon-upload mr-2"></i>
-                    {{ formData.audioFilePath ? t("重新选择") : t("选择音频文件") }}
-                </a-button>
-                <a-button type="primary" @click="doSubmit" :loading="isSubmitting" :disabled="!formData.audioFilePath">
-                    <i class="iconfont icon-submit mr-2"></i>
-                    {{ t("开始识别") }}
-                </a-button>
-            </div>
+            <a-button type="outline" @click="onSelectAudioFile" class="w-96 max-w-full">
+                <i class="iconfont icon-upload mr-2"></i>
+                {{ formData.audioFilePath ? t("重新选择") : t("选择音频文件") }}
+            </a-button>
+        </div>
+        <div class="pt-4 flex">
+            <a-button class="mr-2" type="primary" @click="doSubmit" :loading="isSubmitting">
+                <i class="iconfont icon-submit mr-2"></i>
+                {{ t("开始识别") }}
+            </a-button>
         </div>
     </div>
 </template>

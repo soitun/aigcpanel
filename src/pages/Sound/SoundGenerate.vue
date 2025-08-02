@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import AudioPlayer from "../../components/common/AudioPlayer.vue";
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
-import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
-import {TaskChangeType, useTaskStore} from "../../store/modules/task";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
-import {TaskRecord, TaskService} from "../../service/TaskService";
-import TaskCancelAction from "../../components/Server/TaskCancelAction.vue";
-import {useCheckAll} from "../../components/common/check-all";
 import TaskBatchDeleteAction from "../../components/Server/TaskBatchDeleteAction.vue";
-import TaskTitleField from "../../components/Server/TaskTitleField.vue";
 import TaskBatchDownloadAction from "../../components/Server/TaskBatchDownloadAction.vue";
-import TaskDownloadAction from "../../components/Server/TaskDownloadAction.vue";
+import TaskCancelAction from "../../components/Server/TaskCancelAction.vue";
 import TaskDeleteAction from "../../components/Server/TaskDeleteAction.vue";
+import TaskDownloadAction from "../../components/Server/TaskDownloadAction.vue";
 import TaskDuration from "../../components/Server/TaskDuration.vue";
-import {doCopy} from "../../components/common/util";
+import TaskTitleField from "../../components/Server/TaskTitleField.vue";
+import AudioPlayer from "../../components/common/AudioPlayer.vue";
+import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
+import { useCheckAll } from "../../components/common/check-all";
+import { doCopy } from "../../components/common/util";
+import { TaskRecord, TaskService } from "../../service/TaskService";
+import { TaskChangeType, useTaskStore } from "../../store/modules/task";
 import SoundGenerateCreate from "./Components/SoundGenerateCreate.vue";
 
 const records = ref<TaskRecord[]>([]);
@@ -36,7 +36,7 @@ onBeforeUnmount(() => {
     taskStore.offChange("SoundGenerate", taskChangeCallback);
 });
 
-const {mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords} = useCheckAll({
+const { mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords } = useCheckAll({
     records: recordsForPage,
 });
 
@@ -63,15 +63,12 @@ const doRefresh = async () => {
         </div>
         <div>
             <SoundGenerateCreate @submitted="doRefresh" />
-            <div>
+            <div v-if="records.length > 0">
                 <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
                     <div class="flex-grow flex items-center">
                         <div class="mr-3">
-                            <a-checkbox
-                                :model-value="isAllChecked"
-                                :indeterminate="isIndeterminate"
-                                @change="onCheckAll"
-                            >
+                            <a-checkbox :model-value="isAllChecked" :indeterminate="isIndeterminate"
+                                @change="onCheckAll">
                                 {{ $t("全选") }}
                             </a-checkbox>
                         </div>
@@ -79,13 +76,8 @@ const doRefresh = async () => {
                         <TaskBatchDownloadAction :records="checkRecords" />
                     </div>
                     <div>
-                        <a-pagination
-                            v-model:current="page"
-                            :total="records.length"
-                            :page-size="10"
-                            show-total
-                            simple
-                        />
+                        <a-pagination v-model:current="page" :total="records.length" :page-size="10" show-total
+                            simple />
                     </div>
                 </div>
                 <div v-for="r in recordsForPage" :key="r.id">
@@ -96,11 +88,8 @@ const doRefresh = async () => {
                                     <a-checkbox v-model="r['_check']" />
                                 </div>
                                 <div class="">
-                                    <TaskTitleField
-                                        :record="r"
-                                        @title-click="r['_check'] = !r['_check']"
-                                        @update="v => (r.title = v)"
-                                    />
+                                    <TaskTitleField :record="r" @title-click="r['_check'] = !r['_check']"
+                                        @update="v => (r.title = v)" />
                                 </div>
                             </div>
                             <div class="flex-grow"></div>
@@ -112,17 +101,13 @@ const doRefresh = async () => {
                             </div>
                         </div>
                         <div class="mt-3">
-                            <div
-                                v-if="r.modelConfig.type === 'SoundTts'"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6"
-                            >
+                            <div v-if="r.modelConfig.type === 'SoundTts'"
+                                class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
                                 <i class="iconfont icon-sound-generate"></i>
                                 {{ $t("声音合成") }}
                             </div>
-                            <div
-                                v-else-if="r.modelConfig.type === 'SoundClone'"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6"
-                            >
+                            <div v-else-if="r.modelConfig.type === 'SoundClone'"
+                                class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
                                 <i class="iconfont icon-sound-clone"></i>
                                 {{ $t("声音克隆") }}
                             </div>
@@ -131,38 +116,28 @@ const doRefresh = async () => {
                                 {{ r.serverTitle }}
                                 v{{ r.serverVersion }}
                             </div>
-                            <div
-                                v-if="r.modelConfig.type === 'SoundTts' && r.modelConfig?.ttsParam?.speakerTitle"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
-                            >
+                            <div v-if="r.modelConfig.type === 'SoundTts' && r.modelConfig?.ttsParam?.speakerTitle"
+                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
                                 <i class="iconfont icon-speaker mr-1"></i>
                                 {{ r.modelConfig?.ttsParam?.speakerTitle }}
                             </div>
-                            <div
-                                v-if="r.modelConfig.type === 'SoundTts' && r.param?.ttsParam?.speed"
-                                class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-6 h-6"
-                            >
+                            <div v-if="r.modelConfig.type === 'SoundTts' && r.param?.ttsParam?.speed"
+                                class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-6 h-6">
                                 <i class="iconfont icon-speed mr-1"></i>
                                 <span class="">x{{ r.param?.ttsParam?.speed }}</span>
                             </div>
-                            <div
-                                v-if="r.modelConfig.type === 'SoundClone'"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
-                            >
+                            <div v-if="r.modelConfig.type === 'SoundClone'"
+                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
                                 <i class="iconfont icon-sound-prompt mr-1"></i>
                                 {{ r.modelConfig.promptTitle }}
                             </div>
-                            <div
-                                v-if="r.modelConfig.type === 'SoundClone' && r.modelConfig?.cloneParam?.speed"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
-                            >
+                            <div v-if="r.modelConfig.type === 'SoundClone' && r.modelConfig?.cloneParam?.speed"
+                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
                                 <i class="iconfont icon-speed mr-1"></i>
                                 <span class="">x{{ r.modelConfig?.cloneParam?.speed }}</span>
                             </div>
-                            <div
-                                v-if="r.modelConfig.type === 'SoundClone' && r.modelConfig?.cloneParam?.crossLingual"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
-                            >
+                            <div v-if="r.modelConfig.type === 'SoundClone' && r.modelConfig?.cloneParam?.crossLingual"
+                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
                                 <i class="iconfont icon-global mr-1"></i>
                                 <span class="">{{ $t("跨语种") }}</span>
                             </div>
@@ -189,6 +164,7 @@ const doRefresh = async () => {
                     </div>
                 </div>
             </div>
+            <m-empty v-else :text="$t('暂无声音合成任务')" />
         </div>
     </div>
 </template>
