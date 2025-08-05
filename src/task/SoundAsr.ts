@@ -16,7 +16,7 @@ export const SoundAsr: TaskBiz = {
             id: serverStore.generateTaskId("SoundAsr", bizId),
             result: record.result,
             param: record.param,
-            audioFile: record.modelConfig.audioFile,
+            audio: record.modelConfig.audio,
         });
         if (res.code) {
             throw res.msg || "SoundAsr run fail";
@@ -40,11 +40,7 @@ export const SoundAsr: TaskBiz = {
             status: "success",
             endTime: Date.now(),
             result: {
-                recognizedText: record.jobResult.data.data.recognizedText || record.jobResult.data.data.text,
-                confidence: record.jobResult.data.data.confidence,
-                segments: record.jobResult.data.data.segments,
-                language: record.jobResult.data.data.language,
-                duration: record.jobResult.data.data.duration,
+                records: record.jobResult.data.data.records,
             },
         });
     },

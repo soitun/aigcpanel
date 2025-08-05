@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { t } from "../../../lang";
-import { contentToFilenamePathPart } from "../../../lib/aigcpanel";
 import { Dialog } from "../../../lib/dialog";
 import { PermissionService } from "../../../service/PermissionService";
 import { TaskRecord, TaskService } from "../../../service/TaskService";
@@ -13,22 +12,18 @@ const emit = defineEmits<{
 
 const soundAsrForm = ref<InstanceType<typeof SoundAsrForm>>();
 const formData = ref({
-    audioFilePath: "",
-});
-
-onMounted(async () => {
-    // No need to load title from storage since it's auto-generated from filename
+    audio: "",
 });
 
 const onSelectAudioFile = async () => {
     try {
         const filePath = await window.$mapi.file.openFile({
             title: t("选择音频文件"),
-            filters: [{ name: t("音频文件"), extensions: ["mp3", "wav", "m4a", "aac", "ogg", "flac"] }],
+            filters: [{ name: t("音频文件"), extensions: ["mp3", "wav"] }],
         });
 
         if (filePath) {
-            formData.value.audioFilePath = filePath;
+            formData.value.audio = filePath;
         }
     } catch (error) {
         Dialog.tipError(t("文件选择失败"));
@@ -45,21 +40,13 @@ const doSubmit = async () => {
             return;
         }
 
-        if (!formData.value.audioFilePath) {
+        if (!formData.value.audio) {
             Dialog.tipError(t("请选择音频文件"));
             return;
         }
 
         // Generate task title from audio filename
-        const fileName =
-            formData.value.audioFilePath.split("/").pop() || formData.value.audioFilePath.split("\\").pop() || "";
-        const taskTitle = contentToFilenamePathPart(fileName.replace(/\.[^/.]+$/, ""), 20) || t("语音识别任务");
-
-        // Save audio file to hub
-        const audioPath = await window.$mapi.file.hubSave(formData.value.audioFilePath, {
-            isFullPath: true,
-            returnFullPath: true,
-        });
+        const taskTitle = window.$mapi.file.pathToName(formData.value.audio, false);
 
         const record: TaskRecord = {
             biz: "SoundAsr",
@@ -71,10 +58,9 @@ const doSubmit = async () => {
                 type: value.type,
                 serverKey: value.serverKey,
                 param: value.param,
-                audioFile: audioPath,
+                audio: formData.value.audio,
             },
             param: {
-                audioFile: audioPath,
             },
         };
 
@@ -85,7 +71,7 @@ const doSubmit = async () => {
         await TaskService.submit(record);
 
         // Reset form
-        formData.value.audioFilePath = "";
+        formData.value.audio = "";
 
         emit("submitted");
         Dialog.tipSuccess(t("语音识别任务已提交"));
@@ -101,13 +87,13 @@ const isSubmitting = ref(false);
     <div class="rounded-xl shadow border p-4">
         <SoundAsrForm ref="soundAsrForm" />
         <div class="pt-4">
-            <div v-if="formData.audioFilePath" class="mb-2 text-sm text-gray-600">
+            <div v-if="formData.audio" class="mb-2 text-sm text-gray-600">
                 <i class="iconfont icon-file mr-1"></i>
-                {{ formData.audioFilePath.split("/").pop() || formData.audioFilePath.split("\\").pop() }}
+                {{ formData.audio.split("/").pop() || formData.audio.split("\\").pop() }}
             </div>
             <a-button type="outline" @click="onSelectAudioFile" class="w-96 max-w-full">
                 <i class="iconfont icon-upload mr-2"></i>
-                {{ formData.audioFilePath ? t("重新选择") : t("选择音频文件") }}
+                {{ formData.audio ? t("重新选择") : t("选择音频文件") }}
             </a-button>
         </div>
         <div class="pt-4 flex">

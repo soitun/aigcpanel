@@ -62,7 +62,7 @@ export const TaskService = {
         }
         return record;
     },
-    async get(id: number): Promise<TaskRecord | null> {
+    async get(id: number | string): Promise<TaskRecord | null> {
         const record: any = await window.$mapi.db.first(
             `SELECT *
                                          FROM ${this.tableName()}
@@ -154,7 +154,7 @@ export const TaskService = {
             }
         );
     },
-    async update(id: number, record: Partial<TaskRecord>) {
+    async update(id: number | string, record: Partial<TaskRecord>) {
         if ("result" in record || "jobResult" in record || "startTime" in record) {
             const recordOld = await this.get(id);
             if ("result" in record) {

@@ -1,6 +1,6 @@
-import {SendType, ServerApiType, ServerFunctionDataType, ServerInfo} from "../mapi/server/type";
 import {Files} from "../mapi/file/main";
 import {Log} from "../mapi/log/main";
+import {SendType, ServerApiType, ServerFunctionDataType, ServerInfo} from "../mapi/server/type";
 import {AigcServerUtil} from "./util";
 
 type LauncherResultType = {
@@ -298,6 +298,33 @@ export const EasyServer = function (config: any) {
                 }
                 return {
                     url: launcherResult.result.url,
+                };
+            }
+        );
+    };
+    this.asr = async function (data: ServerFunctionDataType) {
+        // console.log('videoGen', JSON.stringify({data, serverInfo: this.ServerInfo}))
+        return this._callFunc(
+            data,
+            async (data: ServerFunctionDataType) => {
+                return {
+                    id: data.id,
+                    mode: "local",
+                    modelConfig: {
+                        audio: data.audio,
+                        param: data.param,
+                    },
+                };
+            },
+            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+                if (!("records" in launcherResult.result)) {
+                    if (launcherResult.result.error) {
+                        throw launcherResult.result.error;
+                    }
+                    throw "执行失败，请查看模型日志";
+                }
+                return {
+                    records: launcherResult.result.records,
                 };
             }
         );
