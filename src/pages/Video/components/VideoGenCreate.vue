@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import ServerSelector from "../../../components/Server/ServerSelector.vue";
-import {onMounted, ref, watch} from "vue";
-import {useServerStore} from "../../../store/modules/server";
-import {Dialog} from "../../../lib/dialog";
-import {StorageUtil} from "../../../lib/storage";
-import {t} from "../../../lang";
-import {VideoTemplateRecord, VideoTemplateService} from "../../../service/VideoTemplateService";
-import {EnumServerStatus} from "../../../types/Server";
+import { onMounted, ref, watch } from "vue";
+import { useServerStore } from "../../../store/modules/server";
+import { Dialog } from "../../../lib/dialog";
+import { StorageUtil } from "../../../lib/storage";
+import { t } from "../../../lang";
+import { VideoTemplateRecord, VideoTemplateService } from "../../../service/VideoTemplateService";
+import { EnumServerStatus } from "../../../types/Server";
 import ParamForm from "../../../components/common/ParamForm.vue";
-import {PermissionService} from "../../../service/PermissionService";
+import { PermissionService } from "../../../service/PermissionService";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
-import {TaskRecord, TaskService} from "../../../service/TaskService";
-import {TimeUtil} from "../../../lib/util";
-import SoundGenerateSelector from "../../Sound/Components/SoundGenerateSelector.vue";
+import { TaskRecord, TaskService } from "../../../service/TaskService";
+import { TimeUtil } from "../../../lib/util";
+import SoundGenerateSelector from "../../Sound/components/SoundGenerateSelector.vue";
 
 const serverStore = useServerStore();
 const paramForm = ref<InstanceType<typeof ParamForm> | null>(null);
@@ -154,8 +154,8 @@ const refresh = async (type: "videoTemplate") => {
 const doSoundCustomSelect = async () => {
     const path = await window.$mapi.file.openFile({
         filters: [
-            {name: "*.wav", extensions: ["wav"]},
-            {name: "*.mp3", extensions: ["mp3"]},
+            { name: "*.wav", extensions: ["wav"] },
+            { name: "*.mp3", extensions: ["mp3"] },
         ],
     });
     if (!path) {

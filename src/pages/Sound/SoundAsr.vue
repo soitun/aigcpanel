@@ -13,8 +13,8 @@ import { useCheckAll } from "../../components/common/check-all";
 import { Dialog } from "../../lib/dialog";
 import { TaskRecord, TaskService } from "../../service/TaskService";
 import { TaskChangeType, useTaskStore } from "../../store/modules/task";
-import SoundAsrCreate from "./Components/SoundAsrCreate.vue";
-import SoundAsrRecordsEditDialog from "./Components/SoundAsrRecordsEditDialog.vue";
+import SoundAsrCreate from "./components/SoundAsrCreate.vue";
+import SoundAsrRecordsEditDialog from "./components/SoundAsrRecordsEditDialog.vue";
 
 interface AsrRecord {
     start: number;

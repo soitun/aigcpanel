@@ -14,7 +14,7 @@ import { useCheckAll } from "../../components/common/check-all";
 import { doCopy } from "../../components/common/util";
 import { TaskRecord, TaskService } from "../../service/TaskService";
 import { TaskChangeType, useTaskStore } from "../../store/modules/task";
-import SoundGenerateCreate from "./Components/SoundGenerateCreate.vue";
+import SoundGenerateCreate from "./components/SoundGenerateCreate.vue";
 
 const records = ref<TaskRecord[]>([]);
 const taskStore = useTaskStore();

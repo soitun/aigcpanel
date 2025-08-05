@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import ServerSelector from "../../../components/Server/ServerSelector.vue";
-import {onMounted, ref, watch} from "vue";
-import {useServerStore} from "../../../store/modules/server";
-import {Dialog} from "../../../lib/dialog";
-import {StorageUtil} from "../../../lib/storage";
-import {t} from "../../../lang";
-import {VideoTemplateService} from "../../../service/VideoTemplateService";
-import {EnumServerStatus} from "../../../types/Server";
+import { onMounted, ref, watch } from "vue";
 import ParamForm from "../../../components/common/ParamForm.vue";
-import {PermissionService} from "../../../service/PermissionService";
-import {TaskRecord, TaskService} from "../../../service/TaskService";
+import ServerSelector from "../../../components/Server/ServerSelector.vue";
+import { t } from "../../../lang";
+import { Dialog } from "../../../lib/dialog";
+import { StorageUtil } from "../../../lib/storage";
+import { PermissionService } from "../../../service/PermissionService";
+import { TaskRecord, TaskService } from "../../../service/TaskService";
+import { VideoTemplateService } from "../../../service/VideoTemplateService";
+import { useServerStore } from "../../../store/modules/server";
+import { EnumServerStatus } from "../../../types/Server";
+import SoundGenerateForm from "../../Sound/components/SoundGenerateForm.vue";
 import VideoTemplateSelector from "./VideoTemplateSelector.vue";
-import SoundGenerateForm from "../../Sound/Components/SoundGenerateForm.vue";
 
 const serverStore = useServerStore();
 const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(null);
@@ -135,11 +135,8 @@ const emit = defineEmits({
                 </a-tooltip>
             </div>
             <div class="mr-3 w-96 flex-shrink-0">
-                <ServerSelector
-                    v-model="formData.videoServerKey"
-                    @update="onVideoServerUpdate"
-                    functionName="videoGen"
-                />
+                <ServerSelector v-model="formData.videoServerKey" @update="onVideoServerUpdate"
+                    functionName="videoGen" />
             </div>
         </div>
         <div class="flex items-center h-12">
@@ -161,11 +158,8 @@ const emit = defineEmits({
         </div>
         <SoundGenerateForm ref="soundGenerateForm" />
         <div class="pt-2">
-            <a-textarea
-                v-model="formData.text"
-                :auto-size="{minRows: 2}"
-                :placeholder="$t('输入语音内容开始生成视频')"
-            ></a-textarea>
+            <a-textarea v-model="formData.text" :auto-size="{ minRows: 2 }"
+                :placeholder="$t('输入语音内容开始生成视频')"></a-textarea>
         </div>
         <div class="pt-2">
             <a-button class="mr-2" type="primary" @click="doSubmit">
