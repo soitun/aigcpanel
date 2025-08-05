@@ -116,6 +116,31 @@ const doMoveDown = (index: number) => {
     }
 };
 
+// 查找替换功能
+const findText = ref('');
+const replaceText = ref('');
+
+const onFindReplace = () => {
+    if (!findText.value.trim()) {
+        Dialog.tipError('请输入查找内容');
+        return;
+    }
+
+    let replaceCount = 0;
+    editingRecords.value.forEach(record => {
+        if (record.text.includes(findText.value)) {
+            record.text = record.text.replace(new RegExp(findText.value, 'g'), replaceText.value);
+            replaceCount++;
+        }
+    });
+
+    if (replaceCount > 0) {
+        Dialog.tipSuccess(`已替换 ${replaceCount} 条记录`);
+    } else {
+        Dialog.tipError('未找到匹配的内容');
+    }
+};
+
 defineExpose({
     show,
     edit,
@@ -132,6 +157,21 @@ defineExpose({
             <a-button type="primary" @click="doSave">{{ $t("保存") }}</a-button>
         </template>
         <div class="-m-4">
+            <!-- 快捷操作区域 -->
+            <div class="bg-gray-50 p-4 border-b">
+                <div class="flex items-center gap-3">
+                    <div class="text-sm font-medium text-gray-700 min-w-max">
+                        {{ $t("批量替换") }}:
+                    </div>
+                    <a-input v-model="findText" :placeholder="$t('查找')" size="small" style="width: 150px" allow-clear />
+                    <a-input v-model="replaceText" :placeholder="$t('替换')" size="small" style="width: 150px"
+                        allow-clear />
+                    <a-button size="small" @click="onFindReplace" :disabled="!findText.trim()">
+                        {{ $t("执行") }}
+                    </a-button>
+                </div>
+            </div>
+
             <!-- 没有数据提示 -->
             <div v-if="editingRecords.length === 0" class="text-center text-gray-500 py-4">
                 {{ $t("没有可编辑的数据") }}

@@ -10,7 +10,9 @@ import TaskDuration from "../../components/Server/TaskDuration.vue";
 import TaskTitleField from "../../components/Server/TaskTitleField.vue";
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
 import { useCheckAll } from "../../components/common/check-all";
+import { doCopy } from "../../components/common/util";
 import { Dialog } from "../../lib/dialog";
+import { DownloadUtil } from "../../lib/util";
 import { TaskRecord, TaskService } from "../../service/TaskService";
 import { TaskChangeType, useTaskStore } from "../../store/modules/task";
 import SoundAsrCreate from "./components/SoundAsrCreate.vue";
@@ -23,14 +25,20 @@ interface AsrRecord {
 }
 
 interface AsrResult {
-    text?: string;
     records?: AsrRecord[];
 }
 
-const records = ref<TaskRecord[]>([]);
+interface ProcessedTaskRecord extends TaskRecord {
+    _concatText?: string;
+    _concatTextTruncate?: string;
+    _asrRecords?: AsrRecord[];
+    _needsTruncate?: boolean;
+    _isTextExpanded?: boolean;
+}
+
+const records = ref<ProcessedTaskRecord[]>([]);
 const taskStore = useTaskStore();
 const soundAsrRecordsEditDialog = ref<InstanceType<typeof SoundAsrRecordsEditDialog> | null>(null);
-const expandedTexts = ref<Set<string>>(new Set());
 
 const page = ref(1);
 const recordsForPage = computed(() => {
@@ -55,175 +63,101 @@ const { mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords } = 
 });
 
 const doRefresh = async () => {
-    records.value = mergeCheck(await TaskService.list("SoundAsr"));
+    const rawRecords = await TaskService.list("SoundAsr");
+    // 预处理数据，避免模板中重复计算
+    const processedRecords = rawRecords.map(record => {
+        // 内联 getRecords 逻辑
+        let _asrRecords: AsrRecord[] = [];
+        let _concatText = '';
+        if (record.result && record.result.records && Array.isArray(record.result.records)) {
+            _asrRecords = record.result.records;
+            _concatText = _asrRecords.map(r => r.text).join('');
+        }
+
+        const _needsTruncate = _concatText.length > 200;
+        const _concatTextTruncate = _needsTruncate ? _concatText.substring(0, 200) + '...' : _concatText;
+        const _isTextExpanded = false; // 默认收起状态
+
+        return {
+            ...record,
+            _asrRecords,
+            _concatText,
+            _concatTextTruncate,
+            _needsTruncate,
+            _isTextExpanded
+        } as ProcessedTaskRecord;
+    });
+
+    records.value = mergeCheck(processedRecords);
 };
 
-const onCreateSubmitted = () => {
-    doRefresh();
-};
-
-// 切换文本展开状态
-const toggleTextExpanded = (taskId: string) => {
-    if (expandedTexts.value.has(taskId)) {
-        expandedTexts.value.delete(taskId);
-    } else {
-        expandedTexts.value.add(taskId);
-    }
-};
-
-// 检查文本是否需要截断
-const needsTruncate = (text: string) => {
-    return text.length > 200;
-};
-
-// 获取显示的文本
-const getDisplayText = (text: string, taskId: string) => {
-    if (!needsTruncate(text) || expandedTexts.value.has(taskId)) {
-        return text;
-    }
-    return text.substring(0, 200) + '...';
-};
-
-// 获取结果数据
-const getRecords = (result: any): AsrRecord[] => {
-    if (!result) return [];
-
-    // 如果直接是数组格式
-    if (Array.isArray(result)) {
-        return result;
-    }
-
-    // 如果有records字段
-    if (result.records && Array.isArray(result.records)) {
-        return result.records;
-    }
-
-    return [];
-};
-
-// 获取拼接文本
-const getConcatText = (result: any): string => {
-    if (!result) return '';
-
-    // 如果有直接的text字段
-    if (result.text) {
-        return result.text;
-    }
-
-    // 从records中拼接
-    const records = getRecords(result);
-    return records.map(r => r.text).join('');
-};
-
-// 时间格式化
-const formatTime = (ms: number): string => {
-    const seconds = ms / 1000;
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    const milliseconds = Math.floor((seconds % 1) * 1000);
-
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
-};
-
-// 生成SRT格式字幕
-const generateSRT = (records: AsrRecord[]): string => {
-    return records.map((record, index) => {
-        const startTime = formatSRTTime(record.start);
-        const endTime = formatSRTTime(record.end);
-        return `${index + 1}\n${startTime} --> ${endTime}\n${record.text}\n`;
-    }).join('\n');
-};
-
+// SRT时间格式化（简化版）
 const formatSRTTime = (ms: number): string => {
     const totalSeconds = ms / 1000;
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = Math.floor(totalSeconds % 60);
     const milliseconds = Math.floor((totalSeconds % 1) * 1000);
-
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')},${milliseconds.toString().padStart(3, '0')}`;
 };
 
-// 操作结果的方法
-const copyResultText = (taskId: string) => {
+// 操作结果的方法（简化版）
+const onCopyResultText = async (taskId: string) => {
     const record = records.value.find(r => String(r.id) === taskId);
-    if (record) {
-        const text = getConcatText(record.result);
-        if (text) {
-            navigator.clipboard.writeText(text).then(() => {
-                Dialog.tipSuccess('已复制到剪贴板');
-            }).catch(() => {
-                Dialog.tipError('复制失败');
-            });
+    if (record?._concatText) {
+        try {
+            await doCopy(record._concatText, '已复制到剪贴板');
+        } catch (error) {
+            Dialog.tipError('复制失败');
         }
     }
 };
 
-const downloadResultText = (taskId: string) => {
+const onDownloadResultText = (taskId: string) => {
     const record = records.value.find(r => String(r.id) === taskId);
-    if (record) {
-        const text = getConcatText(record.result);
-        if (text) {
-            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${record.title || 'asr-result'}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
+    if (record?._concatText) {
+        DownloadUtil.downloadFile(record._concatText, `${record.title || 'asr-result'}.txt`);
     }
 };
 
-const downloadResultSubtitle = (taskId: string) => {
+const onDownloadResultSubtitle = (taskId: string) => {
     const record = records.value.find(r => String(r.id) === taskId);
-    if (record) {
-        const asrRecords = getRecords(record.result);
-        if (asrRecords.length > 0) {
-            const srtContent = generateSRT(asrRecords);
-            const blob = new Blob([srtContent], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${record.title || 'asr-result'}.srt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
+    if (record?._asrRecords?.length) {
+        // 内联 generateSRT 逻辑
+        const srtContent = record._asrRecords.map((asrRecord, index) =>
+            `${index + 1}\n${formatSRTTime(asrRecord.start)} --> ${formatSRTTime(asrRecord.end)}\n${asrRecord.text}\n`
+        ).join('\n');
+        DownloadUtil.downloadFile(srtContent, `${record.title || 'asr-result'}.srt`);
     }
 };
 
-const editResult = (taskId: string) => {
+const onEditResult = (taskId: string) => {
     const record = records.value.find(r => String(r.id) === taskId);
-    if (record) {
-        const asrRecords = getRecords(record.result);
-        soundAsrRecordsEditDialog.value?.edit(asrRecords, taskId);
+    if (record?._asrRecords) {
+        soundAsrRecordsEditDialog.value?.edit(record._asrRecords, taskId);
     }
 };
 
-// 保存编辑结果
+const onToggleTextExpanded = (record: ProcessedTaskRecord) => {
+    record._isTextExpanded = !record._isTextExpanded;
+};
+
+// 保存编辑结果（简化版）
 const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
-    try {
-        if (!taskId) return;
+    if (!taskId) return;
 
-        // 更新本地记录
+    try {
         const record = records.value.find(r => String(r.id) === taskId);
-        if (record && record.result) {
-            record.result = {
-                ...record.result,
-                records: editedRecords
-            };
+        if (record?.result) {
+            // 更新本地记录和预处理数据
+            record.result = { ...record.result, records: editedRecords };
+            record._asrRecords = editedRecords;
+            record._concatText = editedRecords.map(r => r.text).join('');
+            record._needsTruncate = record._concatText.length > 200;
+            record._concatTextTruncate = record._needsTruncate ? record._concatText.substring(0, 200) + '...' : record._concatText;
         }
 
-        await TaskService.update(taskId, {
-            result: {
-                records: editedRecords
-            }
-        });
-
+        await TaskService.update(taskId, { result: { records: editedRecords } });
         Dialog.tipSuccess('保存成功');
     } catch (error) {
         console.error('保存编辑结果失败:', error);
@@ -240,7 +174,7 @@ const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
             </div>
         </div>
         <div>
-            <SoundAsrCreate @submitted="onCreateSubmitted" />
+            <SoundAsrCreate @submitted="doRefresh" />
             <div v-if="records.length > 0">
                 <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
                     <div class="flex-grow flex items-center">
@@ -296,43 +230,13 @@ const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
                             <ServerTaskResultParam :record="r as any" />
                         </div>
 
-                        <!-- 结果显示区域 -->
-                        <div v-if="r.result && (r.result.records)" class="mt-4">
-                            <div class="bg-gray-50 rounded-lg p-4">
-                                <!-- 拼接文本显示 -->
-                                <div class="mb-3">
-                                    <div class="bg-white rounded p-3 border">
-                                        <div class="whitespace-pre-wrap cursor-pointer hover:bg-gray-50 p-2 rounded"
-                                            @click="copyResultText(String(r.id))">
-                                            {{ getDisplayText(getConcatText(r.result) || $t("暂无识别结果"), String(r.id)) }}
-                                        </div>
-                                        <div v-if="needsTruncate(getConcatText(r.result) || '')"
-                                            class="mt-2 text-center">
-                                            <a-button size="mini" type="text" @click="toggleTextExpanded(String(r.id))">
-                                                {{ expandedTexts.has(String(r.id)) ? $t("收起") : $t("更多") }}
-                                            </a-button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 详细记录列表 -->
-                                <div v-if="getRecords(r.result).length > 0">
-                                    <div class="text-sm text-gray-600 mb-2">
-                                        {{ $t("详细记录") }} ({{ getRecords(r.result).length }} {{ $t("条") }})
-                                    </div>
-                                    <div class="space-y-2 max-h-48 overflow-y-auto">
-                                        <div v-for="(record, index) in getRecords(r.result).slice(0, 5)" :key="index"
-                                            class="flex items-start space-x-3 text-sm">
-                                            <div class="text-gray-500 w-16 flex-shrink-0">
-                                                {{ formatTime(record.start) }}
-                                            </div>
-                                            <div class="flex-1">{{ record.text }}</div>
-                                        </div>
-                                        <div v-if="getRecords(r.result).length > 5"
-                                            class="text-center text-gray-500 text-sm py-2">
-                                            {{ $t("还有") }} {{ getRecords(r.result).length - 5 }} {{ $t("条记录") }}
-                                        </div>
-                                    </div>
+                        <div v-if="r.result && r._asrRecords" class="mt-4">
+                            <div class="bg-gray-100 rounded-lg p-2">
+                                <div class="whitespace-pre-wrap cursor-pointer p-2 rounded-lg">
+                                    {{ (r._isTextExpanded ? r._concatText : r._concatTextTruncate) || $t("暂无识别结果") }}
+                                    <a-button size="mini" v-if="r._needsTruncate" @click="onToggleTextExpanded(r)">
+                                        {{ r._isTextExpanded ? $t("收起") : $t("更多") }}
+                                    </a-button>
                                 </div>
                             </div>
                         </div>
@@ -342,31 +246,31 @@ const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
                                 <timeago :datetime="r['createdAt'] * 1000" />
                             </div>
                             <div class="">
-                                <a-tooltip v-if="r.result && r.result.records" :content="$t('复制文本')" mini>
-                                    <a-button class="mr-2" @click="copyResultText(String(r.id))" title="复制识别结果">
+                                <a-tooltip v-if="r.result && r._asrRecords" :content="$t('复制文本')" mini>
+                                    <a-button class="mr-2" @click="onCopyResultText(String(r.id))" title="复制识别结果">
                                         <template #icon>
                                             <icon-copy />
                                         </template>
                                     </a-button>
                                 </a-tooltip>
-                                <a-tooltip v-if="r.result && r.result.records" :content="$t('下载')" mini>
+                                <a-tooltip v-if="r.result && r._asrRecords" :content="$t('下载')" mini>
                                     <a-dropdown-button class="mr-2">
                                         <icon-download />
                                         <template #icon>
                                             <icon-down />
                                         </template>
                                         <template #content>
-                                            <a-doption @click="downloadResultText(String(r.id))">
+                                            <a-doption @click="onDownloadResultText(String(r.id))">
                                                 {{ $t('下载文本文件') }}
                                             </a-doption>
-                                            <a-doption @click="downloadResultSubtitle(String(r.id))">
+                                            <a-doption @click="onDownloadResultSubtitle(String(r.id))">
                                                 {{ $t('下载字幕文件') }}
                                             </a-doption>
                                         </template>
                                     </a-dropdown-button>
                                 </a-tooltip>
-                                <a-tooltip v-if="r.result && r.result.records" :content="$t('编辑')" mini>
-                                    <a-button class="mr-2" @click="editResult(String(r.id))" title="编辑识别结果">
+                                <a-tooltip v-if="r.result && r._asrRecords" :content="$t('编辑')" mini>
+                                    <a-button class="mr-2" @click="onEditResult(String(r.id))" title="编辑识别结果">
                                         <template #icon>
                                             <icon-edit />
                                         </template>
