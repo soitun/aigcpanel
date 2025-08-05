@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import {onMounted, ref, watch} from "vue";
-import ServerSelector from "../../../components/Server/ServerSelector.vue";
-import {StorageUtil} from "../../../lib/storage";
+import { onMounted, ref, watch } from "vue";
 import ParamForm from "../../../components/common/ParamForm.vue";
-import SoundPromptSelector from "./SoundPromptSelector.vue";
-import SoundPromptDialog from "./SoundPromptDialog.vue";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
-import {Dialog} from "../../../lib/dialog";
-import {t} from "../../../lang";
-import {useServerStore} from "../../../store/modules/server";
-import {EnumServerStatus} from "../../../types/Server";
-import {StorageService} from "../../../service/StorageService";
+import ServerSelector from "../../../components/Server/ServerSelector.vue";
+import { t } from "../../../lang";
+import { Dialog } from "../../../lib/dialog";
+import { StorageUtil } from "../../../lib/storage";
+import { StorageService } from "../../../service/StorageService";
+import { useServerStore } from "../../../store/modules/server";
+import { EnumServerStatus } from "../../../types/Server";
+import SoundPromptDialog from "./SoundPromptDialog.vue";
+import SoundPromptSelector from "./SoundPromptSelector.vue";
 
 const serverStore = useServerStore();
 const formData = ref({
@@ -53,19 +53,19 @@ watch(
 
 const getValue = async (): Promise<
     | {
-          serverName: string;
-          serverTitle: string;
-          serverVersion: string;
-          type: "SoundTts" | "SoundClone";
-          ttsServerKey?: string;
-          ttsParam?: any[];
-          cloneServerKey?: string;
-          cloneParam?: any[];
-          promptId?: number;
-          promptTitle?: string;
-          promptUrl?: string;
-          promptText?: string;
-      }
+        serverName: string;
+        serverTitle: string;
+        serverVersion: string;
+        type: "SoundTts" | "SoundClone";
+        ttsServerKey?: string;
+        ttsParam?: any[];
+        cloneServerKey?: string;
+        cloneParam?: any[];
+        promptId?: number;
+        promptTitle?: string;
+        promptUrl?: string;
+        promptText?: string;
+    }
     | undefined
 > => {
     const data: any = {};
@@ -93,6 +93,11 @@ const getValue = async (): Promise<
             Dialog.tipError(t("声音合成参数不正确"));
             return;
         }
+        if (ttsParamForm.value) {
+            if (!ttsParamForm.value.validate()) {
+                return;
+            }
+        }
     } else if (data.type === "SoundClone") {
         data.cloneServerKey = formData.value.cloneServerKey;
         data.promptId = formData.value.promptId;
@@ -109,10 +114,14 @@ const getValue = async (): Promise<
         data.serverTitle = server.title;
         data.serverVersion = server.version;
         data.cloneParam = cloneParamForm.value?.getValue();
-        console.log("data.cloneParam", data.cloneParam);
         if (!data.cloneParam) {
             Dialog.tipError(t("声音合成参数不正确"));
             return;
+        }
+        if (cloneParamForm.value) {
+            if (!cloneParamForm.value.validate()) {
+                return;
+            }
         }
         if (!data.promptId) {
             Dialog.tipError(t("请选择声音音色"));
@@ -175,11 +184,8 @@ defineExpose({
             </a-tooltip>
         </div>
         <div class="mr-2 w-96 flex-shrink-0">
-            <ServerSelector
-                v-model="formData.cloneServerKey"
-                @update="onSoundCloneServerUpdate"
-                functionName="soundClone"
-            />
+            <ServerSelector v-model="formData.cloneServerKey" @update="onSoundCloneServerUpdate"
+                functionName="soundClone" />
         </div>
         <div>
             <ServerContentInfoAction :config="cloneModelConfig as any" func="soundClone" />

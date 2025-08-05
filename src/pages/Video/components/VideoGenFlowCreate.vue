@@ -50,8 +50,8 @@ const onVideoServerUpdate = async (config: any) => {
 
 const doSubmit = async () => {
     let videoParam = videoParamForm.value?.getValue() || {};
-    let soundValue = await soundGenerateForm.value?.getValue();
-    if (!soundValue) {
+    let soundGenerateValue = await soundGenerateForm.value?.getValue();
+    if (!soundGenerateValue) {
         return;
     }
     if (!formData.value.videoServerKey) {
@@ -86,22 +86,22 @@ const doSubmit = async () => {
             videoTemplateId: videoTemplate?.id as number,
             videoTemplateName: videoTemplate?.name,
             videoUrl: videoTemplate?.video,
-            soundType: soundValue.type,
+            soundType: soundGenerateValue.type,
             soundTts: {
-                serverName: soundValue.type === "SoundTts" ? soundValue.serverName : undefined,
-                serverTitle: soundValue.type === "SoundTts" ? soundValue.serverTitle : undefined,
-                serverVersion: soundValue.type === "SoundTts" ? soundValue.serverVersion : undefined,
-                param: soundValue.type === "SoundTts" ? soundValue.ttsParam : undefined,
+                serverName: soundGenerateValue.type === "SoundTts" ? soundGenerateValue.serverName : undefined,
+                serverTitle: soundGenerateValue.type === "SoundTts" ? soundGenerateValue.serverTitle : undefined,
+                serverVersion: soundGenerateValue.type === "SoundTts" ? soundGenerateValue.serverVersion : undefined,
+                param: soundGenerateValue.type === "SoundTts" ? soundGenerateValue.ttsParam : undefined,
             },
             soundClone: {
-                serverName: soundValue.type === "SoundClone" ? soundValue.serverName : undefined,
-                serverTitle: soundValue.type === "SoundClone" ? soundValue.serverTitle : undefined,
-                serverVersion: soundValue.type === "SoundClone" ? soundValue.serverVersion : undefined,
-                param: soundValue.type === "SoundClone" ? soundValue.cloneParam : undefined,
-                promptId: soundValue.promptId,
-                promptTitle: soundValue.promptTitle,
-                promptUrl: soundValue.promptUrl,
-                promptText: soundValue.promptText,
+                serverName: soundGenerateValue.type === "SoundClone" ? soundGenerateValue.serverName : undefined,
+                serverTitle: soundGenerateValue.type === "SoundClone" ? soundGenerateValue.serverTitle : undefined,
+                serverVersion: soundGenerateValue.type === "SoundClone" ? soundGenerateValue.serverVersion : undefined,
+                param: soundGenerateValue.type === "SoundClone" ? soundGenerateValue.cloneParam : undefined,
+                promptId: soundGenerateValue.promptId,
+                promptTitle: soundGenerateValue.promptTitle,
+                promptUrl: soundGenerateValue.promptUrl,
+                promptText: soundGenerateValue.promptText,
             },
             text: formData.value.text,
         },
@@ -126,7 +126,7 @@ const emit = defineEmits({
     <div class="rounded-xl shadow border p-4">
         <div class="font-bold">
             <i class="iconfont icon-video"></i>
-            视频设置
+            {{ $t('视频设置') }}
         </div>
         <div class="flex items-center h-12">
             <div class="mr-1">
@@ -154,7 +154,7 @@ const emit = defineEmits({
         </div>
         <div class="font-bold pt-4">
             <i class="iconfont icon-video"></i>
-            声音设置
+            {{ $t('声音设置') }}
         </div>
         <SoundGenerateForm ref="soundGenerateForm" />
         <div class="pt-2">

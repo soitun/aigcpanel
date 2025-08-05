@@ -93,7 +93,7 @@ const isSubmitting = ref(false);
             </div>
             <a-button type="outline" @click="onSelectAudioFile" class="w-96 max-w-full">
                 <i class="iconfont icon-upload mr-2"></i>
-                {{ formData.audio ? t("重新选择") : t("选择音频文件") }}
+                {{ formData.audio ? t("重新选择") : t("选择音频文件") }}({{ t("支持MP3、WAV格式") }})
             </a-button>
         </div>
         <div class="pt-4 flex">

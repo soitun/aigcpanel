@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import {ref, watch} from "vue";
-import {cloneDeep} from "lodash-es";
+import { cloneDeep } from "lodash-es";
+import { ref, watch } from "vue";
+import { t } from "../../lang";
+import { Dialog } from "../../lib/dialog";
 import SpeakerSelector from "./SpeakerSelector.vue";
 
 type FieldBasicType = {
@@ -10,6 +12,7 @@ type FieldBasicType = {
     type: "select" | "input" | "inputNumber" | "switch" | "slider" | "speaker";
     defaultValue: any;
     placeholder: string;
+    required: boolean;
     tips: string;
     min?: number;
     max?: number;
@@ -74,8 +77,20 @@ const setValue = value => {
     });
 };
 
+const validate = () => {
+    for (const item of formData.value) {
+        if (item.required) {
+            if (!item.value && item.value !== 0) {
+                Dialog.tipError(t('{title}不能为空', { title: item.title }));
+                return false;
+            }
+        }
+    }
+    return true;
+};
+
 const onSpeakerDataUpdate = (name, data) => {
-    const {param, speaker} = data;
+    const { param, speaker } = data;
     const item = formData.value.find(item => item.name === name);
     if (item) {
         item["speaker"] = speaker;
@@ -96,6 +111,7 @@ const onSpeakerDataUpdate = (name, data) => {
 defineExpose({
     getValue,
     setValue,
+    validate,
 });
 </script>
 
@@ -121,24 +137,13 @@ defineExpose({
             </a-input>
         </div>
         <div v-else-if="item.type === 'inputNumber'" class="w-24 mr-3">
-            <a-input-number
-                :placeholder="item.placeholder"
-                size="small"
-                v-model="item.value"
-                :disabled="props.disabled"
-                :min="item.min"
-                :max="item.max"
-            >
+            <a-input-number :placeholder="item.placeholder" size="small" v-model="item.value" :disabled="props.disabled"
+                :min="item.min" :max="item.max">
             </a-input-number>
         </div>
         <div v-else-if="item.type === 'select'" class="mr-3">
-            <a-select
-                :placeholder="item.placeholder"
-                size="small"
-                style="width: auto"
-                :disabled="props.disabled"
-                v-model="item.value"
-            >
+            <a-select :placeholder="item.placeholder" size="small" style="width: auto" :disabled="props.disabled"
+                v-model="item.value">
                 <a-option v-for="option in item.options" :key="option.value" :value="option.value">
                     {{ option.label }}
                 </a-option>
@@ -148,31 +153,17 @@ defineExpose({
             <a-switch v-model="item.value" :disabled="props.disabled" size="small" />
         </div>
         <div v-else-if="item.type === 'slider'" class="w-48 mr-3">
-            <a-slider
-                v-model="item.value"
-                :marks="item.sliderMarks"
-                show-tooltip
-                :min="item.min"
-                :max="item.max"
-                :disabled="props.disabled"
-                :step="item.step"
-            />
+            <a-slider v-model="item.value" :marks="item.sliderMarks" show-tooltip :min="item.min" :max="item.max"
+                :disabled="props.disabled" :step="item.step" />
         </div>
         <div v-else-if="item.type === 'speaker'" class="w-48 mr-3">
-            <SpeakerSelector
-                v-model="item.value"
-                :speakers="item['speakers']"
-                :disabled="props.disabled"
-                @on-data-update="onSpeakerDataUpdate(item.name, $event)"
-            />
+            <SpeakerSelector v-model="item.value" :speakers="item['speakers']" :disabled="props.disabled"
+                @on-data-update="onSpeakerDataUpdate(item.name, $event)" />
         </div>
         <div v-for="speakerParam in item['speakerParam']">
             <div v-if="!speakerParam.type || speakerParam.type === 'select'" class="mr-3">
-                <a-select
-                    size="small"
-                    :disabled="props.disabled"
-                    v-model="item['speakerParamValue'][speakerParam.name]"
-                >
+                <a-select size="small" :disabled="props.disabled"
+                    v-model="item['speakerParamValue'][speakerParam.name]">
                     <a-option v-for="o in speakerParam.option" :key="o.value" :value="o.value">
                         {{ o.title }}
                     </a-option>

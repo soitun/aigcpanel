@@ -3,7 +3,15 @@ import {useTaskStore} from "../store/modules/task";
 
 const taskStore = useTaskStore();
 
-export type TaskBiz = never | "SoundClone" | "SoundTts" | "SoundGenerate" | "SoundAsr" | "VideoGen" | "VideoGenFlow";
+export type TaskBiz =
+    | never
+    | "SoundClone"
+    | "SoundTts"
+    | "SoundGenerate"
+    | "SoundAsr"
+    | "VideoGen"
+    | "VideoGenFlow"
+    | "SoundReplace";
 
 export type TaskRecord = {
     id?: number;

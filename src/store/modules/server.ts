@@ -1,6 +1,6 @@
+import {ComputedRef} from "@vue/reactivity";
+import {cloneDeep} from "lodash-es";
 import {defineStore} from "pinia";
-import store from "../index";
-import {EnumServerStatus, EnumServerType, ServerRecord, ServerRuntime} from "../../types/Server";
 import {computed, ref, toRaw} from "vue";
 import {cloneDeep} from "lodash-es";
 import {ComputedRef} from "@vue/reactivity";
@@ -9,8 +9,14 @@ import {useTaskStore} from "./task";
 // import {useServerCloudStore} from "./serverCloud";
 import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
+import {Dialog} from "../../lib/dialog";
+import {TimeUtil, wait} from "../../lib/util";
 import {StorageService} from "../../service/StorageService";
 import {TaskService} from "../../service/TaskService";
+import {EnumServerStatus, EnumServerType, ServerRecord, ServerRuntime} from "../../types/Server";
+import store from "../index";
+import {useServerCloudStore} from "./serverCloud";
+import {useTaskStore} from "./task";
 
 // const serverCloudStore = useServerCloudStore()
 const taskStore = useTaskStore();
@@ -230,7 +236,10 @@ export const serverStore = defineStore("server", {
             if (!record) {
                 throw "record not found";
             }
-            const server = await this.getByNameVersion(record.serverName, record.serverVersion);
+            let server: any = null;
+            if (record.serverName && record.serverVersion) {
+                server = await this.getByNameVersion(record.serverName, record.serverVersion);
+            }
             // console.log('SoundTts.runFunc.server', server)
             if (!server) {
                 throw "server not found";

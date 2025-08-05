@@ -8,17 +8,21 @@ import {SoundGenerate} from "./SoundGenerate";
 import {SoundTts} from "./SoundTts";
 import {VideoGen} from "./VideoGen";
 import {VideoGenFlow} from "./VideoGenFlow";
+import {SoundReplace} from "./apps/SoundReplace";
 
 const taskStore = useTaskStore();
 const serverStore = useServerStore();
 
 export const tasks = {
+    // basics
     SoundTts,
     SoundClone,
     SoundGenerate,
     SoundAsr,
     VideoGen,
+    // apps
     VideoGenFlow,
+    SoundReplace,
 };
 
 export const TaskManager = {
