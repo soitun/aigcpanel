@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { onMounted } from "vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
 import TaskBatchDeleteAction from "../../components/Server/TaskBatchDeleteAction.vue";
 import TaskBatchDownloadAction from "../../components/Server/TaskBatchDownloadAction.vue";
@@ -8,33 +8,20 @@ import TaskDeleteAction from "../../components/Server/TaskDeleteAction.vue";
 import TaskDownloadAction from "../../components/Server/TaskDownloadAction.vue";
 import TaskDuration from "../../components/Server/TaskDuration.vue";
 import TaskTitleField from "../../components/Server/TaskTitleField.vue";
+import TextTruncateView from "../../components/TextTruncateView.vue";
 import AudioPlayer from "../../components/common/AudioPlayer.vue";
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
 import { useCheckAll } from "../../components/common/check-all";
-import { doCopy } from "../../components/common/util";
 import { TaskRecord, TaskService } from "../../service/TaskService";
-import { TaskChangeType, useTaskStore } from "../../store/modules/task";
+import { usePaginate } from '../hooks/paginate';
+import { useTaskChangeRefresh } from '../hooks/task';
 import SoundGenerateCreate from "./components/SoundGenerateCreate.vue";
 
-const records = ref<TaskRecord[]>([]);
-const taskStore = useTaskStore();
-
-const page = ref(1);
-const recordsForPage = computed(() => {
-    return records.value.slice((page.value - 1) * 10, page.value * 10);
-});
-
-const taskChangeCallback = (bizId: string, type: TaskChangeType) => {
-    doRefresh();
-};
-
-onMounted(async () => {
-    await doRefresh();
-    taskStore.onChange("SoundGenerate", taskChangeCallback);
-});
-onBeforeUnmount(() => {
-    taskStore.offChange("SoundGenerate", taskChangeCallback);
-});
+const {
+    page,
+    records,
+    recordsForPage,
+} = usePaginate<TaskRecord>();
 
 const { mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords } = useCheckAll({
     records: recordsForPage,
@@ -43,6 +30,14 @@ const { mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords } = 
 const doRefresh = async () => {
     records.value = mergeCheck(await TaskService.list("SoundGenerate"));
 };
+
+useTaskChangeRefresh('SoundGenerate', () => {
+    doRefresh();
+});
+
+onMounted(async () => {
+    await doRefresh();
+});
 </script>
 
 <template>
@@ -143,11 +138,11 @@ const doRefresh = async () => {
                             </div>
                             <ServerTaskResultParam :record="r as any" />
                         </div>
-                        <a-tooltip :content="$t('点击文字复制')" position="left" mini>
-                            <div class="pt-4 cursor-pointer" @click="doCopy(r.modelConfig.text)">
-                                {{ r.modelConfig.text }}
+                        <div class="mt-4">
+                            <div class="bg-gray-100 rounded-lg p-2">
+                                <TextTruncateView :text="r.modelConfig.text" />
                             </div>
-                        </a-tooltip>
+                        </div>
                         <div class="pt-4" v-if="r.result && r.result.url">
                             <AudioPlayer show-wave :url="'file://' + r.result.url" />
                         </div>

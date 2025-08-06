@@ -1,32 +1,26 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import ServerTaskResultParam from '../../../components/Server/ServerTaskResultParam.vue';
+import TaskCancelAction from '../../../components/Server/TaskCancelAction.vue';
+import TaskDeleteAction from '../../../components/Server/TaskDeleteAction.vue';
+import TaskDuration from '../../../components/Server/TaskDuration.vue';
+import TaskTitleField from '../../../components/Server/TaskTitleField.vue';
+import TaskBizStatus from '../../../components/common/TaskBizStatus.vue';
 import { useCheckAll } from '../../../components/common/check-all';
 import { doCopy } from "../../../components/common/util";
 import { Dialog } from "../../../lib/dialog";
 import { DownloadUtil } from "../../../lib/util";
 import { TaskRecord, TaskService } from "../../../service/TaskService";
-import { TaskChangeType, useTaskStore } from "../../../store/modules/task";
 import SoundAsrRecordsEditDialog from "../../Sound/components/SoundAsrRecordsEditDialog.vue";
+import { usePaginate } from '../../hooks/paginate';
+import { useTaskChangeRefresh } from '../../hooks/task';
 import SoundReplaceCreate from './components/SoundReplaceCreate.vue';
 import StepsComponent from './components/StepsComponent.vue';
-
-const stepsVisible = ref(false);
-
-const videoFile = ref<File | null>(null);
-const asrModel = ref<any>(null);
-const generateModel = ref<any>(null);
-const asrText = ref('');
-const generatedAudio = ref<File | null>(null);
-
 
 interface AsrRecord {
     start: number;
     end: number;
     text: string;
-}
-
-interface AsrResult {
-    records?: AsrRecord[];
 }
 
 interface ProcessedTaskRecord extends TaskRecord {
@@ -37,30 +31,28 @@ interface ProcessedTaskRecord extends TaskRecord {
     _isTextExpanded?: boolean;
 }
 
-const records = ref<ProcessedTaskRecord[]>([]);
-const taskStore = useTaskStore();
 const soundAsrRecordsEditDialog = ref<InstanceType<typeof SoundAsrRecordsEditDialog> | null>(null);
 
-const page = ref(1);
-const recordsForPage = computed(() => {
-    return records.value.slice((page.value - 1) * 10, page.value * 10);
+const {
+    page,
+    records,
+    recordsForPage,
+} = usePaginate<ProcessedTaskRecord>({
+    pageSize: 10,
 });
 
-const taskChangeCallback = (bizId: string, type: TaskChangeType) => {
+useTaskChangeRefresh('SoundReplace', () => {
     doRefresh();
-};
-
-onMounted(async () => {
-    await doRefresh();
-    taskStore.onChange("SoundReplace", taskChangeCallback);
-});
-
-onBeforeUnmount(() => {
-    taskStore.offChange("SoundReplace", taskChangeCallback);
 });
 
 const { mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords } = useCheckAll({
     records: recordsForPage,
+});
+
+const stepsVisible = ref(false);
+
+onMounted(async () => {
+    await doRefresh();
 });
 
 const doRefresh = async () => {
@@ -142,29 +134,6 @@ const onEditResult = (taskId: string) => {
 const onToggleTextExpanded = (record: ProcessedTaskRecord) => {
     record._isTextExpanded = !record._isTextExpanded;
 };
-
-// 保存编辑结果（简化版）
-const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
-    if (!taskId) return;
-
-    try {
-        const record = records.value.find(r => String(r.id) === taskId);
-        if (record?.result) {
-            // 更新本地记录和预处理数据
-            record.result = { ...record.result, records: editedRecords };
-            record._asrRecords = editedRecords;
-            record._concatText = editedRecords.map(r => r.text).join('');
-            record._needsTruncate = record._concatText.length > 200;
-            record._concatTextTruncate = record._needsTruncate ? record._concatText.substring(0, 200) + '...' : record._concatText;
-        }
-
-        await TaskService.update(taskId, { result: { records: editedRecords } });
-        Dialog.tipSuccess('保存成功');
-    } catch (error) {
-        console.error('保存编辑结果失败：', error);
-        Dialog.tipError('保存失败');
-    }
-};
 </script>
 
 <template>
@@ -218,9 +187,6 @@ const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
                             <div class="ml-1">
                                 <TaskBizStatus :status="r.status" :status-msg="r.statusMsg" />
                             </div>
-                        </div>
-                        <div class="mt-3">
-                            <pre>{{ r }}</pre>
                         </div>
                         <div class="mt-3">
                             <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">

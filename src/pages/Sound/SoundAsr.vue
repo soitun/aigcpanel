@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IconCopy, IconDown, IconDownload, IconEdit } from '@arco-design/web-vue/es/icon';
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
 import TaskBatchDeleteAction from "../../components/Server/TaskBatchDeleteAction.vue";
 import TaskBatchDownloadAction from "../../components/Server/TaskBatchDownloadAction.vue";
@@ -8,13 +8,16 @@ import TaskCancelAction from "../../components/Server/TaskCancelAction.vue";
 import TaskDeleteAction from "../../components/Server/TaskDeleteAction.vue";
 import TaskDuration from "../../components/Server/TaskDuration.vue";
 import TaskTitleField from "../../components/Server/TaskTitleField.vue";
+import TextTruncateView from '../../components/TextTruncateView.vue';
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
 import { useCheckAll } from "../../components/common/check-all";
 import { doCopy } from "../../components/common/util";
 import { Dialog } from "../../lib/dialog";
 import { DownloadUtil } from "../../lib/util";
 import { TaskRecord, TaskService } from "../../service/TaskService";
-import { TaskChangeType, useTaskStore } from "../../store/modules/task";
+import { usePaginate } from '../hooks/paginate';
+import { formatSRTTime } from '../hooks/srt';
+import { useTaskChangeRefresh } from '../hooks/task';
 import SoundAsrCreate from "./components/SoundAsrCreate.vue";
 import SoundAsrRecordsEditDialog from "./components/SoundAsrRecordsEditDialog.vue";
 
@@ -24,106 +27,53 @@ interface AsrRecord {
     text: string;
 }
 
-interface AsrResult {
-    records?: AsrRecord[];
-}
 
 interface ProcessedTaskRecord extends TaskRecord {
     _concatText?: string;
-    _concatTextTruncate?: string;
     _asrRecords?: AsrRecord[];
-    _needsTruncate?: boolean;
-    _isTextExpanded?: boolean;
 }
 
-const records = ref<ProcessedTaskRecord[]>([]);
-const taskStore = useTaskStore();
 const soundAsrRecordsEditDialog = ref<InstanceType<typeof SoundAsrRecordsEditDialog> | null>(null);
 
-const page = ref(1);
-const recordsForPage = computed(() => {
-    return records.value.slice((page.value - 1) * 10, page.value * 10);
-});
+const {
+    page,
+    records,
+    recordsForPage,
+} = usePaginate<ProcessedTaskRecord>();
 
-const taskChangeCallback = (bizId: string, type: TaskChangeType) => {
+useTaskChangeRefresh('SoundAsr', () => {
     doRefresh();
-};
-
-onMounted(async () => {
-    await doRefresh();
-    taskStore.onChange("SoundAsr", taskChangeCallback);
-});
-
-onBeforeUnmount(() => {
-    taskStore.offChange("SoundAsr", taskChangeCallback);
 });
 
 const { mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords } = useCheckAll({
     records: recordsForPage,
 });
 
+onMounted(async () => {
+    await doRefresh();
+});
+
 const doRefresh = async () => {
     const rawRecords = await TaskService.list("SoundAsr");
-    // 预处理数据，避免模板中重复计算
     const processedRecords = rawRecords.map(record => {
-        // 内联 getRecords 逻辑
         let _asrRecords: AsrRecord[] = [];
         let _concatText = '';
         if (record.result && record.result.records && Array.isArray(record.result.records)) {
             _asrRecords = record.result.records;
             _concatText = _asrRecords.map(r => r.text).join('');
         }
-
-        const _needsTruncate = _concatText.length > 200;
-        const _concatTextTruncate = _needsTruncate ? _concatText.substring(0, 200) + '...' : _concatText;
-        const _isTextExpanded = false; // 默认收起状态
-
         return {
             ...record,
             _asrRecords,
             _concatText,
-            _concatTextTruncate,
-            _needsTruncate,
-            _isTextExpanded
         } as ProcessedTaskRecord;
     });
-
     records.value = mergeCheck(processedRecords);
-};
-
-// SRT时间格式化（简化版）
-const formatSRTTime = (ms: number): string => {
-    const totalSeconds = ms / 1000;
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = Math.floor(totalSeconds % 60);
-    const milliseconds = Math.floor((totalSeconds % 1) * 1000);
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')},${milliseconds.toString().padStart(3, '0')}`;
-};
-
-// 操作结果的方法（简化版）
-const onCopyResultText = async (taskId: string) => {
-    const record = records.value.find(r => String(r.id) === taskId);
-    if (record?._concatText) {
-        try {
-            await doCopy(record._concatText, '已复制到剪贴板');
-        } catch (error) {
-            Dialog.tipError('复制失败');
-        }
-    }
-};
-
-const onDownloadResultText = (taskId: string) => {
-    const record = records.value.find(r => String(r.id) === taskId);
-    if (record?._concatText) {
-        DownloadUtil.downloadFile(record._concatText, `${record.title || 'asr-result'}.txt`);
-    }
 };
 
 const onDownloadResultSubtitle = (taskId: string) => {
     const record = records.value.find(r => String(r.id) === taskId);
     if (record?._asrRecords?.length) {
-        // 内联 generateSRT 逻辑
         const srtContent = record._asrRecords.map((asrRecord, index) =>
             `${index + 1}\n${formatSRTTime(asrRecord.start)} --> ${formatSRTTime(asrRecord.end)}\n${asrRecord.text}\n`
         ).join('\n');
@@ -138,10 +88,6 @@ const onEditResult = (taskId: string) => {
     }
 };
 
-const onToggleTextExpanded = (record: ProcessedTaskRecord) => {
-    record._isTextExpanded = !record._isTextExpanded;
-};
-
 // 保存编辑结果（简化版）
 const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
     if (!taskId) return;
@@ -153,8 +99,6 @@ const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
             record.result = { ...record.result, records: editedRecords };
             record._asrRecords = editedRecords;
             record._concatText = editedRecords.map(r => r.text).join('');
-            record._needsTruncate = record._concatText.length > 200;
-            record._concatTextTruncate = record._needsTruncate ? record._concatText.substring(0, 200) + '...' : record._concatText;
         }
 
         await TaskService.update(taskId, { result: { records: editedRecords } });
@@ -214,10 +158,6 @@ const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
                         </div>
                         <div class="mt-3">
                             <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
-                                <i class="iconfont icon-sound-asr"></i>
-                                {{ $t("语音识别") }}
-                            </div>
-                            <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
                                 <i class="iconfont icon-server mr-1"></i>
                                 {{ r.serverTitle }}
                                 v{{ r.serverVersion }}
@@ -230,14 +170,9 @@ const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
                             <ServerTaskResultParam :record="r as any" />
                         </div>
 
-                        <div v-if="r.result && r._asrRecords" class="mt-4">
+                        <div v-if="r.result && r._asrRecords" class="mt-3">
                             <div class="bg-gray-100 rounded-lg p-2">
-                                <div class="whitespace-pre-wrap cursor-pointer p-2 rounded-lg">
-                                    {{ (r._isTextExpanded ? r._concatText : r._concatTextTruncate) || $t("暂无识别结果") }}
-                                    <a-button size="mini" v-if="r._needsTruncate" @click="onToggleTextExpanded(r)">
-                                        {{ r._isTextExpanded ? $t("收起") : $t("更多") }}
-                                    </a-button>
-                                </div>
+                                <TextTruncateView :text="r._concatText as any" />
                             </div>
                         </div>
 
@@ -247,7 +182,7 @@ const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
                             </div>
                             <div class="">
                                 <a-tooltip v-if="r.result && r._asrRecords" :content="$t('复制文本')" mini>
-                                    <a-button class="mr-2" @click="onCopyResultText(String(r.id))" title="复制识别结果">
+                                    <a-button class="mr-2" @click="doCopy(r._concatText as any)" title="复制识别结果">
                                         <template #icon>
                                             <icon-copy />
                                         </template>
@@ -260,7 +195,8 @@ const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
                                             <icon-down />
                                         </template>
                                         <template #content>
-                                            <a-doption @click="onDownloadResultText(String(r.id))">
+                                            <a-doption
+                                                @click="DownloadUtil.downloadFile(r._concatText as any, `${r.title || 'asr-result'}.txt`)">
                                                 {{ $t('下载文本文件') }}
                                             </a-doption>
                                             <a-doption @click="onDownloadResultSubtitle(String(r.id))">

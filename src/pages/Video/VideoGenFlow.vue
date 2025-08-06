@@ -1,50 +1,41 @@
 <script setup lang="ts">
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
-import {TaskChangeType, useTaskStore} from "../../store/modules/task";
-import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
-import VideoPlayer from "../../components/common/VideoPlayer.vue";
+import { ref } from "vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
-import AudioPlayer from "../../components/common/AudioPlayer.vue";
-import {TaskRecord, TaskService} from "../../service/TaskService";
-import TaskDeleteAction from "../../components/Server/TaskDeleteAction.vue";
-import {useCheckAll} from "../../components/common/check-all";
 import TaskBatchDeleteAction from "../../components/Server/TaskBatchDeleteAction.vue";
-import TaskTitleField from "../../components/Server/TaskTitleField.vue";
 import TaskBatchDownloadAction from "../../components/Server/TaskBatchDownloadAction.vue";
+import TaskDeleteAction from "../../components/Server/TaskDeleteAction.vue";
 import TaskDownloadAction from "../../components/Server/TaskDownloadAction.vue";
 import TaskDuration from "../../components/Server/TaskDuration.vue";
-import {doCopy} from "../../components/common/util";
+import TaskTitleField from "../../components/Server/TaskTitleField.vue";
+import AudioPlayer from "../../components/common/AudioPlayer.vue";
+import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
+import VideoPlayer from "../../components/common/VideoPlayer.vue";
+import { useCheckAll } from "../../components/common/check-all";
+import { doCopy } from "../../components/common/util";
+import { TaskRecord, TaskService } from "../../service/TaskService";
+import { usePaginate } from "../hooks/paginate";
+import { useTaskChangeRefresh } from "../hooks/task";
 import VideoGenFlowCreate from "./components/VideoGenFlowCreate.vue";
 
 const videoGenFlowCreate = ref<InstanceType<typeof VideoGenFlowCreate> | null>(null);
 
-const records = ref<TaskRecord[]>([]);
-const taskStore = useTaskStore();
+const {
+    page,
+    records,
+    recordsForPage,
+} = usePaginate<TaskRecord>();
 
-const page = ref(1);
-const recordsForPage = computed(() => {
-    return records.value.slice((page.value - 1) * 10, page.value * 10);
+const { mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords } = useCheckAll({
+    records: recordsForPage,
 });
 
-const {mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords} = useCheckAll({
-    records: recordsForPage,
+useTaskChangeRefresh('VideoGenFlow', () => {
+    setTimeout(doRefresh, 1000);
 });
 
 const doRefresh = async () => {
     records.value = mergeCheck(await TaskService.list("VideoGenFlow"));
 };
-
-const taskChangeCallback = (bizId: string, type: TaskChangeType) => {
-    setTimeout(doRefresh, 1000);
-};
-
-onMounted(async () => {
-    await doRefresh();
-    taskStore.onChange("VideoGenFlow", taskChangeCallback);
-});
-onBeforeUnmount(() => {
-    taskStore.offChange("VideoGenFlow", taskChangeCallback);
-});
 </script>
 
 <template>
@@ -69,11 +60,8 @@ onBeforeUnmount(() => {
                 <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
                     <div class="flex-grow flex items-center">
                         <div class="mr-3">
-                            <a-checkbox
-                                :model-value="isAllChecked"
-                                :indeterminate="isIndeterminate"
-                                @change="onCheckAll"
-                            >
+                            <a-checkbox :model-value="isAllChecked" :indeterminate="isIndeterminate"
+                                @change="onCheckAll">
                                 {{ $t("全选") }}
                             </a-checkbox>
                         </div>
@@ -81,13 +69,8 @@ onBeforeUnmount(() => {
                         <TaskBatchDownloadAction :records="checkRecords" />
                     </div>
                     <div>
-                        <a-pagination
-                            v-model:current="page"
-                            :total="records.length"
-                            :page-size="10"
-                            show-total
-                            simple
-                        />
+                        <a-pagination v-model:current="page" :total="records.length" :page-size="10" show-total
+                            simple />
                     </div>
                 </div>
                 <div v-for="r in recordsForPage" :key="r.id">
@@ -98,11 +81,8 @@ onBeforeUnmount(() => {
                                     <a-checkbox v-model="r['_check']" />
                                 </div>
                                 <div class="">
-                                    <TaskTitleField
-                                        :record="r"
-                                        @title-click="r['_check'] = !r['_check']"
-                                        @update="v => (r.title = v)"
-                                    />
+                                    <TaskTitleField :record="r" @title-click="r['_check'] = !r['_check']"
+                                        @update="v => (r.title = v)" />
                                 </div>
                             </div>
                             <div class="flex-grow"></div>
@@ -168,10 +148,8 @@ onBeforeUnmount(() => {
                                 </div>
                             </div>
                             <div class="flex-shrink-0 ml-8">
-                                <div
-                                    class="p-2 rounded shadow bg-gray-300"
-                                    v-if="r.status === 'success' && r.result.url"
-                                >
+                                <div class="p-2 rounded shadow bg-gray-300"
+                                    v-if="r.status === 'success' && r.result.url">
                                     <div class="w-48 h-48" v-if="r.result.url">
                                         <VideoPlayer :url="'file://' + r.result.url" />
                                     </div>
