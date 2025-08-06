@@ -170,9 +170,11 @@ export const SoundReplace: TaskBiz = {
             }
             const videoDurationMs = await window.$mapi.ffmpeg.getMediaDuration(video, true);
             const filesToDelete: string[] = [];
-            const audioFilesUse: string[] = [];
             try {
-                // 处理每个音频片段
+                const audioFilesUse: {
+                    path: string;
+                    start: number;
+                }[] = [];
                 for (let i = 0; i < records.length; i++) {
                     const currentRecord = records[i];
                     const nextRecord = records[i + 1];
@@ -194,35 +196,12 @@ export const SoundReplace: TaskBiz = {
                         });
                         filesToDelete.push(audioFileUse);
                     }
-                    // 统一归一化
                     audioFileUse = await window.$mapi.ffmpeg.convertAudio(audioFileUse);
                     filesToDelete.push(audioFileUse);
-                    // 创建带静音的音频片段（从视频开始位置到当前片段开始位置添加静音）
-                    let finalAudioFile = audioFileUse;
-                    const silenceDurationSec = startMs / 1000;
-                    if (silenceDurationSec > 0) {
-                        // 添加前置静音
-                        audioFileUse = await window.$mapi.ffmpeg.runToFileOrFail(
-                            [
-                                "-f",
-                                "lavfi",
-                                "-i",
-                                `anullsrc=channel_layout=mono:sample_rate=44100:duration=${silenceDurationSec}`,
-                                "-i",
-                                audioFileUse,
-                                "-filter_complex",
-                                "[0:a][1:a]concat=n=2:v=0:a=1[out]",
-                                "-map",
-                                "[out]",
-                                "-y",
-                                "{output}",
-                            ],
-                            "wav"
-                        );
-                        filesToDelete.push(audioFileUse);
-                        finalAudioFile = audioFileUse;
-                    }
-                    audioFilesUse.push(finalAudioFile);
+                    audioFilesUse.push({
+                        path: audioFileUse,
+                        start: startMs,
+                    });
                 }
 
                 if (!audioFilesUse.length) {
@@ -232,29 +211,23 @@ export const SoundReplace: TaskBiz = {
                 // 创建合并后的音频文件
                 const mergedAudioFile = await window.$mapi.file.temp("wav");
                 if (audioFilesUse.length === 1) {
-                    await window.$mapi.file.copy(audioFilesUse[0], mergedAudioFile, {isFullPath: true});
+                    await window.$mapi.file.copy(audioFilesUse[0].path, mergedAudioFile, {isFullPath: true});
                 } else if (audioFilesUse.length > 1) {
-                    // 多个音频文件，使用 ffmpeg 混音合并
                     const inputs: string[] = [];
-                    const filterInputs: string[] = [];
+                    const inputSources: string[] = [];
+                    const inputFilters: string[] = [];
                     audioFilesUse.forEach((file, index) => {
-                        inputs.push("-i", file);
-                        filterInputs.push(`[${index}:a]`);
+                        inputs.push("-i", file.path);
+                        inputSources.push(`[${index}:a]adelay=${file.start}|${file.start}[a${index}]`);
+                        inputFilters.push(`[a${index}]`);
                     });
                     const filterComplex = [
-                        `${filterInputs.join("")}amix=inputs=${filterInputs.length}:duration=longest:normalize=0[out]`,
-                        // ";",
-                        // `[out0]volume=${filterInputs.length}[out]`,
+                        inputSources.join(";"),
+                        ";",
+                        inputFilters.join(""),
+                        "amix=inputs=" + inputSources.length + ":duration=longest:normalize=0",
                     ].join("");
-                    await window.$mapi.ffmpeg.run([
-                        ...inputs,
-                        "-filter_complex",
-                        filterComplex,
-                        "-map",
-                        "[out]",
-                        "-y",
-                        mergedAudioFile,
-                    ]);
+                    await window.$mapi.ffmpeg.run([...inputs, "-filter_complex", filterComplex, mergedAudioFile]);
                 }
                 // 检查合并后的音频是否存在
                 if (!(await window.$mapi.file.exists(mergedAudioFile, {isFullPath: true}))) {
