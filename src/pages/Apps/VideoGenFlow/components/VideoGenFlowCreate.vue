@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import ParamForm from "../../../components/common/ParamForm.vue";
-import ServerSelector from "../../../components/Server/ServerSelector.vue";
-import { t } from "../../../lang";
-import { Dialog } from "../../../lib/dialog";
-import { StorageUtil } from "../../../lib/storage";
-import { PermissionService } from "../../../service/PermissionService";
-import { TaskRecord, TaskService } from "../../../service/TaskService";
-import { VideoTemplateService } from "../../../service/VideoTemplateService";
-import { useServerStore } from "../../../store/modules/server";
-import { EnumServerStatus } from "../../../types/Server";
-import SoundGenerateForm from "../../Sound/components/SoundGenerateForm.vue";
-import VideoTemplateSelector from "./VideoTemplateSelector.vue";
+import ParamForm from "../../../../components/common/ParamForm.vue";
+import ServerSelector from "../../../../components/Server/ServerSelector.vue";
+import { t } from "../../../../lang";
+import { Dialog } from "../../../../lib/dialog";
+import { StorageUtil } from "../../../../lib/storage";
+import { PermissionService } from "../../../../service/PermissionService";
+import { TaskRecord, TaskService } from "../../../../service/TaskService";
+import { VideoTemplateService } from "../../../../service/VideoTemplateService";
+import { useServerStore } from "../../../../store/modules/server";
+import { EnumServerStatus } from "../../../../types/Server";
+import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
+import VideoTemplateSelector from "../../../Video/components/VideoTemplateSelector.vue";
 
 const serverStore = useServerStore();
 const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(null);

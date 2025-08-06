@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
-import TaskBatchDeleteAction from "../../components/Server/TaskBatchDeleteAction.vue";
-import TaskBatchDownloadAction from "../../components/Server/TaskBatchDownloadAction.vue";
-import TaskDeleteAction from "../../components/Server/TaskDeleteAction.vue";
-import TaskDownloadAction from "../../components/Server/TaskDownloadAction.vue";
-import TaskDuration from "../../components/Server/TaskDuration.vue";
-import TaskTitleField from "../../components/Server/TaskTitleField.vue";
-import AudioPlayer from "../../components/common/AudioPlayer.vue";
-import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
-import VideoPlayer from "../../components/common/VideoPlayer.vue";
-import { useCheckAll } from "../../components/common/check-all";
-import { doCopy } from "../../components/common/util";
-import { TaskRecord, TaskService } from "../../service/TaskService";
-import { usePaginate } from "../hooks/paginate";
-import { useTaskChangeRefresh } from "../hooks/task";
+import ServerTaskResultParam from "../../../components/Server/ServerTaskResultParam.vue";
+import TaskBatchDeleteAction from "../../../components/Server/TaskBatchDeleteAction.vue";
+import TaskBatchDownloadAction from "../../../components/Server/TaskBatchDownloadAction.vue";
+import TaskDeleteAction from "../../../components/Server/TaskDeleteAction.vue";
+import TaskDownloadAction from "../../../components/Server/TaskDownloadAction.vue";
+import TaskDuration from "../../../components/Server/TaskDuration.vue";
+import TaskTitleField from "../../../components/Server/TaskTitleField.vue";
+import AudioPlayer from "../../../components/common/AudioPlayer.vue";
+import TaskBizStatus from "../../../components/common/TaskBizStatus.vue";
+import VideoPlayer from "../../../components/common/VideoPlayer.vue";
+import { useCheckAll } from "../../../components/common/check-all";
+import { doCopy } from "../../../components/common/util";
+import { TaskRecord, TaskService } from "../../../service/TaskService";
+import { usePaginate } from '../../hooks/paginate';
+import { useTaskChangeRefresh } from '../../hooks/task';
 import VideoGenFlowCreate from "./components/VideoGenFlowCreate.vue";
 
 const videoGenFlowCreate = ref<InstanceType<typeof VideoGenFlowCreate> | null>(null);
