@@ -12,8 +12,8 @@ export type SoundReplaceJobResultType = {
     // 2 识别 SoundAsr
     // 3 确认 Confirm
     // 4 合成 SoundGenerate
-    // 5 替换 Combile
-    step: "ToAudio" | "SoundAsr" | "Confirm" | "SoundGenerate" | "Combile";
+    // 5 替换 Combine
+    step: "ToAudio" | "SoundAsr" | "Confirm" | "SoundGenerate" | "Combine" | "End";
     ToAudio: {
         file: string;
     };
@@ -32,7 +32,8 @@ export type SoundReplaceJobResultType = {
         end: number;
         records: {start: number; end: number; text: string; audio: string}[];
     };
-    Combile: {
+    Combine: {
+        audio: string;
         file: string;
     };
 };

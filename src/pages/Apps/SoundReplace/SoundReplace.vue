@@ -6,6 +6,7 @@ import TaskBatchDownloadAction from '../../../components/Server/TaskBatchDownloa
 import TaskCancelAction from '../../../components/Server/TaskCancelAction.vue';
 import TaskContinueAction from '../../../components/Server/TaskContinueAction.vue';
 import TaskDeleteAction from '../../../components/Server/TaskDeleteAction.vue';
+import TaskDownloadAction from '../../../components/Server/TaskDownloadAction.vue';
 import TaskDuration from '../../../components/Server/TaskDuration.vue';
 import TaskRetryAction from '../../../components/Server/TaskRetryAction.vue';
 import TaskTitleField from '../../../components/Server/TaskTitleField.vue';
@@ -13,6 +14,7 @@ import TextTruncateView from '../../../components/TextTruncateView.vue';
 import AudioPlayer from '../../../components/common/AudioPlayer.vue';
 import AudioPlayerButton from '../../../components/common/AudioPlayerButton.vue';
 import TaskBizStatus from '../../../components/common/TaskBizStatus.vue';
+import VideoPlayer from '../../../components/common/VideoPlayer.vue';
 import { useCheckAll } from '../../../components/common/check-all';
 import { TaskRecord, TaskService } from "../../../service/TaskService";
 import { useTaskStore } from '../../../store/modules/task';
@@ -66,6 +68,9 @@ const doRefresh = async () => {
                     }
                     return '';
                 }),
+            },
+            SoundGenerate: {
+                showTruncate: true,
             }
         }
         return r;
@@ -75,6 +80,7 @@ const doRefresh = async () => {
 
 const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
     await TaskService.update(taskId, {
+        statusMsg: '',
         jobResult: {
             step: "SoundGenerate",
             Confirm: {
@@ -169,7 +175,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                             <div class="flex-grow">
                                 <div>
                                     <div class="bg-gray-100 rounded-lg p-2">
-                                        <TextTruncateView :text="r.runtime?.SoundAsr.text" />
+                                        <TextTruncateView :max-length="40" :text="r.runtime?.SoundAsr.text" />
                                     </div>
                                 </div>
                                 <div class="mt-1">
@@ -199,9 +205,9 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                 </div>
                             </div>
                             <div class="flex-grow">
-                                <div>
+                                <div class="mb-1">
                                     <div class="bg-gray-100 rounded-lg p-2">
-                                        <TextTruncateView :text="r.runtime?.Confirm.text" />
+                                        <TextTruncateView :max-length="40" :text="r.runtime?.Confirm.text" />
                                     </div>
                                 </div>
                                 <div v-if="!r.jobResult.Confirm.confirm">
@@ -211,12 +217,12 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                     </a-button>
                                 </div>
                                 <div v-else>
-                                    <a-alert type="success">
+                                    <a-button :disabled="true">
                                         <template #icon>
                                             <icon-check />
                                         </template>
                                         已确认
-                                    </a-alert>
+                                    </a-button>
                                 </div>
                             </div>
                         </div>
@@ -232,15 +238,32 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                 </div>
                             </div>
                             <div class="bg-gray-100 rounded-lg p-2 flex-grow">
-                                <div v-for="rr in r.jobResult.SoundGenerate.records" class="flex">
-                                    <div>{{ rr.text }}</div>
-                                    <div class="w-10 flex-shrink-0">
-                                        <AudioPlayerButton :source="rr.file" />
+                                <div v-for="rr in r.jobResult.SoundGenerate.records.filter((o, i) => { return i < 5 || !r.runtime?.SoundGenerate.showTruncate })"
+                                    class="flex mb-1">
+                                    <div class="w-8 flex-shrink-0">
+                                        <AudioPlayerButton v-if="rr.audio" :source="rr.audio" />
+                                        <icon-refresh v-else spin />
                                     </div>
+                                    <div>{{ rr.text }}</div>
+                                </div>
+                                <div v-if="r.jobResult.SoundGenerate.records.length > 5 && r.runtime">
+                                    <a-button v-if="r.runtime.SoundGenerate.showTruncate" size="mini"
+                                        @click="r.runtime.SoundGenerate.showTruncate = false">
+                                        <template #icon>
+                                            <icon-down />
+                                        </template>
+                                        {{ $t('展开') }}
+                                    </a-button>
+                                    <a-button v-else size="mini" @click="r.runtime.SoundGenerate.showTruncate = true">
+                                        <template #icon>
+                                            <icon-up />
+                                        </template>
+                                        {{ $t('收起') }}
+                                    </a-button>
                                 </div>
                             </div>
                         </div>
-                        <div v-if="r.jobResult.SoundGenerate && r.jobResult.SoundGenerate.records" class="mt-3 flex">
+                        <div v-if="r.jobResult.Combine && r.jobResult.Combine.file" class="mt-3 flex">
                             <div class="w-32 flex-shrink-0">
                                 <div
                                     class="inline-block text-center mr-2 bg-gray-100 w-6 rounded-full px-1 leading-6 h-6">
@@ -251,13 +274,8 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                     {{ $t("视频合成") }}
                                 </div>
                             </div>
-                            <div class="bg-gray-100 rounded-lg p-2 flex-grow">
-                                <div v-for="rr in r.jobResult.SoundGenerate.records" class="flex">
-                                    <div>{{ rr.text }}</div>
-                                    <div class="w-10 flex-shrink-0">
-                                        <AudioPlayerButton :source="rr.file" />
-                                    </div>
-                                </div>
+                            <div class="bg-gray-100 rounded-lg p-2 w-full h-96">
+                                <VideoPlayer :url="r.jobResult.Combine.file" />
                             </div>
                         </div>
 
@@ -296,6 +314,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                         </template>
                                     </a-button>
                                 </a-tooltip> -->
+                                <TaskDownloadAction :record="r" />
                                 <TaskDeleteAction :record="r" @update="doRefresh" />
                                 <TaskCancelAction :record="r" />
                                 <TaskRetryAction :record="r" @update="doRefresh" />
