@@ -1,4 +1,4 @@
-export type VideoGenModelConfigType = {
+declare type VideoGenModelConfigType = {
     videoTemplateId: number;
     videoTemplateName: string;
     soundType: "soundGenerate" | "soundCustom";
@@ -7,7 +7,7 @@ export type VideoGenModelConfigType = {
     soundCustomFile: string;
 };
 
-export type SoundAsrParamType = {
+declare type SoundAsrParamType = {
     serverName: string;
     serverTitle: string;
     serverVersion: string;
@@ -16,7 +16,7 @@ export type SoundAsrParamType = {
     param: any[];
 };
 
-export type SoundGenerateParamType = {
+declare type SoundGenerateParamType = {
     serverName: string;
     serverTitle: string;
     serverVersion: string;
