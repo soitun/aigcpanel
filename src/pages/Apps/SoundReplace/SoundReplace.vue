@@ -19,8 +19,8 @@ import { useCheckAll } from '../../../components/common/check-all';
 import { TaskRecord, TaskService } from "../../../service/TaskService";
 import { useTaskStore } from '../../../store/modules/task';
 import SoundAsrRecordsEditDialog from "../../Sound/components/SoundAsrRecordsEditDialog.vue";
-import { usePaginate } from '../../hooks/paginate';
-import { useTaskChangeRefresh } from '../../hooks/task';
+import { usePaginate } from '../../../hooks/paginate';
+import { useTaskChangeRefresh } from '../../../hooks/task';
 import SoundReplaceCreate from './components/SoundReplaceCreate.vue';
 import StepsComponent from './components/StepsComponent.vue';
 

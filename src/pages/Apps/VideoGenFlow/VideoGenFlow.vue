@@ -13,8 +13,8 @@ import VideoPlayer from "../../../components/common/VideoPlayer.vue";
 import { useCheckAll } from "../../../components/common/check-all";
 import { doCopy } from "../../../components/common/util";
 import { TaskRecord, TaskService } from "../../../service/TaskService";
-import { usePaginate } from '../../hooks/paginate';
-import { useTaskChangeRefresh } from '../../hooks/task';
+import { usePaginate } from '../../../hooks/paginate';
+import { useTaskChangeRefresh } from '../../../hooks/task';
 import VideoGenFlowCreate from "./components/VideoGenFlowCreate.vue";
 
 const videoGenFlowCreate = ref<InstanceType<typeof VideoGenFlowCreate> | null>(null);

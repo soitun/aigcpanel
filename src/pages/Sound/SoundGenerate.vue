@@ -13,8 +13,8 @@ import AudioPlayer from "../../components/common/AudioPlayer.vue";
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
 import { useCheckAll } from "../../components/common/check-all";
 import { TaskRecord, TaskService } from "../../service/TaskService";
-import { usePaginate } from '../hooks/paginate';
-import { useTaskChangeRefresh } from '../hooks/task';
+import { usePaginate } from '../../hooks/paginate';
+import { useTaskChangeRefresh } from '../../hooks/task';
 import SoundGenerateCreate from "./components/SoundGenerateCreate.vue";
 
 const {

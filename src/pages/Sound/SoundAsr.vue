@@ -15,9 +15,9 @@ import { doCopy } from "../../components/common/util";
 import { Dialog } from "../../lib/dialog";
 import { DownloadUtil } from "../../lib/util";
 import { TaskRecord, TaskService } from "../../service/TaskService";
-import { usePaginate } from '../hooks/paginate';
-import { formatSRTTime } from '../hooks/srt';
-import { useTaskChangeRefresh } from '../hooks/task';
+import { usePaginate } from '../../hooks/paginate';
+import { formatSRTTime } from '../../lib/srt';
+import { useTaskChangeRefresh } from '../../hooks/task';
 import SoundAsrCreate from "./components/SoundAsrCreate.vue";
 import SoundAsrRecordsEditDialog from "./components/SoundAsrRecordsEditDialog.vue";
 

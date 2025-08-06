@@ -13,8 +13,8 @@ import TaskDownloadAction from "../../components/Server/TaskDownloadAction.vue";
 import TaskDuration from "../../components/Server/TaskDuration.vue";
 import TaskTitleField from "../../components/Server/TaskTitleField.vue";
 import { TaskRecord, TaskService } from "../../service/TaskService";
-import { usePaginate } from "../hooks/paginate";
-import { useTaskChangeRefresh } from "../hooks/task";
+import { usePaginate } from "../../hooks/paginate";
+import { useTaskChangeRefresh } from "../../hooks/task";
 import VideoGenCreate from "./components/VideoGenCreate.vue";
 
 const videoGenCreate = ref<InstanceType<typeof VideoGenCreate> | null>(null);
