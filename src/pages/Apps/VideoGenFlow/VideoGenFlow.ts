@@ -1,52 +1,39 @@
-import {TaskBiz} from "../store/modules/task";
-import {useServerStore} from "../store/modules/server";
-import {VideoTemplateService} from "../service/VideoTemplateService";
-import {TaskService} from "../service/TaskService";
-import {DataService} from "../service/DataService";
+import {DataService} from "../../../service/DataService";
+import {TaskService} from "../../../service/TaskService";
+import {useServerStore} from "../../../store/modules/server";
+import {TaskBiz} from "../../../store/modules/task";
+import {VideoGenFlowModelConfigType} from "./type";
 
 const serverStore = useServerStore();
 
 const prepareData = async (bizId: string, bizParam: any) => {
     const {record, server, serverInfo} = await serverStore.prepareForTask(bizId, bizParam);
-    let soundTtsServer: any = null,
-        soundTtsServerInfo: any = null;
-    let soundCloneServer: any = null,
-        soundCloneServerInfo: any = null;
-    if (record.modelConfig.soundType === "SoundTts") {
-        soundTtsServer = await serverStore.getByNameVersion(
-            record.modelConfig.soundTts.serverName,
-            record.modelConfig.soundTts.serverVersion
-        );
-        if (!soundTtsServer) {
-            throw new Error("soundTtsServer not found");
-        }
-        soundTtsServerInfo = await serverStore.serverInfo(soundTtsServer);
-    } else if (record.modelConfig.soundType === "SoundClone") {
-        soundCloneServer = await serverStore.getByNameVersion(
-            record.modelConfig.soundClone.serverName,
-            record.modelConfig.soundClone.serverVersion
-        );
-        if (!soundCloneServer) {
-            throw new Error("soundCloneServer not found");
-        }
-        soundCloneServerInfo = await serverStore.serverInfo(soundCloneServer);
+    const modelConfig: VideoGenFlowModelConfigType = record.modelConfig;
+    const soundGenerateServer = await serverStore.getByNameVersion(
+        modelConfig.soundGenerate.serverName,
+        modelConfig.soundGenerate.serverVersion
+    );
+    if (!soundGenerateServer) {
+        throw new Error("soundGenerateServer not found");
     }
+    const soundGenerateServerInfo = await serverStore.serverInfo(soundGenerateServer);
     return {
         record,
         server,
         serverInfo,
-        soundTtsServer,
-        soundTtsServerInfo,
-        soundCloneServer,
-        soundCloneServerInfo,
+        soundGenerateServer,
+        soundGenerateServerInfo,
     };
 };
 
 export const VideoGenFlow: TaskBiz = {
     runFunc: async (bizId, bizParam) => {
         // console.log('VideoGenFlow.runFunc', {bizId, bizParam})
-        const {record, server, serverInfo, soundTtsServer, soundTtsServerInfo, soundCloneServer, soundCloneServerInfo} =
-            await prepareData(bizId, bizParam);
+        const {record, server, serverInfo, soundGenerateServer, soundGenerateServerInfo} = await prepareData(
+            bizId,
+            bizParam
+        );
+        const modelConfig: VideoGenFlowModelConfigType = record.modelConfig;
         // console.log('VideoGenFlow.runFunc.record', {record, server, soundTtsServer, soundCloneServer})
         // const videoServerInfo = await serverStore.serverInfo(server)
         // console.log('VideoGenFlow.runFunc.serverInfoc', serverInfo)
@@ -54,15 +41,15 @@ export const VideoGenFlow: TaskBiz = {
             status: "wait",
         });
         let audioFilePath: string | null = null;
-        if (record.modelConfig.soundType === "SoundTts") {
+        if (modelConfig.soundGenerate.type === "SoundTts") {
             const res = await window.$mapi.server.callFunctionWithException(
-                soundTtsServerInfo,
+                soundGenerateServerInfo,
                 "soundTts",
                 {
                     id: serverStore.generateTaskId("VideoGenFlow", bizId),
                     result: record.result,
-                    param: record.modelConfig.soundTts.param,
-                    text: record.modelConfig.text,
+                    param: modelConfig.soundGenerate.ttsParam,
+                    text: modelConfig.text,
                 },
                 {
                     taskIdResultKey: "soundTtsTaskId",
@@ -89,18 +76,17 @@ export const VideoGenFlow: TaskBiz = {
                 default:
                     throw new Error("unknown res.data.type");
             }
-        } else if (record.modelConfig.soundType === "SoundClone") {
-            const serverInfo = await serverStore.serverInfo(soundCloneServer);
+        } else if (modelConfig.soundGenerate.type === "SoundClone") {
             const res = await window.$mapi.server.callFunctionWithException(
                 serverInfo,
                 "soundClone",
                 {
                     id: serverStore.generateTaskId("VideoGenFlow", bizId),
                     result: record.result,
-                    param: record.modelConfig.soundClone.param,
-                    text: record.modelConfig.text,
-                    promptAudio: record.modelConfig.soundClone.promptUrl,
-                    promptText: record.modelConfig.soundClone.promptText,
+                    param: modelConfig.soundGenerate.cloneParam,
+                    text: modelConfig.text,
+                    promptAudio: modelConfig.soundGenerate.promptUrl,
+                    promptText: modelConfig.soundGenerate.promptText,
                 },
                 {
                     taskIdResultKey: "soundCloneTaskId",
@@ -154,7 +140,7 @@ export const VideoGenFlow: TaskBiz = {
                 id: serverStore.generateTaskId("VideoGenFlow", bizId),
                 result: record.result,
                 param: record.param,
-                video: record.modelConfig.videoUrl,
+                video: modelConfig.videoUrl,
                 audio: urlSound,
             },
             {

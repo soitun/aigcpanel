@@ -1,20 +1,14 @@
 <script setup lang="ts">
-import {nextTick, onMounted, ref} from "vue";
-import {TaskService} from "../service/TaskService";
-import {TimeUtil} from "../lib/util";
+import { nextTick, onMounted, ref } from "vue";
 import FeedbackTicketButton from "../components/common/FeedbackTicketButton.vue";
 
 const loading = ref(true);
 
 const usageData = ref({
-    soundTts: undefined,
-    soundTtsToday: undefined,
-    soundClone: undefined,
-    soundCloneToday: undefined,
+    soundGenerate: undefined,
+    soundGenerateToday: undefined,
     videoGen: undefined,
     videoGenToday: undefined,
-    videoGenFlow: undefined,
-    videoGenFlowToday: undefined,
 });
 
 onMounted(async () => {
@@ -22,14 +16,10 @@ onMounted(async () => {
     nextTick(async () => {
         const todayStart = TimeUtil.formatDate(Date.now()) + " 00:00:00";
         const todayStartTimestamp = TimeUtil.datetimeToTimestamp(todayStart);
-        usageData.value.soundTts = await TaskService.count("SoundTts");
-        usageData.value.soundTtsToday = await TaskService.count("SoundTts", todayStartTimestamp);
-        usageData.value.soundClone = await TaskService.count("SoundClone");
-        usageData.value.soundCloneToday = await TaskService.count("SoundClone", todayStartTimestamp);
+        usageData.value.soundGenerate = await TaskService.count("SoundGenerate");
+        usageData.value.soundGenerateToday = await TaskService.count("SoundGenerate", todayStartTimestamp);
         usageData.value.videoGen = await TaskService.count("VideoGen");
         usageData.value.videoGenToday = await TaskService.count("VideoGen", todayStartTimestamp);
-        usageData.value.videoGenFlow = await TaskService.count("VideoGenFlow");
-        usageData.value.videoGenFlowToday = await TaskService.count("VideoGenFlow", todayStartTimestamp);
     });
 });
 </script>
@@ -55,18 +45,7 @@ onMounted(async () => {
                         {{ $t("上千种音色模型支持") }}
                     </div>
                     <div>
-                        <a-button type="primary" @click="$router.push('/video?tab=soundTts')">
-                            {{ $t("立即使用") }}
-                        </a-button>
-                    </div>
-                </div>
-                <div class="flex-grow w-0 bg-white rounded-lg p-3 bg-contain bg-right bg-no-repeat">
-                    <div class="font-bold text-xl mb-3">{{ $t("声音克隆") }}</div>
-                    <div class="h-10 truncate overflow-hidden">
-                        {{ $t("一键复制不同角色声音") }}
-                    </div>
-                    <div>
-                        <a-button type="primary" @click="$router.push('/video?tab=soundClone')">
+                        <a-button type="primary" @click="$router.push('/video?tab=soundGenerate')">
                             {{ $t("立即使用") }}
                         </a-button>
                     </div>
@@ -103,39 +82,14 @@ onMounted(async () => {
                         {{ $t("声音合成") }}
                     </div>
                     <div class="font-bold text-2xl mb-3">
-                        <a-statistic animation placeholder="-" :value="usageData.soundTts as any" />
+                        <a-statistic animation placeholder="-" :value="usageData.soundGenerate as any" />
                     </div>
                     <div>
                         {{ $t("今日") }} +
-                        <a-statistic
-                            animation
-                            placeholder="-"
-                            :value-style="{
-                                color: usageData.soundTtsToday && usageData.soundTtsToday > 0 ? 'green' : 'gray',
-                                fontSize: '14px',
-                            }"
-                            :value="usageData.soundTtsToday as any"
-                        />
-                    </div>
-                </div>
-                <div class="flex-grow w-0">
-                    <div class="mb-3">
-                        {{ $t("声音克隆") }}
-                    </div>
-                    <div class="font-bold text-2xl mb-3">
-                        <a-statistic animation placeholder="-" :value="usageData.soundClone as any" />
-                    </div>
-                    <div>
-                        {{ $t("今日") }} +
-                        <a-statistic
-                            animation
-                            placeholder="-"
-                            :value-style="{
-                                color: usageData.soundCloneToday && usageData.soundCloneToday > 0 ? 'green' : 'gray',
-                                fontSize: '14px',
-                            }"
-                            :value="usageData.soundCloneToday as any"
-                        />
+                        <a-statistic animation placeholder="-" :value-style="{
+                            color: usageData.soundGenerateToday && usageData.soundGenerateToday > 0 ? 'green' : 'gray',
+                            fontSize: '14px',
+                        }" :value="usageData.soundGenerateToday as any" />
                     </div>
                 </div>
                 <div class="flex-grow w-0">
@@ -147,47 +101,18 @@ onMounted(async () => {
                     </div>
                     <div>
                         {{ $t("今日") }} +
-                        <a-statistic
-                            animation
-                            placeholder="-"
-                            :value-style="{
-                                color: usageData.videoGenToday && usageData.videoGenToday > 0 ? 'green' : 'gray',
-                                fontSize: '14px',
-                            }"
-                            :value="usageData.videoGenToday as any"
-                        />
-                    </div>
-                </div>
-                <div class="flex-grow w-0">
-                    <div class="mb-3">
-                        {{ $t("数字人一键合成") }}
-                    </div>
-                    <div class="font-bold text-2xl mb-3">
-                        <a-statistic animation placeholder="-" :value="usageData.videoGenFlow as any" />
-                    </div>
-                    <div>
-                        {{ $t("今日") }} +
-                        <a-statistic
-                            animation
-                            placeholder="-"
-                            :value-style="{
-                                color:
-                                    usageData.videoGenFlowToday && usageData.videoGenFlowToday > 0 ? 'green' : 'gray',
-                                fontSize: '14px',
-                            }"
-                            :value="usageData.videoGenFlowToday as any"
-                        />
+                        <a-statistic animation placeholder="-" :value-style="{
+                            color: usageData.videoGenToday && usageData.videoGenToday > 0 ? 'green' : 'gray',
+                            fontSize: '14px',
+                        }" :value="usageData.videoGenToday as any" />
                     </div>
                 </div>
             </div>
         </div>
         <div>
             <div class="flex gap-5">
-                <a
-                    href="https://aigcpanel.com/zh/asset"
-                    target="_blank"
-                    class="bg-white rounded-lg p-3 flex items-center flex-grow w-0"
-                >
+                <a href="https://aigcpanel.com/zh/asset" target="_blank"
+                    class="bg-white rounded-lg p-3 flex items-center flex-grow w-0">
                     <div class="flex-grow">
                         <div class="font-bold text-xl mb-3">
                             {{ $t("模型市场") }}

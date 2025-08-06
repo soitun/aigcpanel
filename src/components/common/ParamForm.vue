@@ -80,7 +80,7 @@ const setValue = value => {
 const validate = () => {
     for (const item of formData.value) {
         if (item.required) {
-            if (!item.value && item.value !== 0) {
+            if (!item.value && item.value !== 0 && item.value !== false) {
                 Dialog.tipError(t('{title}不能为空', { title: item.title }));
                 return false;
             }

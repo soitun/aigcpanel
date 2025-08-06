@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import ServerTaskResultParam from '../../../components/Server/ServerTaskResultParam.vue';
+import TaskBatchDeleteAction from '../../../components/Server/TaskBatchDeleteAction.vue';
+import TaskBatchDownloadAction from '../../../components/Server/TaskBatchDownloadAction.vue';
 import TaskCancelAction from '../../../components/Server/TaskCancelAction.vue';
+import TaskContinueAction from '../../../components/Server/TaskContinueAction.vue';
 import TaskDeleteAction from '../../../components/Server/TaskDeleteAction.vue';
 import TaskDuration from '../../../components/Server/TaskDuration.vue';
+import TaskRetryAction from '../../../components/Server/TaskRetryAction.vue';
 import TaskTitleField from '../../../components/Server/TaskTitleField.vue';
 import TaskBizStatus from '../../../components/common/TaskBizStatus.vue';
 import { useCheckAll } from '../../../components/common/check-all';
@@ -254,6 +258,8 @@ const onToggleTextExpanded = (record: ProcessedTaskRecord) => {
                                 </a-tooltip>
                                 <TaskDeleteAction :record="r" @update="doRefresh" />
                                 <TaskCancelAction :record="r" />
+                                <TaskRetryAction :record="r" @update="doRefresh" />
+                                <TaskContinueAction :record="r" @update="doRefresh" />
                             </div>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {computed} from "vue";
-import {t} from "../../lang";
+import { computed } from "vue";
+import { t } from "../../lang";
 
 interface Props {
     status: string | undefined;
@@ -16,6 +16,7 @@ const statusColor = computed(() => {
         running: "bg-yellow-500",
         success: "bg-green-500",
         fail: "bg-red-500",
+        pause: "bg-blue-500",
     };
     return colorMap[props.status as string] || "bg-gray-400";
 });
@@ -27,6 +28,7 @@ const statusText = computed(() => {
         running: t("运行中"),
         success: t("成功"),
         fail: t("失败"),
+        pause: t("暂停"),
     };
     return textMap[props.status as string] || "Unknown";
 });

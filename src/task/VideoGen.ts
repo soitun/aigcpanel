@@ -1,8 +1,9 @@
-import {TaskBiz} from "../store/modules/task";
-import {useServerStore} from "../store/modules/server";
-import {VideoTemplateService} from "../service/VideoTemplateService";
-import {TaskService} from "../service/TaskService";
 import {DataService} from "../service/DataService";
+import {TaskService} from "../service/TaskService";
+import {VideoTemplateService} from "../service/VideoTemplateService";
+import {useServerStore} from "../store/modules/server";
+import {TaskBiz} from "../store/modules/task";
+import {VideoGenModelConfigType} from "../types/Video";
 
 const serverStore = useServerStore();
 
@@ -10,20 +11,21 @@ export const VideoGen: TaskBiz = {
     runFunc: async (bizId, bizParam) => {
         // console.log('VideoGen.runFunc', {bizId, bizParam})
         const {record, server, serverInfo} = await serverStore.prepareForTask(bizId, bizParam);
+        const modelConfig: VideoGenModelConfigType = record.modelConfig;
         // console.log('VideoGen.runFunc.serverInfo', serverInfo)
         await TaskService.update(bizId as any, {
             status: "wait",
         });
-        const videoTemplateRecord = await VideoTemplateService.get(record.modelConfig.videoTemplateId);
+        const videoTemplateRecord = await VideoTemplateService.get(modelConfig.videoTemplateId);
         if (!videoTemplateRecord) {
             throw new Error("VideoTemplateEmpty");
         }
         let audioFile: string | null = null;
-        if (record.modelConfig.soundType === "soundGenerate") {
-            const soundRecord = await TaskService.get(record.modelConfig.soundGenerateId);
+        if (modelConfig.soundType === "soundGenerate") {
+            const soundRecord = await TaskService.get(modelConfig.soundGenerateId);
             audioFile = soundRecord?.result.url as string;
-        } else if (record.modelConfig.soundType === "soundCustom") {
-            audioFile = record.modelConfig.soundCustomFile;
+        } else if (modelConfig.soundType === "soundCustom") {
+            audioFile = modelConfig.soundCustomFile;
         }
         if (!audioFile) {
             throw new Error("AudioFileEmpty");

@@ -8,6 +8,7 @@ import { Dialog } from "../../../lib/dialog";
 import { StorageUtil } from "../../../lib/storage";
 import { StorageService } from "../../../service/StorageService";
 import { useServerStore } from "../../../store/modules/server";
+import { SoundGenerateParamType } from "../../../types/App";
 import { EnumServerStatus } from "../../../types/Server";
 import SoundPromptDialog from "./SoundPromptDialog.vue";
 import SoundPromptSelector from "./SoundPromptSelector.vue";
@@ -52,20 +53,7 @@ watch(
 );
 
 const getValue = async (): Promise<
-    | {
-        serverName: string;
-        serverTitle: string;
-        serverVersion: string;
-        type: "SoundTts" | "SoundClone";
-        ttsServerKey?: string;
-        ttsParam?: any[];
-        cloneServerKey?: string;
-        cloneParam?: any[];
-        promptId?: number;
-        promptTitle?: string;
-        promptUrl?: string;
-        promptText?: string;
-    }
+    | SoundGenerateParamType
     | undefined
 > => {
     const data: any = {};

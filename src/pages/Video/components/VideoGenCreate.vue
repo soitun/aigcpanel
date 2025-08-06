@@ -28,8 +28,6 @@ const formData = ref({
 });
 const formDataParam = ref([]);
 
-const soundTtsRecords = ref<TaskRecord[]>([]);
-const soundCloneRecords = ref<TaskRecord[]>([]);
 const videoTemplateRecords = ref<VideoTemplateRecord[]>([]);
 
 onMounted(() => {
@@ -48,20 +46,6 @@ watch(
     },
     {
         deep: true,
-    }
-);
-
-watch(
-    () => formData.value.soundType,
-    async value => {
-        if (value === "soundTts") {
-            soundTtsRecords.value = await TaskService.list("SoundTts");
-        } else if (value === "soundClone") {
-            soundCloneRecords.value = await TaskService.list("SoundClone");
-        }
-    },
-    {
-        immediate: true,
     }
 );
 

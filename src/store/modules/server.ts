@@ -117,31 +117,32 @@ const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime)
                 const {id} = data;
                 const {biz, bizId} = serverStoreInstance.parseTaskId(id);
                 // console.log('task', {type, biz, bizId, data})
+                const taskUpdate = async (bizId: string, data: any) => {
+                    const bizer = taskStore.get(biz);
+                    if (bizer && bizer.update) {
+                        await bizer.update(bizId, data);
+                    } else {
+                        await TaskService.update(bizId, data);
+                    }
+                };
+                const taskFireRunning = async () => {
+                    taskStore.fireChange(
+                        {
+                            biz,
+                            bizId,
+                        } as any,
+                        "running"
+                    );
+                };
                 if ("taskRunning" === type) {
-                    TaskService.update(bizId as any, {
+                    taskUpdate(bizId, {
                         status: "running",
                         startTime: TimeUtil.timestampMS(),
-                    }).then(() => {
-                        taskStore.fireChange(
-                            {
-                                biz,
-                                bizId,
-                            } as any,
-                            "running"
-                        );
-                    });
+                    }).then(taskFireRunning);
                 } else if ("taskResult" === type) {
-                    TaskService.update(bizId as any, {
+                    taskUpdate(bizId, {
                         result: data.result,
-                    }).then(() => {
-                        taskStore.fireChange(
-                            {
-                                biz,
-                                bizId,
-                            } as any,
-                            "running"
-                        );
-                    });
+                    }).then(taskFireRunning);
                 }
                 break;
             default:
@@ -237,14 +238,15 @@ export const serverStore = defineStore("server", {
                 throw "record not found";
             }
             let server: any = null;
+            let serverInfo: any = null;
             if (record.serverName && record.serverVersion) {
                 server = await this.getByNameVersion(record.serverName, record.serverVersion);
+                // console.log('SoundTts.runFunc.server', server)
+                if (!server) {
+                    throw "server not found";
+                }
+                serverInfo = await this.serverInfo(server);
             }
-            // console.log('SoundTts.runFunc.server', server)
-            if (!server) {
-                throw "server not found";
-            }
-            const serverInfo = await this.serverInfo(server);
             return {
                 record,
                 server,

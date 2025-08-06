@@ -1,17 +1,10 @@
+import {merge} from "lodash-es";
 import {TimeUtil} from "../lib/util";
 import {useTaskStore} from "../store/modules/task";
 
 const taskStore = useTaskStore();
 
-export type TaskBiz =
-    | never
-    | "SoundClone"
-    | "SoundTts"
-    | "SoundGenerate"
-    | "SoundAsr"
-    | "VideoGen"
-    | "VideoGenFlow"
-    | "SoundReplace";
+export type TaskBiz = never | "SoundGenerate" | "SoundAsr" | "VideoGen" | "VideoGenFlow" | "SoundReplace";
 
 export type TaskRecord = {
     id?: number;
@@ -20,7 +13,7 @@ export type TaskRecord = {
 
     title: string;
 
-    status?: "queue" | "wait" | "running" | "success" | "fail";
+    status?: "queue" | "wait" | "running" | "success" | "fail" | "pause";
     statusMsg?: string;
     startTime?: number;
     endTime?: number | undefined;
@@ -162,14 +155,28 @@ export const TaskService = {
             }
         );
     },
-    async update(id: number | string, record: Partial<TaskRecord>) {
+    async update(
+        id: number | string,
+        record: Partial<TaskRecord>,
+        option?: {
+            mergeResult?: boolean;
+        }
+    ) {
+        option = Object.assign(
+            {
+                mergeResult: true,
+            },
+            option
+        );
         if ("result" in record || "jobResult" in record || "startTime" in record) {
             const recordOld = await this.get(id);
-            if ("result" in record) {
-                record.result = Object.assign(recordOld?.result, record.result);
-            }
-            if ("jobResult" in record) {
-                record.jobResult = Object.assign(recordOld?.jobResult, record.jobResult);
+            if (option.mergeResult) {
+                if ("result" in record) {
+                    record.result = merge(recordOld?.result, record.result);
+                }
+                if ("jobResult" in record) {
+                    record.jobResult = merge(recordOld?.jobResult, record.jobResult);
+                }
             }
             if ("startTime" in record) {
                 if (recordOld?.startTime) {
