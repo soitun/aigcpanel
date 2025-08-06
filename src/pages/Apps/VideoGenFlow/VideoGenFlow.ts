@@ -78,7 +78,7 @@ export const VideoGenFlow: TaskBiz = {
             }
         } else if (modelConfig.soundGenerate.type === "SoundClone") {
             const res = await window.$mapi.server.callFunctionWithException(
-                serverInfo,
+                soundGenerateServerInfo,
                 "soundClone",
                 {
                     id: serverStore.generateTaskId("VideoGenFlow", bizId),
@@ -108,13 +108,6 @@ export const VideoGenFlow: TaskBiz = {
                     });
                     audioFilePath = res.data.data.url;
                     break;
-                case "querying":
-                    await TaskService.update(bizId as any, {
-                        jobResult: {
-                            soundTts: res,
-                        },
-                    });
-                    return "querying";
                 case "retry":
                     return "retry";
                 default:

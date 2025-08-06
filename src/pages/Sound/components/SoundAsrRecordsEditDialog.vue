@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { t } from "../../../lang";
 import { Dialog } from "../../../lib/dialog";
 
 interface AsrRecord {
@@ -13,24 +14,27 @@ interface EditingAsrRecord extends AsrRecord {
     endSeconds?: number;    // 结束时间的秒数（包含小数部分）
 }
 
+const props = defineProps({
+    saveTitle: {
+        type: String,
+        default: t('保存')
+    }
+})
+
 const emit = defineEmits<{
-    save: [records: AsrRecord[], taskId?: string];
+    save: [taskId: number, records: AsrRecord[]];
 }>();
 
 const visible = ref(false);
 const editingRecords = ref<EditingAsrRecord[]>([]);
 const currentRecords = ref<AsrRecord[]>([]);
-const currentTaskId = ref<string>('');
+const currentTaskId = ref<number>(0);
 
-const show = (records: AsrRecord[], taskId?: string) => {
+const edit = (taskId: number, records: AsrRecord[]) => {
     currentRecords.value = records;
-    currentTaskId.value = taskId || '';
+    currentTaskId.value = taskId || 0;
     initEditingRecords();
     visible.value = true;
-};
-
-const edit = (records: AsrRecord[], taskId?: string) => {
-    show(records, taskId);
 };
 
 // 初始化编辑记录
@@ -66,7 +70,7 @@ const doSave = () => {
         end: secondsToMs(record.endSeconds || 0),
         text: record.text
     }));
-    emit('save', finalRecords, currentTaskId.value);
+    emit('save', currentTaskId.value, finalRecords);
     visible.value = false;
 };
 
@@ -142,7 +146,6 @@ const onFindReplace = () => {
 };
 
 defineExpose({
-    show,
     edit,
 });
 </script>
@@ -154,7 +157,7 @@ defineExpose({
         </template>
         <template #footer>
             <a-button @click="doCancel">{{ $t("取消") }}</a-button>
-            <a-button type="primary" @click="doSave">{{ $t("保存") }}</a-button>
+            <a-button type="primary" @click="doSave">{{ props.saveTitle }}</a-button>
         </template>
         <div class="-m-4">
             <!-- 快捷操作区域 -->

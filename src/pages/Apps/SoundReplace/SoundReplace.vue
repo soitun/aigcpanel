@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import ServerTaskResultParam from '../../../components/Server/ServerTaskResultParam.vue';
 import TaskBatchDeleteAction from '../../../components/Server/TaskBatchDeleteAction.vue';
 import TaskBatchDownloadAction from '../../../components/Server/TaskBatchDownloadAction.vue';
@@ -9,39 +9,26 @@ import TaskDeleteAction from '../../../components/Server/TaskDeleteAction.vue';
 import TaskDuration from '../../../components/Server/TaskDuration.vue';
 import TaskRetryAction from '../../../components/Server/TaskRetryAction.vue';
 import TaskTitleField from '../../../components/Server/TaskTitleField.vue';
+import TextTruncateView from '../../../components/TextTruncateView.vue';
+import AudioPlayer from '../../../components/common/AudioPlayer.vue';
 import TaskBizStatus from '../../../components/common/TaskBizStatus.vue';
 import { useCheckAll } from '../../../components/common/check-all';
-import { doCopy } from "../../../components/common/util";
-import { Dialog } from "../../../lib/dialog";
-import { DownloadUtil } from "../../../lib/util";
 import { TaskRecord, TaskService } from "../../../service/TaskService";
+import { useTaskStore } from '../../../store/modules/task';
 import SoundAsrRecordsEditDialog from "../../Sound/components/SoundAsrRecordsEditDialog.vue";
 import { usePaginate } from '../../hooks/paginate';
 import { useTaskChangeRefresh } from '../../hooks/task';
 import SoundReplaceCreate from './components/SoundReplaceCreate.vue';
 import StepsComponent from './components/StepsComponent.vue';
 
-interface AsrRecord {
-    start: number;
-    end: number;
-    text: string;
-}
-
-interface ProcessedTaskRecord extends TaskRecord {
-    _concatText?: string;
-    _concatTextTruncate?: string;
-    _asrRecords?: AsrRecord[];
-    _needsTruncate?: boolean;
-    _isTextExpanded?: boolean;
-}
-
 const soundAsrRecordsEditDialog = ref<InstanceType<typeof SoundAsrRecordsEditDialog> | null>(null);
+const taskStore = useTaskStore();
 
 const {
     page,
     records,
     recordsForPage,
-} = usePaginate<ProcessedTaskRecord>({
+} = usePaginate<TaskRecord>({
     pageSize: 10,
 });
 
@@ -61,95 +48,49 @@ onMounted(async () => {
 
 const doRefresh = async () => {
     const rawRecords = await TaskService.list("SoundReplace");
-    // 预处理数据，避免模板中重复计算
-    const processedRecords = rawRecords.map(record => {
-        // 内联 getRecords 逻辑
-        let _asrRecords: AsrRecord[] = [];
-        let _concatText = '';
-        if (record.result && record.result.records && Array.isArray(record.result.records)) {
-            _asrRecords = record.result.records;
-            _concatText = _asrRecords.map(r => r.text).join('');
+    const processRecords = rawRecords.map(r => {
+        r.runtime = {
+            SoundAsr: {
+                text: computed(() => {
+                    if (r.jobResult.SoundAsr && r.jobResult.SoundAsr.data && r.jobResult.SoundAsr.data.records) {
+                        return r.jobResult.SoundAsr.data.records.map(item => item.text).join(' ');
+                    }
+                    return '';
+                }),
+            }
         }
-
-        const _needsTruncate = _concatText.length > 200;
-        const _concatTextTruncate = _needsTruncate ? _concatText.substring(0, 200) + '...' : _concatText;
-        const _isTextExpanded = false; // 默认收起状态
-
-        return {
-            ...record,
-            _asrRecords,
-            _concatText,
-            _concatTextTruncate,
-            _needsTruncate,
-            _isTextExpanded
-        } as ProcessedTaskRecord;
+        return r;
     });
-
-    records.value = mergeCheck(processedRecords);
+    records.value = mergeCheck(processRecords);
 };
 
-// SRT 时间格式化（简化版）
-const formatSRTTime = (ms: number): string => {
-    const totalSeconds = ms / 1000;
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = Math.floor(totalSeconds % 60);
-    const milliseconds = Math.floor((totalSeconds % 1) * 1000);
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')},${milliseconds.toString().padStart(3, '0')}`;
+const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
+    await TaskService.update(taskId, {
+        jobResult: {
+            step: "SoundGenerate",
+            Confirm: {},
+            SoundAsr: {
+                data: {
+                    records: records,
+                },
+            },
+        },
+    });
+    await taskStore.dispatch('SoundReplace', taskId + '');
 };
 
-// 操作结果的方法（简化版）
-const onCopyResultText = async (taskId: string) => {
-    const record = records.value.find(r => String(r.id) === taskId);
-    if (record?._concatText) {
-        try {
-            await doCopy(record._concatText, '已复制到剪贴板');
-        } catch (error) {
-            Dialog.tipError('复制失败');
-        }
-    }
-};
-
-const onDownloadResultText = (taskId: string) => {
-    const record = records.value.find(r => String(r.id) === taskId);
-    if (record?._concatText) {
-        DownloadUtil.downloadFile(record._concatText, `${record.title || 'asr-result'}.txt`);
-    }
-};
-
-const onDownloadResultSubtitle = (taskId: string) => {
-    const record = records.value.find(r => String(r.id) === taskId);
-    if (record?._asrRecords?.length) {
-        // 内联 generateSRT 逻辑
-        const srtContent = record._asrRecords.map((asrRecord, index) =>
-            `${index + 1}\n${formatSRTTime(asrRecord.start)} --> ${formatSRTTime(asrRecord.end)}\n${asrRecord.text}\n`
-        ).join('\n');
-        DownloadUtil.downloadFile(srtContent, `${record.title || 'asr-result'}.srt`);
-    }
-};
-
-const onEditResult = (taskId: string) => {
-    const record = records.value.find(r => String(r.id) === taskId);
-    if (record?._asrRecords) {
-        soundAsrRecordsEditDialog.value?.edit(record._asrRecords, taskId);
-    }
-};
-
-const onToggleTextExpanded = (record: ProcessedTaskRecord) => {
-    record._isTextExpanded = !record._isTextExpanded;
-};
 </script>
 
 <template>
     <div class="p-5">
         <div class="mb-4 flex items-center">
-            <div class="text-3xl font-bold flex-grow">声音替换</div>
+            <div class="text-3xl font-bold flex-grow">{{ $t('声音替换') }}</div>
             <a-button @click="stepsVisible = !stepsVisible" size="small" class="ml-2">
                 <template #icon>
                     <icon-up v-if="!stepsVisible" />
                     <icon-down v-else />
                 </template>
-                说明
+                {{ $t('说明') }}
             </a-button>
         </div>
         <StepsComponent v-if="stepsVisible" />
@@ -192,31 +133,78 @@ const onToggleTextExpanded = (record: ProcessedTaskRecord) => {
                                 <TaskBizStatus :status="r.status" :status-msg="r.statusMsg" />
                             </div>
                         </div>
-                        <div class="mt-3">
-                            <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
-                                <i class="iconfont icon-sound-asr"></i>
-                                {{ $t("语音识别") }}
+                        <div v-if="r.jobResult.ToAudio && r.jobResult.ToAudio.file" class="mt-3 flex">
+                            <div class="w-32 flex-shrink-0">
+                                <div
+                                    class="inline-block text-center mr-2 bg-gray-100 w-6 rounded-full px-1 leading-6 h-6">
+                                    1
+                                </div>
+                                <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
+                                    <i class="iconfont icon-sound"></i>
+                                    {{ $t("提取音频") }}
+                                </div>
                             </div>
-                            <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
-                                <i class="iconfont icon-server mr-1"></i>
-                                {{ r.serverTitle }}
-                                v{{ r.serverVersion }}
+                            <div class="flex-grow">
+                                <AudioPlayer :url="r.jobResult.ToAudio.file" show-wave />
                             </div>
-                            <div v-if="r.modelConfig?.model"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
-                                <i class="iconfont icon-model mr-1"></i>
-                                {{ r.modelConfig.model }}
-                            </div>
-                            <ServerTaskResultParam :record="r as any" />
                         </div>
-
-                        <div v-if="r.result && r._asrRecords" class="mt-4">
-                            <div class="bg-gray-100 rounded-lg p-2">
-                                <div class="whitespace-pre-wrap cursor-pointer p-2 rounded-lg">
-                                    {{ (r._isTextExpanded ? r._concatText : r._concatTextTruncate) || $t("暂无识别结果") }}
-                                    <a-button size="mini" v-if="r._needsTruncate" @click="onToggleTextExpanded(r)">
-                                        {{ r._isTextExpanded ? $t("收起") : $t("更多") }}
+                        <div v-if="r.jobResult.SoundAsr && r.jobResult.SoundAsr.data.records" class="mt-3 flex">
+                            <div class="w-32 flex-shrink-0">
+                                <div
+                                    class="inline-block text-center mr-2 bg-gray-100 w-6 rounded-full px-1 leading-6 h-6">
+                                    2
+                                </div>
+                                <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
+                                    <i class="iconfont icon-asr"></i>
+                                    {{ $t("语音转写") }}
+                                </div>
+                            </div>
+                            <div class="flex-grow">
+                                <div>
+                                    <div class="bg-gray-100 rounded-lg p-2">
+                                        <TextTruncateView :text="r.runtime?.SoundAsr.text" />
+                                    </div>
+                                </div>
+                                <div class="mt-1">
+                                    <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
+                                        <i class="iconfont icon-server mr-1"></i>
+                                        {{ r.modelConfig.soundAsr.serverTitle }}
+                                        v{{ r.modelConfig.soundAsr.serverVersion }}
+                                    </div>
+                                    <div v-if="r.modelConfig?.model"
+                                        class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
+                                        <i class="iconfont icon-model mr-1"></i>
+                                        {{ r.modelConfig.model }}
+                                    </div>
+                                    <ServerTaskResultParam :record="r as any" />
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="r.jobResult.SoundAsr && r.jobResult.SoundAsr.data.records" class="mt-3 flex">
+                            <div class="w-32 flex-shrink-0">
+                                <div
+                                    class="inline-block text-center mr-2 bg-gray-100 w-6 rounded-full px-1 leading-6 h-6">
+                                    3
+                                </div>
+                                <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
+                                    <i class="iconfont icon-asr"></i>
+                                    {{ $t("重排确认") }}
+                                </div>
+                            </div>
+                            <div class="flex-grow">
+                                <div v-if="!r.jobResult.Confirm">
+                                    <a-button type="primary"
+                                        @click="soundAsrRecordsEditDialog?.edit(r.id as any, r.jobResult.SoundAsr.data.records)">
+                                        {{ $t('确认文字') }}
                                     </a-button>
+                                </div>
+                                <div v-else>
+                                    <a-alert type="success">
+                                        <template #icon>
+                                            <icon-check />
+                                        </template>
+                                        已确认
+                                    </a-alert>
                                 </div>
                             </div>
                         </div>
@@ -226,7 +214,7 @@ const onToggleTextExpanded = (record: ProcessedTaskRecord) => {
                                 <timeago :datetime="r['createdAt'] * 1000" />
                             </div>
                             <div class="">
-                                <a-tooltip v-if="r.result && r._asrRecords" :content="$t('复制文本')" mini>
+                                <!-- <a-tooltip v-if="r.result && r._asrRecords" :content="$t('复制文本')" mini>
                                     <a-button class="mr-2" @click="onCopyResultText(String(r.id))" title="复制识别结果">
                                         <template #icon>
                                             <icon-copy />
@@ -255,7 +243,7 @@ const onToggleTextExpanded = (record: ProcessedTaskRecord) => {
                                             <icon-edit />
                                         </template>
                                     </a-button>
-                                </a-tooltip>
+                                </a-tooltip> -->
                                 <TaskDeleteAction :record="r" @update="doRefresh" />
                                 <TaskCancelAction :record="r" />
                                 <TaskRetryAction :record="r" @update="doRefresh" />
@@ -267,5 +255,7 @@ const onToggleTextExpanded = (record: ProcessedTaskRecord) => {
             </div>
             <m-empty v-else :text="$t('暂无语音识别任务')" />
         </div>
+        <SoundAsrRecordsEditDialog ref="soundAsrRecordsEditDialog" :save-title="$t('保存并继续')"
+            @save="onAsrRecordsUpdate" />
     </div>
 </template>

@@ -1,3 +1,28 @@
+type ServerCallFunctionData = {
+    id: string;
+    result: {
+        [key: string]: any;
+    };
+    [key: string]: any;
+};
+type ServerCallFunctionOption = {
+    taskIdResultKey?: string;
+    [key: string]: any;
+};
+type ServerCallFunctionResultData = {
+    type: "success" | "retry";
+    start: number;
+    end: number;
+    data: {
+        [key: string]: any;
+    };
+};
+type ServerCallFunctionResult = {
+    code: number;
+    msg: string;
+    data: ServerCallFunctionResultData;
+};
+
 declare interface Window {
     __page: {
         onShow: (cb: Function) => void;
@@ -278,29 +303,15 @@ declare interface Window {
             callFunction: (
                 serverInfo: ServerInfo,
                 method: string,
-                data: {
-                    id: string;
-                    result: {
-                        [key: string]: any;
-                    };
-                    [key: string]: any;
-                }
-            ) => Promise<any>;
+                data: ServerCallFunctionData,
+                option?: ServerCallFunctionOption
+            ) => Promise<ServerCallFunctionResult>;
             callFunctionWithException: (
                 serverInfo: ServerInfo,
                 method: string,
-                data: {
-                    id: string;
-                    result: {
-                        [key: string]: any;
-                    };
-                    [key: string]: any;
-                },
-                option?: {
-                    taskIdResultKey?: string;
-                    [key: string]: any;
-                }
-            ) => Promise<any>;
+                data: ServerCallFunctionData,
+                option?: ServerCallFunctionOption
+            ) => Promise<ServerCallFunctionResult>;
         };
     };
 }

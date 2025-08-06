@@ -80,33 +80,9 @@ const onDownloadResultSubtitle = (taskId: string) => {
         DownloadUtil.downloadFile(srtContent, `${record.title || 'asr-result'}.srt`);
     }
 };
-
-const onEditResult = (taskId: string) => {
-    const record = records.value.find(r => String(r.id) === taskId);
-    if (record?._asrRecords) {
-        soundAsrRecordsEditDialog.value?.edit(record._asrRecords, taskId);
-    }
-};
-
-// 保存编辑结果（简化版）
-const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
-    if (!taskId) return;
-
-    try {
-        const record = records.value.find(r => String(r.id) === taskId);
-        if (record?.result) {
-            // 更新本地记录和预处理数据
-            record.result = { ...record.result, records: editedRecords };
-            record._asrRecords = editedRecords;
-            record._concatText = editedRecords.map(r => r.text).join('');
-        }
-
-        await TaskService.update(taskId, { result: { records: editedRecords } });
-        Dialog.tipSuccess('保存成功');
-    } catch (error) {
-        console.error('保存编辑结果失败:', error);
-        Dialog.tipError('保存失败');
-    }
+const onEditSave = async (taskId: number, records: AsrRecord[]) => {
+    await TaskService.update(taskId, { result: { records } });
+    Dialog.tipSuccess('保存成功');
 };
 </script>
 
@@ -206,7 +182,9 @@ const onEditSave = async (editedRecords: AsrRecord[], taskId?: string) => {
                                     </a-dropdown-button>
                                 </a-tooltip>
                                 <a-tooltip v-if="r.result && r._asrRecords" :content="$t('编辑')" mini>
-                                    <a-button class="mr-2" @click="onEditResult(String(r.id))" title="编辑识别结果">
+                                    <a-button class="mr-2"
+                                        @click="soundAsrRecordsEditDialog?.edit(r.id as any, r._asrRecords)"
+                                        title="编辑识别结果">
                                         <template #icon>
                                             <icon-edit />
                                         </template>

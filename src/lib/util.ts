@@ -8,10 +8,20 @@ export const sleep = (time = 1000) => {
     });
 };
 
-export const wait = (callback: () => boolean, interval = 10) => {
+export const wait = (callback: () => boolean | Promise<boolean>, interval = 10, timeout = 3600) => {
+    const startTime = Date.now();
     return new Promise(resolve => {
-        const timer = setInterval(() => {
-            if (callback()) {
+        const timer = setInterval(async () => {
+            if (Date.now() - startTime > timeout * 1000) {
+                clearInterval(timer);
+                resolve(false);
+                return;
+            }
+            let res = callback();
+            if (res instanceof Promise) {
+                res = await res;
+            }
+            if (res) {
                 clearInterval(timer);
                 resolve(true);
             }

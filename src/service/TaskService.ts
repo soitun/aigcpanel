@@ -30,7 +30,9 @@ export type TaskRecord = {
     runtime?: TaskRuntime;
 };
 
-export type TaskRuntime = {};
+export type TaskRuntime = {
+    [key: string]: any;
+};
 
 export const TaskService = {
     tableName() {

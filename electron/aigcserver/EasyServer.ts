@@ -81,7 +81,7 @@ export const EasyServer = function (config: any) {
             option
         );
         const resultData = {
-            // success, querying, retry
+            // success, retry
             type: "success",
             start: 0,
             end: 0,
