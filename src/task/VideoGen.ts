@@ -13,7 +13,7 @@ export const VideoGen: TaskBiz = {
         const {record, server, serverInfo} = await serverStore.prepareForTask(bizId, bizParam);
         const modelConfig: VideoGenModelConfigType = record.modelConfig;
         // console.log('VideoGen.runFunc.serverInfo', serverInfo)
-        await TaskService.update(bizId as any, {
+        await TaskService.update(bizId, {
             status: "wait",
         });
         const videoTemplateRecord = await VideoTemplateService.get(modelConfig.videoTemplateId);
@@ -43,7 +43,7 @@ export const VideoGen: TaskBiz = {
         }
         switch (res.data.type) {
             case "success":
-                await TaskService.update(bizId as any, {
+                await TaskService.update(bizId, {
                     status: "success",
                     jobResult: res,
                 });
@@ -58,7 +58,7 @@ export const VideoGen: TaskBiz = {
         // console.log('VideoGen.successFunc', {bizId, bizParam})
         const {record} = await serverStore.prepareForTask(bizId, bizParam);
         // console.log('VideoGen.successFunc.record', {record, server})
-        await TaskService.update(bizId as any, {
+        await TaskService.update(bizId, {
             status: "success",
             endTime: Date.now(),
             result: {
@@ -69,7 +69,7 @@ export const VideoGen: TaskBiz = {
     failFunc: async (bizId, msg, bizParam) => {
         // console.log('VideoGen.failFunc', {bizId, bizParam, msg})
         // const {record, server} = await prepareData(bizId, bizParam)
-        await TaskService.update(bizId as any, {
+        await TaskService.update(bizId, {
             status: "fail",
             statusMsg: msg,
             endTime: Date.now(),

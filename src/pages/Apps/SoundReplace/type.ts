@@ -18,14 +18,19 @@ export type SoundReplaceJobResultType = {
         file: string;
     };
 
-    SoundAsr: ServerCallFunctionResultData & {
-        data: {
-            records: {start: number; end: number; text: string}[];
-        };
+    SoundAsr: {
+        start: number;
+        end: number;
+        records: {start: number; end: number; text: string}[];
     };
-    Confirm: {};
-    SoundGenerate: ServerCallFunctionResultData & {
-        data: {};
+    Confirm: {
+        confirm: boolean;
+        records: {start: number; end: number; text: string}[];
+    };
+    SoundGenerate: {
+        start: number;
+        end: number;
+        records: {start: number; end: number; text: string; audio: string}[];
     };
     Combile: {
         file: string;

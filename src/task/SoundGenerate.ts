@@ -1,7 +1,7 @@
-import {TaskBiz} from "../store/modules/task";
-import {useServerStore} from "../store/modules/server";
-import {TaskService} from "../service/TaskService";
 import {DataService} from "../service/DataService";
+import {TaskService} from "../service/TaskService";
+import {useServerStore} from "../store/modules/server";
+import {TaskBiz} from "../store/modules/task";
 
 const serverStore = useServerStore();
 
@@ -10,7 +10,7 @@ export const SoundGenerate: TaskBiz = {
         // console.log('SoundClone.runFunc', {bizId, bizParam})
         const {record, server, serverInfo} = await serverStore.prepareForTask(bizId, bizParam);
         // console.log('runFunc', serverInfo, record)
-        await TaskService.update(bizId as any, {
+        await TaskService.update(bizId, {
             status: "wait",
         });
         let res;
@@ -37,7 +37,7 @@ export const SoundGenerate: TaskBiz = {
         }
         switch (res.data.type) {
             case "success":
-                await TaskService.update(bizId as any, {
+                await TaskService.update(bizId, {
                     status: "success",
                     jobResult: res,
                 });
@@ -50,7 +50,7 @@ export const SoundGenerate: TaskBiz = {
     },
     successFunc: async (bizId, bizParam) => {
         const {record} = await serverStore.prepareForTask(bizId, bizParam);
-        await TaskService.update(bizId as any, {
+        await TaskService.update(bizId, {
             status: "success",
             endTime: Date.now(),
             result: {
@@ -61,7 +61,7 @@ export const SoundGenerate: TaskBiz = {
     failFunc: async (bizId, msg, bizParam) => {
         // console.log('SoundClone.failFunc', {bizId, bizParam, msg})
         // const {record, server} = await prepareData(bizId, bizParam)
-        await TaskService.update(bizId as any, {
+        await TaskService.update(bizId, {
             status: "fail",
             statusMsg: msg,
             endTime: Date.now(),

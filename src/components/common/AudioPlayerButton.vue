@@ -6,12 +6,12 @@
         <a v-if="playing" class="pause" href="javascript:;">
             <icon-pause-circle />
         </a>
-        <audio ref="audio" :src="source" preload="none"></audio>
+        <audio ref="audio" :src="audioSource" preload="none"></audio>
     </span>
 </template>
 
 <script setup lang="ts">
-import {onBeforeUnmount, onMounted, ref, watch} from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 const props = defineProps({
     source: {
@@ -28,6 +28,16 @@ const audio = ref<HTMLAudioElement | null>(null);
 const loaded = ref(false);
 const playing = ref(false);
 const durationSeconds = ref(0);
+
+const audioSource = computed(() => {
+    if (props.source) {
+        if (props.source.startsWith('http:') || props.source.startsWith('https:') || props.source.startsWith('file:')) {
+            return props.source;
+        }
+        return `file://${props.source}`;
+    }
+    return "";
+});
 
 watch(
     () => props.source,

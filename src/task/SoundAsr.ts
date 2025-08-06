@@ -6,10 +6,8 @@ const serverStore = useServerStore();
 
 export const SoundAsr: TaskBiz = {
     runFunc: async (bizId, bizParam) => {
-        // console.log('SoundAsr.runFunc', {bizId, bizParam})
         const {record, server, serverInfo} = await serverStore.prepareForTask(bizId, bizParam);
-        // console.log('SoundAsr.runFunc.serverInfo', serverInfo)
-        await TaskService.update(bizId as any, {
+        await TaskService.update(bizId, {
             status: "wait",
         });
         const res = await window.$mapi.server.callFunctionWithException(serverInfo, "asr", {
@@ -23,7 +21,7 @@ export const SoundAsr: TaskBiz = {
         }
         switch (res.data.type) {
             case "success":
-                await TaskService.update(bizId as any, {
+                await TaskService.update(bizId, {
                     status: "success",
                     jobResult: res,
                 });
@@ -36,7 +34,7 @@ export const SoundAsr: TaskBiz = {
     },
     successFunc: async (bizId, bizParam) => {
         const {record} = await serverStore.prepareForTask(bizId, bizParam);
-        await TaskService.update(bizId as any, {
+        await TaskService.update(bizId, {
             status: "success",
             endTime: Date.now(),
             result: {
@@ -45,8 +43,7 @@ export const SoundAsr: TaskBiz = {
         });
     },
     failFunc: async (bizId, msg, bizParam) => {
-        // console.log('SoundAsr.failFunc', {bizId, bizParam, msg})
-        await TaskService.update(bizId as any, {
+        await TaskService.update(bizId, {
             status: "fail",
             statusMsg: msg,
             endTime: Date.now(),

@@ -1,4 +1,5 @@
 import {t} from "../../../lang";
+import {ObjectUtil} from "../../../lib/util";
 import {TaskService} from "../../../service/TaskService";
 import {useServerStore} from "../../../store/modules/server";
 import {TaskBiz, useTaskStore} from "../../../store/modules/task";
@@ -9,7 +10,7 @@ const taskStore = useTaskStore();
 
 export const SoundReplace: TaskBiz = {
     runFunc: async (bizId, bizParam) => {
-        // console.log('SoundReplace.runFunc', {bizId, bizParam})
+        console.log("SoundReplace.runFunc", {bizId, bizParam});
         const {record} = await serverStore.prepareForTask(bizId, bizParam);
         const modelConfig: SoundReplaceModelConfigType = record.modelConfig;
         const jobResult: SoundReplaceJobResultType = record.jobResult;
@@ -67,7 +68,9 @@ export const SoundReplace: TaskBiz = {
             }
             switch (res.data.type) {
                 case "success":
-                    jobResult.SoundAsr = res.data as any;
+                    jobResult.SoundAsr.start = res.data.start;
+                    jobResult.SoundAsr.end = res.data.end;
+                    jobResult.SoundAsr.records = res.data.data.records || [];
                     break;
                 case "retry":
                     return "retry";
@@ -75,21 +78,30 @@ export const SoundReplace: TaskBiz = {
                     throw `unknown res.data.type : ${res.data.type}`;
             }
             await TaskService.update(bizId, {jobResult});
-            if (
-                !jobResult.SoundAsr.data ||
-                !jobResult.SoundAsr.data.records ||
-                jobResult.SoundAsr.data.records.length === 0
-            ) {
+            if (!jobResult.SoundAsr.records || !jobResult.SoundAsr.records.length) {
                 throw "SoundAsr 识别结果为空，请检查音频文件是否正常";
             }
             jobResult.step = "Confirm";
             await TaskService.update(bizId, {jobResult});
-            return "success";
         }
         if (jobResult.step === "Confirm") {
+            jobResult.Confirm = jobResult.Confirm || {};
+            jobResult.Confirm.records = ObjectUtil.clone(jobResult.SoundAsr.records);
+            jobResult.Confirm.confirm = false;
+            await TaskService.update(bizId, {jobResult});
             return "success";
         }
         if (jobResult.step === "SoundGenerate") {
+            jobResult.SoundGenerate = jobResult.SoundGenerate || {};
+            jobResult.SoundGenerate.records = jobResult.Confirm.records.map(item => ({
+                ...item,
+                audio: "",
+            }));
+            await TaskService.update(bizId, {jobResult});
+            await TaskService.update(bizId, {
+                status: "running",
+            });
+            taskStore.fireChange({biz: "SoundReplace", bizId}, "running");
             const server = await serverStore.getByNameVersion(
                 modelConfig.soundGenerate.serverName,
                 modelConfig.soundGenerate.serverVersion
@@ -98,15 +110,51 @@ export const SoundReplace: TaskBiz = {
                 throw "SoundGenerate server not found: " + modelConfig.soundGenerate.serverName;
             }
             const serverInfo = await serverStore.serverInfo(server);
-            let res;
-            if (modelConfig.soundGenerate.type == "SoundTts") {
-                // res = await window.$mapi.server.callFunctionWithException(serverInfo, "soundTts", {
-                //     id: serverStore.generateTaskId("SoundReplace", bizId),
-                //     result: jobResult.SoundGenerate,
-                //     param: modelConfig.soundGenerate.ttsParam,
-                //     // text: modelConfig.soundGenerate,
-                // });
+            for (const record of jobResult.SoundGenerate.records) {
+                if (record.audio) {
+                    continue;
+                }
+                console.log("SoundReplace.runFunc.soundGenerate", {record, serverInfo});
+                let res;
+                if (modelConfig.soundGenerate.type == "SoundTts") {
+                    res = await window.$mapi.server.callFunctionWithException(serverInfo, "soundTts", {
+                        id: serverStore.generateTaskId("SoundReplace", bizId),
+                        result: {},
+                        param: modelConfig.soundGenerate.ttsParam,
+                        text: record.text,
+                    });
+                } else if (modelConfig.soundGenerate.type == "SoundClone") {
+                    res = await window.$mapi.server.callFunctionWithException(serverInfo, "soundClone", {
+                        id: serverStore.generateTaskId("SoundReplace", bizId),
+                        result: {},
+                        param: modelConfig.soundGenerate.cloneParam,
+                        text: record.text,
+                        promptAudio: modelConfig.soundGenerate.promptUrl,
+                        promptText: modelConfig.soundGenerate.promptText,
+                    });
+                } else {
+                    throw `unknown soundGenerate type: ${modelConfig.soundGenerate.type}`;
+                }
+                console.log("SoundReplace.runFunc.soundGenerate.res", res);
+                if (res.code) {
+                    throw res.msg || "SoundGenerate fail";
+                }
+                switch (res.data.type) {
+                    case "success":
+                        record.audio = res.data.data.url;
+                        await TaskService.update(bizId, {jobResult});
+                        break;
+                    case "retry":
+                        return "retry";
+                    default:
+                        throw `unknown res.data.type : ${res.data.type}`;
+                }
             }
+            jobResult.step = "Combile";
+            await TaskService.update(bizId, {jobResult});
+        }
+        if (jobResult.step === "Combile") {
+            throw "Combile step not implemented yet";
         }
         throw `SoundReplace.runFunc: unknown jobResult.step: ${jobResult.step}`;
     },

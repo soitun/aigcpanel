@@ -205,7 +205,8 @@ defineExpose({
 
                     <a-table-column :title="$t('句子')">
                         <template #cell="{ record }">
-                            <a-textarea size="mini" v-model="record.text" :auto-size="{ minRows: 1, maxRows: 3 }" />
+                            <a-textarea size="mini" v-model="record.text" :max-length="200" :auto-size="{ minRows: 1 }"
+                                show-word-limit />
                         </template>
                     </a-table-column>
 
