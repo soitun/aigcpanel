@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import ServerSelector from "../../../components/Server/ServerSelector.vue";
-import { onMounted, ref, watch } from "vue";
-import { useServerStore } from "../../../store/modules/server";
-import { Dialog } from "../../../lib/dialog";
-import { StorageUtil } from "../../../lib/storage";
-import { t } from "../../../lang";
-import { VideoTemplateRecord, VideoTemplateService } from "../../../service/VideoTemplateService";
-import { EnumServerStatus } from "../../../types/Server";
+import {onMounted, ref, watch} from "vue";
 import ParamForm from "../../../components/common/ParamForm.vue";
-import { PermissionService } from "../../../service/PermissionService";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
-import { TaskRecord, TaskService } from "../../../service/TaskService";
-import { TimeUtil } from "../../../lib/util";
+import ServerSelector from "../../../components/Server/ServerSelector.vue";
+import {t} from "../../../lang";
+import {Dialog} from "../../../lib/dialog";
+import {StorageUtil} from "../../../lib/storage";
+import {TimeUtil} from "../../../lib/util";
+import {PermissionService} from "../../../service/PermissionService";
+import {TaskRecord, TaskService} from "../../../service/TaskService";
+import {VideoTemplateRecord, VideoTemplateService} from "../../../service/VideoTemplateService";
+import {useServerStore} from "../../../store/modules/server";
+import {EnumServerStatus} from "../../../types/Server";
 import SoundGenerateSelector from "../../Sound/components/SoundGenerateSelector.vue";
 
 const serverStore = useServerStore();
@@ -82,10 +82,6 @@ const doSubmit = async () => {
             Dialog.tipError(t("请选择声音"));
             return;
         }
-        soundCustomFile = await window.$mapi.file.hubSave(soundCustomFile, {
-            isFullPath: true,
-            returnFullPath: true,
-        });
     }
     if (!formData.value.videoTemplateId) {
         Dialog.tipError(t("请选择视频"));
@@ -138,8 +134,8 @@ const refresh = async (type: "videoTemplate") => {
 const doSoundCustomSelect = async () => {
     const path = await window.$mapi.file.openFile({
         filters: [
-            { name: "*.wav", extensions: ["wav"] },
-            { name: "*.mp3", extensions: ["mp3"] },
+            {name: "*.wav", extensions: ["wav"]},
+            {name: "*.mp3", extensions: ["mp3"]},
         ],
     });
     if (!path) {

@@ -68,8 +68,8 @@ export const TaskService = {
     async get(id: number | string): Promise<TaskRecord | null> {
         const record: any = await window.$mapi.db.first(
             `SELECT *
-                                         FROM ${this.tableName()}
-                                         WHERE id = ?`,
+             FROM ${this.tableName()}
+             WHERE id = ?`,
             [id]
         );
         return this.decodeRecord(record);
@@ -77,9 +77,9 @@ export const TaskService = {
     async list(biz: TaskBiz): Promise<TaskRecord[]> {
         const records: TaskRecord[] = await window.$mapi.db.select(
             `SELECT *
-                                          FROM ${this.tableName()}
-                                          WHERE biz = ?
-                                          ORDER BY id DESC`,
+             FROM ${this.tableName()}
+             WHERE biz = ?
+             ORDER BY id DESC`,
             [biz]
         );
         return records.map(this.decodeRecord) as TaskRecord[];
@@ -93,10 +93,10 @@ export const TaskService = {
         }
         const records: TaskRecord[] = await window.$mapi.db.select(
             `SELECT *
-                                          FROM ${this.tableName()}
-                                          WHERE biz = ?
-                                            AND status IN (${statusList.map(() => "?").join(",")})
-                                          ORDER BY id DESC`,
+             FROM ${this.tableName()}
+             WHERE biz = ?
+               AND status IN (${statusList.map(() => "?").join(",")})
+             ORDER BY id DESC`,
             [biz, ...statusList]
         );
         return records.map(this.decodeRecord) as TaskRecord[];
@@ -104,10 +104,10 @@ export const TaskService = {
     async restoreForTask(biz: TaskBiz) {
         const records: TaskRecord[] = await window.$mapi.db.select(
             `SELECT *
-                                          FROM ${this.tableName()}
-                                          WHERE biz = ?
-                                            AND (status = 'running' OR status = 'wait' OR status = 'queue')
-                                          ORDER BY id DESC`,
+             FROM ${this.tableName()}
+             WHERE biz = ?
+               AND (status = 'running' OR status = 'wait' OR status = 'queue')
+             ORDER BY id DESC`,
             [biz]
         );
         // console.log('TaskService.restoreForTask', records.length)
@@ -145,7 +145,7 @@ export const TaskService = {
         const valuesPlaceholder = fields.map(f => "?");
         const id = await window.$mapi.db.insert(
             `INSERT INTO ${this.tableName()} (${fields.join(",")})
-                                                 VALUES (${valuesPlaceholder.join(",")})`,
+             VALUES (${valuesPlaceholder.join(",")})`,
             values
         );
         await taskStore.dispatch(
@@ -192,24 +192,32 @@ export const TaskService = {
         const set = fields.map(f => `${f} = ?`).join(",");
         return await window.$mapi.db.execute(
             `UPDATE ${this.tableName()}
-                                              SET ${set}
-                                              WHERE id = ?`,
+             SET ${set}
+             WHERE id = ?`,
             [...values, id]
         );
     },
-    async delete(record: TaskRecord) {
+    async delete(
+        record: TaskRecord,
+        option?: {
+            fileCleanCollector?: Function;
+        }
+    ) {
+        option = Object.assign(
+            {
+                fileCleanCollector: null,
+            },
+            option
+        );
         const filesForClean: string[] = [];
         if (record.result) {
-            if (record.result.url) {
-                filesForClean.push(record.result.url);
-            }
-            if (record.result.urlSound) {
-                filesForClean.push(record.result.urlSound);
-            }
-        }
-        if (record.modelConfig) {
-            if (record.modelConfig.soundCustomFile) {
-                filesForClean.push(record.modelConfig.soundCustomFile);
+            // collection files from result
+            for (const k in record.result) {
+                if (record.result[k] && typeof record.result[k] === "string") {
+                    if (await window.$mapi.file.isHubFile(record.result[k], {isFullPath: true})) {
+                        filesForClean.push(record.result[k]);
+                    }
+                }
             }
         }
         for (const file of filesForClean) {
@@ -218,8 +226,8 @@ export const TaskService = {
         }
         await window.$mapi.db.delete(
             `DELETE
-                                      FROM ${this.tableName()}
-                                      WHERE id = ?`,
+             FROM ${this.tableName()}
+             WHERE id = ?`,
             [record.id]
         );
     },

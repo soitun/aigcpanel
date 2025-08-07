@@ -3,7 +3,7 @@ export const ffmpegMergeAudio = async (
         start: number;
         end: number;
         text: string;
-        audio: string
+        audio: string;
     }[],
     recordMaxMs: number
 ) => {
@@ -15,10 +15,7 @@ export const ffmpegMergeAudio = async (
     for (let i = 0; i < records.length; i++) {
         const currentRecord = records[i];
         const nextRecord = records[i + 1];
-        if (
-            !currentRecord.audio ||
-            !(await window.$mapi.file.exists(currentRecord.audio, {isFullPath: true}))
-        ) {
+        if (!currentRecord.audio || !(await window.$mapi.file.exists(currentRecord.audio, {isFullPath: true}))) {
             throw `音频文件不存在: ${currentRecord.audio}`;
         }
         // 计算当前片段的时长限制
@@ -73,12 +70,9 @@ export const ffmpegMergeAudio = async (
         output,
         cleans,
     };
-}
+};
 
-export const ffmpegCombineVideoAudio = async (
-    video: string,
-    audio: string,
-) => {
+export const ffmpegCombineVideoAudio = async (video: string, audio: string) => {
     const output = await window.$mapi.file.temp("mp4");
     await window.$mapi.ffmpeg.run([
         "-i",
@@ -101,7 +95,7 @@ export const ffmpegCombineVideoAudio = async (
         throw `视频音频合成失败`;
     }
     return output;
-}
+};
 
 export const ffmpegVideoToAudio = async (video: string) => {
     const file = await window.$mapi.file.temp("mp3");
@@ -122,4 +116,4 @@ export const ffmpegVideoToAudio = async (video: string) => {
         throw "转换成为音频失败，请检查视频文件是否存在或ffmpeg是否正常工作";
     }
     return file;
-}
+};

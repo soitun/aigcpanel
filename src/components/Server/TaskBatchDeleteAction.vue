@@ -2,12 +2,20 @@
 import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
 import {TaskRecord, TaskService} from "../../service/TaskService";
-import {computed} from "vue";
+import {computed, PropType} from "vue";
 import {sleep} from "../../lib/util";
 
-const props = defineProps<{
-    records: TaskRecord[];
-}>();
+const props = defineProps({
+    records: {
+        type: Array as () => TaskRecord[],
+        required: true,
+    },
+    fileCleanCollector: {
+        type: Function as PropType<(task: TaskRecord) => Promise<string[]> | null>,
+        default: null,
+        required: false,
+    },
+});
 
 const canDelete = computed(() => {
     return props.records.filter(record => record.status === "success" || record.status === "fail").length > 0;
@@ -25,7 +33,9 @@ const doDelete = async () => {
         if (r.status !== "success" && r.status !== "fail") {
             continue;
         }
-        await TaskService.delete(r);
+        await TaskService.delete(r, {
+            fileCleanCollector: props.fileCleanCollector,
+        });
     }
     Dialog.loadingOff();
     emit("update");

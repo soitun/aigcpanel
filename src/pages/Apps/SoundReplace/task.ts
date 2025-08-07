@@ -19,19 +19,26 @@ export const SoundReplace: TaskBiz = {
 
         jobResult.step = jobResult.step || "ToAudio";
         if (jobResult.step === "ToAudio") {
-            jobResult.ToAudio = jobResult.ToAudio || {}
-            // console.log('SoundReplace.runFunc.serverInfo', serverInfo)
+            console.log("SoundReplace.ToAudio", JSON.stringify(jobResult));
+            jobResult.ToAudio = jobResult.ToAudio || {};
             await TaskService.update(bizId, {
                 status: "running",
                 jobResult,
             });
             taskStore.fireChange({biz: "SoundReplace", bizId}, "running");
-            jobResult.ToAudio.file = await ffmpegVideoToAudio(modelConfig.video);
+            const output = await ffmpegVideoToAudio(modelConfig.video);
+            jobResult.ToAudio.file = await window.$mapi.file.hubSave(output, {
+                isFullPath: true,
+                returnFullPath: true,
+                saveGroup: "part",
+                cleanOld: true,
+            });
             jobResult.step = "SoundAsr";
             await TaskService.update(bizId, {jobResult});
         }
 
         if (jobResult.step === "SoundAsr") {
+            console.log("SoundReplace.SoundAsr", JSON.stringify(jobResult));
             jobResult.SoundAsr = jobResult.SoundAsr || {};
             await TaskService.update(bizId, {
                 status: "running",
@@ -43,19 +50,21 @@ export const SoundReplace: TaskBiz = {
                 modelConfig.soundAsr,
                 jobResult.SoundAsr,
                 jobResult.ToAudio.file
-            )
-            if (ret.type === 'retry') {
-                return ret.type
+            );
+            console.log("SoundReplace.SoundAsr.ret", ret);
+            if (ret.type === "retry") {
+                return ret.type;
             }
-            jobResult.SoundAsr.start = ret.start
-            jobResult.SoundAsr.end = ret.end
-            jobResult.SoundAsr.records = ret.records
+            jobResult.SoundAsr.start = ret.start;
+            jobResult.SoundAsr.end = ret.end;
+            jobResult.SoundAsr.records = ret.records;
             await TaskService.update(bizId, {jobResult});
             jobResult.step = "Confirm";
             await TaskService.update(bizId, {jobResult});
         }
 
         if (jobResult.step === "Confirm") {
+            console.log("SoundReplace.Confirm", JSON.stringify(jobResult));
             jobResult.Confirm = jobResult.Confirm || {};
             jobResult.Confirm.records = ObjectUtil.clone(jobResult.SoundAsr.records);
             jobResult.Confirm.confirm = false;
@@ -64,6 +73,7 @@ export const SoundReplace: TaskBiz = {
         }
 
         if (jobResult.step === "SoundGenerate") {
+            console.log("SoundReplace.SoundGenerate", JSON.stringify(jobResult));
             jobResult.SoundGenerate = jobResult.SoundGenerate || {};
             jobResult.SoundGenerate.records = jobResult.Confirm.records.map(item => ({
                 ...item,
@@ -78,11 +88,22 @@ export const SoundReplace: TaskBiz = {
                 if (record.audio) {
                     continue;
                 }
-                const ret = await serverSoundGenerate("SoundReplace", bizId, modelConfig.soundGenerate, {}, record.text)
-                if (ret.type === 'retry') {
+                const ret = await serverSoundGenerate(
+                    "SoundReplace",
+                    bizId,
+                    modelConfig.soundGenerate,
+                    {},
+                    record.text
+                );
+                if (ret.type === "retry") {
                     return ret.type;
                 }
-                record.audio = ret.url;
+                record.audio = await window.$mapi.file.hubSave(ret.url, {
+                    isFullPath: true,
+                    returnFullPath: true,
+                    saveGroup: "part",
+                    cleanOld: true,
+                });
                 await TaskService.update(bizId, {jobResult});
             }
             jobResult.step = "Combine";
@@ -90,6 +111,7 @@ export const SoundReplace: TaskBiz = {
         }
 
         if (jobResult.step === "Combine") {
+            console.log("SoundReplace.Combine", JSON.stringify(jobResult));
             jobResult.Combine = jobResult.Combine || {};
             jobResult.Combine.audio = "";
             jobResult.Combine.file = "";
@@ -102,15 +124,23 @@ export const SoundReplace: TaskBiz = {
             const filesToClean: string[] = [];
             try {
                 // 创建合并后的音频文件
-                const {output, cleans} = await ffmpegMergeAudio(
-                    jobResult.SoundGenerate.records,
-                    videoDurationMs
-                );
+                const {output, cleans} = await ffmpegMergeAudio(jobResult.SoundGenerate.records, videoDurationMs);
                 filesToClean.push(...cleans);
-                jobResult.Combine.audio = output;
+                jobResult.Combine.audio = await window.$mapi.file.hubSave(output, {
+                    isFullPath: true,
+                    returnFullPath: true,
+                    saveGroup: "part",
+                    cleanOld: true,
+                });
                 await TaskService.update(bizId, {jobResult});
                 // 使用合并后的音频替换视频的音频轨道
-                jobResult.Combine.file = await ffmpegCombineVideoAudio(modelConfig.video, jobResult.Combine.audio);
+                const url = await ffmpegCombineVideoAudio(modelConfig.video, jobResult.Combine.audio);
+                jobResult.Combine.file = await window.$mapi.file.hubSave(url, {
+                    isFullPath: true,
+                    returnFullPath: true,
+                    saveGroup: "part",
+                    cleanOld: true,
+                });
                 jobResult.step = "End";
                 await TaskService.update(bizId, {
                     jobResult,
@@ -138,7 +168,11 @@ export const SoundReplace: TaskBiz = {
                 status: "success",
                 endTime: Date.now(),
                 result: {
-                    url: jobResult.Combine?.file || "",
+                    url: await window.$mapi.file.hubSave(jobResult.Combine.file, {
+                        isFullPath: true,
+                        returnFullPath: true,
+                        cleanOld: false,
+                    }),
                 },
             });
         } else {

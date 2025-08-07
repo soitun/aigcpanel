@@ -29,10 +29,10 @@ const $mapi = {
 };
 
 export const MAPI = {
-    init() {
-        $mapi.user.init();
-        $mapi.db.init();
-        $mapi.event.init();
+    async init() {
+        await $mapi.user.init();
+        await $mapi.db.init();
+        await $mapi.event.init();
     },
     ready() {
         $mapi.keys.ready();

@@ -3,10 +3,19 @@ import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
 import {sleep} from "../../lib/util";
 import {TaskRecord, TaskService} from "../../service/TaskService";
+import {PropType} from "vue";
 
-const props = defineProps<{
-    record: TaskRecord;
-}>();
+const props = defineProps({
+    record: {
+        type: Object as () => TaskRecord,
+        required: true,
+    },
+    fileCleanCollector: {
+        type: Function as PropType<(task: TaskRecord) => Promise<string[]> | null>,
+        default: null,
+        required: false,
+    },
+});
 const emit = defineEmits({
     update: () => true,
 });
@@ -15,7 +24,9 @@ const doDelete = async () => {
     const record = props.record;
     Dialog.loadingOn(t("正在删除"));
     await sleep(500);
-    await TaskService.delete(record);
+    await TaskService.delete(record, {
+        fileCleanCollector: props.fileCleanCollector,
+    });
     Dialog.loadingOff();
     emit("update");
 };
