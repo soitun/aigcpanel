@@ -1,24 +1,15 @@
 <script setup lang="ts">
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
-import {StorageRecord, StorageService} from "../../../service/StorageService";
-import SoundPromptEditDialog from "./SoundPromptEditDialog.vue";
-import InputInlineEditor from "../../../components/common/InputInlineEditor.vue";
 import AudioPlayer from "../../../components/common/AudioPlayer.vue";
-import {Dialog} from "../../../lib/dialog";
 import {t} from "../../../lang";
 import {TaskRecord, TaskService} from "../../../service/TaskService";
 import {TaskChangeType, useTaskStore} from "../../../store/modules/task";
 import {useCheckAll} from "../../../components/common/check-all";
 import {doCopy} from "../../../components/common/util";
 import TaskDuration from "../../../components/Server/TaskDuration.vue";
-import TaskCancelAction from "../../../components/Server/TaskCancelAction.vue";
 import ServerTaskResultParam from "../../../components/Server/ServerTaskResultParam.vue";
 import TaskTitleField from "../../../components/Server/TaskTitleField.vue";
-import TaskBatchDeleteAction from "../../../components/Server/TaskBatchDeleteAction.vue";
-import TaskDeleteAction from "../../../components/Server/TaskDeleteAction.vue";
-import TaskBatchDownloadAction from "../../../components/Server/TaskBatchDownloadAction.vue";
 import TaskBizStatus from "../../../components/common/TaskBizStatus.vue";
-import TaskDownloadAction from "../../../components/Server/TaskDownloadAction.vue";
 
 const visible = ref(false);
 
@@ -63,8 +54,13 @@ const show = () => {
     visible.value = true;
 };
 
+const load = async (id: number) => {
+    return await TaskService.get(id);
+};
+
 defineExpose({
     show,
+    load,
 });
 </script>
 
@@ -194,7 +190,7 @@ defineExpose({
                                 <timeago :datetime="r['createdAt'] * 1000" />
                             </div>
                             <div class="">
-                                <a-button @click="doSelect(r)">
+                                <a-button @click="doSelect(r)" type="primary">
                                     <template #icon>
                                         <icon-check />
                                     </template>

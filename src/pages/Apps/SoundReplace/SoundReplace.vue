@@ -355,7 +355,6 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                     @update="doRefresh"
                                     :file-clean-collector="soundReplaceFileCleanCollector"
                                 />
-                                <TaskCancelAction :record="r" />
                                 <TaskRetryAction :record="r" @update="doRefresh" />
                                 <TaskContinueAction :record="r" @update="doRefresh" />
                             </div>

@@ -82,6 +82,9 @@ const doSubmit = async () => {
             Dialog.tipError(t("请选择声音"));
             return;
         }
+    } else {
+        Dialog.tipError("unknown soundType");
+        return;
     }
     if (!formData.value.videoTemplateId) {
         Dialog.tipError(t("请选择视频"));

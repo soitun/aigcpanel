@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { t } from "../../lang";
-import { Dialog } from "../../lib/dialog";
-import { sleep } from "../../lib/util";
-import { TaskRecord } from "../../service/TaskService";
-import { useTaskStore } from "../../store/modules/task";
+import {t} from "../../lang";
+import {Dialog} from "../../lib/dialog";
+import {sleep} from "../../lib/util";
+import {TaskRecord} from "../../service/TaskService";
+import {useTaskStore} from "../../store/modules/task";
 
 const taskStore = useTaskStore();
 
@@ -27,7 +27,7 @@ const doContinue = async () => {
 </script>
 
 <template>
-    <a-tooltip v-if="record.status === 'pause' || record.status === 'fail'" :content="$t('继续任务')" mini>
+    <a-tooltip v-if="record.status === 'pause'" :content="$t('继续任务')" mini>
         <a-button class="mr-2" @click="doContinue()">
             <template #icon>
                 <icon-right-circle />

@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import {onMounted, ref, watch} from "vue";
 import ParamForm from "../../../components/common/ParamForm.vue";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
 import ServerSelector from "../../../components/Server/ServerSelector.vue";
-import { t } from "../../../lang";
-import { Dialog } from "../../../lib/dialog";
-import { StorageUtil } from "../../../lib/storage";
-import { useServerStore } from "../../../store/modules/server";
-import { SoundAsrParamType } from "../../../types/App";
-import { EnumServerStatus } from "../../../types/Server";
+import {t} from "../../../lang";
+import {Dialog} from "../../../lib/dialog";
+import {StorageUtil} from "../../../lib/storage";
+import {useServerStore} from "../../../store/modules/server";
+import {EnumServerStatus} from "../../../types/Server";
 
 const serverStore = useServerStore();
 const formData = ref({
@@ -38,10 +37,7 @@ watch(
     }
 );
 
-const getValue = async (): Promise<
-    | SoundAsrParamType
-    | undefined
-> => {
+const getValue = async (): Promise<SoundAsrParamType | undefined> => {
     const data: any = {};
     data.type = "SoundAsr";
     data.serverKey = formData.value.serverKey;

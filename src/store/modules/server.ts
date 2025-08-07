@@ -32,7 +32,7 @@ const createServerStatus = (record: ServerRecord): ComputedRef<EnumServerStatus>
 const getServerRuntimeComputedValue = (record: ServerRecord): ComputedRef<ServerRuntime> => {
     return computed(() => {
         let defaultStatus = EnumServerStatus.STOPPED;
-        if (record.type === EnumServerType.CLOUD) {
+        if (record.type === EnumServerType.CLOUD || record.autoStart) {
             defaultStatus = EnumServerStatus.RUNNING;
         }
         return (
@@ -53,7 +53,7 @@ const getOrCreateServerRuntime = (record: ServerRecord): ServerRuntime => {
         eventChannelName: undefined,
         logFile: "",
     } as ServerRuntime;
-    if (record.type === EnumServerType.CLOUD) {
+    if (record.type === EnumServerType.CLOUD || record.autoStart) {
         defaultValue.status = EnumServerStatus.RUNNING;
         defaultValue.eventChannelName = createEventChannel(record, defaultValue);
         defaultValue.logFile = `logs/${record.name}_${record.version}_${TimeUtil.dateString()}.log`;
@@ -271,9 +271,12 @@ export const serverStore = defineStore("server", {
         },
         start: async function (server: ServerRecord) {
             const record = this.findRecord(server);
-            if (record?.status === EnumServerStatus.STOPPED || record?.status === EnumServerStatus.ERROR) {
+            if (!record) {
+                throw "RecordNotFound";
+            }
+            if (record.status === EnumServerStatus.STOPPED || record.status === EnumServerStatus.ERROR) {
             } else {
-                throw new Error("StatusError");
+                throw "StatusError";
             }
             const serverRuntime = getOrCreateServerRuntime(server);
             serverRuntime.status = EnumServerStatus.STARTING;
@@ -347,7 +350,11 @@ export const serverStore = defineStore("server", {
                 return;
             }
             const record = this.records[index];
-            if (record.status === EnumServerStatus.STOPPED || record.status === EnumServerStatus.ERROR) {
+            if (
+                record.autoStart ||
+                record.status === EnumServerStatus.STOPPED ||
+                record.status === EnumServerStatus.ERROR
+            ) {
             } else {
                 if (record.type === EnumServerType.LOCAL_DIR) {
                     throw new Error("StatusError");

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AudioPlayerButton from "../../../components/common/AudioPlayerButton.vue";
 import SoundGenerateDialog from "./SoundGenerateDialog.vue";
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import {TaskRecord} from "../../../service/TaskService";
 
 const soundGenerateDialog = ref<InstanceType<typeof SoundGenerateDialog> | null>(null);
@@ -12,14 +12,33 @@ const props = defineProps({
         default: 0,
     },
 });
+const soundId = ref(0);
 const soundTitle = ref("");
 const soundUrl = ref("");
 const emit = defineEmits(["update:modelValue"]);
-const onSelect = (record: TaskRecord) => {
-    soundTitle.value = record.title;
-    soundUrl.value = record.result?.url || "";
-    emit("update:modelValue", record.id);
+const onSelect = (record: TaskRecord | null) => {
+    if (record) {
+        soundId.value = record.id as number;
+        soundTitle.value = record.title;
+        soundUrl.value = record.result?.url || "";
+    } else {
+        soundId.value = 0;
+        soundTitle.value = "";
+        soundUrl.value = "";
+    }
+    emit("update:modelValue", record ? record.id : 0);
 };
+watch(
+    () => props.modelValue,
+    value => {
+        if (value > 0 && soundId.value !== value) {
+            soundGenerateDialog.value?.load(value).then(onSelect);
+        }
+    },
+    {
+        immediate: true,
+    }
+);
 </script>
 
 <template>

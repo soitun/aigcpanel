@@ -59,11 +59,11 @@ watch(
 <template>
     <a-button v-if="content" class="mr-2" @click="visible = true">
         <icon-info-circle class="mr-1" />
-        {{ $t("使用说明") }}
+        {{ $t("模型说明") }}
     </a-button>
     <a-modal v-model:visible="visible" width="40rem" :footer="false" title-align="start">
         <template #title>
-            {{ $t("使用说明") }}
+            {{ $t("模型说明") }}
         </template>
         <div class="overflow-y-auto overflow-x-hidden leading-6 pb-content-info" style="max-height: 60vh">
             <div v-html="content"></div>

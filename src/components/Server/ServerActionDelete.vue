@@ -4,6 +4,7 @@ import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
 import {sleep} from "../../lib/util";
 import {useServerStore} from "../../store/modules/server";
+import {computed} from "vue";
 
 const serverStore = useServerStore();
 
@@ -23,19 +24,22 @@ const doDelete = async () => {
     Dialog.loadingOff();
     emit("update");
 };
+
+const disabled = computed(() => {
+    if (props.record.autoStart) {
+        return false;
+    }
+    return (
+        props.record.type === EnumServerType.LOCAL_DIR &&
+        props.record.status !== EnumServerStatus.STOPPED &&
+        props.record.status !== EnumServerStatus.ERROR
+    );
+});
 </script>
 
 <template>
     <a-tooltip :content="$t('删除')" mini>
-        <a-button
-            class="mr-2"
-            :disabled="
-                record.type === EnumServerType.LOCAL_DIR &&
-                record.status !== EnumServerStatus.STOPPED &&
-                record.status !== EnumServerStatus.ERROR
-            "
-            @click="doDelete()"
-        >
+        <a-button class="mr-2" :disabled="disabled" @click="doDelete()">
             <template #icon>
                 <icon-delete />
             </template>
