@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {EnumServerType, ServerRecord} from "../../types/Server";
 import {ref} from "vue";
 import {buildServerContent, functionToLabels} from "../../lib/aigcpanel";
 import {useServerStore} from "../../store/modules/server";
+import {EnumServerType, ServerRecord} from "../../types/Server";
 
 const serverStore = useServerStore();
 const props = defineProps<{
@@ -23,7 +23,7 @@ const show = async () => {
 
 const doOpenHttpUrl = () => {
     if (httpUrl.value) {
-        window.$mapi.app.openExternalWeb(httpUrl.value);
+        window.$mapi.app.openExternal(httpUrl.value);
     }
 };
 

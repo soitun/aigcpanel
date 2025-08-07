@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import ServerStatus from "../components/Server/ServerStatus.vue";
-import {EnumServerType} from "../types/Server";
-import ServerAddDialog from "../components/Server/ServerAddDialog.vue";
 import {ref} from "vue";
-import {useServerStore} from "../store/modules/server";
+import ServerActionDelete from "../components/Server/ServerActionDelete.vue";
+import ServerActionInfo from "../components/Server/ServerActionInfo.vue";
+import ServerActionLog from "../components/Server/ServerActionLog.vue";
+import ServerActionSetting from "../components/Server/ServerActionSetting.vue";
+import ServerActionStartStop from "../components/Server/ServerActionStartStop.vue";
+import ServerAddDialog from "../components/Server/ServerAddDialog.vue";
+import ServerStartTime from "../components/Server/ServerStartTime.vue";
+import ServerStatus from "../components/Server/ServerStatus.vue";
 import {AppConfig} from "../config";
 import {t} from "../lang";
-import ServerActionDelete from "../components/Server/ServerActionDelete.vue";
-import ServerActionStartStop from "../components/Server/ServerActionStartStop.vue";
-import ServerActionLog from "../components/Server/ServerActionLog.vue";
-import ServerStartTime from "../components/Server/ServerStartTime.vue";
-import ServerActionInfo from "../components/Server/ServerActionInfo.vue";
-import ServerActionSetting from "../components/Server/ServerActionSetting.vue";
 import {functionToLabels} from "../lib/aigcpanel";
 import ModelSettingDialog from "../module/Model/ModelSettingDialog.vue";
+import {useServerStore} from "../store/modules/server";
+import {EnumServerType} from "../types/Server";
 
 const addDialog = ref<InstanceType<typeof ServerAddDialog> | null>(null);
 const modelSettingDialog = ref<InstanceType<typeof ModelSettingDialog> | null>(null);
@@ -21,7 +21,7 @@ const serverStore = useServerStore();
 const helpShow = ref(false);
 
 const doHelp = () => {
-    window.$mapi.app.openExternalWeb(AppConfig.helpUrl);
+    window.$mapi.app.openExternal(AppConfig.helpUrl);
 };
 
 const doRefresh = async () => {
