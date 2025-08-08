@@ -3,7 +3,6 @@ import {computed, onMounted, ref} from "vue";
 import ServerTaskResultParam from "../../../components/Server/ServerTaskResultParam.vue";
 import TaskBatchDeleteAction from "../../../components/Server/TaskBatchDeleteAction.vue";
 import TaskBatchDownloadAction from "../../../components/Server/TaskBatchDownloadAction.vue";
-import TaskCancelAction from "../../../components/Server/TaskCancelAction.vue";
 import TaskContinueAction from "../../../components/Server/TaskContinueAction.vue";
 import TaskDeleteAction from "../../../components/Server/TaskDeleteAction.vue";
 import TaskDownloadAction from "../../../components/Server/TaskDownloadAction.vue";

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
 import AudioPlayer from "../../components/common/AudioPlayer.vue";
-import { useCheckAll } from "../../components/common/check-all";
+import {useCheckAll} from "../../components/common/check-all";
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
 import VideoPlayer from "../../components/common/VideoPlayer.vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
@@ -12,25 +12,25 @@ import TaskDeleteAction from "../../components/Server/TaskDeleteAction.vue";
 import TaskDownloadAction from "../../components/Server/TaskDownloadAction.vue";
 import TaskDuration from "../../components/Server/TaskDuration.vue";
 import TaskTitleField from "../../components/Server/TaskTitleField.vue";
-import { TaskRecord, TaskService } from "../../service/TaskService";
-import { usePaginate } from "../../hooks/paginate";
-import { useTaskChangeRefresh } from "../../hooks/task";
+import {TaskRecord, TaskService} from "../../service/TaskService";
+import {usePaginate} from "../../hooks/paginate";
+import {useTaskChangeRefresh} from "../../hooks/task";
 import VideoGenCreate from "./components/VideoGenCreate.vue";
 
 const videoGenCreate = ref<InstanceType<typeof VideoGenCreate> | null>(null);
 
-const {
-    page,
-    records,
-    recordsForPage,
-} = usePaginate<TaskRecord>();
+const {page, records, recordsForPage} = usePaginate<TaskRecord>();
 
-const { mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords } = useCheckAll({
+const {mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords} = useCheckAll({
     records: recordsForPage,
 });
 
-useTaskChangeRefresh('VideoGen', () => {
+useTaskChangeRefresh("VideoGen", () => {
     setTimeout(doRefresh, 1000);
+});
+
+onMounted(() => {
+    doRefresh();
 });
 
 const doRefresh = async () => {
@@ -56,12 +56,15 @@ const doRefresh = async () => {
         </div>
         <div>
             <VideoGenCreate ref="videoGenCreate" @submitted="doRefresh" />
-            <div>
+            <div v-if="records.length > 0">
                 <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
                     <div class="flex-grow flex items-center">
                         <div class="mr-3">
-                            <a-checkbox :model-value="isAllChecked" :indeterminate="isIndeterminate"
-                                @change="onCheckAll">
+                            <a-checkbox
+                                :model-value="isAllChecked"
+                                :indeterminate="isIndeterminate"
+                                @change="onCheckAll"
+                            >
                                 {{ $t("全选") }}
                             </a-checkbox>
                         </div>
@@ -69,8 +72,13 @@ const doRefresh = async () => {
                         <TaskBatchDownloadAction :records="checkRecords" />
                     </div>
                     <div>
-                        <a-pagination v-model:current="page" :total="records.length" :page-size="10" show-total
-                            simple />
+                        <a-pagination
+                            v-model:current="page"
+                            :total="records.length"
+                            :page-size="10"
+                            show-total
+                            simple
+                        />
                     </div>
                 </div>
                 <div v-for="r in recordsForPage" :key="r.id">
@@ -81,8 +89,11 @@ const doRefresh = async () => {
                                     <a-checkbox v-model="r['_check']" />
                                 </div>
                                 <div class="">
-                                    <TaskTitleField :record="r" @title-click="r['_check'] = !r['_check']"
-                                        @update="v => (r.title = v)" />
+                                    <TaskTitleField
+                                        :record="r"
+                                        @title-click="r['_check'] = !r['_check']"
+                                        @update="v => (r.title = v)"
+                                    />
                                 </div>
                             </div>
                             <div class="flex-grow"></div>
@@ -158,6 +169,7 @@ const doRefresh = async () => {
                     </div>
                 </div>
             </div>
+            <m-empty v-else />
         </div>
     </div>
 </template>
