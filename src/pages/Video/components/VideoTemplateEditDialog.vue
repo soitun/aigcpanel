@@ -44,10 +44,7 @@ const doSave = async () => {
         Dialog.tipError(t("名称重复"));
         return;
     }
-    const videoPathFull = await window.$mapi.file.fullPath(`videoTemplate/${StringUtil.random()}.mp4`);
-    await window.$mapi.file.copy(formData.value.video, videoPathFull, {
-        isFullPath: true,
-    });
+    const videoPathFull = await window.$mapi.file.hubSave(formData.value.video);
     await VideoTemplateService.insert({
         name: formData.value.name,
         video: videoPathFull,

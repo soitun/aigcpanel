@@ -7,8 +7,6 @@ export const DataService = {
     ) {
         return await window.$mapi.file.hubSave(file, {
             ...option,
-            isFullPath: true,
-            returnFullPath: true,
         });
     },
     async saveBuffer(ext: string, data: Uint8Array) {

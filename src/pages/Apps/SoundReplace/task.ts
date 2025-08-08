@@ -32,8 +32,6 @@ export const SoundReplace: TaskBiz = {
             taskStore.fireChange({biz: "SoundReplace", bizId}, "running");
             const output = await ffmpegVideoToAudio(modelConfig.video);
             jobResult.ToAudio.file = await window.$mapi.file.hubSave(output, {
-                isFullPath: true,
-                returnFullPath: true,
                 saveGroup: "part",
                 cleanOld: true,
             });
@@ -103,8 +101,6 @@ export const SoundReplace: TaskBiz = {
                     return ret.type;
                 }
                 record.audio = await window.$mapi.file.hubSave(ret.url, {
-                    isFullPath: true,
-                    returnFullPath: true,
                     saveGroup: "part",
                     cleanOld: true,
                 });
@@ -130,8 +126,6 @@ export const SoundReplace: TaskBiz = {
                 const {output, cleans} = await ffmpegMergeAudio(jobResult.SoundGenerate.records, videoDurationMs);
                 filesToClean.push(...cleans);
                 jobResult.Combine.audio = await window.$mapi.file.hubSave(output, {
-                    isFullPath: true,
-                    returnFullPath: true,
                     saveGroup: "part",
                     cleanOld: true,
                 });
@@ -139,8 +133,6 @@ export const SoundReplace: TaskBiz = {
                 // 使用合并后的音频替换视频的音频轨道
                 const url = await ffmpegCombineVideoAudio(modelConfig.video, jobResult.Combine.audio);
                 jobResult.Combine.file = await window.$mapi.file.hubSave(url, {
-                    isFullPath: true,
-                    returnFullPath: true,
                     saveGroup: "part",
                     cleanOld: true,
                 });
@@ -171,11 +163,7 @@ export const SoundReplace: TaskBiz = {
                 status: "success",
                 endTime: Date.now(),
                 result: {
-                    url: await window.$mapi.file.hubSave(jobResult.Combine.file, {
-                        isFullPath: true,
-                        returnFullPath: true,
-                        cleanOld: false,
-                    }),
+                    url: await window.$mapi.file.hubSave(jobResult.Combine.file),
                 },
             });
         } else {

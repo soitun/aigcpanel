@@ -214,7 +214,7 @@ export const TaskService = {
             // collection files from result
             for (const k in record.result) {
                 if (record.result[k] && typeof record.result[k] === "string") {
-                    if (await window.$mapi.file.isHubFile(record.result[k], {isFullPath: true})) {
+                    if (await window.$mapi.file.isHubFile(record.result[k])) {
                         filesForClean.push(record.result[k]);
                     }
                 }

@@ -52,9 +52,7 @@ export const VideoTemplateService = {
     },
     async delete(record: VideoTemplateRecord) {
         if (record.video) {
-            await window.$mapi.file.deletes(record.video, {
-                isFullPath: true,
-            });
+            await window.$mapi.file.hubDelete(record.video);
         }
         await window.$mapi.db.delete(
             `DELETE
