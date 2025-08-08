@@ -505,7 +505,7 @@ const hubDelete = async (
 ) => {
     option = Object.assign(
         {
-            isFullPath: false,
+            isFullPath: true,
             ignoreWhenNotInHub: true,
             tryLaterWhenFailed: true,
         },
