@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import {onMounted} from "vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
 import TaskBatchDeleteAction from "../../components/Server/TaskBatchDeleteAction.vue";
 import TaskBatchDownloadAction from "../../components/Server/TaskBatchDownloadAction.vue";
@@ -11,19 +11,15 @@ import TaskTitleField from "../../components/Server/TaskTitleField.vue";
 import TextTruncateView from "../../components/TextTruncateView.vue";
 import AudioPlayer from "../../components/common/AudioPlayer.vue";
 import TaskBizStatus from "../../components/common/TaskBizStatus.vue";
-import { useCheckAll } from "../../components/common/check-all";
-import { TaskRecord, TaskService } from "../../service/TaskService";
-import { usePaginate } from '../../hooks/paginate';
-import { useTaskChangeRefresh } from '../../hooks/task';
+import {useCheckAll} from "../../components/common/check-all";
+import {TaskRecord, TaskService} from "../../service/TaskService";
+import {usePaginate} from "../../hooks/paginate";
+import {useTaskChangeRefresh} from "../../hooks/task";
 import SoundGenerateCreate from "./components/SoundGenerateCreate.vue";
 
-const {
-    page,
-    records,
-    recordsForPage,
-} = usePaginate<TaskRecord>();
+const {page, records, recordsForPage} = usePaginate<TaskRecord>();
 
-const { mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords } = useCheckAll({
+const {mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords} = useCheckAll({
     records: recordsForPage,
 });
 
@@ -31,7 +27,7 @@ const doRefresh = async () => {
     records.value = mergeCheck(await TaskService.list("SoundGenerate"));
 };
 
-useTaskChangeRefresh('SoundGenerate', () => {
+useTaskChangeRefresh("SoundGenerate", () => {
     doRefresh();
 });
 
@@ -43,8 +39,9 @@ onMounted(async () => {
 <template>
     <div class="p-5">
         <div class="mb-4 flex items-center">
-            <div class="text-3xl font-bold flex-grow">
-                {{ $t("声音合成") }}
+            <div class="flex-grow flex items-end">
+                <div class="text-3xl font-bold">{{ $t("声音合成") }}</div>
+                <div class="text-gray-400 ml-3">{{ $t("支持内置声音合成，5秒音频声音克隆") }}</div>
             </div>
             <div class="flex items-center" v-if="0">
                 <a-tooltip :content="$t('清空历史')" position="right" mini>
@@ -62,8 +59,11 @@ onMounted(async () => {
                 <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
                     <div class="flex-grow flex items-center">
                         <div class="mr-3">
-                            <a-checkbox :model-value="isAllChecked" :indeterminate="isIndeterminate"
-                                @change="onCheckAll">
+                            <a-checkbox
+                                :model-value="isAllChecked"
+                                :indeterminate="isIndeterminate"
+                                @change="onCheckAll"
+                            >
                                 {{ $t("全选") }}
                             </a-checkbox>
                         </div>
@@ -71,8 +71,13 @@ onMounted(async () => {
                         <TaskBatchDownloadAction :records="checkRecords" />
                     </div>
                     <div>
-                        <a-pagination v-model:current="page" :total="records.length" :page-size="10" show-total
-                            simple />
+                        <a-pagination
+                            v-model:current="page"
+                            :total="records.length"
+                            :page-size="10"
+                            show-total
+                            simple
+                        />
                     </div>
                 </div>
                 <div v-for="r in recordsForPage" :key="r.id">
@@ -83,8 +88,11 @@ onMounted(async () => {
                                     <a-checkbox v-model="r['_check']" />
                                 </div>
                                 <div class="">
-                                    <TaskTitleField :record="r" @title-click="r['_check'] = !r['_check']"
-                                        @update="v => (r.title = v)" />
+                                    <TaskTitleField
+                                        :record="r"
+                                        @title-click="r['_check'] = !r['_check']"
+                                        @update="v => (r.title = v)"
+                                    />
                                 </div>
                             </div>
                             <div class="flex-grow"></div>
@@ -96,13 +104,17 @@ onMounted(async () => {
                             </div>
                         </div>
                         <div class="mt-3">
-                            <div v-if="r.modelConfig.type === 'SoundTts'"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
+                            <div
+                                v-if="r.modelConfig.type === 'SoundTts'"
+                                class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6"
+                            >
                                 <i class="iconfont icon-sound-generate"></i>
                                 {{ $t("声音合成") }}
                             </div>
-                            <div v-else-if="r.modelConfig.type === 'SoundClone'"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
+                            <div
+                                v-else-if="r.modelConfig.type === 'SoundClone'"
+                                class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6"
+                            >
                                 <i class="iconfont icon-sound-clone"></i>
                                 {{ $t("声音克隆") }}
                             </div>
@@ -111,28 +123,38 @@ onMounted(async () => {
                                 {{ r.serverTitle }}
                                 v{{ r.serverVersion }}
                             </div>
-                            <div v-if="r.modelConfig.type === 'SoundTts' && r.modelConfig?.ttsParam?.speakerTitle"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
+                            <div
+                                v-if="r.modelConfig.type === 'SoundTts' && r.modelConfig?.ttsParam?.speakerTitle"
+                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
+                            >
                                 <i class="iconfont icon-speaker mr-1"></i>
                                 {{ r.modelConfig?.ttsParam?.speakerTitle }}
                             </div>
-                            <div v-if="r.modelConfig.type === 'SoundTts' && r.param?.ttsParam?.speed"
-                                class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-6 h-6">
+                            <div
+                                v-if="r.modelConfig.type === 'SoundTts' && r.param?.ttsParam?.speed"
+                                class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-6 h-6"
+                            >
                                 <i class="iconfont icon-speed mr-1"></i>
                                 <span class="">x{{ r.param?.ttsParam?.speed }}</span>
                             </div>
-                            <div v-if="r.modelConfig.type === 'SoundClone'"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
+                            <div
+                                v-if="r.modelConfig.type === 'SoundClone'"
+                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
+                            >
                                 <i class="iconfont icon-sound-prompt mr-1"></i>
                                 {{ r.modelConfig.promptTitle }}
                             </div>
-                            <div v-if="r.modelConfig.type === 'SoundClone' && r.modelConfig?.cloneParam?.speed"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
+                            <div
+                                v-if="r.modelConfig.type === 'SoundClone' && r.modelConfig?.cloneParam?.speed"
+                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
+                            >
                                 <i class="iconfont icon-speed mr-1"></i>
                                 <span class="">x{{ r.modelConfig?.cloneParam?.speed }}</span>
                             </div>
-                            <div v-if="r.modelConfig.type === 'SoundClone' && r.modelConfig?.cloneParam?.crossLingual"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
+                            <div
+                                v-if="r.modelConfig.type === 'SoundClone' && r.modelConfig?.cloneParam?.crossLingual"
+                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
+                            >
                                 <i class="iconfont icon-global mr-1"></i>
                                 <span class="">{{ $t("跨语种") }}</span>
                             </div>

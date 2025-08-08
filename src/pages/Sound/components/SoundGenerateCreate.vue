@@ -96,19 +96,23 @@ const emit = defineEmits({
 
 <template>
     <div class="rounded-xl shadow border p-4">
-        <SoundGenerateForm ref="soundGenerateForm" />
-        <div class="pt-2">
+        <div class="mb-2">
             <a-textarea
                 v-model="formData.text"
                 :auto-size="{minRows: 2}"
                 :placeholder="$t('输入语音内容开始合成')"
             ></a-textarea>
         </div>
-        <div class="pt-2 flex">
+        <SoundGenerateForm ref="soundGenerateForm" />
+        <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 {{ $t("开始合成") }}
             </a-button>
-            <BatchTextareaInputAction :text="$t('批量克隆')" :confirm-text="$t('开始克隆')" @submit="doSubmitBatch" />
+            <BatchTextareaInputAction
+                :text="$t('批量文本合成')"
+                :confirm-text="$t('提交合成')"
+                @submit="doSubmitBatch"
+            />
         </div>
     </div>
 </template>

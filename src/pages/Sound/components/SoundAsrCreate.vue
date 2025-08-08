@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { t } from "../../../lang";
-import { Dialog } from "../../../lib/dialog";
-import { PermissionService } from "../../../service/PermissionService";
-import { TaskRecord, TaskService } from "../../../service/TaskService";
+import {ref} from "vue";
+import {t} from "../../../lang";
+import {Dialog} from "../../../lib/dialog";
+import {PermissionService} from "../../../service/PermissionService";
+import {TaskRecord, TaskService} from "../../../service/TaskService";
 import SoundAsrForm from "./SoundAsrForm.vue";
 
 const emit = defineEmits<{
@@ -19,7 +19,7 @@ const onSelectAudioFile = async () => {
     try {
         const filePath = await window.$mapi.file.openFile({
             title: t("选择音频文件"),
-            filters: [{ name: t("音频文件"), extensions: ["mp3", "wav"] }],
+            filters: [{name: t("音频文件"), extensions: ["mp3", "wav"]}],
         });
 
         if (filePath) {
@@ -60,8 +60,7 @@ const doSubmit = async () => {
                 param: value.param,
                 audio: formData.value.audio,
             },
-            param: {
-            },
+            param: {},
         };
 
         if (!(await PermissionService.checkForTask(value.type, record))) {
@@ -85,18 +84,25 @@ const isSubmitting = ref(false);
 
 <template>
     <div class="rounded-xl shadow border p-4">
-        <SoundAsrForm ref="soundAsrForm" />
-        <div class="pt-4">
-            <div v-if="formData.audio" class="mb-2 text-sm text-gray-600">
-                <i class="iconfont icon-file mr-1"></i>
-                {{ formData.audio.split("/").pop() || formData.audio.split("\\").pop() }}
+        <div class="mb-4 flex items-start">
+            <div class="mr-1 pt-1">
+                <a-tooltip :content="$t('声音文件')" mini>
+                    <i class="iconfont icon-sound"></i>
+                </a-tooltip>
             </div>
-            <a-button type="outline" @click="onSelectAudioFile" class="w-96 max-w-full">
-                <i class="iconfont icon-upload mr-2"></i>
-                {{ formData.audio ? t("重新选择") : t("选择音频文件") }}({{ t("支持MP3、WAV格式") }})
-            </a-button>
+            <div>
+                <div v-if="formData.audio" class="mb-2 text-sm text-gray-600">
+                    <i class="iconfont icon-file mr-1"></i>
+                    {{ formData.audio.split("/").pop() || formData.audio.split("\\").pop() }}
+                </div>
+                <a-button @click="onSelectAudioFile" class="w-96 max-w-full">
+                    <i class="iconfont icon-upload mr-2"></i>
+                    {{ formData.audio ? t("重新选择") : t("选择音频文件") }}({{ t("支持MP3、WAV格式") }})
+                </a-button>
+            </div>
         </div>
-        <div class="pt-4 flex">
+        <SoundAsrForm ref="soundAsrForm" />
+        <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit" :loading="isSubmitting">
                 <i class="iconfont icon-submit mr-2"></i>
                 {{ t("开始识别") }}

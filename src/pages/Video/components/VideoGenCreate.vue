@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import {onMounted, ref, watch} from "vue";
-import ParamForm from "../../../components/common/ParamForm.vue";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
-import ServerSelector from "../../../components/Server/ServerSelector.vue";
 import {t} from "../../../lang";
 import {Dialog} from "../../../lib/dialog";
 import {StorageUtil} from "../../../lib/storage";
@@ -10,30 +8,22 @@ import {TimeUtil} from "../../../lib/util";
 import {PermissionService} from "../../../service/PermissionService";
 import {TaskRecord, TaskService} from "../../../service/TaskService";
 import {VideoTemplateRecord, VideoTemplateService} from "../../../service/VideoTemplateService";
-import {useServerStore} from "../../../store/modules/server";
-import {EnumServerStatus} from "../../../types/Server";
 import SoundGenerateSelector from "../../Sound/components/SoundGenerateSelector.vue";
+import VideoGenForm from "./VideoGenForm.vue";
 
-const serverStore = useServerStore();
-const paramForm = ref<InstanceType<typeof ParamForm> | null>(null);
+const videoGenForm = ref<InstanceType<typeof VideoGenForm> | null>(null);
 
 const modelConfig = ref(null);
 const formData = ref({
-    serverKey: "",
-    videoTemplateId: 0,
     soundType: "soundGenerate",
     soundGenerateId: 0,
     soundCustomFile: "",
-    param: {},
 });
-const formDataParam = ref([]);
 
 const videoTemplateRecords = ref<VideoTemplateRecord[]>([]);
 
 onMounted(() => {
     const old = StorageUtil.getObject("VideoGenCreate.formData");
-    formData.value.serverKey = old.serverKey || "";
-    formData.value.videoTemplateId = old.videoTemplateId || 0;
     formData.value.soundType = old.soundType || "soundGenerate";
     formData.value.soundGenerateId = old.soundGenerateId || 0;
     formData.value.soundCustomFile = old.soundCustomFile || "";
@@ -49,19 +39,9 @@ watch(
     }
 );
 
-const onServerUpdate = async (config: any) => {
-    formDataParam.value = config.functions.videoGen?.param || [];
-    modelConfig.value = config;
-};
-
-onMounted(async () => {
-    videoTemplateRecords.value = await VideoTemplateService.list();
-});
-
 const doSubmit = async () => {
-    formData.value.param = paramForm.value?.getValue() || {};
-    if (!formData.value.serverKey) {
-        Dialog.tipError(t("请选择模型"));
+    const videoGenValue = await videoGenForm.value?.getValue();
+    if (!videoGenValue) {
         return;
     }
     let soundRecord: TaskRecord | null = null;
@@ -86,39 +66,22 @@ const doSubmit = async () => {
         Dialog.tipError("unknown soundType");
         return;
     }
-    if (!formData.value.videoTemplateId) {
-        Dialog.tipError(t("请选择视频"));
-        return;
-    }
-    const videoTemplate = await VideoTemplateService.get(formData.value.videoTemplateId);
-    if (!videoTemplate) {
-        Dialog.tipError(t("请选择视频"));
-        return;
-    }
-    const server = await serverStore.getByKey(formData.value.serverKey);
-    if (!server) {
-        Dialog.tipError(t("模型不存在"));
-        return;
-    }
-    if (server.status !== EnumServerStatus.RUNNING) {
-        Dialog.tipError(t("模型未启动"));
-        return;
-    }
     const record: TaskRecord = {
         biz: "VideoGen",
-        title: await window.$mapi.file.textToName(videoTemplate.name + "_" + TimeUtil.datetimeString()),
-        serverName: server.name,
-        serverTitle: server.title,
-        serverVersion: server.version,
+        title: await window.$mapi.file.textToName(videoGenValue.videoTemplateName + "_" + TimeUtil.datetimeString()),
+        serverName: videoGenValue.serverName,
+        serverTitle: videoGenValue.serverTitle,
+        serverVersion: videoGenValue.serverVersion,
         modelConfig: {
-            videoTemplateId: videoTemplate.id as number,
-            videoTemplateName: videoTemplate.name,
+            videoTemplateId: videoGenValue.videoTemplateId,
+            videoTemplateName: videoGenValue.videoTemplateName,
+            videoTemplateUrl: videoGenValue.videoTemplateUrl,
             soundType: formData.value.soundType,
             soundGenerateId: formData.value.soundGenerateId as number,
             soundGenerateText: soundRecord ? soundRecord.modelConfig.text : "",
             soundCustomFile: soundCustomFile || "",
         },
-        param: formData.value.param,
+        param: videoGenValue.param,
     };
     if (!(await PermissionService.checkForTask("VideoGen", record))) {
         return;
@@ -162,34 +125,10 @@ defineExpose({
 
 <template>
     <div class="rounded-xl shadow border p-4">
-        <div class="flex items-center h-12">
-            <div class="mr-1">
-                <a-tooltip :content="$t('模型')" mini>
-                    <i class="iconfont icon-server"></i>
-                    {{ $t("模型") }}
-                </a-tooltip>
-            </div>
-            <div class="mr-3 w-96 flex-shrink-0">
-                <ServerSelector v-model="formData.serverKey" @update="onServerUpdate" functionName="videoGen" />
-            </div>
-        </div>
-        <div class="flex items-center h-12">
-            <div class="mr-1">
-                <a-tooltip :content="$t('形象')" mini>
-                    <i class="iconfont icon-video-template"></i>
-                    {{ $t("形象") }}
-                </a-tooltip>
-            </div>
-            <div class="mr-3 w-56 flex-shrink-0">
-                <a-select v-model="formData.videoTemplateId">
-                    <a-option :value="0">{{ $t("请选择") }}</a-option>
-                    <a-option v-for="record in videoTemplateRecords" :key="record.id" :value="record.id">
-                        <div>
-                            {{ record.name }}
-                        </div>
-                    </a-option>
-                </a-select>
-            </div>
+        <VideoGenForm ref="videoGenForm" />
+        <div class="font-bold">
+            <icon-settings />
+            {{ $t("声音配置") }}
         </div>
         <div class="flex items-center h-12">
             <div class="mr-1">
@@ -222,10 +161,7 @@ defineExpose({
                 </a-button>
             </div>
         </div>
-        <div class="flex items-center min-h-12" v-if="formDataParam.length > 0">
-            <ParamForm ref="paramForm" :param="formDataParam" />
-        </div>
-        <div class="pt-2">
+        <div class="pt-4">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 {{ $t("开始生成视频") }}
             </a-button>

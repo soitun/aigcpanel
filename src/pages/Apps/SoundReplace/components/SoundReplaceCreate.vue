@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { dataAutoSaveDraft } from "../../../../components/common/util";
-import { t } from "../../../../lang";
-import { Dialog } from "../../../../lib/dialog";
-import { TaskRecord, TaskService } from "../../../../service/TaskService";
+import {ref} from "vue";
+import {dataAutoSaveDraft} from "../../../../components/common/util";
+import {t} from "../../../../lang";
+import {Dialog} from "../../../../lib/dialog";
+import {TaskRecord, TaskService} from "../../../../service/TaskService";
 import SoundAsrForm from "../../../Sound/components/SoundAsrForm.vue";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 
@@ -17,13 +17,13 @@ const formData = ref({
     video: "",
 });
 
-const { clearDraft } = dataAutoSaveDraft("SoundReplaceCreate.formData", formData.value);
+const {clearDraft} = dataAutoSaveDraft("SoundReplaceCreate.formData", formData.value);
 
 const onSelectAudioFile = async () => {
     try {
         const filePath = await window.$mapi.file.openFile({
             title: t("选择视频文件"),
-            filters: [{ name: t("视频文件"), extensions: ["mp4"] }],
+            filters: [{name: t("视频文件"), extensions: ["mp4"]}],
         });
 
         if (filePath) {
@@ -56,16 +56,15 @@ const doSubmit = async () => {
         const record: TaskRecord = {
             biz: "SoundReplace",
             title: taskTitle,
-            serverName: '',
-            serverTitle: '',
-            serverVersion: '',
+            serverName: "",
+            serverTitle: "",
+            serverVersion: "",
             modelConfig: {
                 video: formData.value.video,
                 soundAsr: soundAsrValue,
                 soundGenerate: soundGenerateValue,
             },
-            param: {
-            },
+            param: {},
         };
         await TaskService.submit(record);
         formData.value.video = "";
@@ -82,27 +81,26 @@ const isSubmitting = ref(false);
 
 <template>
     <div class="rounded-xl shadow border p-4">
-        <div class="font-bold">
-            <i class="iconfont icon-video"></i>
-            {{ $t('声音识别') }}
+        <div class="mb-4 flex items-start">
+            <div class="mr-1 pt-1">
+                <a-tooltip :content="$t('视频文件')" mini>
+                    <i class="iconfont icon-video"></i>
+                </a-tooltip>
+            </div>
+            <div>
+                <div v-if="formData.video" class="mb-2 text-sm text-gray-600">
+                    <i class="iconfont icon-file mr-1"></i>
+                    {{ formData.video.split("/").pop() || formData.video.split("\\").pop() }}
+                </div>
+                <a-button @click="onSelectAudioFile" class="w-96 max-w-full">
+                    <i class="iconfont icon-upload mr-2"></i>
+                    {{ formData.video ? t("重新选择") : t("选择视频文件") }}({{ t("支持MP4格式") }})
+                </a-button>
+            </div>
         </div>
         <SoundAsrForm ref="soundAsrForm" />
-        <div class="font-bold">
-            <i class="iconfont icon-video"></i>
-            {{ $t('声音合成') }}
-        </div>
         <SoundGenerateForm ref="soundGenerateForm" />
-        <div class="pt-4">
-            <div v-if="formData.video" class="mb-2 text-sm text-gray-600">
-                <i class="iconfont icon-file mr-1"></i>
-                {{ formData.video.split("/").pop() || formData.video.split("\\").pop() }}
-            </div>
-            <a-button type="outline" @click="onSelectAudioFile" class="w-96 max-w-full">
-                <i class="iconfont icon-upload mr-2"></i>
-                {{ formData.video ? t("重新选择") : t("选择视频文件") }}({{ t("支持MP4格式") }})
-            </a-button>
-        </div>
-        <div class="pt-4 flex">
+        <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit" :loading="isSubmitting">
                 <i class="iconfont icon-submit mr-2"></i>
                 {{ t("提交任务") }}

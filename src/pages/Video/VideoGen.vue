@@ -41,8 +41,9 @@ const doRefresh = async () => {
 <template>
     <div class="p-5">
         <div class="mb-4 flex items-center">
-            <div class="text-3xl font-bold flex-grow">
-                {{ $t("数字人合成") }}
+            <div class="flex-grow flex items-end">
+                <div class="text-3xl font-bold">{{ $t("数字人合成") }}</div>
+                <div class="text-gray-400 ml-3">{{ $t("支持音频驱动实现口型替换") }}</div>
             </div>
             <div class="flex items-center">
                 <a-tooltip v-if="0" :content="$t('清空历史')" position="right" mini>

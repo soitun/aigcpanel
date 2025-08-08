@@ -1,6 +1,7 @@
 declare type VideoGenModelConfigType = {
     videoTemplateId: number;
     videoTemplateName: string;
+    videoTemplateUrl: string;
     soundType: "soundGenerate" | "soundCustom";
     soundGenerateId: number;
     soundGenerateText: string;
@@ -13,7 +14,9 @@ declare type SoundAsrParamType = {
     serverVersion: string;
     type: "SoundAsr";
     serverKey: string;
-    param: any[];
+    param: {
+        [key: string]: any;
+    };
 };
 
 declare type SoundGenerateParamType = {
@@ -22,11 +25,28 @@ declare type SoundGenerateParamType = {
     serverVersion: string;
     type: "SoundTts" | "SoundClone";
     ttsServerKey?: string;
-    ttsParam?: any[];
+    ttsParam?: {
+        [key: string]: any;
+    };
     cloneServerKey?: string;
-    cloneParam?: any[];
+    cloneParam?: {
+        [key: string]: any;
+    };
     promptId?: number;
     promptTitle?: string;
     promptUrl?: string;
     promptText?: string;
+};
+
+declare type VideoGenParamType = {
+    serverName: string;
+    serverTitle: string;
+    serverVersion: string;
+    serverKey: string;
+    param: {
+        [key: string]: any;
+    };
+    videoTemplateId: number;
+    videoTemplateName: string;
+    videoTemplateUrl: string;
 };

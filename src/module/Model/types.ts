@@ -9,6 +9,7 @@ export type Model = {
     group: string;
     types: ModelType[];
     enabled: boolean;
+    editable: boolean;
 };
 
 export type Provider = {

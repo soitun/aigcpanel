@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {computed, onMounted, ref} from "vue";
-import ServerTaskResultParam from "../../../components/Server/ServerTaskResultParam.vue";
 import TaskBatchDeleteAction from "../../../components/Server/TaskBatchDeleteAction.vue";
 import TaskBatchDownloadAction from "../../../components/Server/TaskBatchDownloadAction.vue";
 import TaskContinueAction from "../../../components/Server/TaskContinueAction.vue";
@@ -23,6 +22,7 @@ import {useTaskChangeRefresh} from "../../../hooks/task";
 import SoundReplaceCreate from "./components/SoundReplaceCreate.vue";
 import StepsComponent from "./components/StepsComponent.vue";
 import {soundReplaceFileCleanCollector} from "./util";
+import ServerNameVersion from "../../../components/Server/ServerNameVersion.vue";
 
 const soundAsrRecordsEditDialog = ref<InstanceType<typeof SoundAsrRecordsEditDialog> | null>(null);
 const taskStore = useTaskStore();
@@ -159,157 +159,197 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                 <TaskBizStatus :status="r.status" :status-msg="r.statusMsg" />
                             </div>
                         </div>
-                        <div v-if="r.jobResult.ToAudio && r.jobResult.ToAudio.file" class="mt-3 flex">
-                            <div class="w-32 flex-shrink-0">
-                                <div
-                                    class="inline-block text-center mr-2 bg-gray-100 w-6 rounded-full px-1 leading-6 h-6"
-                                >
-                                    1
-                                </div>
-                                <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
+                        <div class="mt-3 flex">
+                            <div class="w-24 flex-shrink-0">
+                                <div class="inline-block text-center">
                                     <i class="iconfont icon-sound"></i>
                                     {{ $t("提取音频") }}
                                 </div>
                             </div>
-                            <div class="flex-grow">
-                                <AudioPlayer :url="r.jobResult.ToAudio.file" show-wave />
+                            <div class="flex-grow pt-1">
+                                <div v-if="r.jobResult.ToAudio && r.jobResult.ToAudio.file">
+                                    <AudioPlayer :url="r.jobResult.ToAudio.file" show-wave />
+                                </div>
+                                <div
+                                    v-else-if="r.jobResult.step === 'ToAudio' && r.status === 'running'"
+                                    class="bg-gray-100 rounded-lg p-1"
+                                >
+                                    <div class="text-gray-400">
+                                        <icon-refresh spin />
+                                        {{ $t("处理中") }}
+                                    </div>
+                                </div>
+                                <div v-else class="bg-gray-100 rounded-lg p-1">
+                                    <div class="text-gray-400">
+                                        <icon-info-circle />
+                                        {{ $t("未处理") }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div v-if="r.jobResult.SoundAsr && r.jobResult.SoundAsr.records" class="mt-3 flex">
-                            <div class="w-32 flex-shrink-0">
-                                <div
-                                    class="inline-block text-center mr-2 bg-gray-100 w-6 rounded-full px-1 leading-6 h-6"
-                                >
-                                    2
-                                </div>
-                                <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
+                        <div class="mt-3 flex">
+                            <div class="w-24 flex-shrink-0">
+                                <div class="inline-block text-center">
                                     <i class="iconfont icon-asr"></i>
-                                    {{ $t("语音转写") }}
+                                    {{ $t("语音识别") }}
                                 </div>
                             </div>
-                            <div class="flex-grow">
-                                <div>
+                            <div class="flex-grow pt-1">
+                                <div v-if="r.jobResult.SoundAsr && r.jobResult.SoundAsr.records">
                                     <div class="bg-gray-100 rounded-lg p-2">
                                         <TextTruncateView :max-length="40" :text="r.runtime?.SoundAsr.text" />
                                     </div>
                                 </div>
+                                <div
+                                    v-else-if="r.jobResult.step === 'SoundAsr' && r.status === 'running'"
+                                    class="bg-gray-100 rounded-lg p-1"
+                                >
+                                    <div class="text-gray-400">
+                                        <icon-refresh spin />
+                                        {{ $t("处理中") }}
+                                    </div>
+                                </div>
+                                <div v-else class="bg-gray-100 rounded-lg p-1">
+                                    <div class="text-gray-400">
+                                        <icon-info-circle />
+                                        {{ $t("未处理") }}
+                                    </div>
+                                </div>
                                 <div class="mt-1">
-                                    <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
-                                        <i class="iconfont icon-server mr-1"></i>
-                                        {{ r.modelConfig.soundAsr.serverTitle }}
-                                        v{{ r.modelConfig.soundAsr.serverVersion }}
-                                    </div>
-                                    <div
-                                        v-if="r.modelConfig?.model"
-                                        class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
-                                    >
-                                        <i class="iconfont icon-model mr-1"></i>
-                                        {{ r.modelConfig.model }}
-                                    </div>
-                                    <ServerTaskResultParam :record="r as any" />
+                                    <ServerNameVersion :record="r.modelConfig.soundAsr" />
                                 </div>
                             </div>
                         </div>
-                        <div v-if="r.jobResult.Confirm && r.jobResult.Confirm.records" class="mt-3 flex">
-                            <div class="w-32 flex-shrink-0">
-                                <div
-                                    class="inline-block text-center mr-2 bg-gray-100 w-6 rounded-full px-1 leading-6 h-6"
-                                >
-                                    3
-                                </div>
-                                <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
-                                    <i class="iconfont icon-asr"></i>
+                        <div class="mt-3 flex">
+                            <div class="w-24 flex-shrink-0">
+                                <div class="inline-block text-center">
+                                    <i class="iconfont icon-sound"></i>
                                     {{ $t("重排确认") }}
                                 </div>
                             </div>
-                            <div class="flex-grow">
-                                <div class="mb-1">
-                                    <div class="bg-gray-100 rounded-lg p-2">
-                                        <TextTruncateView :max-length="40" :text="r.runtime?.Confirm.text" />
+                            <div class="flex-grow pt-1">
+                                <div v-if="r.jobResult.Confirm && r.jobResult.Confirm.records">
+                                    <div class="mb-1">
+                                        <div class="bg-gray-100 rounded-lg p-2">
+                                            <TextTruncateView :max-length="40" :text="r.runtime?.Confirm.text" />
+                                        </div>
+                                    </div>
+                                    <div v-if="!r.jobResult.Confirm.confirm">
+                                        <a-button
+                                            type="primary"
+                                            @click="
+                                                soundAsrRecordsEditDialog?.edit(
+                                                    r.id as any,
+                                                    r.jobResult.Confirm.records
+                                                )
+                                            "
+                                        >
+                                            <template #icon>
+                                                <icon-check-circle />
+                                            </template>
+                                            {{ $t("修改确认文字") }}
+                                        </a-button>
                                     </div>
                                 </div>
-                                <div v-if="!r.jobResult.Confirm.confirm">
-                                    <a-button
-                                        type="primary"
-                                        @click="
-                                            soundAsrRecordsEditDialog?.edit(r.id as any, r.jobResult.Confirm.records)
-                                        "
-                                    >
-                                        <template #icon>
-                                            <icon-check-circle />
-                                        </template>
-                                        {{ $t("修改确认文字") }}
-                                    </a-button>
-                                </div>
-                                <div v-else>
-                                    <a-button :disabled="true">
-                                        <template #icon>
-                                            <icon-check />
-                                        </template>
-                                        已确认
-                                    </a-button>
+                                <div v-else class="bg-gray-100 rounded-lg p-1">
+                                    <div class="text-gray-400">
+                                        <icon-info-circle />
+                                        {{ $t("未处理") }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div v-if="r.jobResult.SoundGenerate && r.jobResult.SoundGenerate.records" class="mt-3 flex">
-                            <div class="w-32 flex-shrink-0">
-                                <div
-                                    class="inline-block text-center mr-2 bg-gray-100 w-6 rounded-full px-1 leading-6 h-6"
-                                >
-                                    4
-                                </div>
-                                <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
-                                    <i class="iconfont icon-asr"></i>
+                        <div class="mt-3 flex">
+                            <div class="w-24 flex-shrink-0">
+                                <div class="inline-block text-center">
+                                    <i class="iconfont icon-sound"></i>
                                     {{ $t("声音合成") }}
                                 </div>
                             </div>
-                            <div class="bg-gray-100 rounded-lg p-2 flex-grow">
+                            <div class="flex-grow">
                                 <div
-                                    v-for="rr in r.jobResult.SoundGenerate.records.filter((o, i) => {
-                                        return i < 5 || !r.runtime?.SoundGenerate.showTruncate;
-                                    })"
-                                    class="flex mb-1"
+                                    v-if="r.jobResult.SoundGenerate && r.jobResult.SoundGenerate.records"
+                                    class="bg-gray-100 rounded-lg p-2"
                                 >
-                                    <div class="w-6 flex-shrink-0">
-                                        <AudioPlayerButton v-if="rr.audio" :source="rr.audio" />
-                                        <icon-refresh v-else spin />
-                                    </div>
-                                    <div>{{ rr.text }}</div>
-                                </div>
-                                <div v-if="r.jobResult.SoundGenerate.records.length > 5 && r.runtime">
-                                    <a-button
-                                        v-if="r.runtime.SoundGenerate.showTruncate"
-                                        size="mini"
-                                        @click="r.runtime.SoundGenerate.showTruncate = false"
+                                    <div
+                                        v-for="rr in r.jobResult.SoundGenerate.records.filter((o, i) => {
+                                            return i < 5 || !r.runtime?.SoundGenerate.showTruncate;
+                                        })"
+                                        class="flex mb-1"
                                     >
-                                        <template #icon>
-                                            <icon-down />
-                                        </template>
-                                        {{ $t("展开") }}
-                                    </a-button>
-                                    <a-button v-else size="mini" @click="r.runtime.SoundGenerate.showTruncate = true">
-                                        <template #icon>
-                                            <icon-up />
-                                        </template>
-                                        {{ $t("收起") }}
-                                    </a-button>
+                                        <div class="w-6 flex-shrink-0">
+                                            <AudioPlayerButton v-if="rr.audio" :source="rr.audio" />
+                                            <icon-refresh
+                                                v-else-if="
+                                                    r.jobResult.step === 'SoundGenerate' && r.status === 'running'
+                                                "
+                                                spin
+                                            />
+                                            <icon-info-circle v-else class="text-gray-400" />
+                                        </div>
+                                        <div>{{ rr.text }}</div>
+                                    </div>
+                                    <div v-if="r.jobResult.SoundGenerate.records.length > 5 && r.runtime">
+                                        <a-button
+                                            v-if="r.runtime.SoundGenerate.showTruncate"
+                                            size="mini"
+                                            @click="r.runtime.SoundGenerate.showTruncate = false"
+                                        >
+                                            <template #icon>
+                                                <icon-down />
+                                            </template>
+                                            {{ $t("展开") }}
+                                        </a-button>
+                                        <a-button
+                                            v-else
+                                            size="mini"
+                                            @click="r.runtime.SoundGenerate.showTruncate = true"
+                                        >
+                                            <template #icon>
+                                                <icon-up />
+                                            </template>
+                                            {{ $t("收起") }}
+                                        </a-button>
+                                    </div>
+                                </div>
+                                <div v-else class="bg-gray-100 rounded-lg p-1">
+                                    <div class="text-gray-400">
+                                        <icon-info-circle />
+                                        {{ $t("未处理") }}
+                                    </div>
+                                </div>
+                                <div class="mt-1">
+                                    <ServerNameVersion :record="r.modelConfig.soundGenerate" />
                                 </div>
                             </div>
                         </div>
-                        <div v-if="r.jobResult.Combine && r.jobResult.Combine.file" class="mt-3 flex">
-                            <div class="w-32 flex-shrink-0">
-                                <div
-                                    class="inline-block text-center mr-2 bg-gray-100 w-6 rounded-full px-1 leading-6 h-6"
-                                >
-                                    5
-                                </div>
-                                <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
-                                    <i class="iconfont icon-asr"></i>
+                        <div class="mt-3 flex">
+                            <div class="w-24 flex-shrink-0">
+                                <div class="inline-block text-center">
+                                    <i class="iconfont icon-sound"></i>
                                     {{ $t("视频合成") }}
                                 </div>
                             </div>
-                            <div class="bg-gray-100 rounded-lg p-2 w-full h-96">
+                            <div
+                                v-if="r.jobResult.Combine && r.jobResult.Combine.file"
+                                class="bg-gray-100 rounded-lg p-2 w-full h-96"
+                            >
                                 <VideoPlayer :url="r.jobResult.Combine.file" />
+                            </div>
+                            <div
+                                v-else-if="r.jobResult.step === 'Combine' && r.status === 'running'"
+                                class="bg-gray-100 rounded-lg p-1"
+                            >
+                                <div class="text-gray-400">
+                                    <icon-refresh spin />
+                                    {{ $t("处理中") }}
+                                </div>
+                            </div>
+                            <div v-else class="bg-gray-100 rounded-lg p-1 flex-grow">
+                                <div class="text-gray-400">
+                                    <icon-info-circle />
+                                    {{ $t("未处理") }}
+                                </div>
                             </div>
                         </div>
 
@@ -354,7 +394,6 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                     @update="doRefresh"
                                     :file-clean-collector="soundReplaceFileCleanCollector"
                                 />
-                                <TaskRetryAction :record="r" @update="doRefresh" />
                                 <TaskContinueAction :record="r" @update="doRefresh" />
                             </div>
                         </div>

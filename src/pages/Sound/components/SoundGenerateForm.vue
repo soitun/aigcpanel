@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import {onMounted, ref, watch} from "vue";
 import ParamForm from "../../../components/common/ParamForm.vue";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
 import ServerSelector from "../../../components/Server/ServerSelector.vue";
-import { t } from "../../../lang";
-import { Dialog } from "../../../lib/dialog";
-import { StorageUtil } from "../../../lib/storage";
-import { StorageService } from "../../../service/StorageService";
-import { useServerStore } from "../../../store/modules/server";
-import { SoundGenerateParamType } from "../../../types/App";
-import { EnumServerStatus } from "../../../types/Server";
+import {t} from "../../../lang";
+import {Dialog} from "../../../lib/dialog";
+import {StorageUtil} from "../../../lib/storage";
+import {StorageService} from "../../../service/StorageService";
+import {useServerStore} from "../../../store/modules/server";
+import {EnumServerStatus} from "../../../types/Server";
 import SoundPromptDialog from "./SoundPromptDialog.vue";
 import SoundPromptSelector from "./SoundPromptSelector.vue";
 
@@ -52,10 +51,7 @@ watch(
     }
 );
 
-const getValue = async (): Promise<
-    | SoundGenerateParamType
-    | undefined
-> => {
+const getValue = async (): Promise<SoundGenerateParamType | undefined> => {
     const data: any = {};
     data.type = formData.value.type;
     if (!data.type) {
@@ -133,67 +129,80 @@ defineExpose({
 </script>
 
 <template>
-    <div class="flex items-center h-12">
-        <div class="mr-1">
-            <a-tooltip :content="$t('合成类型')" mini>
-                <i class="iconfont icon-sound"></i>
-            </a-tooltip>
+    <div class="mb-4">
+        <div class="font-bold">
+            <icon-settings />
+            {{ $t("声音合成配置") }}
         </div>
-        <div class="mr-1">
-            <a-radio-group v-model="formData.type">
-                <a-radio value="SoundTts">
-                    <i class="iconfont icon-sound-generate"></i>
-                    {{ $t("声音合成") }}
-                </a-radio>
-                <a-radio value="SoundClone">
-                    <i class="iconfont icon-sound-clone"></i>
-                    {{ $t("声音克隆") }}
-                </a-radio>
-            </a-radio-group>
+        <div class="flex items-center h-12">
+            <div class="mr-1">
+                <a-tooltip :content="$t('合成类型')" mini>
+                    <i class="iconfont icon-sound"></i>
+                </a-tooltip>
+            </div>
+            <div class="mr-1">
+                <a-radio-group v-model="formData.type">
+                    <a-radio value="SoundTts">
+                        <i class="iconfont icon-sound-generate"></i>
+                        {{ $t("声音合成") }}
+                    </a-radio>
+                    <a-radio value="SoundClone">
+                        <i class="iconfont icon-sound-clone"></i>
+                        {{ $t("声音克隆") }}
+                    </a-radio>
+                </a-radio-group>
+            </div>
         </div>
-    </div>
-    <div v-if="formData.type === 'SoundTts'" class="flex items-center h-12">
-        <div class="mr-1">
-            <a-tooltip :content="$t('声音模型')" mini>
-                <i class="iconfont icon-server"></i>
-            </a-tooltip>
+        <div v-if="formData.type === 'SoundTts'" class="flex items-center h-12 mb-2">
+            <div class="mr-1">
+                <a-tooltip :content="$t('声音合成模型')" mini>
+                    <i class="iconfont icon-server"></i>
+                </a-tooltip>
+            </div>
+            <div class="mr-2 w-96 flex-shrink-0">
+                <ServerSelector
+                    v-model="formData.ttsServerKey"
+                    @update="onSoundTtsServerUpdate"
+                    functionName="soundTts"
+                />
+            </div>
+            <div>
+                <ServerContentInfoAction :config="ttsModelConfig as any" func="soundTts" />
+            </div>
         </div>
-        <div class="mr-2 w-96 flex-shrink-0">
-            <ServerSelector v-model="formData.ttsServerKey" @update="onSoundTtsServerUpdate" functionName="soundTts" />
+        <div v-if="formData.type === 'SoundClone'" class="flex items-center h-12 mb-2">
+            <div class="mr-1">
+                <a-tooltip :content="$t('声音克隆模型')" mini>
+                    <i class="iconfont icon-server"></i>
+                </a-tooltip>
+            </div>
+            <div class="mr-2 w-96 flex-shrink-0">
+                <ServerSelector
+                    v-model="formData.cloneServerKey"
+                    @update="onSoundCloneServerUpdate"
+                    functionName="soundClone"
+                />
+            </div>
+            <div>
+                <ServerContentInfoAction :config="cloneModelConfig as any" func="soundClone" />
+            </div>
         </div>
-        <div>
-            <ServerContentInfoAction :config="ttsModelConfig as any" func="soundTts" />
+        <div v-if="formData.type === 'SoundClone'" class="flex items-center h-12 mb-2">
+            <div class="mr-1">
+                <a-tooltip :content="$t('声音音色')" mini>
+                    <i class="iconfont icon-sound-prompt"></i>
+                </a-tooltip>
+            </div>
+            <div class="mr-2 w-96 flex-shrink-0 flex items-center">
+                <SoundPromptSelector v-model="formData.promptId" />
+            </div>
         </div>
-    </div>
-    <div v-if="formData.type === 'SoundClone'" class="flex items-center h-12">
-        <div class="mr-1">
-            <a-tooltip :content="$t('声音模型')" mini>
-                <i class="iconfont icon-server"></i>
-            </a-tooltip>
+        <div class="flex items-center" v-if="formData.type === 'SoundTts'">
+            <ParamForm ref="ttsParamForm" :param="ttsParam" />
         </div>
-        <div class="mr-2 w-96 flex-shrink-0">
-            <ServerSelector v-model="formData.cloneServerKey" @update="onSoundCloneServerUpdate"
-                functionName="soundClone" />
+        <div class="flex items-center" v-else-if="formData.type === 'SoundClone'">
+            <ParamForm ref="cloneParamForm" :param="cloneParam" />
         </div>
-        <div>
-            <ServerContentInfoAction :config="cloneModelConfig as any" func="soundClone" />
-        </div>
-    </div>
-    <div v-if="formData.type === 'SoundClone'" class="flex items-center h-12">
-        <div class="mr-1">
-            <a-tooltip :content="$t('声音音色')" mini>
-                <i class="iconfont icon-sound-prompt"></i>
-            </a-tooltip>
-        </div>
-        <div class="mr-2 w-96 flex-shrink-0 flex items-center">
-            <SoundPromptSelector v-model="formData.promptId" />
-        </div>
-    </div>
-    <div class="flex items-center" v-if="formData.type === 'SoundTts'">
-        <ParamForm ref="ttsParamForm" :param="ttsParam" />
-    </div>
-    <div class="flex items-center" v-if="formData.type === 'SoundClone'">
-        <ParamForm ref="cloneParamForm" :param="cloneParam" />
     </div>
     <SoundPromptDialog />
 </template>

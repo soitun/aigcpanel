@@ -133,7 +133,7 @@ export const VideoGenFlow: TaskBiz = {
                 id: serverStore.generateTaskId("VideoGenFlow", bizId),
                 result: record.result,
                 param: record.param,
-                video: modelConfig.videoUrl,
+                video: modelConfig.videoTemplateUrl,
                 audio: urlSound,
             },
             {

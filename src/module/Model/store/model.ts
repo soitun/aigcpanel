@@ -13,6 +13,7 @@ import {t} from "../../../lang";
 import {useUserStore} from "../../../store/modules/user";
 import {watch} from "vue";
 import {AppConfig} from "../../../config";
+import {AbstractModelProvider} from "../provider/driver/base";
 
 const userStore = useUserStore();
 
@@ -25,6 +26,39 @@ watch(
         deep: true,
     }
 );
+
+const mapModelError = (e: any, provider: Provider) => {
+    if (provider.id === "buildIn") {
+        const msg = e + "";
+        const showCharge = () => {
+            window.$mapi.user
+                .open({
+                    readyParam: {
+                        page: "ChargeLmApi",
+                    },
+                })
+                .then();
+        };
+        const map = {
+            insufficient_user_quota: {
+                msg: t("用户配额不足"),
+                callback: showCharge,
+            },
+        };
+        for (const key in map) {
+            if (msg.includes(key)) {
+                const error = map[key];
+                if (error.callback) {
+                    setTimeout(() => {
+                        error.callback();
+                    }, 3000);
+                }
+                return error.msg;
+            }
+        }
+    }
+    return mapError(e);
+};
 
 export const modelStore = defineStore("model", {
     state() {
@@ -91,40 +125,6 @@ export const modelStore = defineStore("model", {
                         });
                     });
                 }
-                // 云端模型
-                if (userStore.data && userStore.data.lmApi && userStore.data.lmApi.models) {
-                    const lmApi = userStore.data.lmApi;
-                    const models: Model[] = [];
-                    for (const m of lmApi.models) {
-                        models.push({
-                            id: m,
-                            provider: "buildIn",
-                            name: m,
-                            group: "Default",
-                            types: ["text"],
-                            enabled: true,
-                        });
-                    }
-                    results.unshift({
-                        id: "buildIn",
-                        type: "openai",
-                        title: getProviderTitle("buildIn"),
-                        logo: getProviderLogo("buildIn"),
-                        isSystem: true,
-                        apiUrl: lmApi.apiUrl,
-                        websites: {
-                            official: AppConfig.website,
-                            docs: AppConfig.website,
-                            models: AppConfig.website,
-                        },
-                        data: {
-                            apiKey: lmApi.apiKey,
-                            apiHost: "",
-                            models: models,
-                            enabled: true,
-                        },
-                    });
-                }
                 if (storageData.providerData) {
                     for (const providerId in storageData.providerData) {
                         const provider = results.find(p => p.id === providerId);
@@ -146,6 +146,7 @@ export const modelStore = defineStore("model", {
                                         group: model.group,
                                         types: ["text"],
                                         enabled: model.enabled || false,
+                                        editable: true,
                                     });
                                 }
                             });
@@ -154,8 +155,50 @@ export const modelStore = defineStore("model", {
                     }
                 }
             }
-            results.forEach(provider => {});
             this.providers = results;
+            await this.refreshBuildIn();
+        },
+        async refreshBuildIn() {
+            if (userStore.data && userStore.data.lmApi && userStore.data.lmApi.models) {
+                const lmApi = userStore.data.lmApi;
+                const buildInProvider = this.providers.find(p => p.id === "buildIn");
+                if (!buildInProvider) {
+                    const models: Model[] = [];
+                    for (const m of lmApi.models) {
+                        models.push({
+                            id: m,
+                            provider: "buildIn",
+                            name: m,
+                            group: "Default",
+                            types: ["text"],
+                            enabled: true,
+                            editable: false,
+                        });
+                    }
+                    // console.log("model.init.buildIn", JSON.stringify({lmApi}, null, 2));
+                    this.providers.unshift({
+                        id: "buildIn",
+                        type: "openai",
+                        title: getProviderTitle("buildIn"),
+                        logo: getProviderLogo("buildIn"),
+                        isSystem: true,
+                        apiUrl: lmApi.apiUrl,
+                        websites: {
+                            official: AppConfig.website,
+                            docs: AppConfig.website,
+                            models: AppConfig.website,
+                        },
+                        data: {
+                            apiKey: lmApi.apiKey,
+                            apiHost: "",
+                            models: models,
+                            enabled: true,
+                        },
+                    });
+                } else {
+                    buildInProvider.data.apiKey = lmApi.apiKey;
+                }
+            }
         },
         async add(provider: Partial<Provider>) {
             const p = {
@@ -203,6 +246,7 @@ export const modelStore = defineStore("model", {
             }
         },
         async test(providerId: string, modelId: string) {
+            await this.refreshBuildIn();
             const provider = this.providers.find(p => p.id === providerId);
             if (!provider) {
                 return;
@@ -225,7 +269,7 @@ export const modelStore = defineStore("model", {
                 }
                 Dialog.tipSuccess(t("测试成功"));
             } catch (e) {
-                Dialog.tipError(t("测试失败") + " " + mapError(e));
+                Dialog.tipError(t("测试失败") + " " + mapModelError(e, provider));
             } finally {
                 Dialog.loadingOff();
             }
@@ -238,6 +282,7 @@ export const modelStore = defineStore("model", {
                 loading: boolean;
             }
         ): Promise<ModelChatResult> {
+            await this.refreshBuildIn();
             if (!providerId || !modelId) {
                 Dialog.tipError(t("请选择模型"));
                 return {code: -1, msg: t("请选择模型")};
@@ -249,6 +294,7 @@ export const modelStore = defineStore("model", {
                 option
             );
             const provider = this.providers.find(p => p.id === providerId);
+            // console.log("provider.chat", JSON.stringify({provider}, null, 2));
             if (!provider) {
                 return {code: -1, msg: "provider not found"};
             }
@@ -268,7 +314,7 @@ export const modelStore = defineStore("model", {
                     apiKey: provider.data.apiKey,
                 });
             } catch (e) {
-                return {code: -1, msg: "ERROR:" + mapError(e)};
+                return {code: -1, msg: mapModelError(e, provider)};
             } finally {
                 if (option.loading) {
                     Dialog.loadingOff();
@@ -354,7 +400,10 @@ export const modelStore = defineStore("model", {
         sync: debounce(async () => {
             const providerData = {};
             model.providers.forEach(provider => {
-                providerData[provider.id] = provider.data;
+                providerData[provider.id] = ObjectUtil.clone(provider.data);
+                if (provider.id === "buildIn") {
+                    providerData[provider.id].apiKey = "";
+                }
             });
             const userProviders = model.providers.filter(provider => !provider.isSystem);
             await window.$mapi.storage.write("models", ObjectUtil.clone({providerData, userProviders}));

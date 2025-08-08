@@ -41,8 +41,9 @@ const onUpdate = async () => {
 <template>
     <div class="p-5">
         <div class="mb-4 flex items-center">
-            <div class="text-3xl font-bold flex-grow">
-                {{ $t("数字人形象") }}
+            <div class="flex-grow flex items-end">
+                <div class="text-3xl font-bold">{{ $t("数字人形象") }}</div>
+                <div class="text-gray-400 ml-3">{{ $t("管理多个数字人形象") }}</div>
             </div>
             <div class="flex items-center">
                 <a-button @click="editDialog?.add()">

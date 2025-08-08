@@ -18,9 +18,13 @@ export const SoundReplace: TaskBiz = {
         const jobResult: SoundReplaceJobResultType = record.jobResult;
 
         jobResult.step = jobResult.step || "ToAudio";
+        jobResult.ToAudio = jobResult.ToAudio || {};
+        jobResult.SoundAsr = jobResult.SoundAsr || {};
+        jobResult.Confirm = jobResult.Confirm || {};
+        jobResult.SoundGenerate = jobResult.SoundGenerate || {};
+        jobResult.Combine = jobResult.Combine || {};
         if (jobResult.step === "ToAudio") {
             console.log("SoundReplace.ToAudio", JSON.stringify(jobResult));
-            jobResult.ToAudio = jobResult.ToAudio || {};
             await TaskService.update(bizId, {
                 status: "running",
                 jobResult,
@@ -39,9 +43,9 @@ export const SoundReplace: TaskBiz = {
 
         if (jobResult.step === "SoundAsr") {
             console.log("SoundReplace.SoundAsr", JSON.stringify(jobResult));
-            jobResult.SoundAsr = jobResult.SoundAsr || {};
             await TaskService.update(bizId, {
                 status: "running",
+                jobResult,
             });
             taskStore.fireChange({biz: "SoundReplace", bizId}, "running");
             const ret = await serverSoundAsr(
@@ -65,7 +69,6 @@ export const SoundReplace: TaskBiz = {
 
         if (jobResult.step === "Confirm") {
             console.log("SoundReplace.Confirm", JSON.stringify(jobResult));
-            jobResult.Confirm = jobResult.Confirm || {};
             jobResult.Confirm.records = ObjectUtil.clone(jobResult.SoundAsr.records);
             jobResult.Confirm.confirm = false;
             await TaskService.update(bizId, {jobResult});
@@ -74,11 +77,12 @@ export const SoundReplace: TaskBiz = {
 
         if (jobResult.step === "SoundGenerate") {
             console.log("SoundReplace.SoundGenerate", JSON.stringify(jobResult));
-            jobResult.SoundGenerate = jobResult.SoundGenerate || {};
-            jobResult.SoundGenerate.records = jobResult.Confirm.records.map(item => ({
-                ...item,
-                audio: "",
-            }));
+            if (!jobResult.SoundGenerate.records) {
+                jobResult.SoundGenerate.records = jobResult.Confirm.records.map(item => ({
+                    ...item,
+                    audio: "",
+                }));
+            }
             await TaskService.update(bizId, {jobResult});
             await TaskService.update(bizId, {
                 status: "running",
@@ -112,7 +116,6 @@ export const SoundReplace: TaskBiz = {
 
         if (jobResult.step === "Combine") {
             console.log("SoundReplace.Combine", JSON.stringify(jobResult));
-            jobResult.Combine = jobResult.Combine || {};
             jobResult.Combine.audio = "";
             jobResult.Combine.file = "";
             await TaskService.update(bizId, {

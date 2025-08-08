@@ -3,7 +3,6 @@ import {TaskService} from "../service/TaskService";
 import {VideoTemplateService} from "../service/VideoTemplateService";
 import {useServerStore} from "../store/modules/server";
 import {TaskBiz} from "../store/modules/task";
-import {VideoGenModelConfigType} from "../types/Video";
 
 const serverStore = useServerStore();
 
@@ -16,10 +15,6 @@ export const VideoGen: TaskBiz = {
         await TaskService.update(bizId, {
             status: "wait",
         });
-        const videoTemplateRecord = await VideoTemplateService.get(modelConfig.videoTemplateId);
-        if (!videoTemplateRecord) {
-            throw new Error("VideoTemplateEmpty");
-        }
         let audioFile: string | null = null;
         if (modelConfig.soundType === "soundGenerate") {
             const soundRecord = await TaskService.get(modelConfig.soundGenerateId);
@@ -34,7 +29,7 @@ export const VideoGen: TaskBiz = {
             id: serverStore.generateTaskId("VideoGen", bizId),
             result: record.result,
             param: record.param,
-            video: videoTemplateRecord?.video,
+            video: modelConfig.videoTemplateUrl,
             audio: audioFile,
         });
         // console.log('VideoGen.runFunc.res', res)

@@ -24,7 +24,11 @@ const doUser = async () => {
     if (!setting.basic.userEnable) {
         return;
     }
-    await window.$mapi.user.open();
+    await window.$mapi.user.open({
+        readyParam: {
+            page: "ChargeLmApi",
+        },
+    });
 };
 
 const keywords = ref("");
@@ -256,6 +260,7 @@ defineExpose({
                                             </div>
                                             <div class="flex items-center">
                                                 <a-switch
+                                                    v-if="provider.id !== 'buildIn'"
                                                     :model-value="m.enabled"
                                                     @change="
                                                         modelStore.changeModel(provider.id, m.id, 'enabled', $event)

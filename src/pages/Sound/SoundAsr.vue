@@ -172,7 +172,12 @@ const onEditSave = async (taskId: number, records: AsrRecord[]) => {
                                     </a-button>
                                 </a-tooltip>
                                 <a-tooltip v-if="r.result && r.runtime?.text" :content="$t('下载')" mini>
-                                    <a-dropdown-button class="mr-2">
+                                    <a-dropdown-button
+                                        @click="
+                                            DownloadUtil.downloadFile(r.runtime?.text, `${r.title || 'asr-result'}.txt`)
+                                        "
+                                        class="mr-2"
+                                    >
                                         <icon-download />
                                         <template #icon>
                                             <icon-down />

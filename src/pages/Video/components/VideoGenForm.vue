@@ -8,10 +8,13 @@ import {Dialog} from "../../../lib/dialog";
 import {StorageUtil} from "../../../lib/storage";
 import {useServerStore} from "../../../store/modules/server";
 import {EnumServerStatus} from "../../../types/Server";
+import VideoTemplateSelector from "./VideoTemplateSelector.vue";
+import {VideoTemplateService} from "../../../service/VideoTemplateService";
 
 const serverStore = useServerStore();
 const formData = ref({
     serverKey: "",
+    videoTemplateId: 0,
 });
 const paramForm = ref<InstanceType<typeof ParamForm>>();
 const param = ref([]);
@@ -23,40 +26,52 @@ const onServerUpdate = async (config: any) => {
 };
 
 onMounted(async () => {
-    const old = StorageUtil.getObject("SoundAsrForm.formData");
+    const old = StorageUtil.getObject("VideoGenForm.formData");
     formData.value.serverKey = old.serverKey || "";
 });
 
 watch(
     () => formData.value,
     async value => {
-        StorageUtil.set("SoundAsrForm.formData", value);
+        StorageUtil.set("VideoGenForm.formData", value);
     },
     {
         deep: true,
     }
 );
 
-const getValue = async (): Promise<SoundAsrParamType | undefined> => {
+const getValue = async (): Promise<VideoGenParamType | undefined> => {
     const data: any = {};
-    data.type = "SoundAsr";
     data.serverKey = formData.value.serverKey;
 
     const server = await serverStore.getByKey(data.serverKey);
     if (!server) {
-        Dialog.tipError(t("请选择语音识别模型"));
+        Dialog.tipError(t("请选择数字人模型"));
         return;
     }
     if (server.status !== EnumServerStatus.RUNNING) {
-        Dialog.tipError(t("语音识别模型未启动"));
+        Dialog.tipError(t("数字人模型未启动"));
+        return;
+    }
+
+    if (!formData.value.videoTemplateId) {
+        Dialog.tipError(t("请选择视频"));
+        return;
+    }
+    const videoTemplate = await VideoTemplateService.get(formData.value.videoTemplateId);
+    if (!videoTemplate) {
+        Dialog.tipError(t("请选择视频"));
         return;
     }
 
     data.serverName = server.name;
     data.serverTitle = server.title;
     data.serverVersion = server.version;
-    data.param = paramForm.value?.getValue();
+    data.videoTemplateId = formData.value.videoTemplateId;
+    data.videoTemplateName = videoTemplate.name;
+    data.videoTemplateUrl = videoTemplate.video;
 
+    data.param = paramForm.value?.getValue();
     if (!data.param) {
         Dialog.tipError(t("语音识别参数不正确"));
         return;
@@ -74,19 +89,29 @@ defineExpose({
     <div class="mb-4">
         <div class="font-bold">
             <icon-settings />
-            {{ $t("语音识别配置") }}
+            {{ $t("数字人配置") }}
         </div>
         <div class="flex items-center h-12 mb-2">
             <div class="mr-1">
-                <a-tooltip :content="$t('语音识别模型')" mini>
+                <a-tooltip :content="$t('数字人模型')" mini>
                     <i class="iconfont icon-server"></i>
                 </a-tooltip>
             </div>
             <div class="mr-2 w-96 flex-shrink-0">
-                <ServerSelector v-model="formData.serverKey" @update="onServerUpdate" functionName="asr" />
+                <ServerSelector v-model="formData.serverKey" @update="onServerUpdate" functionName="videoGen" />
             </div>
             <div>
-                <ServerContentInfoAction :config="modelConfig as any" func="asr" />
+                <ServerContentInfoAction :config="modelConfig as any" func="videoGen" />
+            </div>
+        </div>
+        <div class="flex items-center h-12 mb-2">
+            <div class="mr-1">
+                <a-tooltip :content="$t('视频形象')" mini>
+                    <i class="iconfont icon-video-template"></i>
+                </a-tooltip>
+            </div>
+            <div class="mr-3 w-56 flex-shrink-0">
+                <VideoTemplateSelector v-model="formData.videoTemplateId" />
             </div>
         </div>
         <div class="flex items-center">
