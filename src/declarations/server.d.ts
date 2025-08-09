@@ -16,6 +16,7 @@ declare type ServerCallFunctionResultData = {
     data: {
         [key: string]: any;
     };
+    [key: string]: any;
 };
 declare type ServerCallFunctionResult = {
     code: number;

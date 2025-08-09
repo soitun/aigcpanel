@@ -248,9 +248,17 @@ export const liveStore = defineStore("live", {
                 [key: string]: any;
             } = {}
         ) {
+            if (!this.server) {
+                return {
+                    code: -1,
+                    msg: "没有可用的直播服务器",
+                    data: {},
+                };
+            }
             const serverInfo = await serverStore.serverInfo(this.server);
             return await window.$mapi.server.callFunctionWithException(serverInfo, "apiRequest", {
                 id: "live",
+                result: {},
                 url,
                 param,
             });
