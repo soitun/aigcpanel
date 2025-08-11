@@ -18,14 +18,14 @@
 ## 功能特性
 
 - 支持视频数字人合成，支持视频画面和声音换口型匹配
-- 支持语音合成、语音克隆，多种声音参数可设置
+- 支持语音合成、语音克隆、视频声音替换，多种声音参数可设置
 - 支持多模型导入、一键启动、模型设置、模型日志查看
 - 支持国际化，支持简体中文、英语
 - 支持多种模型一键启动包
 
 ## 模型支持
 
-### 声音模型
+### 声音合成
 
 - 声音模型 [CosyVoice-300M](https://github.com/FunAudioLLM/CosyVoice)
 - 声音模型 [CosyVoice-300M-Instruct](https://github.com/FunAudioLLM/CosyVoice)
@@ -34,6 +34,10 @@
 - 声音模型 [IndexTTS](https://github.com/index-tts/index-tts)
 - 声音模型 [SparkTTS](https://github.com/SparkAudio/Spark-TTS)
 - 声音模型 [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS)
+
+### 声音识别
+
+- 声音识别模型 [FunASR](https://github.com/modelscope/FunASR)
 
 ### 视频模型
 
