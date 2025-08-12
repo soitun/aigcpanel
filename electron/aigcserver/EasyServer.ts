@@ -284,8 +284,8 @@ export const EasyServer = function (config: any) {
                     modelConfig: {
                         type: "videoGen",
                         param: data.param,
-                        video: data.videoFile,
-                        audio: data.soundFile,
+                        video: data.video,
+                        audio: data.audio,
                     },
                 };
             },
