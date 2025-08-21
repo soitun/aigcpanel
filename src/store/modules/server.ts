@@ -17,6 +17,7 @@ import {EnumServerStatus, EnumServerType, ServerRecord, ServerRuntime} from "../
 import store from "../index";
 import {useServerCloudStore} from "./serverCloud";
 import {useTaskStore} from "./task";
+import {ServerInfo} from "../../../electron/mapi/server/type";
 
 // const serverCloudStore = useServerCloudStore()
 const taskStore = useTaskStore();
@@ -50,6 +51,7 @@ const getOrCreateServerRuntime = (record: ServerRecord): ServerRuntime => {
     }
     const defaultValue = {
         status: EnumServerStatus.STOPPED,
+        autoStartStatus: EnumServerStatus.STOPPED,
         eventChannelName: undefined,
         logFile: "",
     } as ServerRuntime;
@@ -405,6 +407,26 @@ export const serverStore = defineStore("server", {
         },
         generateServerKey(server: ServerRecord) {
             return `${server.name}|${server.version}`;
+        },
+        async callStart(serverInfo: ServerInfo) {
+            const server = await this.getByNameVersion(serverInfo.name, serverInfo.version);
+            if (!server) {
+                throw new Error("ServerNotFound");
+            }
+            const serverRuntime = getOrCreateServerRuntime(server);
+            if (server.autoStart) {
+                serverRuntime.autoStartStatus = EnumServerStatus.RUNNING;
+            }
+        },
+        async callEnd(serverInfo: ServerInfo) {
+            const server = await this.getByNameVersion(serverInfo.name, serverInfo.version);
+            if (!server) {
+                throw new Error("ServerNotFound");
+            }
+            const serverRuntime = getOrCreateServerRuntime(server);
+            if (server.autoStart) {
+                serverRuntime.autoStartStatus = EnumServerStatus.STOPPED;
+            }
         },
         async serverInfo(server: ServerRecord) {
             const result = {

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import {EnumServerStatus} from "../../types/Server";
+import {EnumServerStatus, ServerRuntime} from "../../types/Server";
 import {computed} from "vue";
 import {t} from "../../lang";
 
 interface Props {
     status: EnumServerStatus | null;
     autoStart: boolean | null;
+    runtime: ServerRuntime;
 }
 
 const props = defineProps<Props>();
@@ -18,6 +19,12 @@ const statusColor = computed(() => {
         [EnumServerStatus.STOPPING]: "bg-yellow-400",
         [EnumServerStatus.ERROR]: "bg-red-500",
     };
+    if (props.autoStart) {
+        if (props.runtime.autoStartStatus === EnumServerStatus.RUNNING) {
+            return colorMap[props.runtime.autoStartStatus as string];
+        }
+        return "bg-blue-400";
+    }
     return colorMap[props.status as string] || "bg-gray-400";
 });
 
@@ -29,6 +36,12 @@ const statusText = computed(() => {
         [EnumServerStatus.STOPPING]: t("停止中"),
         [EnumServerStatus.ERROR]: t("错误"),
     };
+    if (props.autoStart) {
+        if (props.runtime.autoStartStatus === EnumServerStatus.RUNNING) {
+            return textMap[props.runtime.autoStartStatus as string];
+        }
+        return t("自启动");
+    }
     return textMap[props.status as string] || "Unknown";
 });
 </script>
@@ -36,10 +49,7 @@ const statusText = computed(() => {
 <template>
     <div class="text-white px-2 py-1 rounded-full text-sm inline-flex items-center" :class="statusColor">
         <div class="w-2 h-2 rounded-full bg-white mr-2"></div>
-        <div v-if="autoStart">
-            {{ $t("自动启动") }}
-        </div>
-        <div v-else>
+        <div>
             {{ statusText }}
         </div>
     </div>

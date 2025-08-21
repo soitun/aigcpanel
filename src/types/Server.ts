@@ -37,11 +37,12 @@ export type ServerRecord = {
     };
     cloudConfig?: any;
     status?: any;
-    runtime?: any;
+    runtime?: ServerRuntime | any;
 };
 
 export type ServerRuntime = {
     status: EnumServerStatus;
+    autoStartStatus: EnumServerStatus;
     // shellController: any,
     // httpUrl: string,
     logFile: string;

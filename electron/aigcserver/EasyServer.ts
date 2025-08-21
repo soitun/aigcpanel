@@ -162,14 +162,19 @@ export const EasyServer = function (config: any) {
                             resolve(undefined);
                         }, option.timeout * 1000);
                     }
+                    let buffer = "";
                     this.ServerApi.app
                         .spawnShell(command, {
                             env: envMap,
                             cwd: this.ServerInfo.localPath,
                             stdout: _data => {
                                 // console.log('easyServer.stdout', _data)
+                                buffer += _data;
+                                // check if has \n and process the buffer
+                                let lines = buffer.split("\n");
+                                buffer = lines.pop() || "";
                                 this.ServerApi.file.appendText(this.ServerInfo.logFile, _data);
-                                const result = this.ServerApi.extractResultFromLogs(data.id, _data);
+                                const result = this.ServerApi.extractResultFromLogs(data.id, lines.join("\n") + "\n");
                                 if (result) {
                                     launcherResult.result = Object.assign(launcherResult.result, result);
                                     this.send("taskResult", {id: data.id, result});

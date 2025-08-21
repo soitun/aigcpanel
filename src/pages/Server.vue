@@ -120,7 +120,11 @@ const typeName = (type: string) => {
                                 </div>
                             </div>
                             <div>
-                                <ServerStatus :status="record.status" :auto-start="record.autoStart" />
+                                <ServerStatus
+                                    :status="record.status"
+                                    :auto-start="record.autoStart"
+                                    :runtime="record.runtime"
+                                />
                             </div>
                         </div>
                         <div class="h-12 pt-4">
