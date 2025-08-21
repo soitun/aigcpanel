@@ -408,6 +408,17 @@ export const serverStore = defineStore("server", {
         generateServerKey(server: ServerRecord) {
             return `${server.name}|${server.version}`;
         },
+        async call(
+            serverInfo: ServerInfo,
+            method: string,
+            data: ServerCallFunctionData,
+            option?: ServerCallFunctionOption
+        ): Promise<ServerCallFunctionResult> {
+            await this.callStart(serverInfo);
+            const res = await window.$mapi.server.callFunctionWithException(serverInfo, method, data, option);
+            await this.callEnd(serverInfo);
+            return res;
+        },
         async callStart(serverInfo: ServerInfo) {
             const server = await this.getByNameVersion(serverInfo.name, serverInfo.version);
             if (!server) {
@@ -450,7 +461,7 @@ export const serverStore = defineStore("server", {
                 result.logFile = serverRuntime.logFile;
                 result.eventChannelName = serverRuntime.eventChannelName as string;
             }
-            return result;
+            return result as ServerInfo;
         },
     },
 });

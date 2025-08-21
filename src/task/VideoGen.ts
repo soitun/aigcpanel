@@ -1,6 +1,5 @@
 import {DataService} from "../service/DataService";
 import {TaskService} from "../service/TaskService";
-import {VideoTemplateService} from "../service/VideoTemplateService";
 import {useServerStore} from "../store/modules/server";
 import {TaskBiz} from "../store/modules/task";
 
@@ -25,7 +24,7 @@ export const VideoGen: TaskBiz = {
         if (!audioFile) {
             throw new Error("AudioFileEmpty");
         }
-        const res = await window.$mapi.server.callFunctionWithException(serverInfo, "videoGen", {
+        const res = await serverStore.call(serverInfo, "videoGen", {
             id: serverStore.generateTaskId("VideoGen", bizId),
             result: record.result,
             param: record.param,

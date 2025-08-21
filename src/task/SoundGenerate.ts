@@ -16,14 +16,14 @@ export const SoundGenerate: TaskBiz = {
         let res;
         if (record.modelConfig.type === "SoundTts") {
             // {"type":"SoundTts","ttsServerKey":"server-cosyvoice|0.6.0","ttsParam":{"speaker":"中文女","speed":1},"text":"你好"}
-            res = await window.$mapi.server.callFunctionWithException(serverInfo, "soundTts", {
+            res = await serverStore.call(serverInfo, "soundTts", {
                 id: serverStore.generateTaskId(record.modelConfig.type, bizId),
                 result: record.result,
                 param: record.modelConfig.ttsParam,
                 text: record.modelConfig.text,
             });
         } else {
-            res = await window.$mapi.server.callFunctionWithException(serverInfo, "soundClone", {
+            res = await serverStore.call(serverInfo, "soundClone", {
                 id: serverStore.generateTaskId(record.modelConfig.type, bizId),
                 result: record.result,
                 param: record.modelConfig.cloneParam,

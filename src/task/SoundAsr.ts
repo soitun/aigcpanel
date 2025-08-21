@@ -10,14 +10,12 @@ export const SoundAsr: TaskBiz = {
         await TaskService.update(bizId, {
             status: "wait",
         });
-        await serverStore.callStart(serverInfo);
-        const res = await window.$mapi.server.callFunctionWithException(serverInfo, "asr", {
+        const res = await serverStore.call(serverInfo, "asr", {
             id: serverStore.generateTaskId("SoundAsr", bizId),
             result: record.result,
             param: record.param,
             audio: record.modelConfig.audio,
         });
-        await serverStore.callEnd(serverInfo);
         if (res.code) {
             throw res.msg || "SoundAsr run fail";
         }

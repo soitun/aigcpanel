@@ -1,7 +1,7 @@
 import {useServerStore} from "../store/modules/server";
 import {TaskBiz} from "../service/TaskService";
 
-const serverStore = useServerStore()
+const serverStore = useServerStore();
 
 export const serverSoundAsr = async (
     biz: TaskBiz,
@@ -29,7 +29,7 @@ export const serverSoundAsr = async (
         start: 0,
         end: 0,
         records: [],
-    }
+    };
     switch (res.data.type) {
         case "success":
             ret.start = res.data.start;
@@ -44,8 +44,8 @@ export const serverSoundAsr = async (
         default:
             throw `unknown res.data.type : ${res.data.type}`;
     }
-    return ret
-}
+    return ret;
+};
 
 export const serverSoundGenerate = async (
     biz: TaskBiz,
@@ -54,24 +54,21 @@ export const serverSoundGenerate = async (
     result: {},
     text: string
 ) => {
-    const server = await serverStore.getByNameVersion(
-        soundGenerate.serverName,
-        soundGenerate.serverVersion
-    );
+    const server = await serverStore.getByNameVersion(soundGenerate.serverName, soundGenerate.serverVersion);
     if (!server) {
         throw "SoundGenerate server not found: " + soundGenerate.serverName;
     }
     const serverInfo = await serverStore.serverInfo(server);
-    let res
+    let res;
     if (soundGenerate.type == "SoundTts") {
-        res = await window.$mapi.server.callFunctionWithException(serverInfo, "soundTts", {
+        res = await serverStore.call(serverInfo, "soundTts", {
             id: serverStore.generateTaskId(biz, bizId),
             result: result,
             param: soundGenerate.ttsParam,
             text: text,
         });
     } else if (soundGenerate.type == "SoundClone") {
-        res = await window.$mapi.server.callFunctionWithException(serverInfo, "soundClone", {
+        res = await serverStore.call(serverInfo, "soundClone", {
             id: serverStore.generateTaskId(biz, bizId),
             result: result,
             param: soundGenerate.cloneParam,
@@ -90,16 +87,16 @@ export const serverSoundGenerate = async (
         type: res.data.type,
         start: 0,
         end: 0,
-        url: '',
-    }
+        url: "",
+    };
     switch (res.data.type) {
         case "success":
-            ret.url = res.data.data.url
+            ret.url = res.data.data.url;
             break;
         case "retry":
             break;
         default:
             throw `unknown res.data.type : ${res.data.type}`;
     }
-    return ret
-}
+    return ret;
+};

@@ -42,7 +42,7 @@ export const VideoGenFlow: TaskBiz = {
         });
         let audioFilePath: string | null = null;
         if (modelConfig.soundGenerate.type === "SoundTts") {
-            const res = await window.$mapi.server.callFunctionWithException(
+            const res = await serverStore.call(
                 soundGenerateServerInfo,
                 "soundTts",
                 {
@@ -77,7 +77,7 @@ export const VideoGenFlow: TaskBiz = {
                     throw new Error("unknown res.data.type");
             }
         } else if (modelConfig.soundGenerate.type === "SoundClone") {
-            const res = await window.$mapi.server.callFunctionWithException(
+            const res = await serverStore.call(
                 soundGenerateServerInfo,
                 "soundClone",
                 {
@@ -126,7 +126,7 @@ export const VideoGenFlow: TaskBiz = {
             },
         });
         // console.log('VideoGenFlow.runFunc.urlSound', urlSound)
-        const res = await window.$mapi.server.callFunctionWithException(
+        const res = await serverStore.call(
             serverInfo,
             "videoGen",
             {
