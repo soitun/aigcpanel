@@ -458,6 +458,7 @@
     "5ead16a5": "Model path cannot contain non-English characters, spaces, or special characters",
     "5f465380": "Cloud models support direct use without download and installation, convenient and fast",
     "6146764e": "3. It's recommended that the person in the video keeps mouth closed or slightly open, not too wide, at a certain distance from the camera, adjustable based on synthesis effect",
+    "62841d73": "参考声音需要大于 6s 小于 20s，保证声音清晰可见",
     "62bef086": "Developer Tools",
     "64138215": "Speech Recognition Model",
     "6418684c": "Speech Recognition Configuration",

@@ -47,6 +47,11 @@ const doSave = async () => {
         Dialog.tipError(t("名称重复"));
         return;
     }
+    const duration = AudioUtil.audioBufferDuration(audioBuffer);
+    if (duration > 20 || duration < 6) {
+        Dialog.tipError(t("参考声音需要大于 6s 小于 20s，保证声音清晰可见"));
+        return;
+    }
     const wav = AudioUtil.audioBufferToWav(audioBuffer);
     formData.value.promptWav = await DataService.saveBuffer("wav", wav);
     await StorageService.add("SoundPrompt", {
@@ -132,7 +137,7 @@ const emit = defineEmits({
                     <div class="bg-gray-100 mt-2 p-3 rounded-lg leading-6 text-xs">
                         <div>{{ $t("1. 请在安静的环境下进行录音，避免噪音干扰") }}</div>
                         <div>{{ $t("2. 请使用标准普通话，吐字清晰，语速适当") }}</div>
-                        <div>{{ $t("3. 录音时长控制在 6～12秒 最佳，最多不超过14秒") }}</div>
+                        <div>{{ $t("3. 录音时长控制在 6～20秒 最佳，最多不超过20秒") }}</div>
                         <div>{{ $t("4. 录制完成后先试听看是否达到要求再提交") }}</div>
                     </div>
                 </div>
