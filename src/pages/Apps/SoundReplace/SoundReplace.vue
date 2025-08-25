@@ -91,7 +91,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
 
 <template>
     <div class="p-5">
-        <div class="mb-4 flex items-center">
+        <div class="app-header mb-4 flex items-center">
             <div class="flex-grow flex items-end">
                 <div class="text-3xl font-bold">{{ $t("声音替换") }}</div>
                 <div class="text-gray-400 ml-3">{{ $t("使用新声音替换已有视频的声音") }}</div>
