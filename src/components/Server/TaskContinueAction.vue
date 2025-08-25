@@ -26,10 +26,10 @@ const doContinue = async () => {
     }
 };
 const continueContent = computed(() => {
-    if (props.record.status === 'fail') {
-        return t('重新尝试');
+    if (props.record.status === "fail") {
+        return t("继续尝试");
     }
-    return t('继续任务');
+    return t("继续任务");
 });
 </script>
 
@@ -37,7 +37,7 @@ const continueContent = computed(() => {
     <a-tooltip v-if="record.status === 'pause' || record.status === 'fail'" :content="continueContent" mini>
         <a-button class="mr-2" @click="doContinue()">
             <template #icon>
-                <icon-right-circle/>
+                <icon-right-circle />
             </template>
         </a-button>
     </a-tooltip>
