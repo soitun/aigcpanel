@@ -4,6 +4,7 @@ import {Dialog} from "../../lib/dialog";
 import {sleep} from "../../lib/util";
 import {TaskRecord} from "../../service/TaskService";
 import {useTaskStore} from "../../store/modules/task";
+import {computed} from "vue";
 
 const taskStore = useTaskStore();
 
@@ -24,13 +25,19 @@ const doContinue = async () => {
         Dialog.tipError(t("继续失败"));
     }
 };
+const continueContent = computed(() => {
+    if (props.record.status === 'fail') {
+        return t('重新尝试');
+    }
+    return t('继续任务');
+});
 </script>
 
 <template>
-    <a-tooltip v-if="record.status === 'pause' || record.status === 'fail'" :content="$t('继续任务')" mini>
+    <a-tooltip v-if="record.status === 'pause' || record.status === 'fail'" :content="continueContent" mini>
         <a-button class="mr-2" @click="doContinue()">
             <template #icon>
-                <icon-right-circle />
+                <icon-right-circle/>
             </template>
         </a-button>
     </a-tooltip>

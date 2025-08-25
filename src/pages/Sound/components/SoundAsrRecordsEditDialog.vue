@@ -267,7 +267,7 @@ defineExpose({
                                         </template>
                                     </a-button>
                                 </a-tooltip>
-                                <a-tooltip :content="$t('前插入')" mini>
+                                <a-tooltip :content="$t('再之前插入')" mini>
                                     <a-button @click="doInsertBefore(rowIndex)">
                                         <template #icon>
                                             <icon-plus />

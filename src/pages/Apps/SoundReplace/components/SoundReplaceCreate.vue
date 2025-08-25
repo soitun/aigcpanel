@@ -87,19 +87,22 @@ const isSubmitting = ref(false);
                     <i class="iconfont icon-video"></i>
                 </a-tooltip>
             </div>
-            <div>
-                <div v-if="formData.video" class="mb-2 text-sm text-gray-600">
-                    <i class="iconfont icon-file mr-1"></i>
-                    {{ formData.video.split("/").pop() || formData.video.split("\\").pop() }}
-                </div>
-                <a-button @click="onSelectAudioFile" class="w-96 max-w-full">
+            <div class="flex items-center">
+                <a-tooltip v-if="formData.video" :content="formData.video" mini>
+                    <div
+                        class="mr-2 text-sm text-black rounded-lg leading-7 min-w-48 px-3 min-h-7 border border-gray-500 cursor-default select-none">
+                        <icon-file/>
+                        {{ formData.video.split("/").pop() || formData.video.split("\\").pop() }}
+                    </div>
+                </a-tooltip>
+                <a-button @click="onSelectAudioFile" class="w-48 max-w-full">
                     <i class="iconfont icon-upload mr-2"></i>
                     {{ formData.video ? t("重新选择") : t("选择视频文件") }}({{ t("支持MP4格式") }})
                 </a-button>
             </div>
         </div>
-        <SoundAsrForm ref="soundAsrForm" />
-        <SoundGenerateForm ref="soundGenerateForm" />
+        <SoundAsrForm ref="soundAsrForm"/>
+        <SoundGenerateForm ref="soundGenerateForm"/>
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit" :loading="isSubmitting">
                 <i class="iconfont icon-submit mr-2"></i>
