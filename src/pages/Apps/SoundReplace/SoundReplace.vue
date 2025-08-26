@@ -6,7 +6,6 @@ import TaskContinueAction from "../../../components/Server/TaskContinueAction.vu
 import TaskDeleteAction from "../../../components/Server/TaskDeleteAction.vue";
 import TaskDownloadAction from "../../../components/Server/TaskDownloadAction.vue";
 import TaskDuration from "../../../components/Server/TaskDuration.vue";
-import TaskRetryAction from "../../../components/Server/TaskRetryAction.vue";
 import TaskTitleField from "../../../components/Server/TaskTitleField.vue";
 import TextTruncateView from "../../../components/TextTruncateView.vue";
 import AudioPlayer from "../../../components/common/AudioPlayer.vue";
@@ -23,6 +22,7 @@ import SoundReplaceCreate from "./components/SoundReplaceCreate.vue";
 import StepsComponent from "./components/StepsComponent.vue";
 import {soundReplaceFileCleanCollector} from "./util";
 import ServerNameVersion from "../../../components/Server/ServerNameVersion.vue";
+import {ToggleUtil} from "../../../lib/toggle";
 
 const soundAsrRecordsEditDialog = ref<InstanceType<typeof SoundAsrRecordsEditDialog> | null>(null);
 const taskStore = useTaskStore();
@@ -64,9 +64,6 @@ const doRefresh = async () => {
                     }
                     return "";
                 }),
-            },
-            SoundGenerate: {
-                showTruncate: true,
             },
         };
         return r;
@@ -235,7 +232,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                             <TextTruncateView :max-length="40" :text="r.runtime?.Confirm.text"/>
                                         </div>
                                     </div>
-                                    <div v-if="1||!r.jobResult.Confirm.confirm">
+                                    <div v-if="!r.jobResult.Confirm.confirm">
                                         <a-button
                                             type="primary"
                                             @click="
@@ -243,8 +240,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                                     r.id as any,
                                                     r.jobResult.Confirm.records
                                                 )
-                                            "
-                                        >
+                                            ">
                                             <template #icon>
                                                 <icon-check-circle/>
                                             </template>
@@ -270,31 +266,32 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                             <div class="flex-grow">
                                 <div
                                     v-if="r.jobResult.SoundGenerate && r.jobResult.SoundGenerate.records"
-                                    class="bg-gray-100 rounded-lg p-2"
+                                    class="bg-gray-100 rounded-lg"
                                 >
-                                    <div
-                                        v-for="rr in r.jobResult.SoundGenerate.records.filter((o, i) => {
-                                            return i < 5 || !r.runtime?.SoundGenerate.showTruncate;
+                                    <div class="max-h-96 overflow-y-auto p-2 rounded-lg">
+                                        <div
+                                            v-for="rr in r.jobResult.SoundGenerate.records.filter((o, i) => {
+                                            return i < 2 || ToggleUtil.get('SoundReplace',r.id,false).value;
                                         })"
-                                        class="flex mb-1"
-                                    >
-                                        <div class="w-6 flex-shrink-0">
-                                            <AudioPlayerButton v-if="rr.audio" :source="rr.audio"/>
-                                            <icon-refresh
-                                                v-else-if="
+                                            class="flex mb-1">
+                                            <div class="w-6 flex-shrink-0">
+                                                <AudioPlayerButton v-if="rr.audio" :source="rr.audio"/>
+                                                <icon-refresh
+                                                    v-else-if="
                                                     r.jobResult.step === 'SoundGenerate' && r.status === 'running'
                                                 "
-                                                spin
-                                            />
-                                            <icon-info-circle v-else class="text-gray-400"/>
+                                                    spin
+                                                />
+                                                <icon-info-circle v-else class="text-gray-400"/>
+                                            </div>
+                                            <div>{{ rr.text }}</div>
                                         </div>
-                                        <div>{{ rr.text }}</div>
                                     </div>
-                                    <div v-if="r.jobResult.SoundGenerate.records.length > 5 && r.runtime">
+                                    <div v-if="r.jobResult.SoundGenerate.records.length > 5" class="p-2">
                                         <a-button
-                                            v-if="r.runtime.SoundGenerate.showTruncate"
+                                            v-if="!ToggleUtil.get('SoundReplace',r.id,false).value"
                                             size="mini"
-                                            @click="r.runtime.SoundGenerate.showTruncate = false"
+                                            @click="ToggleUtil.toggle('SoundReplace',r.id)"
                                         >
                                             <template #icon>
                                                 <icon-down/>
@@ -304,7 +301,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                         <a-button
                                             v-else
                                             size="mini"
-                                            @click="r.runtime.SoundGenerate.showTruncate = true"
+                                            @click="ToggleUtil.toggle('SoundReplace',r.id)"
                                         >
                                             <template #icon>
                                                 <icon-up/>

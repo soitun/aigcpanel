@@ -95,7 +95,7 @@ const isSubmitting = ref(false);
                         {{ formData.video.split("/").pop() || formData.video.split("\\").pop() }}
                     </div>
                 </a-tooltip>
-                <a-button @click="onSelectAudioFile" class="w-48 max-w-full">
+                <a-button @click="onSelectAudioFile" class="w-64 max-w-full">
                     <i class="iconfont icon-upload mr-2"></i>
                     {{ formData.video ? t("重新选择") : t("选择视频文件") }}({{ t("支持MP4格式") }})
                 </a-button>
