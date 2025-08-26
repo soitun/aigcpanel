@@ -10,8 +10,8 @@ interface AsrRecord {
 }
 
 interface EditingAsrRecord extends AsrRecord {
-    startSeconds?: number; // 开始时间的秒数（包含小数部分）
-    endSeconds?: number; // 结束时间的秒数（包含小数部分）
+    startSeconds?: number;
+    endSeconds?: number;
 }
 
 const props = defineProps({
@@ -240,7 +240,7 @@ defineExpose({
                             <a-textarea
                                 size="mini"
                                 v-model="record.text"
-                                :max-length="20000"
+                                :max-length="1000"
                                 :auto-size="{minRows: 1}"
                                 show-word-limit
                             />

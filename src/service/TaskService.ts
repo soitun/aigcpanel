@@ -1,4 +1,3 @@
-import {merge} from "lodash-es";
 import {TimeUtil} from "../lib/util";
 import {useTaskStore} from "../store/modules/task";
 
@@ -33,6 +32,37 @@ export type TaskRecord = {
 export type TaskRuntime = {
     [key: string]: any;
 };
+
+// deep merge two object, newData has higher priority
+// if value is array, replace it directly
+const mergeData = (oldData: any, newData: any) => {
+    if (typeof oldData !== 'object' || oldData === null) {
+        return newData;
+    }
+    if (typeof newData !== 'object' || newData === null) {
+        return newData;
+    }
+    const result = {};
+    for (const key in oldData) {
+        if (key in newData) {
+            if (Array.isArray(newData[key])) {
+                result[key] = newData[key];
+            } else if (typeof newData[key] === 'object' && newData[key] !== null) {
+                result[key] = mergeData(oldData[key], newData[key]);
+            } else {
+                result[key] = newData[key];
+            }
+        } else {
+            result[key] = oldData[key];
+        }
+    }
+    for (const key in newData) {
+        if (!(key in oldData)) {
+            result[key] = newData[key];
+        }
+    }
+    return result;
+}
 
 export const TaskService = {
     tableName() {
@@ -174,10 +204,10 @@ export const TaskService = {
             const recordOld = await this.get(id);
             if (option.mergeResult) {
                 if ("result" in record) {
-                    record.result = merge(recordOld?.result, record.result);
+                    record.result = mergeData(recordOld?.result, record.result);
                 }
                 if ("jobResult" in record) {
-                    record.jobResult = merge(recordOld?.jobResult, record.jobResult);
+                    record.jobResult = mergeData(recordOld?.jobResult, record.jobResult);
                 }
             }
             if ("startTime" in record) {

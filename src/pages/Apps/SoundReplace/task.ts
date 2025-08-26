@@ -24,7 +24,7 @@ export const SoundReplace: TaskBiz = {
         jobResult.SoundGenerate = jobResult.SoundGenerate || {};
         jobResult.Combine = jobResult.Combine || {};
         if (jobResult.step === "ToAudio") {
-            console.log("SoundReplace.ToAudio", JSON.stringify(jobResult));
+            console.log("SoundReplace.ToAudio", jobResult);
             await TaskService.update(bizId, {
                 status: "running",
                 jobResult,
@@ -40,7 +40,7 @@ export const SoundReplace: TaskBiz = {
         }
 
         if (jobResult.step === "SoundAsr") {
-            console.log("SoundReplace.SoundAsr", JSON.stringify(jobResult));
+            console.log("SoundReplace.SoundAsr", jobResult);
             await TaskService.update(bizId, {
                 status: "running",
                 jobResult,
@@ -66,7 +66,7 @@ export const SoundReplace: TaskBiz = {
         }
 
         if (jobResult.step === "Confirm") {
-            console.log("SoundReplace.Confirm", JSON.stringify(jobResult));
+            console.log("SoundReplace.Confirm", jobResult);
             jobResult.Confirm.records = ObjectUtil.clone(jobResult.SoundAsr.records);
             jobResult.Confirm.confirm = false;
             await TaskService.update(bizId, {jobResult});
@@ -74,7 +74,7 @@ export const SoundReplace: TaskBiz = {
         }
 
         if (jobResult.step === "SoundGenerate") {
-            console.log("SoundReplace.SoundGenerate", JSON.stringify(jobResult));
+            console.log("SoundReplace.SoundGenerate", jobResult);
             if (!jobResult.SoundGenerate.records) {
                 jobResult.SoundGenerate.records = jobResult.Confirm.records.map(item => ({
                     ...item,
@@ -111,7 +111,7 @@ export const SoundReplace: TaskBiz = {
         }
 
         if (jobResult.step === "Combine") {
-            console.log("SoundReplace.Combine", JSON.stringify(jobResult));
+            console.log("SoundReplace.Combine", jobResult);
             jobResult.Combine.audio = "";
             jobResult.Combine.file = "";
             await TaskService.update(bizId, {

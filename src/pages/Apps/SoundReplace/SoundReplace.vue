@@ -75,6 +75,7 @@ const doRefresh = async () => {
 };
 
 const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
+    console.log('onAsrRecordsUpdate', {taskId, records});
     await TaskService.update(taskId, {
         statusMsg: "",
         jobResult: {
@@ -85,6 +86,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
             },
         },
     });
+    await doRefresh();
     await taskStore.dispatch("SoundReplace", taskId + "");
 };
 </script>
@@ -98,15 +100,15 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
             </div>
             <a-button @click="stepsVisible = !stepsVisible" size="small" class="ml-2">
                 <template #icon>
-                    <icon-up v-if="!stepsVisible" />
-                    <icon-down v-else />
+                    <icon-up v-if="!stepsVisible"/>
+                    <icon-down v-else/>
                 </template>
                 {{ $t("说明") }}
             </a-button>
         </div>
-        <StepsComponent v-if="stepsVisible" />
+        <StepsComponent v-if="stepsVisible"/>
         <div>
-            <SoundReplaceCreate @submitted="doRefresh" />
+            <SoundReplaceCreate @submitted="doRefresh"/>
             <div v-if="records.length > 0">
                 <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
                     <div class="flex-grow flex items-center">
@@ -124,7 +126,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                             @update="doRefresh"
                             :file-clean-collector="soundReplaceFileCleanCollector"
                         />
-                        <TaskBatchDownloadAction :records="checkRecords" />
+                        <TaskBatchDownloadAction :records="checkRecords"/>
                     </div>
                     <div>
                         <a-pagination
@@ -141,7 +143,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                         <div class="flex items-center">
                             <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
                                 <div class="mr-2 h-8 pt-0.5">
-                                    <a-checkbox v-model="r['_check']" />
+                                    <a-checkbox v-model="r['_check']"/>
                                 </div>
                                 <div class="">
                                     <TaskTitleField
@@ -153,35 +155,34 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                             </div>
                             <div class="flex-grow"></div>
                             <div class="ml-1">
-                                <TaskDuration :start="r.startTime" :end="r.endTime" />
+                                <TaskDuration :start="r.startTime" :end="r.endTime"/>
                             </div>
                             <div class="ml-1">
-                                <TaskBizStatus :status="r.status" :status-msg="r.statusMsg" />
+                                <TaskBizStatus :status="r.status" :status-msg="r.statusMsg"/>
                             </div>
                         </div>
                         <div class="mt-3 flex">
                             <div class="w-24 flex-shrink-0">
                                 <div class="inline-block text-center">
-                                    <i class="iconfont icon-sound"></i>
+                                    <i class="iconfont icon-sound-prompt"></i>
                                     {{ $t("提取音频") }}
                                 </div>
                             </div>
                             <div class="flex-grow pt-1">
                                 <div v-if="r.jobResult.ToAudio && r.jobResult.ToAudio.file">
-                                    <AudioPlayer :url="r.jobResult.ToAudio.file" show-wave />
+                                    <AudioPlayer :url="r.jobResult.ToAudio.file" show-wave/>
                                 </div>
                                 <div
                                     v-else-if="r.jobResult.step === 'ToAudio' && r.status === 'running'"
-                                    class="bg-gray-100 rounded-lg p-1"
-                                >
+                                    class="bg-gray-100 rounded-lg p-1">
                                     <div class="text-gray-400">
-                                        <icon-refresh spin />
+                                        <icon-refresh spin/>
                                         {{ $t("处理中") }}
                                     </div>
                                 </div>
                                 <div v-else class="bg-gray-100 rounded-lg p-1">
                                     <div class="text-gray-400">
-                                        <icon-info-circle />
+                                        <icon-info-circle/>
                                         {{ $t("未处理") }}
                                     </div>
                                 </div>
@@ -197,7 +198,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                             <div class="flex-grow pt-1">
                                 <div v-if="r.jobResult.SoundAsr && r.jobResult.SoundAsr.records">
                                     <div class="bg-gray-100 rounded-lg p-2">
-                                        <TextTruncateView :max-length="40" :text="r.runtime?.SoundAsr.text" />
+                                        <TextTruncateView :max-length="40" :text="r.runtime?.SoundAsr.text"/>
                                     </div>
                                 </div>
                                 <div
@@ -205,25 +206,25 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                     class="bg-gray-100 rounded-lg p-1"
                                 >
                                     <div class="text-gray-400">
-                                        <icon-refresh spin />
+                                        <icon-refresh spin/>
                                         {{ $t("处理中") }}
                                     </div>
                                 </div>
                                 <div v-else class="bg-gray-100 rounded-lg p-1">
                                     <div class="text-gray-400">
-                                        <icon-info-circle />
+                                        <icon-info-circle/>
                                         {{ $t("未处理") }}
                                     </div>
                                 </div>
                                 <div class="mt-1">
-                                    <ServerNameVersion :record="r.modelConfig.soundAsr" />
+                                    <ServerNameVersion :record="r.modelConfig.soundAsr"/>
                                 </div>
                             </div>
                         </div>
                         <div class="mt-3 flex">
                             <div class="w-24 flex-shrink-0">
                                 <div class="inline-block text-center">
-                                    <i class="iconfont icon-sound"></i>
+                                    <i class="iconfont icon-video-text"></i>
                                     {{ $t("重排确认") }}
                                 </div>
                             </div>
@@ -231,10 +232,10 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                 <div v-if="r.jobResult.Confirm && r.jobResult.Confirm.records">
                                     <div class="mb-1">
                                         <div class="bg-gray-100 rounded-lg p-2">
-                                            <TextTruncateView :max-length="40" :text="r.runtime?.Confirm.text" />
+                                            <TextTruncateView :max-length="40" :text="r.runtime?.Confirm.text"/>
                                         </div>
                                     </div>
-                                    <div v-if="!r.jobResult.Confirm.confirm">
+                                    <div v-if="1||!r.jobResult.Confirm.confirm">
                                         <a-button
                                             type="primary"
                                             @click="
@@ -245,7 +246,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                             "
                                         >
                                             <template #icon>
-                                                <icon-check-circle />
+                                                <icon-check-circle/>
                                             </template>
                                             {{ $t("修改确认文字") }}
                                         </a-button>
@@ -253,7 +254,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                 </div>
                                 <div v-else class="bg-gray-100 rounded-lg p-1">
                                     <div class="text-gray-400">
-                                        <icon-info-circle />
+                                        <icon-info-circle/>
                                         {{ $t("未处理") }}
                                     </div>
                                 </div>
@@ -278,14 +279,14 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                         class="flex mb-1"
                                     >
                                         <div class="w-6 flex-shrink-0">
-                                            <AudioPlayerButton v-if="rr.audio" :source="rr.audio" />
+                                            <AudioPlayerButton v-if="rr.audio" :source="rr.audio"/>
                                             <icon-refresh
                                                 v-else-if="
                                                     r.jobResult.step === 'SoundGenerate' && r.status === 'running'
                                                 "
                                                 spin
                                             />
-                                            <icon-info-circle v-else class="text-gray-400" />
+                                            <icon-info-circle v-else class="text-gray-400"/>
                                         </div>
                                         <div>{{ rr.text }}</div>
                                     </div>
@@ -296,7 +297,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                             @click="r.runtime.SoundGenerate.showTruncate = false"
                                         >
                                             <template #icon>
-                                                <icon-down />
+                                                <icon-down/>
                                             </template>
                                             {{ $t("展开") }}
                                         </a-button>
@@ -306,7 +307,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                             @click="r.runtime.SoundGenerate.showTruncate = true"
                                         >
                                             <template #icon>
-                                                <icon-up />
+                                                <icon-up/>
                                             </template>
                                             {{ $t("收起") }}
                                         </a-button>
@@ -314,19 +315,19 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                 </div>
                                 <div v-else class="bg-gray-100 rounded-lg p-1">
                                     <div class="text-gray-400">
-                                        <icon-info-circle />
+                                        <icon-info-circle/>
                                         {{ $t("未处理") }}
                                     </div>
                                 </div>
                                 <div class="mt-1">
-                                    <ServerNameVersion :record="r.modelConfig.soundGenerate" />
+                                    <ServerNameVersion :record="r.modelConfig.soundGenerate"/>
                                 </div>
                             </div>
                         </div>
                         <div class="mt-3 flex">
                             <div class="w-24 flex-shrink-0">
                                 <div class="inline-block text-center">
-                                    <i class="iconfont icon-sound"></i>
+                                    <i class="iconfont icon-video"></i>
                                     {{ $t("视频合成") }}
                                 </div>
                             </div>
@@ -334,20 +335,20 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                 v-if="r.jobResult.Combine && r.jobResult.Combine.file"
                                 class="bg-gray-100 rounded-lg p-2 w-full h-96"
                             >
-                                <VideoPlayer :url="r.jobResult.Combine.file" />
+                                <VideoPlayer :url="r.jobResult.Combine.file"/>
                             </div>
                             <div
                                 v-else-if="r.jobResult.step === 'Combine' && r.status === 'running'"
                                 class="bg-gray-100 rounded-lg p-1"
                             >
                                 <div class="text-gray-400">
-                                    <icon-refresh spin />
+                                    <icon-refresh spin/>
                                     {{ $t("处理中") }}
                                 </div>
                             </div>
                             <div v-else class="bg-gray-100 rounded-lg p-1 flex-grow">
                                 <div class="text-gray-400">
-                                    <icon-info-circle />
+                                    <icon-info-circle/>
                                     {{ $t("未处理") }}
                                 </div>
                             </div>
@@ -355,7 +356,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
 
                         <div class="pt-4 flex items-center">
                             <div class="text-gray-400 flex-grow">
-                                <timeago :datetime="r['createdAt'] * 1000" />
+                                <timeago :datetime="r['createdAt'] * 1000"/>
                             </div>
                             <div class="">
                                 <!-- <a-tooltip v-if="r.result && r._asrRecords" :content="$t('复制文本')" mini>
@@ -388,19 +389,19 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                         </template>
                                     </a-button>
                                 </a-tooltip> -->
-                                <TaskDownloadAction :record="r" />
+                                <TaskDownloadAction :record="r"/>
                                 <TaskDeleteAction
                                     :record="r"
                                     @update="doRefresh"
                                     :file-clean-collector="soundReplaceFileCleanCollector"
                                 />
-                                <TaskContinueAction :record="r" @update="doRefresh" />
+                                <TaskContinueAction :record="r" @update="doRefresh"/>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <m-empty v-else :text="$t('暂无语音识别任务')" />
+            <m-empty v-else :text="$t('暂无语音识别任务')"/>
         </div>
         <SoundAsrRecordsEditDialog
             ref="soundAsrRecordsEditDialog"
