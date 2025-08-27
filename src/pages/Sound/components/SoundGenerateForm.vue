@@ -72,7 +72,7 @@ const getValue = async (): Promise<SoundGenerateParamType | undefined> => {
         data.serverName = server.name;
         data.serverTitle = server.title;
         data.serverVersion = server.version;
-        data.ttsParam = ttsParamForm.value?.getValue();
+        data.ttsParam = ttsParamForm.value ? ttsParamForm.value.getValue() : {}
         if (!data.ttsParam) {
             Dialog.tipError(t("声音合成参数不正确"));
             return;
@@ -97,7 +97,7 @@ const getValue = async (): Promise<SoundGenerateParamType | undefined> => {
         data.serverName = server.name;
         data.serverTitle = server.title;
         data.serverVersion = server.version;
-        data.cloneParam = cloneParamForm.value?.getValue();
+        data.cloneParam = cloneParamForm.value ? cloneParamForm.value.getValue() : {};
         if (!data.cloneParam) {
             Dialog.tipError(t("声音合成参数不正确"));
             return;
@@ -131,7 +131,7 @@ defineExpose({
 <template>
     <div class="mb-4">
         <div class="font-bold mb-2">
-            <icon-settings />
+            <icon-settings/>
             {{ $t("声音合成配置") }}
         </div>
         <div class="flex items-start min-h-8">
@@ -168,7 +168,7 @@ defineExpose({
                     />
                 </div>
                 <div>
-                    <ServerContentInfoAction :config="ttsModelConfig as any" func="soundTts" />
+                    <ServerContentInfoAction :config="ttsModelConfig as any" func="soundTts"/>
                 </div>
             </div>
         </div>
@@ -187,7 +187,7 @@ defineExpose({
                     />
                 </div>
                 <div class="">
-                    <ServerContentInfoAction :config="cloneModelConfig as any" func="soundClone" />
+                    <ServerContentInfoAction :config="cloneModelConfig as any" func="soundClone"/>
                 </div>
             </div>
         </div>
@@ -198,15 +198,16 @@ defineExpose({
                 </a-tooltip>
             </div>
             <div class="mr-2 flex items-center">
-                <SoundPromptSelector v-model="formData.promptId" />
+                <SoundPromptSelector v-model="formData.promptId"/>
             </div>
         </div>
         <div class="flex flex-wrap items-center mt-2" v-if="formData.type === 'SoundTts'&&ttsParam&&ttsParam.length>0">
-            <ParamForm ref="ttsParamForm" :param="ttsParam" />
+            <ParamForm ref="ttsParamForm" :param="ttsParam"/>
         </div>
-        <div class="flex flex-wrap items-center mt-2" v-else-if="formData.type === 'SoundClone'&&cloneParam&&cloneParam.length>0">
-            <ParamForm ref="cloneParamForm" :param="cloneParam" />
+        <div class="flex flex-wrap items-center mt-2"
+             v-else-if="formData.type === 'SoundClone'&&cloneParam&&cloneParam.length>0">
+            <ParamForm ref="cloneParamForm" :param="cloneParam"/>
         </div>
     </div>
-    <SoundPromptDialog />
+    <SoundPromptDialog/>
 </template>

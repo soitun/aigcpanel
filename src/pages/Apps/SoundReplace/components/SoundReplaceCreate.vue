@@ -7,10 +7,6 @@ import {TaskRecord, TaskService} from "../../../../service/TaskService";
 import SoundAsrForm from "../../../Sound/components/SoundAsrForm.vue";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 
-const props = defineProps<{
-    node?: any,
-}>();
-
 const emit = defineEmits<{
     submitted: [];
 }>();
@@ -84,22 +80,22 @@ const isSubmitting = ref(false);
 </script>
 
 <template>
-    <div :class="node?'p-2':'rounded-xl shadow border p-4'">
-        <div v-if="!node" class="mb-4 flex items-start max-w-lg">
+    <div class="rounded-xl shadow border p-4">
+        <div class="mb-4 flex items-start">
             <div class="mr-1 pt-1">
                 <a-tooltip :content="$t('视频文件')" mini>
                     <i class="iconfont icon-video"></i>
                 </a-tooltip>
             </div>
-            <div class="flex flex-grow flex-wrap items-center gap-2">
+            <div class="flex items-center gap-2">
                 <a-tooltip v-if="formData.video" :content="formData.video" mini>
                     <div
-                        class="flex-grow text-sm text-black rounded-lg leading-7 min-w-48 px-3 min-h-7 border border-gray-500 cursor-default select-none">
+                        class="flex-grow text-sm text-black rounded-lg leading-7 min-w-64 px-3 min-h-7 border border-gray-500 cursor-default select-none">
                         <icon-file/>
                         {{ formData.video.split("/").pop() || formData.video.split("\\").pop() }}
                     </div>
                 </a-tooltip>
-                <a-button @click="onSelectAudioFile" class="flex-grow">
+                <a-button @click="onSelectAudioFile" class="flex-grow w-64">
                     <i class="iconfont icon-upload mr-2"></i>
                     {{ formData.video ? t("重新选择") : t("选择视频文件") }}({{ t("支持MP4格式") }})
                 </a-button>
@@ -107,7 +103,7 @@ const isSubmitting = ref(false);
         </div>
         <SoundAsrForm ref="soundAsrForm"/>
         <SoundGenerateForm ref="soundGenerateForm"/>
-        <div v-if="!node" class="flex">
+        <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit" :loading="isSubmitting">
                 <i class="iconfont icon-submit mr-2"></i>
                 {{ t("提交任务") }}

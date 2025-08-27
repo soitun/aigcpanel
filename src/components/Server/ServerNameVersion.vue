@@ -13,8 +13,8 @@ const props = defineProps({
 </script>
 
 <template>
-    <a-tag class="rounded-lg mr-1">
-        <i class="iconfont icon-server mr-1"></i>
+    <a-tag class="rounded-lg">
+        <i class="iconfont icon-server w-5"></i>
         {{ props.record.serverTitle }}
         v{{ props.record.serverVersion }}
     </a-tag>

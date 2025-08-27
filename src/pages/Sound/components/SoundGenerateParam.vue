@@ -1,0 +1,33 @@
+<script setup lang="ts">
+import ServerNameVersion from "../../../components/Server/ServerNameVersion.vue";
+import ParamFormView from "../../../components/common/ParamFormView.vue";
+
+const props = defineProps<{
+    data: SoundGenerateParamType,
+}>();
+</script>
+
+<template>
+    <div class="mb-4">
+        <div class="font-bold mb-2">
+            {{ $t("声音合成配置") }}
+        </div>
+        <div class="flex flex-wrap gap-1 min-h-8">
+            <a-tag v-if="data.type==='SoundTts'" class="rounded-lg">
+                <i class="iconfont icon-sound-generate w-5"></i>
+                {{ $t("声音合成") }}
+            </a-tag>
+            <a-tag v-else-if="data.type==='SoundClone'" class="rounded-lg">
+                <i class="iconfont icon-sound-clone w-5"></i>
+                {{ $t("声音克隆") }}
+            </a-tag>
+            <ServerNameVersion :record="data"/>
+            <a-tag v-if="data.type==='SoundClone'" class="rounded-lg">
+                <i class="iconfont icon-sound-clone w-5"></i>
+                {{ data.promptTitle }}
+            </a-tag>
+            <ParamFormView v-if="data.type==='SoundTts'&&data.ttsParam" :param="data.ttsParam"/>
+            <ParamFormView v-else-if="data.type==='SoundClone'&&data.cloneParam" :param="data.cloneParam"/>
+        </div>
+    </div>
+</template>

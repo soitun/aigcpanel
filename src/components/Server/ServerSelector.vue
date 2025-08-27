@@ -47,7 +47,7 @@ watch(
 </script>
 
 <template>
-    <a-select ref="select" :placeholder="$t('选择模型')" size="small" style="height:32px;">
+    <a-select ref="select" :placeholder="$t('选择模型')" size="small" class="min-w-64" style="height:32px;">
         <a-optgroup :label="$t('本地模型')">
             <a-option v-for="server in recordsFilter" :key="server.key" :value="server.key">
                 <div class="flex items-center py-2 flex-nowrap truncate no-wrap">

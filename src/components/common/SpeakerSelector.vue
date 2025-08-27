@@ -2,7 +2,7 @@
     <div>
         <div
             @click="doShow"
-            class="leading-8 h-8 px-3 rounded-lg text-left cursor-pointer bg-gray-100 hover:bg-gray-200"
+            class="leading-8 h-8 px-3 rounded-lg text-left cursor-pointer bg-gray-100 min-w-64 hover:bg-gray-200"
         >
             {{ speakerTitle || $t("选择音色") }}
         </div>

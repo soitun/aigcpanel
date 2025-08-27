@@ -29,7 +29,7 @@ const onSelect = (id: number) => {
     <div class="flex items-center">
         <div
             @click="soundPromptDialog?.show()"
-            class="mr-2 h-8 leading-8 px-3 rounded-lg cursor-pointer truncate bg-gray-100 hover:bg-gray-200"
+            class="mr-2 h-8 leading-8 px-3 rounded-lg cursor-pointer truncate bg-gray-100 hover:bg-gray-200 min-w-64"
         >
             {{ records.find(s => s.id === props.modelValue)?.title || "选择音色" }}
         </div>
