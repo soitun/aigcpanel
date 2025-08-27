@@ -129,12 +129,12 @@ defineExpose({
 </script>
 
 <template>
-    <div class="mb-4">
-        <div class="font-bold">
+    <div class="">
+        <div class="font-bold mb-2">
             <icon-settings />
             {{ $t("声音合成配置") }}
         </div>
-        <div class="flex items-center h-12">
+        <div class="flex items-start min-h-8">
             <div class="mr-1">
                 <a-tooltip :content="$t('合成类型')" mini>
                     <i class="iconfont icon-sound"></i>
@@ -153,54 +153,58 @@ defineExpose({
                 </a-radio-group>
             </div>
         </div>
-        <div v-if="formData.type === 'SoundTts'" class="flex items-center h-12 mb-2">
+        <div v-if="formData.type === 'SoundTts'" class="flex items-center min-h-8">
             <div class="mr-1">
                 <a-tooltip :content="$t('声音合成模型')" mini>
                     <i class="iconfont icon-server"></i>
                 </a-tooltip>
             </div>
-            <div class="mr-2 w-96 flex-shrink-0">
-                <ServerSelector
-                    v-model="formData.ttsServerKey"
-                    @update="onSoundTtsServerUpdate"
-                    functionName="soundTts"
-                />
-            </div>
-            <div>
-                <ServerContentInfoAction :config="ttsModelConfig as any" func="soundTts" />
+            <div class="flex flex-wrap">
+                <div class="mr-2">
+                    <ServerSelector
+                        v-model="formData.ttsServerKey"
+                        @update="onSoundTtsServerUpdate"
+                        functionName="soundTts"
+                    />
+                </div>
+                <div>
+                    <ServerContentInfoAction :config="ttsModelConfig as any" func="soundTts" />
+                </div>
             </div>
         </div>
-        <div v-if="formData.type === 'SoundClone'" class="flex items-center h-12 mb-2">
+        <div v-if="formData.type === 'SoundClone'" class="flex items-start min-h-8">
             <div class="mr-1">
                 <a-tooltip :content="$t('声音克隆模型')" mini>
                     <i class="iconfont icon-server"></i>
                 </a-tooltip>
             </div>
-            <div class="mr-2 w-96 flex-shrink-0">
-                <ServerSelector
-                    v-model="formData.cloneServerKey"
-                    @update="onSoundCloneServerUpdate"
-                    functionName="soundClone"
-                />
-            </div>
-            <div>
-                <ServerContentInfoAction :config="cloneModelConfig as any" func="soundClone" />
+            <div class="flex flex-wrap">
+                <div class="mr-2">
+                    <ServerSelector
+                        v-model="formData.cloneServerKey"
+                        @update="onSoundCloneServerUpdate"
+                        functionName="soundClone"
+                    />
+                </div>
+                <div class="">
+                    <ServerContentInfoAction :config="cloneModelConfig as any" func="soundClone" />
+                </div>
             </div>
         </div>
-        <div v-if="formData.type === 'SoundClone'" class="flex items-center h-12 mb-2">
+        <div v-if="formData.type === 'SoundClone'" class="flex items-center min-h-8 mt-2">
             <div class="mr-1">
                 <a-tooltip :content="$t('声音音色')" mini>
                     <i class="iconfont icon-sound-prompt"></i>
                 </a-tooltip>
             </div>
-            <div class="mr-2 w-96 flex-shrink-0 flex items-center">
+            <div class="mr-2 flex items-center">
                 <SoundPromptSelector v-model="formData.promptId" />
             </div>
         </div>
-        <div class="flex items-center" v-if="formData.type === 'SoundTts'">
+        <div class="flex flex-wrap items-center" v-if="formData.type === 'SoundTts'&&ttsParam&&ttsParam.length>0">
             <ParamForm ref="ttsParamForm" :param="ttsParam" />
         </div>
-        <div class="flex items-center" v-else-if="formData.type === 'SoundClone'">
+        <div class="flex flex-wrap items-center" v-else-if="formData.type === 'SoundClone'&&cloneParam&&cloneParam.length>0">
             <ParamForm ref="cloneParamForm" :param="cloneParam" />
         </div>
     </div>
