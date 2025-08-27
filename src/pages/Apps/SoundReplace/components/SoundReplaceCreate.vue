@@ -7,6 +7,10 @@ import {TaskRecord, TaskService} from "../../../../service/TaskService";
 import SoundAsrForm from "../../../Sound/components/SoundAsrForm.vue";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 
+const props = defineProps<{
+    node?: any,
+}>();
+
 const emit = defineEmits<{
     submitted: [];
 }>();
@@ -87,15 +91,15 @@ const isSubmitting = ref(false);
                     <i class="iconfont icon-video"></i>
                 </a-tooltip>
             </div>
-            <div class="flex items-center">
+            <div class="flex flex-wrap items-center">
                 <a-tooltip v-if="formData.video" :content="formData.video" mini>
                     <div
-                        class="mr-2 text-sm text-black rounded-lg leading-7 min-w-48 px-3 min-h-7 border border-gray-500 cursor-default select-none">
+                        class="mb-1 mr-2 text-sm text-black rounded-lg leading-7 min-w-48 px-3 min-h-7 border border-gray-500 cursor-default select-none">
                         <icon-file/>
                         {{ formData.video.split("/").pop() || formData.video.split("\\").pop() }}
                     </div>
                 </a-tooltip>
-                <a-button @click="onSelectAudioFile" class="w-64 max-w-full">
+                <a-button @click="onSelectAudioFile" class="mb-1">
                     <i class="iconfont icon-upload mr-2"></i>
                     {{ formData.video ? t("重新选择") : t("选择视频文件") }}({{ t("支持MP4格式") }})
                 </a-button>
