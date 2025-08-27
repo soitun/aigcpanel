@@ -84,22 +84,22 @@ const isSubmitting = ref(false);
 </script>
 
 <template>
-    <div class="rounded-xl shadow border p-4">
-        <div class="mb-4 flex items-start">
+    <div :class="node?'p-2':'rounded-xl shadow border p-4'">
+        <div v-if="!node" class="mb-4 flex items-start max-w-lg">
             <div class="mr-1 pt-1">
                 <a-tooltip :content="$t('视频文件')" mini>
                     <i class="iconfont icon-video"></i>
                 </a-tooltip>
             </div>
-            <div class="flex flex-wrap items-center">
+            <div class="flex flex-grow flex-wrap items-center gap-2">
                 <a-tooltip v-if="formData.video" :content="formData.video" mini>
                     <div
-                        class="mb-1 mr-2 text-sm text-black rounded-lg leading-7 min-w-48 px-3 min-h-7 border border-gray-500 cursor-default select-none">
+                        class="flex-grow text-sm text-black rounded-lg leading-7 min-w-48 px-3 min-h-7 border border-gray-500 cursor-default select-none">
                         <icon-file/>
                         {{ formData.video.split("/").pop() || formData.video.split("\\").pop() }}
                     </div>
                 </a-tooltip>
-                <a-button @click="onSelectAudioFile" class="mb-1">
+                <a-button @click="onSelectAudioFile" class="flex-grow">
                     <i class="iconfont icon-upload mr-2"></i>
                     {{ formData.video ? t("重新选择") : t("选择视频文件") }}({{ t("支持MP4格式") }})
                 </a-button>
@@ -107,7 +107,7 @@ const isSubmitting = ref(false);
         </div>
         <SoundAsrForm ref="soundAsrForm"/>
         <SoundGenerateForm ref="soundGenerateForm"/>
-        <div class="flex">
+        <div v-if="!node" class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit" :loading="isSubmitting">
                 <i class="iconfont icon-submit mr-2"></i>
                 {{ t("提交任务") }}

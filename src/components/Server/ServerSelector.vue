@@ -47,7 +47,7 @@ watch(
 </script>
 
 <template>
-    <a-select ref="select" :placeholder="$t('选择模型')" size="small">
+    <a-select ref="select" :placeholder="$t('选择模型')" size="small" style="height:32px;">
         <a-optgroup :label="$t('本地模型')">
             <a-option v-for="server in recordsFilter" :key="server.key" :value="server.key">
                 <div class="flex items-center py-2 flex-nowrap truncate no-wrap">
@@ -65,7 +65,7 @@ watch(
         </a-optgroup>
         <a-optgroup :label="$t('升级Pro版，畅享云模型')"></a-optgroup>
         <template #label="{data}">
-            <div class="text-sm flex items-center flex-nowrap truncate no-wrap h7">
+            <div class="text-sm flex items-center flex-nowrap truncate no-wrap">
                 <div
                     v-if="valueStatus === EnumServerStatus.RUNNING"
                     class="w-2 h-2 bg-green-700 rounded-full mr-1 flex-shrink-0"

@@ -71,19 +71,19 @@ defineExpose({
 </script>
 
 <template>
-    <div class="">
+    <div class="mb-4">
         <div class="font-bold mb-2">
             <icon-settings />
             {{ $t("语音识别配置") }}
         </div>
-        <div class="flex items-start min-h-12">
-            <div class="mr-1">
+        <div class="flex items-start min-h-8 max-w-lg w-full gap-1">
+            <div class="pt-2">
                 <a-tooltip :content="$t('语音识别模型')" mini>
                     <i class="iconfont icon-server"></i>
                 </a-tooltip>
             </div>
-            <div class="flex-grow flex flex-wrap">
-                <div class="mr-2">
+            <div class="flex-grow flex flex-wrap gap-1">
+                <div>
                     <ServerSelector v-model="formData.serverKey" @update="onServerUpdate" functionName="asr" />
                 </div>
                 <div class="">
@@ -91,7 +91,7 @@ defineExpose({
                 </div>
             </div>
         </div>
-        <div class="flex items-center mt-2" v-if="param && param.length > 0">
+        <div class="flex items-center m t-2" v-if="param && param.length > 0">
             <ParamForm ref="paramForm" :param="param" />
         </div>
     </div>

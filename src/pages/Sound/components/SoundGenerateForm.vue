@@ -129,7 +129,7 @@ defineExpose({
 </script>
 
 <template>
-    <div class="">
+    <div class="mb-4">
         <div class="font-bold mb-2">
             <icon-settings />
             {{ $t("声音合成配置") }}
@@ -153,14 +153,14 @@ defineExpose({
                 </a-radio-group>
             </div>
         </div>
-        <div v-if="formData.type === 'SoundTts'" class="flex items-center min-h-8">
-            <div class="mr-1">
+        <div v-if="formData.type === 'SoundTts'" class="flex items-start min-h-8">
+            <div class="mr-1 pt-2">
                 <a-tooltip :content="$t('声音合成模型')" mini>
                     <i class="iconfont icon-server"></i>
                 </a-tooltip>
             </div>
-            <div class="flex flex-wrap">
-                <div class="mr-2">
+            <div class="flex flex-wrap gap-1">
+                <div>
                     <ServerSelector
                         v-model="formData.ttsServerKey"
                         @update="onSoundTtsServerUpdate"
@@ -172,14 +172,14 @@ defineExpose({
                 </div>
             </div>
         </div>
-        <div v-if="formData.type === 'SoundClone'" class="flex items-start min-h-8">
-            <div class="mr-1">
+        <div v-if="formData.type === 'SoundClone'" class="flex items-start min-h-8 gap-1">
+            <div class="mr-1 pt-2">
                 <a-tooltip :content="$t('声音克隆模型')" mini>
                     <i class="iconfont icon-server"></i>
                 </a-tooltip>
             </div>
-            <div class="flex flex-wrap">
-                <div class="mr-2">
+            <div class="flex flex-wrap gap-1">
+                <div>
                     <ServerSelector
                         v-model="formData.cloneServerKey"
                         @update="onSoundCloneServerUpdate"
@@ -191,8 +191,8 @@ defineExpose({
                 </div>
             </div>
         </div>
-        <div v-if="formData.type === 'SoundClone'" class="flex items-center min-h-8 mt-2">
-            <div class="mr-1">
+        <div v-if="formData.type === 'SoundClone'" class="flex items-center min-h-8 mt-2 gap-2">
+            <div class="">
                 <a-tooltip :content="$t('声音音色')" mini>
                     <i class="iconfont icon-sound-prompt"></i>
                 </a-tooltip>
@@ -201,10 +201,10 @@ defineExpose({
                 <SoundPromptSelector v-model="formData.promptId" />
             </div>
         </div>
-        <div class="flex flex-wrap items-center" v-if="formData.type === 'SoundTts'&&ttsParam&&ttsParam.length>0">
+        <div class="flex flex-wrap items-center mt-2" v-if="formData.type === 'SoundTts'&&ttsParam&&ttsParam.length>0">
             <ParamForm ref="ttsParamForm" :param="ttsParam" />
         </div>
-        <div class="flex flex-wrap items-center" v-else-if="formData.type === 'SoundClone'&&cloneParam&&cloneParam.length>0">
+        <div class="flex flex-wrap items-center mt-2" v-else-if="formData.type === 'SoundClone'&&cloneParam&&cloneParam.length>0">
             <ParamForm ref="cloneParamForm" :param="cloneParam" />
         </div>
     </div>
