@@ -3,7 +3,7 @@ import {ref} from "vue";
 import SoundAsrForm from "../../../Sound/components/SoundAsrForm.vue";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 import SoundGenerateFormView from "../../../Sound/components/SoundGenerateFormView.vue";
-import SoundAsrFormViewBody from "../../../Sound/components/SoundAsrFormViewBody.vue";
+import SoundAsrFormView from "../../../Sound/components/SoundAsrFormView.vue";
 
 const props = defineProps<{
     node: any;
@@ -38,16 +38,16 @@ const doSubmit = async () => {
 
 <template>
     <div class="p-2 relative">
-        <SoundAsrFormViewBody v-if="data.soundAsr" :data="data.soundAsr" />
-        <SoundGenerateFormView v-if="data.soundGenerate" :data="data.soundGenerate" />
+        <SoundAsrFormView v-if="data.soundAsr" :data="data.soundAsr"/>
+        <SoundGenerateFormView v-if="data.soundGenerate" :data="data.soundGenerate"/>
         <div
             v-if="!data.soundAsr && !data.soundGenerate"
-            class="p-2 text-center text-sm text-gray-500 rounded-lg bg-gray-200"
-        >
-            {{ $t("未配置") }}
+            @click="visible = true"
+            class="p-2 text-center text-xs text-gray-500 rounded-lg bg-gray-100 cursor-pointer">
+            {{ $t("点击配置") }}
         </div>
-        <div class="mt-2">
-            <a-button size="small" type="outline" @click="visible = true">{{ $t("修改") }}</a-button>
+        <div v-else class="mt-2">
+            <a-button size="mini" @click="visible = true">{{ $t("修改") }}</a-button>
         </div>
     </div>
     <a-modal
@@ -63,8 +63,8 @@ const doSubmit = async () => {
             </div>
         </template>
         <div v-if="visible" class="space-y-4 overflow-y-auto" style="max-height: calc(100vh - 10rem)">
-            <SoundAsrForm ref="soundAsrForm" />
-            <SoundGenerateForm ref="soundGenerateForm" />
+            <SoundAsrForm ref="soundAsrForm"/>
+            <SoundGenerateForm ref="soundGenerateForm"/>
         </div>
     </a-modal>
 </template>
