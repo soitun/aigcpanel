@@ -82,7 +82,7 @@ const isSubmitting = ref(false);
 <template>
     <div class="rounded-xl shadow border p-4">
         <div class="mb-4 flex items-start">
-            <div class="mr-1 pt-1">
+            <div class="pt-1 w-5">
                 <a-tooltip :content="$t('视频文件')" mini>
                     <i class="iconfont icon-video"></i>
                 </a-tooltip>
@@ -90,8 +90,9 @@ const isSubmitting = ref(false);
             <div class="flex items-center gap-2">
                 <a-tooltip v-if="formData.video" :content="formData.video" mini>
                     <div
-                        class="flex-grow text-sm text-black rounded-lg leading-7 min-w-64 px-3 min-h-7 border border-gray-500 cursor-default select-none">
-                        <icon-file/>
+                        class="flex-grow text-sm text-black rounded-lg leading-7 min-w-64 px-3 min-h-7 border border-gray-500 cursor-default select-none"
+                    >
+                        <icon-file />
                         {{ formData.video.split("/").pop() || formData.video.split("\\").pop() }}
                     </div>
                 </a-tooltip>
@@ -101,8 +102,8 @@ const isSubmitting = ref(false);
                 </a-button>
             </div>
         </div>
-        <SoundAsrForm ref="soundAsrForm"/>
-        <SoundGenerateForm ref="soundGenerateForm"/>
+        <SoundAsrForm ref="soundAsrForm" />
+        <SoundGenerateForm ref="soundGenerateForm" />
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit" :loading="isSubmitting">
                 <i class="iconfont icon-submit mr-2"></i>

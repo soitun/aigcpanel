@@ -15,8 +15,8 @@ const props = defineProps({
 <template>
     <a-tag class="rounded-lg">
         <i class="iconfont icon-server w-5"></i>
-        {{ props.record.serverTitle }}
-        v{{ props.record.serverVersion }}
+        {{ record.serverTitle }}
+        v{{ record.serverVersion }}
     </a-tag>
 </template>
 

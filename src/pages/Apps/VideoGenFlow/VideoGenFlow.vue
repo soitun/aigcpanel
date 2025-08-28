@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
-import ServerTaskResultParam from "../../../components/Server/ServerTaskResultParam.vue";
 import TaskBatchDeleteAction from "../../../components/Server/TaskBatchDeleteAction.vue";
 import TaskBatchDownloadAction from "../../../components/Server/TaskBatchDownloadAction.vue";
 import TaskDeleteAction from "../../../components/Server/TaskDeleteAction.vue";
@@ -11,11 +10,14 @@ import AudioPlayer from "../../../components/common/AudioPlayer.vue";
 import TaskBizStatus from "../../../components/common/TaskBizStatus.vue";
 import VideoPlayer from "../../../components/common/VideoPlayer.vue";
 import {useCheckAll} from "../../../components/common/check-all";
-import {doCopy} from "../../../components/common/util";
 import {TaskRecord, TaskService} from "../../../service/TaskService";
 import {usePaginate} from "../../../hooks/paginate";
 import {useTaskChangeRefresh} from "../../../hooks/task";
 import VideoGenFlowCreate from "./components/VideoGenFlowCreate.vue";
+import ServerNameVersion from "../../../components/Server/ServerNameVersion.vue";
+import VideoGenFormViewBody from "../../Video/components/VideoGenFormViewBody.vue";
+import SoundGenerateFormViewBody from "../../Sound/components/SoundGenerateFormViewBody.vue";
+import TextTruncateView from "../../../components/TextTruncateView.vue";
 
 const videoGenFlowCreate = ref<InstanceType<typeof VideoGenFlowCreate> | null>(null);
 
@@ -105,57 +107,19 @@ onMounted(() => {
                                 <TaskBizStatus :status="r.status" :status-msg="r.statusMsg" />
                             </div>
                         </div>
-                        <div class="mt-3">
-                            <div class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
-                                <i class="iconfont icon-server mr-1"></i>
-                                {{ r.serverTitle }}
-                                v{{ r.serverVersion }}
-                            </div>
-                            <ServerTaskResultParam :record="r as any" />
+                        <div class="mt-3 flex gap-1">
+                            <ServerNameVersion :record="r" />
+                            <VideoGenFormViewBody :data="r.modelConfig" />
+                        </div>
+                        <div class="mt-3 flex gap-1" v-if="r.modelConfig.soundGenerate">
+                            <SoundGenerateFormViewBody :data="r.modelConfig.soundGenerate" />
                         </div>
                         <div class="pt-4 flex">
-                            <div class="flex-grow flex flex-col">
-                                <div>
-                                    <div class="flex mb-3">
-                                        <div class="mr-2 flex-shrink-0">
-                                            <div class="bg-gray-100 px-2 leading-6 rounded-lg">
-                                                <i class="iconfont icon-video-template"></i>
-                                                {{ $t("视频形象") }}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            {{ r.modelConfig.videoTemplateName }}
-                                        </div>
-                                    </div>
-                                    <div v-if="r.modelConfig.soundType === 'SoundTts'" class="flex items-start">
-                                        <div class="mr-2 flex-shrink-0">
-                                            <div class="bg-gray-100 px-2 leading-6 rounded-lg">
-                                                <i class="iconfont icon-sound"></i>
-                                                {{ $t("声音合成") }}
-                                            </div>
-                                        </div>
-                                        <a-tooltip :content="$t('点击文字复制')" position="left" mini>
-                                            <div class="cursor-pointer" @click="doCopy(r.modelConfig.text)">
-                                                {{ r.modelConfig.text }}
-                                            </div>
-                                        </a-tooltip>
-                                    </div>
-                                    <div v-if="r.modelConfig.soundType === 'SoundClone'" class="flex items-start">
-                                        <div class="mr-2 flex-shrink-0">
-                                            <div class="bg-gray-100 px-2 leading-6 rounded-lg">
-                                                <i class="iconfont icon-video-template"></i>
-                                                {{ $t("声音克隆") }}
-                                            </div>
-                                        </div>
-                                        <a-tooltip :content="$t('点击文字复制')" position="left" mini>
-                                            <div class="cursor-pointer" @click="doCopy(r.modelConfig.text)">
-                                                {{ r.modelConfig.text }}
-                                            </div>
-                                        </a-tooltip>
-                                    </div>
+                            <div class="flex-grow">
+                                <div class="bg-gray-100 rounded-lg p-2 mb-3">
+                                    <TextTruncateView :text="r.modelConfig.text" />
                                 </div>
-                                <div class="flex-grow"></div>
-                                <div class="mt-3" v-if="r.status === 'success' && r.result.urlSound">
+                                <div v-if="r.status === 'success' && r.result.urlSound">
                                     <AudioPlayer show-wave :url="'file://' + r.result.urlSound" />
                                 </div>
                             </div>

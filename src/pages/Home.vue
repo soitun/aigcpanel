@@ -15,6 +15,8 @@ const usageData = ref({
     soundAsrToday: undefined,
     videoGen: undefined,
     videoGenToday: undefined,
+    taskTotal: undefined,
+    taskTotalToday: undefined,
 });
 
 const apps: {
@@ -58,6 +60,8 @@ onMounted(async () => {
         usageData.value.soundAsrToday = await TaskService.count("SoundAsr", todayStartTimestamp);
         usageData.value.videoGen = await TaskService.count("VideoGen");
         usageData.value.videoGenToday = await TaskService.count("VideoGen", todayStartTimestamp);
+        usageData.value.taskTotal = await TaskService.count(null);
+        usageData.value.taskTotalToday = await TaskService.count(null, todayStartTimestamp);
     });
 });
 </script>
@@ -187,6 +191,26 @@ onMounted(async () => {
                                 fontSize: '14px',
                             }"
                             :value="usageData.videoGenToday as any"
+                        />
+                    </div>
+                </div>
+                <div class="flex-grow w-0">
+                    <div class="mb-3">
+                        {{ $t("今日总任务") }}
+                    </div>
+                    <div class="font-bold text-2xl mb-3">
+                        <a-statistic animation placeholder="-" :value="usageData.taskTotal as any" />
+                    </div>
+                    <div>
+                        {{ $t("今日") }} +
+                        <a-statistic
+                            animation
+                            placeholder="-"
+                            :value-style="{
+                                color: usageData.taskTotalToday && usageData.taskTotalToday > 0 ? 'green' : 'gray',
+                                fontSize: '14px',
+                            }"
+                            :value="usageData.taskTotalToday as any"
                         />
                     </div>
                 </div>

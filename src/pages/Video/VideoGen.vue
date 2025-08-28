@@ -16,6 +16,9 @@ import {TaskRecord, TaskService} from "../../service/TaskService";
 import {usePaginate} from "../../hooks/paginate";
 import {useTaskChangeRefresh} from "../../hooks/task";
 import VideoGenCreate from "./components/VideoGenCreate.vue";
+import VideoGenFormViewBody from "./components/VideoGenFormViewBody.vue";
+import ServerNameVersion from "../../components/Server/ServerNameVersion.vue";
+import TextTruncateView from "../../components/TextTruncateView.vue";
 
 const videoGenCreate = ref<InstanceType<typeof VideoGenCreate> | null>(null);
 
@@ -105,44 +108,30 @@ const doRefresh = async () => {
                                 <TaskBizStatus :status="r.status" :status-msg="r.statusMsg" />
                             </div>
                         </div>
-                        <div class="mt-3">
-                            <div class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6">
-                                <i class="iconfont icon-server mr-1"></i>
-                                {{ r.serverTitle }}
-                                v{{ r.serverVersion }}
-                            </div>
+                        <div class="mt-3 flex gap-1">
+                            <ServerNameVersion :record="r" />
+                            <VideoGenFormViewBody :data="r.modelConfig" />
                             <ServerTaskResultParam :record="r as any" />
                         </div>
                         <div class="pt-4 flex">
                             <div class="flex-grow">
-                                <div class="flex mb-3">
-                                    <div class="mr-2 flex-shrink-0">
-                                        <div class="bg-gray-100 px-2 leading-6 rounded-lg">
-                                            <i class="iconfont icon-video-template"></i>
-                                            {{ $t("视频形象") }}
-                                        </div>
-                                    </div>
-                                    <div class="">
-                                        {{ r.modelConfig.videoTemplateName }}
-                                    </div>
-                                </div>
-                                <div v-if="r.modelConfig.soundType === 'soundGenerate'" class="flex items-start">
-                                    <div class="mr-2 flex-shrink-0">
-                                        <div class="bg-gray-100 px-2 leading-6 rounded-lg">
-                                            <i class="iconfont icon-sound"></i>
+                                <div v-if="r.modelConfig.soundType === 'soundGenerate'">
+                                    <div class="mb-2">
+                                        <a-tag class="rounded-lg">
+                                            <i class="iconfont icon-sound w-5"></i>
                                             {{ $t("声音合成") }}
-                                        </div>
+                                        </a-tag>
                                     </div>
-                                    <div class="">
-                                        {{ r.modelConfig.soundGenerateText }}
+                                    <div class="bg-gray-100 rounded-lg p-2 mb-3">
+                                        <TextTruncateView :text="r.modelConfig.soundGenerateText" />
                                     </div>
                                 </div>
-                                <div v-if="r.modelConfig.soundType === 'soundCustom'" class="flex items-start">
-                                    <div class="mr-2 flex-shrink-0">
-                                        <div class="bg-gray-100 px-2 leading-6 rounded-lg">
+                                <div v-if="r.modelConfig.soundType === 'soundCustom'">
+                                    <div class="mb-2">
+                                        <a-tag class="rounded-lg">
                                             <icon-file />
                                             {{ $t("本地文件") }}
-                                        </div>
+                                        </a-tag>
                                     </div>
                                     <div class="flex-grow">
                                         <AudioPlayer :url="`file://${r.modelConfig.soundCustomFile}`" />

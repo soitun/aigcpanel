@@ -5,10 +5,16 @@ const taskStore = useTaskStore();
 
 export type TaskBiz = never | "SoundGenerate" | "SoundAsr" | "VideoGen" | "VideoGenFlow" | "SoundReplace";
 
+export enum TaskType {
+    User = 1,
+    System = 2,
+}
+
 export type TaskRecord = {
     id?: number;
 
     biz: TaskBiz;
+    type?: TaskType;
 
     title: string;
 
@@ -36,10 +42,10 @@ export type TaskRuntime = {
 // deep merge two object, newData has higher priority
 // if value is array, replace it directly
 const mergeData = (oldData: any, newData: any) => {
-    if (typeof oldData !== 'object' || oldData === null) {
+    if (typeof oldData !== "object" || oldData === null) {
         return newData;
     }
-    if (typeof newData !== 'object' || newData === null) {
+    if (typeof newData !== "object" || newData === null) {
         return newData;
     }
     const result = {};
@@ -47,7 +53,7 @@ const mergeData = (oldData: any, newData: any) => {
         if (key in newData) {
             if (Array.isArray(newData[key])) {
                 result[key] = newData[key];
-            } else if (typeof newData[key] === 'object' && newData[key] !== null) {
+            } else if (typeof newData[key] === "object" && newData[key] !== null) {
                 result[key] = mergeData(oldData[key], newData[key]);
             } else {
                 result[key] = newData[key];
@@ -62,7 +68,7 @@ const mergeData = (oldData: any, newData: any) => {
         }
     }
     return result;
-}
+};
 
 export const TaskService = {
     tableName() {
@@ -104,13 +110,14 @@ export const TaskService = {
         );
         return this.decodeRecord(record);
     },
-    async list(biz: TaskBiz): Promise<TaskRecord[]> {
+    async list(biz: TaskBiz, type: TaskType = TaskType.User): Promise<TaskRecord[]> {
         const records: TaskRecord[] = await window.$mapi.db.select(
             `SELECT *
              FROM ${this.tableName()}
              WHERE biz = ?
+               AND type = ?
              ORDER BY id DESC`,
-            [biz]
+            [biz, type]
         );
         return records.map(this.decodeRecord) as TaskRecord[];
     },
@@ -170,6 +177,9 @@ export const TaskService = {
             "param",
             "modelConfig",
         ];
+        if (!("type" in record)) {
+            record.type = TaskType.User;
+        }
         record = this.encodeRecord(record);
         const values = fields.map(f => record[f]);
         const valuesPlaceholder = fields.map(f => "?");
@@ -261,18 +271,32 @@ export const TaskService = {
             [record.id]
         );
     },
-    async count(biz: TaskBiz, startTime: number = 0, endTime: number = 0) {
+    async count(
+        biz: TaskBiz | null,
+        startTime: number = 0,
+        endTime: number = 0,
+        type: TaskType = TaskType.User
+    ): Promise<number> {
         let sql = `SELECT COUNT(*) as cnt
-                   FROM ${this.tableName()}
-                   WHERE biz = ?`;
-        let params: any[] = [biz];
+                   FROM ${this.tableName()}`;
+        const params: any[] = [];
+        const wheres: string[] = [];
+        if (biz) {
+            wheres.push("biz = ?");
+            params.push(biz);
+        }
         if (startTime > 0) {
-            sql += ` AND createdAt >= ?`;
+            wheres.push("createdAt >= ?");
             params.push(startTime);
         }
         if (endTime > 0) {
-            sql += ` AND createdAt <= ?`;
+            wheres.push("createdAt <= ?");
             params.push(endTime);
+        }
+        wheres.push("type = ?");
+        params.push(type);
+        if (wheres.length > 0) {
+            sql += " WHERE " + wheres.join(" AND ");
         }
         const result = await window.$mapi.db.first(sql, params);
         return result.cnt;

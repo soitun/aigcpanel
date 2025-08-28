@@ -73,7 +73,9 @@ defineExpose({
 <template>
     <div class="mb-4">
         <div class="font-bold mb-2">
-            <icon-settings/>
+            <div class="inline-block w-5">
+                <icon-settings />
+            </div>
             {{ $t("语音识别配置") }}
         </div>
         <div class="flex items-start min-h-8 max-w-lg w-full gap-1">
@@ -84,15 +86,15 @@ defineExpose({
             </div>
             <div class="flex-grow flex flex-wrap gap-1">
                 <div>
-                    <ServerSelector v-model="formData.serverKey" @update="onServerUpdate" functionName="asr"/>
+                    <ServerSelector v-model="formData.serverKey" @update="onServerUpdate" functionName="asr" />
                 </div>
                 <div class="">
-                    <ServerContentInfoAction :config="modelConfig as any" func="asr"/>
+                    <ServerContentInfoAction :config="modelConfig as any" func="asr" />
                 </div>
             </div>
         </div>
         <div class="flex items-center m t-2" v-if="param && param.length > 0">
-            <ParamForm ref="paramForm" :param="param"/>
+            <ParamForm ref="paramForm" :param="param" />
         </div>
     </div>
 </template>

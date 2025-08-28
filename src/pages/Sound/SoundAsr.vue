@@ -20,6 +20,7 @@ import {formatSRTTime} from "../../lib/srt";
 import {useTaskChangeRefresh} from "../../hooks/task";
 import SoundAsrCreate from "./components/SoundAsrCreate.vue";
 import SoundAsrRecordsEditDialog from "./components/SoundAsrRecordsEditDialog.vue";
+import ServerNameVersion from "../../components/Server/ServerNameVersion.vue";
 
 interface AsrRecord {
     start: number;
@@ -137,19 +138,8 @@ const onEditSave = async (taskId: number, records: AsrRecord[]) => {
                                 <TaskBizStatus :status="r.status" :status-msg="r.statusMsg" />
                             </div>
                         </div>
-                        <div class="mt-3">
-                            <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
-                                <i class="iconfont icon-server mr-1"></i>
-                                {{ r.serverTitle }}
-                                v{{ r.serverVersion }}
-                            </div>
-                            <div
-                                v-if="r.modelConfig?.model"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
-                            >
-                                <i class="iconfont icon-model mr-1"></i>
-                                {{ r.modelConfig.model }}
-                            </div>
+                        <div class="mt-3 flex gap-1 flex-wrap">
+                            <ServerNameVersion :record="r" />
                             <ServerTaskResultParam :record="r as any" />
                         </div>
 

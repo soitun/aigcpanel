@@ -2,12 +2,12 @@
 import {ref} from "vue";
 import SoundAsrForm from "../../../Sound/components/SoundAsrForm.vue";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
-import SoundAsrParam from "../../../Sound/components/SoundAsrParam.vue";
-import SoundGenerateParam from "../../../Sound/components/SoundGenerateParam.vue";
+import SoundGenerateFormView from "../../../Sound/components/SoundGenerateFormView.vue";
+import SoundAsrFormViewBody from "../../../Sound/components/SoundAsrFormViewBody.vue";
 
 const props = defineProps<{
-    node: any,
-    data: any,
+    node: any;
+    data: any;
 }>();
 
 const emit = defineEmits<{
@@ -31,36 +31,40 @@ const doSubmit = async () => {
         soundAsr: soundAsrValue,
         soundGenerate: soundGenerateValue,
     };
-    emit('change', newData);
+    emit("change", newData);
     visible.value = false;
 };
 </script>
 
 <template>
     <div class="p-2 relative">
-        <SoundAsrParam v-if="data.soundAsr" :data="data.soundAsr"/>
-        <SoundGenerateParam v-if="data.soundGenerate" :data="data.soundGenerate"/>
-        <div v-if="!data.soundAsr&&!data.soundGenerate"
-             class="p-2 text-center text-sm text-gray-500 rounded-lg bg-gray-200">
-            {{ $t('未配置') }}
+        <SoundAsrFormViewBody v-if="data.soundAsr" :data="data.soundAsr" />
+        <SoundGenerateFormView v-if="data.soundGenerate" :data="data.soundGenerate" />
+        <div
+            v-if="!data.soundAsr && !data.soundGenerate"
+            class="p-2 text-center text-sm text-gray-500 rounded-lg bg-gray-200"
+        >
+            {{ $t("未配置") }}
         </div>
         <div class="mt-2">
-            <a-button size="small" type="outline" @click="visible = true">{{ $t('修改') }}</a-button>
+            <a-button size="small" type="outline" @click="visible = true">{{ $t("修改") }}</a-button>
         </div>
     </div>
-    <a-modal v-model:visible="visible"
-             title-align="start"
-             :title="$t('声音替换设置')"
-             width="600px"
-             :destroyOnClose="true">
+    <a-modal
+        v-model:visible="visible"
+        title-align="start"
+        :title="$t('声音替换设置')"
+        width="600px"
+        :destroyOnClose="true"
+    >
         <template #footer>
             <div class="flex justify-end space-x-2">
-                <a-button type="primary" @click="doSubmit">{{ $t('保存') }}</a-button>
+                <a-button type="primary" @click="doSubmit">{{ $t("保存") }}</a-button>
             </div>
         </template>
-        <div v-if="visible" class="space-y-4 overflow-y-auto" style="max-height:calc(100vh - 10rem);">
-            <SoundAsrForm ref="soundAsrForm"/>
-            <SoundGenerateForm ref="soundGenerateForm"/>
+        <div v-if="visible" class="space-y-4 overflow-y-auto" style="max-height: calc(100vh - 10rem)">
+            <SoundAsrForm ref="soundAsrForm" />
+            <SoundGenerateForm ref="soundGenerateForm" />
         </div>
     </a-modal>
 </template>

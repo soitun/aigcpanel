@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {onMounted} from "vue";
-import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
 import TaskBatchDeleteAction from "../../components/Server/TaskBatchDeleteAction.vue";
 import TaskBatchDownloadAction from "../../components/Server/TaskBatchDownloadAction.vue";
 import TaskCancelAction from "../../components/Server/TaskCancelAction.vue";
@@ -16,6 +15,9 @@ import {TaskRecord, TaskService} from "../../service/TaskService";
 import {usePaginate} from "../../hooks/paginate";
 import {useTaskChangeRefresh} from "../../hooks/task";
 import SoundGenerateCreate from "./components/SoundGenerateCreate.vue";
+import SoundGenerateFormViewBody from "./components/SoundGenerateFormViewBody.vue";
+import ServerNameVersion from "../../components/Server/ServerNameVersion.vue";
+import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
 
 const {page, records, recordsForPage} = usePaginate<TaskRecord>();
 
@@ -103,61 +105,9 @@ onMounted(async () => {
                                 <TaskBizStatus :status="r.status" :status-msg="r.statusMsg" />
                             </div>
                         </div>
-                        <div class="mt-3">
-                            <div
-                                v-if="r.modelConfig.type === 'SoundTts'"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6"
-                            >
-                                <i class="iconfont icon-sound-generate"></i>
-                                {{ $t("声音合成") }}
-                            </div>
-                            <div
-                                v-else-if="r.modelConfig.type === 'SoundClone'"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6"
-                            >
-                                <i class="iconfont icon-sound-clone"></i>
-                                {{ $t("声音克隆") }}
-                            </div>
-                            <div class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6">
-                                <i class="iconfont icon-server mr-1"></i>
-                                {{ r.serverTitle }}
-                                v{{ r.serverVersion }}
-                            </div>
-                            <div
-                                v-if="r.modelConfig.type === 'SoundTts' && r.modelConfig?.ttsParam?.speakerTitle"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
-                            >
-                                <i class="iconfont icon-speaker mr-1"></i>
-                                {{ r.modelConfig?.ttsParam?.speakerTitle }}
-                            </div>
-                            <div
-                                v-if="r.modelConfig.type === 'SoundTts' && r.param?.ttsParam?.speed"
-                                class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-6 h-6"
-                            >
-                                <i class="iconfont icon-speed mr-1"></i>
-                                <span class="">x{{ r.param?.ttsParam?.speed }}</span>
-                            </div>
-                            <div
-                                v-if="r.modelConfig.type === 'SoundClone'"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
-                            >
-                                <i class="iconfont icon-sound-prompt mr-1"></i>
-                                {{ r.modelConfig.promptTitle }}
-                            </div>
-                            <div
-                                v-if="r.modelConfig.type === 'SoundClone' && r.modelConfig?.cloneParam?.speed"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
-                            >
-                                <i class="iconfont icon-speed mr-1"></i>
-                                <span class="">x{{ r.modelConfig?.cloneParam?.speed }}</span>
-                            </div>
-                            <div
-                                v-if="r.modelConfig.type === 'SoundClone' && r.modelConfig?.cloneParam?.crossLingual"
-                                class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
-                            >
-                                <i class="iconfont icon-global mr-1"></i>
-                                <span class="">{{ $t("跨语种") }}</span>
-                            </div>
+                        <div class="mt-3 flex gap-1 flex-wrap">
+                            <ServerNameVersion :record="r" />
+                            <SoundGenerateFormViewBody :data="r.modelConfig" />
                             <ServerTaskResultParam :record="r as any" />
                         </div>
                         <div class="mt-4">

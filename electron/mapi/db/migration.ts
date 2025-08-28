@@ -323,6 +323,13 @@ const versions = [
             }
         },
     },
+    {
+        version: 10,
+        up: async (db: DB) => {
+            await db.execute(`ALTER TABLE data_task
+                ADD COLUMN type INTEGER DEFAULT 1`);
+        },
+    },
 ];
 
 export default {
