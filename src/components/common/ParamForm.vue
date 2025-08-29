@@ -45,9 +45,13 @@ watch(
                 itemClone["speakerParam"] = [];
                 itemClone["speakerParamValue"] = {};
             }
+            let value = itemClone.defaultValue;
+            if (typeof value === 'undefined') {
+                value = null;
+            }
             return {
                 ...itemClone,
-                value: itemClone.defaultValue || null,
+                value: value,
             };
         }) as any;
     },

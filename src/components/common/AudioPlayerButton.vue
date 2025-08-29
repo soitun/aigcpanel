@@ -1,17 +1,17 @@
 <template>
     <span @click="playing = !playing">
         <a v-if="!playing" class="play" href="javascript:;">
-            <icon-play-circle />
+            <icon-play-arrow/>
         </a>
         <a v-if="playing" class="pause" href="javascript:;">
-            <icon-pause-circle />
+            <icon-pause-circle-fill/>
         </a>
         <audio ref="audio" :src="audioSource" preload="none"></audio>
     </span>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 
 const props = defineProps({
     source: {

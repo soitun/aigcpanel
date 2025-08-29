@@ -25,7 +25,7 @@
                         size="small"
                     >
                         <template #append>
-                            <icon-search />
+                            <icon-search/>
                         </template>
                     </a-input>
                 </div>
@@ -44,7 +44,7 @@
                             class="mb-1 mr-1"
                             :type="filterLang === l.name ? 'primary' : undefined"
                             @click="filterLang = l.name"
-                            >{{ l.name }}({{ l.count }})
+                        >{{ l.name }}({{ l.count }})
                         </a-button>
                     </div>
                 </div>
@@ -52,7 +52,7 @@
                     <div v-if="filterRecords.length === 0 && speakers.length > 0">
                         <div class="text-center text-gray-400 py-20">
                             <div>
-                                <icon-info-circle class="text-5xl" />
+                                <icon-info-circle class="text-5xl"/>
                             </div>
                             <div class="mt-2">没有找到相关音色</div>
                         </div>
@@ -61,7 +61,7 @@
                         <div class="border mb-3 p-3 flex items-start rounded-lg shadow margin-top">
                             <div class="flex-grow">
                                 <div class="mb-2 flex items-center">
-                                    <img :src="s.cover" class="h-4 rounded-full shadow w-4 mr-1" />
+                                    <img :src="s.cover" class="h-4 rounded-full shadow w-4 mr-1"/>
                                     <div class="font-bold">{{ s.title }}</div>
                                 </div>
                                 <div>
@@ -70,9 +70,9 @@
                             </div>
                             <div class="flex-shrink-0 w-26 flex items-start">
                                 <div v-if="s.preview" class="pb-btn-preview">
-                                    <AudioPlayerButton ref="audioPlayerButtons" :source="s.preview" />
+                                    <AudioPlayerButton ref="audioPlayerButtons" :source="s.preview"/>
                                 </div>
-                                <a-button type="primary" @click="doSelect(s)" round> 选择 </a-button>
+                                <a-button type="primary" @click="doSelect(s)" round> 选择</a-button>
                             </div>
                         </div>
                     </div>
