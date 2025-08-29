@@ -10,17 +10,27 @@ import SoundReplaceCreate from "./components/SoundReplaceCreate.vue";
 import SoundReplaceItem from "./components/SoundReplaceItem.vue";
 import StepsComponent from "./components/StepsComponent.vue";
 import {soundReplaceFileCleanCollector} from "./util";
-import StepToggleButton from "./components/StepToggleButton.vue";
+import ToggleButton from "../../../components/common/ToggleButton.vue";
+import {TaskChangeType} from "../../../store/modules/task";
 
 const {page, records, recordsForPage} = usePaginate<TaskRecord>({
     pageSize: 10,
 });
 
-useTaskChangeRefresh("SoundReplace", () => {
+useTaskChangeRefresh("SoundReplace", (
+    bizId: string,
+    type: TaskChangeType
+) => {
     doRefresh();
 });
 
-const {mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords} = useCheckAll({
+const {
+    mergeCheck,
+    isIndeterminate,
+    isAllChecked,
+    onCheckAll,
+    checkRecords,
+} = useCheckAll({
     records: recordsForPage,
 });
 
@@ -43,7 +53,7 @@ const doRefresh = async () => {
                 <div class="text-3xl font-bold">{{ $t("声音替换") }}</div>
                 <div class="text-gray-400 ml-3">{{ $t("使用新声音替换已有视频的声音") }}</div>
             </div>
-            <StepToggleButton v-model="stepsVisible"/>
+            <ToggleButton v-model="stepsVisible"/>
         </div>
         <StepsComponent v-if="stepsVisible"/>
         <div>

@@ -15,7 +15,7 @@ import {ToggleUtil} from "../../../../lib/toggle";
 import {TaskRecord, TaskService} from "../../../../service/TaskService";
 import SoundAsrRecordsEditDialog from "../../../Sound/components/SoundAsrRecordsEditDialog.vue";
 import SoundGenerateFormViewBody from "../../../Sound/components/SoundGenerateFormViewBody.vue";
-import SoundReplaceItemDialog from "../workflow/SoundReplaceItemDialog.vue";
+import SoundReplaceItemDialog from "./SoundReplaceItemDialog.vue";
 import {soundReplaceFileCleanCollector} from "../util";
 
 interface Props {
@@ -66,7 +66,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
 </script>
 
 <template>
-    <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
+    <div class="rounded-xl shadow border p-4 mb-4 hover:shadow-lg">
         <div class="flex items-center">
             <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
                 <div class="mr-2 h-8 pt-0.5">

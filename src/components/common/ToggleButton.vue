@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
     modelValue: boolean;
+    text?: string;
 }>();
 const emits = defineEmits<{
     (e: "update:modelValue", value: boolean): void;
@@ -13,7 +14,7 @@ const emits = defineEmits<{
             <icon-up v-if="!modelValue"/>
             <icon-down v-else/>
         </template>
-        {{ $t("说明") }}
+        {{ text || $t("说明") }}
     </a-button>
 </template>
 
