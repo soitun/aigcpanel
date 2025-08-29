@@ -30,12 +30,12 @@ const soundReplaceParamDialog = ref<InstanceType<typeof SoundReplaceParamDialog>
             </template>
             <template v-else-if="props.source==='config'">
                 <div v-if="!nodeData.soundAsr && !nodeData.soundGenerate"
-                     @click="visible = true"
+                     @click="soundReplaceParamDialog.show()"
                      class="p-2 text-center text-xs text-gray-500 rounded-lg bg-gray-100 cursor-pointer mb-4">
                     {{ $t("点击配置") }}
                 </div>
                 <div class="-mt-2 mb-4">
-                    <a-button size="mini" @click="visible = true">
+                    <a-button size="mini" @click="soundReplaceParamDialog.show()">
                         <template #icon>
                             <icon-edit/>
                         </template>
@@ -52,6 +52,7 @@ const soundReplaceParamDialog = ref<InstanceType<typeof SoundReplaceParamDialog>
                             <icon-tool/>
                         </template>
                         {{ $t('查看任务') }}
+                        {{nodeRunData.taskId}}
                     </a-button>
                 </div>
             </div>

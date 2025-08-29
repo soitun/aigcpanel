@@ -196,6 +196,7 @@ export const TaskService = {
                 queryInterval: 5 * 1000,
             }
         );
+        return id;
     },
     async update(
         id: number | string,

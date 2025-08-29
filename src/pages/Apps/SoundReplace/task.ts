@@ -1,14 +1,95 @@
 import {t} from "../../../lang";
 import {ObjectUtil} from "../../../lib/util";
-import {TaskService} from "../../../service/TaskService";
+import {TaskRecord, TaskService, TaskType} from "../../../service/TaskService";
 import {useServerStore} from "../../../store/modules/server";
-import {TaskBiz, useTaskStore} from "../../../store/modules/task";
+import {TaskBiz, TaskChangeType, useTaskStore} from "../../../store/modules/task";
 import {SoundReplaceJobResultType, SoundReplaceModelConfigType} from "./type";
 import {ffmpegCombineVideoAudio, ffmpegMergeAudio, ffmpegVideoToAudio} from "../../../lib/ffmpeg";
 import {serverSoundAsr, serverSoundGenerate} from "../../../lib/server";
 
 const serverStore = useServerStore();
 const taskStore = useTaskStore();
+
+export const SoundReplaceRun = async (
+    data: {
+        taskId: string,
+        title: string,
+        video: string,
+        soundAsr: SoundAsrParamType,
+        soundGenerate: SoundGenerateParamType,
+    }
+): Promise<{
+    taskId: string,
+    result: () => Promise<{
+        code: number,
+        msg: string,
+        data?: { status: 'success' | 'pause', video: string }
+    }>,
+}> => {
+    console.log('SoundReplace.Run', data);
+    let taskId = data.taskId;
+    if (!taskId) {
+        const record: TaskRecord = {
+            type: TaskType.System,
+            biz: "SoundReplace",
+            title: data.title,
+            serverName: "",
+            serverTitle: "",
+            serverVersion: "",
+            modelConfig: {
+                video: data.video,
+                soundAsr: data.soundAsr,
+                soundGenerate: data.soundGenerate,
+            },
+            param: {},
+        };
+        taskId = await TaskService.submit(record);
+    }
+    const result = () => {
+        return new Promise<{
+            code: number,
+            msg: string,
+            data?: { status: 'success' | 'pause', video: string }
+        }>(resolve => {
+            const callback = (bizId: string, type: TaskChangeType) => {
+                if (bizId !== taskId) {
+                    return;
+                }
+                TaskService.get(bizId).then(task => {
+                    if (!task) {
+                        resolve({code: -1, msg: t("任务不存在")});
+                        taskStore.offChange('SoundReplace', callback);
+                        return;
+                    }
+                    if (task.status === 'success') {
+                        resolve({code: 0, msg: 'ok', data: {status: 'success', video: task.result.url}});
+                        taskStore.offChange('SoundReplace', callback);
+                        return;
+                    }
+                    if (task.status === 'pause') {
+                        resolve({code: 0, msg: '', data: {status: 'pause', video: ''}});
+                        taskStore.offChange('SoundReplace', callback);
+                        return;
+                    }
+                    if (task.status === 'fail') {
+                        resolve({code: -1, msg: task.statusMsg || t("任务失败")});
+                        taskStore.offChange('SoundReplace', callback);
+                        return;
+                    }
+                }).catch(error => {
+                    resolve({code: -1, msg: '' + error || t("任务获取失败")});
+                    taskStore.offChange('SoundReplace', callback);
+                })
+            }
+            taskStore.onChange('SoundReplace', callback);
+            callback(taskId, null!);
+        })
+    };
+    return {
+        taskId,
+        result,
+    }
+}
 
 export const SoundReplace: TaskBiz = {
     runFunc: async (bizId, bizParam) => {

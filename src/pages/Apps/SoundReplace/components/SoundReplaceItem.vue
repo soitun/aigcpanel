@@ -17,12 +17,14 @@ import SoundAsrRecordsEditDialog from "../../../Sound/components/SoundAsrRecords
 import SoundGenerateFormViewBody from "../../../Sound/components/SoundGenerateFormViewBody.vue";
 import SoundReplaceItemDialog from "./SoundReplaceItemDialog.vue";
 import {soundReplaceFileCleanCollector} from "../util";
+import {useTaskStore} from "../../../../store/modules/task";
 
 interface Props {
     record: TaskRecord;
     onRefresh: () => void;
 }
 
+const taskStore = useTaskStore()
 const props = defineProps<Props>();
 
 const soundAsrRecordsEditDialog = ref<InstanceType<typeof SoundAsrRecordsEditDialog> | null>(null);
@@ -46,7 +48,7 @@ const confirmText = computed(() => {
 const recordId = computed(() => props.record.id as any);
 
 const onViewDetail = () => {
-    soundReplaceItemDialog.value?.show(props.record.id);
+    soundReplaceItemDialog.value?.show(props.record.id!);
     dialogVisible.value = true;
 };
 
@@ -61,6 +63,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
             },
         },
     });
+    await taskStore.dispatch("SoundReplace", taskId + "");
     props.onRefresh();
 };
 </script>
@@ -103,13 +106,13 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                     v-else-if="record.jobResult.step === 'ToAudio' && record.status === 'running'"
                     class="bg-gray-100 rounded-lg p-1"
                 >
-                    <div class="text-gray-400">
+                    <div class="text-gray-400 text-xs">
                         <icon-refresh spin/>
                         {{ $t("处理中") }}
                     </div>
                 </div>
                 <div v-else class="bg-gray-100 rounded-lg p-1">
-                    <div class="text-gray-400">
+                    <div class="text-gray-400 text-xs">
                         <icon-info-circle/>
                         {{ $t("未处理") }}
                     </div>
@@ -133,13 +136,13 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                     v-else-if="record.jobResult.step === 'SoundAsr' && record.status === 'running'"
                     class="bg-gray-100 rounded-lg p-1"
                 >
-                    <div class="text-gray-400">
+                    <div class="text-gray-400 text-xs">
                         <icon-refresh spin/>
                         {{ $t("处理中") }}
                     </div>
                 </div>
                 <div v-else class="bg-gray-100 rounded-lg p-1">
-                    <div class="text-gray-400">
+                    <div class="text-gray-400 text-xs">
                         <icon-info-circle/>
                         {{ $t("未处理") }}
                     </div>
@@ -181,7 +184,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                     </div>
                 </div>
                 <div v-else class="bg-gray-100 rounded-lg p-1">
-                    <div class="text-gray-400">
+                    <div class="text-gray-400 text-xs">
                         <icon-info-circle/>
                         {{ $t("未处理") }}
                     </div>
@@ -216,7 +219,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                                     "
                                     spin
                                 />
-                                <icon-info-circle v-else class="text-gray-400"/>
+                                <icon-info-circle v-else class="text-gray-400 text-xs"/>
                             </div>
                             <div>{{ rr.text }}</div>
                         </div>
@@ -241,7 +244,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                     </div>
                 </div>
                 <div v-else class="bg-gray-100 rounded-lg p-1">
-                    <div class="text-gray-400">
+                    <div class="text-gray-400 text-xs">
                         <icon-info-circle/>
                         {{ $t("未处理") }}
                     </div>
@@ -268,13 +271,13 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                 v-else-if="record.jobResult.step === 'Combine' && record.status === 'running'"
                 class="bg-gray-100 rounded-lg p-1"
             >
-                <div class="text-gray-400">
+                <div class="text-gray-400 text-xs">
                     <icon-refresh spin/>
                     {{ $t("处理中") }}
                 </div>
             </div>
             <div v-else class="bg-gray-100 rounded-lg p-1 flex-grow">
-                <div class="text-gray-400">
+                <div class="text-gray-400 text-xs">
                     <icon-info-circle/>
                     {{ $t("未处理") }}
                 </div>
@@ -282,6 +285,9 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
         </div>
 
         <div class="pt-4 flex items-center">
+            <div class="text-gray-400 text-xs mr-2">
+                #{{ record.id }}
+            </div>
             <div class="text-gray-400 flex-grow">
                 <timeago :datetime="record['createdAt'] * 1000"/>
             </div>

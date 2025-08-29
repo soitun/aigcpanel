@@ -30,6 +30,13 @@ const doSubmit = async () => {
         soundGenerate: soundGenerateValue,
     });
 };
+
+defineExpose({
+    show: () => {
+        visible.value = true;
+    },
+});
+
 </script>
 
 <template>
