@@ -129,13 +129,15 @@ export const SoundReplace: TaskBiz = {
         const jobResult: SoundReplaceJobResultType = record.jobResult;
 
         jobResult.step = jobResult.step || "ToAudio";
-        jobResult.ToAudio = jobResult.ToAudio || {};
-        jobResult.SoundAsr = jobResult.SoundAsr || {};
-        jobResult.Confirm = jobResult.Confirm || {};
-        jobResult.SoundGenerate = jobResult.SoundGenerate || {};
-        jobResult.Combine = jobResult.Combine || {};
+        jobResult.ToAudio = jobResult.ToAudio || {status: "queue"};
+        jobResult.SoundAsr = jobResult.SoundAsr || {status: "queue"};
+        jobResult.Confirm = jobResult.Confirm || {status: "queue"};
+        jobResult.SoundGenerate = jobResult.SoundGenerate || {status: "queue"};
+        jobResult.Combine = jobResult.Combine || {status: "queue"};
+
         if (jobResult.step === "ToAudio") {
             console.log("SoundReplace.ToAudio", jobResult);
+            jobResult.ToAudio.status = "running";
             await TaskService.update(bizId, {
                 status: "running",
                 jobResult,
@@ -147,11 +149,13 @@ export const SoundReplace: TaskBiz = {
                 cleanOld: true,
             });
             jobResult.step = "SoundAsr";
+            jobResult.ToAudio.status = "success";
             await TaskService.update(bizId, {jobResult});
         }
 
         if (jobResult.step === "SoundAsr") {
             console.log("SoundReplace.SoundAsr", jobResult);
+            jobResult.SoundAsr.status = "running";
             await TaskService.update(bizId, {
                 status: "running",
                 jobResult,
@@ -173,27 +177,31 @@ export const SoundReplace: TaskBiz = {
             jobResult.SoundAsr.records = ret.records;
             await TaskService.update(bizId, {jobResult});
             jobResult.step = "Confirm";
+            jobResult.SoundAsr.status = "success";
             await TaskService.update(bizId, {jobResult});
         }
 
         if (jobResult.step === "Confirm") {
             console.log("SoundReplace.Confirm", jobResult);
+            jobResult.Confirm.status = "running";
             jobResult.Confirm.records = ObjectUtil.clone(jobResult.SoundAsr.records);
-            jobResult.Confirm.confirm = false;
+            jobResult.Confirm.status = "pending";
             await TaskService.update(bizId, {jobResult});
             return "success";
         }
 
         if (jobResult.step === "SoundGenerate") {
             console.log("SoundReplace.SoundGenerate", jobResult);
+            jobResult.Confirm.status = "success";
+            jobResult.SoundGenerate.status = "running";
             if (!jobResult.SoundGenerate.records) {
                 jobResult.SoundGenerate.records = jobResult.Confirm.records.map(item => ({
                     ...item,
                     audio: "",
                 }));
             }
-            await TaskService.update(bizId, {jobResult});
             await TaskService.update(bizId, {
+                jobResult,
                 status: "running",
             });
             taskStore.fireChange({biz: "SoundReplace", bizId}, "running");
@@ -218,11 +226,13 @@ export const SoundReplace: TaskBiz = {
                 await TaskService.update(bizId, {jobResult});
             }
             jobResult.step = "Combine";
+            jobResult.SoundGenerate.status = "success";
             await TaskService.update(bizId, {jobResult});
         }
 
         if (jobResult.step === "Combine") {
             console.log("SoundReplace.Combine", jobResult);
+            jobResult.Combine.status = "running";
             jobResult.Combine.audio = "";
             jobResult.Combine.file = "";
             await TaskService.update(bizId, {
@@ -248,6 +258,7 @@ export const SoundReplace: TaskBiz = {
                     cleanOld: true,
                 });
                 jobResult.step = "End";
+                jobResult.Combine.status = "success";
                 await TaskService.update(bizId, {
                     jobResult,
                 });

@@ -58,14 +58,13 @@ const doRefresh = async () => {
         <div>
             <SoundReplaceCreate @submitted="doRefresh"/>
             <div v-if="records.length > 0">
-                <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
+                <div class="rounded-xl shadow border p-4 mt-4 mb-4 hover:shadow-lg flex items-center">
                     <div class="flex-grow flex items-center">
                         <div class="mr-3">
                             <a-checkbox
                                 :model-value="isAllChecked"
                                 :indeterminate="isIndeterminate"
-                                @change="onCheckAll"
-                            >
+                                @change="onCheckAll">
                                 {{ $t("全选") }}
                             </a-checkbox>
                         </div>
@@ -93,7 +92,7 @@ const doRefresh = async () => {
                     />
                 </div>
             </div>
-            <m-empty v-else :text="$t('暂无语音识别任务')"/>
+            <m-empty v-else/>
         </div>
     </div>
 </template>

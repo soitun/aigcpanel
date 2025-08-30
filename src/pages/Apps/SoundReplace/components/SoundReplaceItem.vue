@@ -15,52 +15,37 @@ import {ToggleUtil} from "../../../../lib/toggle";
 import {TaskRecord, TaskService} from "../../../../service/TaskService";
 import SoundAsrRecordsEditDialog from "../../../Sound/components/SoundAsrRecordsEditDialog.vue";
 import SoundGenerateFormViewBody from "../../../Sound/components/SoundGenerateFormViewBody.vue";
-import SoundReplaceItemDialog from "./SoundReplaceItemDialog.vue";
 import {useTaskStore} from "../../../../store/modules/task";
-
-interface Props {
-    record: TaskRecord;
-    dialog: boolean;
-    onRefresh: () => void;
-}
+import {SoundReplaceJobResultType, SoundReplaceModelConfigType} from "../type";
+import TaskJobResultStepView from "../../../../components/common/TaskJobResultStepView.vue";
 
 const taskStore = useTaskStore()
-const props = defineProps<Props>();
+const props = defineProps<{
+    record: TaskRecord<SoundReplaceModelConfigType, SoundReplaceJobResultType>;
+    dialog: boolean;
+    onRefresh: () => void;
+}>();
 
 const soundAsrRecordsEditDialog = ref<InstanceType<typeof SoundAsrRecordsEditDialog> | null>(null);
-const soundReplaceItemDialog = ref<InstanceType<typeof SoundReplaceItemDialog> | null>(null);
-const dialogVisible = ref(false);
-
 const soundAsrText = computed(() => {
-    if (props.record.jobResult.SoundAsr && props.record.jobResult.SoundAsr.records) {
-        return props.record.jobResult.SoundAsr.records.map(item => item.text).join(" ");
+    if (props.record.jobResult?.SoundAsr && props.record.jobResult?.SoundAsr.records) {
+        return props.record.jobResult?.SoundAsr.records.map(item => item.text).join(" ");
     }
     return "";
 });
-
 const confirmText = computed(() => {
-    if (props.record.jobResult.Confirm && props.record.jobResult.Confirm.records) {
-        return props.record.jobResult.Confirm.records.map(item => item.text).join(" ");
+    if (props.record.jobResult?.Confirm && props.record.jobResult?.Confirm.records) {
+        return props.record.jobResult?.Confirm.records.map(item => item.text).join(" ");
     }
     return "";
 });
 
-const recordId = computed(() => props.record.id as any);
-
-const onViewDetail = () => {
-    soundReplaceItemDialog.value?.show(props.record.id!);
-    dialogVisible.value = true;
-};
-
-const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
+const onConfirm = async (taskId: number, records: any[]) => {
     await TaskService.update(taskId, {
         statusMsg: "",
         jobResult: {
             step: "SoundGenerate",
-            Confirm: {
-                records,
-                confirm: true,
-            },
+            Confirm: {records,},
         },
     });
     await taskStore.dispatch("SoundReplace", taskId + "");
@@ -86,7 +71,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
             </div>
             <div class="flex-grow"></div>
             <div class="ml-1">
-                <TaskDuration :start="record.startTime" :end="record.endTime"/>
+                <TaskDuration  v-if="record.status==='running'" :start="record.startTime" :end="record.endTime"/>
             </div>
             <div class="ml-1">
                 <TaskBizStatus :status="record.status" :status-msg="record.statusMsg"/>
@@ -100,24 +85,9 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                 </div>
             </div>
             <div class="flex-grow pt-1">
-                <div v-if="record.jobResult.ToAudio && record.jobResult.ToAudio.file">
-                    <AudioPlayer :url="record.jobResult.ToAudio.file" show-wave/>
-                </div>
-                <div
-                    v-else-if="record.jobResult.step === 'ToAudio' && record.status === 'running'"
-                    class="bg-gray-100 rounded-lg p-1"
-                >
-                    <div class="text-gray-400 text-xs">
-                        <icon-refresh spin/>
-                        {{ $t("处理中") }}
-                    </div>
-                </div>
-                <div v-else class="bg-gray-100 rounded-lg p-1">
-                    <div class="text-gray-400 text-xs">
-                        <icon-info-circle/>
-                        {{ $t("未处理") }}
-                    </div>
-                </div>
+                <TaskJobResultStepView :record="record" step="ToAudio">
+                    <AudioPlayer :url="record.jobResult?.ToAudio.file" show-wave/>
+                </TaskJobResultStepView>
             </div>
         </div>
         <div class="mt-3 flex">
@@ -128,28 +98,13 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                 </div>
             </div>
             <div class="flex-grow pt-1">
-                <div v-if="record.jobResult.SoundAsr && record.jobResult.SoundAsr.records">
+                <TaskJobResultStepView :record="record" step="SoundAsr">
                     <div class="bg-gray-100 rounded-lg p-2">
                         <TextTruncateView :max-length="40" :text="soundAsrText"/>
                     </div>
-                </div>
-                <div
-                    v-else-if="record.jobResult.step === 'SoundAsr' && record.status === 'running'"
-                    class="bg-gray-100 rounded-lg p-1"
-                >
-                    <div class="text-gray-400 text-xs">
-                        <icon-refresh spin/>
-                        {{ $t("处理中") }}
-                    </div>
-                </div>
-                <div v-else class="bg-gray-100 rounded-lg p-1">
-                    <div class="text-gray-400 text-xs">
-                        <icon-info-circle/>
-                        {{ $t("未处理") }}
-                    </div>
-                </div>
+                </TaskJobResultStepView>
                 <div class="mt-1">
-                    <ServerNameVersion :record="record.modelConfig.soundAsr"/>
+                    <ServerNameVersion :record="record.modelConfig?.soundAsr!"/>
                 </div>
             </div>
         </div>
@@ -161,35 +116,25 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                 </div>
             </div>
             <div class="flex-grow pt-1">
-                <div v-if="record.jobResult.Confirm && record.jobResult.Confirm.records">
+                <TaskJobResultStepView :record="record" step="Confirm">
                     <div class="mb-1">
                         <div class="bg-gray-100 rounded-lg p-2">
                             <TextTruncateView :max-length="40" :text="confirmText"/>
                         </div>
                     </div>
-                    <div v-if="!record.jobResult.Confirm.confirm">
-                        <a-button
-                            type="primary"
-                            @click="
-                                soundAsrRecordsEditDialog?.edit(
-                                    recordId,
-                                    record.jobResult.Confirm.records
-                                )
-                            "
-                        >
-                            <template #icon>
-                                <icon-check-circle/>
-                            </template>
-                            {{ $t("修改确认文字") }}
-                        </a-button>
-                    </div>
-                </div>
-                <div v-else class="bg-gray-100 rounded-lg p-1">
-                    <div class="text-gray-400 text-xs">
-                        <icon-info-circle/>
-                        {{ $t("未处理") }}
-                    </div>
-                </div>
+                    <template #pending>
+                        <div class="mb-1">
+                            <a-button
+                                type="primary"
+                                @click="soundAsrRecordsEditDialog?.edit(record.id!,record.jobResult?.Confirm.records!)">
+                                <template #icon>
+                                    <icon-check-circle/>
+                                </template>
+                                {{ $t("修改确认文字") }}
+                            </a-button>
+                        </div>
+                    </template>
+                </TaskJobResultStepView>
             </div>
         </div>
         <div class="mt-3 flex">
@@ -200,58 +145,49 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                 </div>
             </div>
             <div class="flex-grow">
-                <div
-                    v-if="record.jobResult.SoundGenerate && record.jobResult.SoundGenerate.records"
-                    class="bg-gray-100 rounded-lg"
-                >
-                    <div class="max-h-96 overflow-y-auto p-2 rounded-lg">
-                        <div
-                            v-for="(rr, index) in record.jobResult.SoundGenerate.records.filter((o, i) => {
+                <TaskJobResultStepView :record="record" step="SoundGenerate">
+                    <div class="bg-gray-100 rounded-lg">
+                        <div class="max-h-96 overflow-y-auto p-2 rounded-lg">
+                            <div
+                                v-for="(rr, index) in record.jobResult?.SoundGenerate.records.filter((o, i) => {
                                 return i < 2 || ToggleUtil.get('SoundReplace', record.id, false).value;
                             })"
-                            :key="index"
-                            class="flex mb-1"
-                        >
-                            <div class="w-6 flex-shrink-0">
-                                <AudioPlayerButton v-if="rr.audio" :source="rr.audio"/>
-                                <icon-refresh
-                                    v-else-if="
-                                        record.jobResult.step === 'SoundGenerate' && record.status === 'running'
-                                    "
-                                    spin
-                                />
-                                <icon-info-circle v-else class="text-gray-400 text-xs"/>
+                                :key="index"
+                                class="flex mb-1"
+                            >
+                                <div class="w-6 flex-shrink-0">
+                                    <AudioPlayerButton v-if="rr.audio" :source="rr.audio"/>
+                                    <icon-refresh
+                                        v-else-if="record.jobResult?.step === 'SoundGenerate' && record.status === 'running'"
+                                        spin
+                                    />
+                                    <icon-info-circle v-else class="text-gray-400 text-xs"/>
+                                </div>
+                                <div>{{ rr.text }}</div>
                             </div>
-                            <div>{{ rr.text }}</div>
+                        </div>
+                        <div v-if="record.jobResult?.SoundGenerate.records!.length > 5" class="p-2">
+                            <a-button
+                                v-if="!ToggleUtil.get('SoundReplace', record.id, false).value"
+                                size="mini"
+                                @click="ToggleUtil.toggle('SoundReplace', record.id)"
+                            >
+                                <template #icon>
+                                    <icon-down/>
+                                </template>
+                                {{ $t("展开") }}
+                            </a-button>
+                            <a-button v-else size="mini" @click="ToggleUtil.toggle('SoundReplace', record.id)">
+                                <template #icon>
+                                    <icon-up/>
+                                </template>
+                                {{ $t("收起") }}
+                            </a-button>
                         </div>
                     </div>
-                    <div v-if="record.jobResult.SoundGenerate.records.length > 5" class="p-2">
-                        <a-button
-                            v-if="!ToggleUtil.get('SoundReplace', record.id, false).value"
-                            size="mini"
-                            @click="ToggleUtil.toggle('SoundReplace', record.id)"
-                        >
-                            <template #icon>
-                                <icon-down/>
-                            </template>
-                            {{ $t("展开") }}
-                        </a-button>
-                        <a-button v-else size="mini" @click="ToggleUtil.toggle('SoundReplace', record.id)">
-                            <template #icon>
-                                <icon-up/>
-                            </template>
-                            {{ $t("收起") }}
-                        </a-button>
-                    </div>
-                </div>
-                <div v-else class="bg-gray-100 rounded-lg p-1">
-                    <div class="text-gray-400 text-xs">
-                        <icon-info-circle/>
-                        {{ $t("未处理") }}
-                    </div>
-                </div>
+                </TaskJobResultStepView>
                 <div class="mt-1 flex gap-1">
-                    <SoundGenerateFormViewBody :data="record.modelConfig.soundGenerate"/>
+                    <SoundGenerateFormViewBody :data="record.modelConfig?.soundGenerate!"/>
                 </div>
             </div>
         </div>
@@ -262,28 +198,12 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                     {{ $t("视频合成") }}
                 </div>
             </div>
-            <div
-                v-if="record.jobResult.Combine && record.jobResult.Combine.file"
-                class="bg-gray-100 rounded-lg p-2 w-full h-96">
-                <VideoPlayer :url="record.jobResult.Combine.file"/>
-            </div>
-            <div
-                v-else-if="record.jobResult.step === 'Combine' && record.status === 'running'"
-                class="bg-gray-100 rounded-lg p-1"
-            >
-                <div class="text-gray-400 text-xs">
-                    <icon-refresh spin/>
-                    {{ $t("处理中") }}
+            <TaskJobResultStepView :record="record" step="Combine">
+                <div class="bg-gray-100 rounded-lg p-2 w-full h-96">
+                    <VideoPlayer :url="record.jobResult?.Combine.file"/>
                 </div>
-            </div>
-            <div v-else class="bg-gray-100 rounded-lg p-1 flex-grow">
-                <div class="text-gray-400 text-xs">
-                    <icon-info-circle/>
-                    {{ $t("未处理") }}
-                </div>
-            </div>
+            </TaskJobResultStepView>
         </div>
-
         <div class="pt-4 flex items-center">
             <div class="text-gray-400 text-xs mr-2">
                 #{{ record.id }}
@@ -302,14 +222,5 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
             </div>
         </div>
     </div>
-    <SoundAsrRecordsEditDialog
-        ref="soundAsrRecordsEditDialog"
-        :save-title="$t('保存并继续')"
-        @save="onAsrRecordsUpdate"
-    />
-    <SoundReplaceItemDialog
-        ref="soundReplaceItemDialog"
-        :id="recordId"
-        v-model:visible="dialogVisible"
-    />
+    <SoundAsrRecordsEditDialog ref="soundAsrRecordsEditDialog" :save-title="$t('保存并继续')" @save="onConfirm"/>
 </template>

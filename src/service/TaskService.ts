@@ -10,7 +10,10 @@ export enum TaskType {
     System = 2,
 }
 
-export type TaskRecord = {
+export type TaskRecord<
+    MODEL_CONFIG extends any = any,
+    JOB_RESULT extends any = any,
+> = {
     id?: number;
 
     biz: TaskBiz;
@@ -28,8 +31,8 @@ export type TaskRecord = {
     serverVersion: string;
 
     param?: any;
-    jobResult?: any;
-    modelConfig?: any;
+    jobResult?: JOB_RESULT;
+    modelConfig?: MODEL_CONFIG;
     result?: any;
 
     runtime?: TaskRuntime;
