@@ -40,7 +40,7 @@ export default <NodeFunctionCall>{
         const taskRunData = {
             taskId: param.runData?.['taskId'] || '',
             video: param.runInputs['Video'],
-            title: 'Workflow-' + param.node.id,
+            title: param.node.properties?.title + '-' + param.node.id,
             soundAsr: param.node.properties?.data?.soundAsr,
             soundGenerate: param.node.properties?.data?.soundGenerate,
         };

@@ -2,18 +2,13 @@
 import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
 import {TaskRecord, TaskService} from "../../service/TaskService";
-import {computed, PropType} from "vue";
+import {computed} from "vue";
 import {sleep} from "../../lib/util";
 
 const props = defineProps({
     records: {
         type: Array as () => TaskRecord[],
         required: true,
-    },
-    fileCleanCollector: {
-        type: Function as PropType<(task: TaskRecord) => Promise<string[]> | null>,
-        default: null,
-        required: false,
     },
 });
 
@@ -33,9 +28,7 @@ const doDelete = async () => {
         if (r.status !== "success" && r.status !== "fail") {
             continue;
         }
-        await TaskService.delete(r, {
-            fileCleanCollector: props.fileCleanCollector,
-        });
+        await TaskService.delete(r);
     }
     Dialog.loadingOff();
     emit("update");
@@ -46,7 +39,7 @@ const doDelete = async () => {
     <a-tooltip :content="$t('删除')" mini>
         <a-button class="mr-2" :disabled="!canDelete" @click="doDelete()">
             <template #icon>
-                <icon-delete />
+                <icon-delete/>
             </template>
         </a-button>
     </a-tooltip>

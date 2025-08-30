@@ -16,11 +16,11 @@ import {TaskRecord, TaskService} from "../../../../service/TaskService";
 import SoundAsrRecordsEditDialog from "../../../Sound/components/SoundAsrRecordsEditDialog.vue";
 import SoundGenerateFormViewBody from "../../../Sound/components/SoundGenerateFormViewBody.vue";
 import SoundReplaceItemDialog from "./SoundReplaceItemDialog.vue";
-import {soundReplaceFileCleanCollector} from "../util";
 import {useTaskStore} from "../../../../store/modules/task";
 
 interface Props {
     record: TaskRecord;
+    dialog: boolean;
     onRefresh: () => void;
 }
 
@@ -72,12 +72,13 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
     <div class="rounded-xl shadow border p-4 mb-4 hover:shadow-lg">
         <div class="flex items-center">
             <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
-                <div class="mr-2 h-8 pt-0.5">
+                <div v-if="!dialog" class="mr-2 h-8 pt-0.5">
                     <a-checkbox v-model="record['_check']"/>
                 </div>
                 <div class="">
                     <TaskTitleField
                         :record="record"
+                        :disabled="dialog"
                         @title-click="record['_check'] = !record['_check']"
                         @update="v => (record.title = v)"
                     />
@@ -263,8 +264,7 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
             </div>
             <div
                 v-if="record.jobResult.Combine && record.jobResult.Combine.file"
-                class="bg-gray-100 rounded-lg p-2 w-full h-96"
-            >
+                class="bg-gray-100 rounded-lg p-2 w-full h-96">
                 <VideoPlayer :url="record.jobResult.Combine.file"/>
             </div>
             <div
@@ -292,21 +292,11 @@ const onAsrRecordsUpdate = async (taskId: number, records: any[]) => {
                 <timeago :datetime="record['createdAt'] * 1000"/>
             </div>
             <div class="">
-                <a-button
-                    v-if="record.id"
-                    @click="onViewDetail"
-                    class="mr-2"
-                >
-                    <template #icon>
-                        <icon-eye/>
-                    </template>
-                    {{ $t("查看详情") }}
-                </a-button>
                 <TaskDownloadAction :record="record"/>
                 <TaskDeleteAction
+                    v-if="!dialog"
                     :record="record"
                     @update="onRefresh"
-                    :file-clean-collector="soundReplaceFileCleanCollector"
                 />
                 <TaskContinueAction :record="record" @update="onRefresh"/>
             </div>

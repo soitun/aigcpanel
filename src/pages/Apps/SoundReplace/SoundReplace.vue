@@ -9,7 +9,6 @@ import {TaskRecord, TaskService} from "../../../service/TaskService";
 import SoundReplaceCreate from "./components/SoundReplaceCreate.vue";
 import SoundReplaceItem from "./components/SoundReplaceItem.vue";
 import StepsComponent from "./components/StepsComponent.vue";
-import {soundReplaceFileCleanCollector} from "./util";
 import ToggleButton from "../../../components/common/ToggleButton.vue";
 import {TaskChangeType} from "../../../store/modules/task";
 
@@ -73,7 +72,6 @@ const doRefresh = async () => {
                         <TaskBatchDeleteAction
                             :records="checkRecords"
                             @update="doRefresh"
-                            :file-clean-collector="soundReplaceFileCleanCollector"
                         />
                         <TaskBatchDownloadAction :records="checkRecords"/>
                     </div>
@@ -90,6 +88,7 @@ const doRefresh = async () => {
                 <div v-for="r in recordsForPage" :key="r.id">
                     <SoundReplaceItem
                         :record="r"
+                        :dialog="false"
                         :on-refresh="doRefresh"
                     />
                 </div>

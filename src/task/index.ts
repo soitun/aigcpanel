@@ -1,5 +1,5 @@
 import {nextTick} from "vue";
-import {SoundReplace} from "../pages/Apps/SoundReplace/task";
+import {SoundReplace, SoundReplaceCleaner} from "../pages/Apps/SoundReplace/task";
 import {VideoGenFlow} from "../pages/Apps/VideoGenFlow/task";
 import {TaskService} from "../service/TaskService";
 import {useServerStore} from "../store/modules/server";
@@ -21,6 +21,10 @@ export const tasks = {
     SoundReplace,
 };
 
+export const taskCleaners = {
+    SoundReplace: SoundReplaceCleaner,
+}
+
 export const TaskManager = {
     init() {
         for (const k in tasks) {
@@ -30,6 +34,9 @@ export const TaskManager = {
             await serverStore.waitReady();
             for (const k in tasks) {
                 await TaskService.restoreForTask(k as any);
+            }
+            for (const k in taskCleaners) {
+                TaskService.registerCleaner(k as any, taskCleaners[k]);
             }
         }).then();
     },

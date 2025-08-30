@@ -64,6 +64,7 @@ defineExpose({
             <div v-else-if="record">
                 <SoundReplaceItem
                     :record="record"
+                    :dialog="true"
                     :on-refresh="doLoad"
                 />
             </div>

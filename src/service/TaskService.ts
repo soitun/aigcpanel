@@ -70,9 +70,18 @@ const mergeData = (oldData: any, newData: any) => {
     return result;
 };
 
+type CleanerFunctionType = (record: TaskRecord) => Promise<{
+    files: string[];
+}>;
+
+const cleanersMap = new Map<TaskBiz, CleanerFunctionType>();
+
 export const TaskService = {
     tableName() {
         return "data_task";
+    },
+    registerCleaner(biz: TaskBiz, cleaner: CleanerFunctionType) {
+        cleanersMap.set(biz, cleaner);
     },
     decodeRecord(record: TaskRecord): TaskRecord | null {
         if (!record) {
@@ -238,18 +247,7 @@ export const TaskService = {
             [...values, id]
         );
     },
-    async delete(
-        record: TaskRecord,
-        option?: {
-            fileCleanCollector?: Function;
-        }
-    ) {
-        option = Object.assign(
-            {
-                fileCleanCollector: null,
-            },
-            option
-        );
+    async delete(record: TaskRecord) {
         const filesForClean: string[] = [];
         if (record.result) {
             // collection files from result
@@ -259,6 +257,13 @@ export const TaskService = {
                         filesForClean.push(record.result[k]);
                     }
                 }
+            }
+        }
+        const cleaner = cleanersMap.get(record.biz);
+        if (cleaner) {
+            const {files} = await cleaner(record);
+            if (files && files.length > 0) {
+                filesForClean.push(...files);
             }
         }
         for (const file of filesForClean) {
