@@ -6,6 +6,7 @@ import {TaskBiz, TaskChangeType, useTaskStore} from "../../../store/modules/task
 import {SoundReplaceJobResultType, SoundReplaceModelConfigType} from "./type";
 import {ffmpegCombineVideoAudio, ffmpegMergeAudio, ffmpegVideoToAudio} from "../../../lib/ffmpeg";
 import {serverSoundAsr, serverSoundGenerate} from "../../../lib/server";
+import {ffprobeGetMediaDuration} from "../../../lib/ffprobe";
 
 const serverStore = useServerStore();
 const taskStore = useTaskStore();
@@ -240,7 +241,7 @@ export const SoundReplace: TaskBiz = {
                 jobResult,
             });
             taskStore.fireChange({biz: "SoundReplace", bizId}, "running");
-            const videoDurationMs = await window.$mapi.ffmpeg.getMediaDuration(modelConfig.video, true);
+            const videoDurationMs = await ffprobeGetMediaDuration(modelConfig.video, true);
             const filesToClean: string[] = [];
             try {
                 // 创建合并后的音频文件

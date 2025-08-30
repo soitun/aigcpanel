@@ -1,3 +1,139 @@
+import {ffprobeGetMediaDuration} from "./ffprobe";
+
+export const ffmpegSetMediaRatio = async (
+    input: string,
+    output: string,
+    option?: {
+        ratio: number;
+    }
+) => {
+    option = Object.assign(
+        {
+            ratio: 1.0,
+        },
+        option || {}
+    );
+    const ext = await window.$mapi.file.ext(input);
+    if (!output) {
+        output = await window.$mapi.file.temp(ext);
+    }
+    const buildAtempoFilter = (ratio: number): string => {
+        // atempo 只支持 0.5~2.0，超过需要多次串联
+        const filters: string[] = [];
+        let remain = ratio;
+        while (remain > 2.0) {
+            filters.push("atempo=2.0");
+            remain /= 2.0;
+        }
+        while (remain < 0.5) {
+            filters.push("atempo=0.5");
+            remain /= 0.5;
+        }
+        filters.push(`atempo=${remain}`);
+        return filters.join(",");
+    };
+
+    let args: string[] = [];
+    if ("mp4" === ext) {
+        args = [
+            "-i",
+            input,
+            "-filter_complex",
+            `[0:v]setpts=${(1 / option.ratio).toFixed(6)}*PTS[v];[0:a]${buildAtempoFilter(option.ratio)}[a]`,
+            "-map",
+            "[v]",
+            "-map",
+            "[a]",
+            "-preset",
+            "fast",
+            "-y",
+            output,
+        ];
+    } else {
+        args = ["-i", input, "-filter:a", buildAtempoFilter(option.ratio), "-vn", "-y", output];
+    }
+
+    // console.log("FFmpeg setMediaRatio args:", args.join(" "));
+
+    return new Promise<string>(async (resolve, reject) => {
+        let buffer = "";
+        let called = false;
+        const endCheck = async () => {
+            if (await window.$mapi.file.exists(output, {isFullPath: true})) {
+                resolve(output);
+            } else {
+                reject("Failed to create output file");
+            }
+        };
+        const controller = await window.$mapi.app.spawnBinary('ffmpeg', args, {
+            shell: false,
+            stdout: (data: string) => {
+                // console.log("FFmpeg stdout:", data);
+            },
+            stderr: (data: string) => {
+                // console.log("FFmpeg stderr:", data);
+            },
+            success: () => {
+                endCheck().then();
+            },
+            error: (msg: string, exitCode: number) => {
+                endCheck().then();
+            },
+        });
+    });
+};
+
+const ffmpegConvertAudio = async (
+    input: string,
+    output?: string,
+    option?: {
+        channels?: number;
+        sampleRate?: number;
+        format?: string;
+    }
+) => {
+    option = Object.assign({
+            channels: 1,
+            sampleRate: 44100,
+            format: "wav",
+        },
+        option
+    );
+    if (!output) {
+        output = await window.$mapi.file.temp(option.format);
+    }
+    return new Promise<string>(async (resolve, reject) => {
+        const args: string[] = [
+            "-i",
+            input,
+            "-ac",
+            option.channels!.toString(),
+            "-ar",
+            option.sampleRate!.toString(),
+            "-f",
+            option.format!,
+            "-y",
+            output,
+        ];
+        // console.log("FFmpeg convertAudio args:", args.join(" "));
+        const controller = await window.$mapi.app.spawnBinary('ffmpeg', args, {
+            shell: false,
+            stdout: (data: string) => {
+                // console.log("FFmpeg stdout:", data);
+            },
+            stderr: (data: string) => {
+                // console.log("FFmpeg stderr:", data);
+            },
+            success: () => {
+                resolve(output);
+            },
+            error: (msg: string, exitCode: number) => {
+                reject(`FFmpeg error (code ${exitCode}): ${msg}`);
+            },
+        });
+    });
+};
+
 export const ffmpegMergeAudio = async (
     records: {
         start: number;
@@ -21,16 +157,16 @@ export const ffmpegMergeAudio = async (
         // 计算当前片段的时长限制
         const startMs = currentRecord.start;
         const maxDurationMs = nextRecord ? nextRecord.start - startMs : recordMaxMs - startMs;
-        const actualDurationMs = await window.$mapi.ffmpeg.getMediaDuration(currentRecord.audio, true);
+        const actualDurationMs = await ffprobeGetMediaDuration(currentRecord.audio, true);
         let audioFileUse = currentRecord.audio;
         // 如果音频时长超过限制，需要压缩
         if (actualDurationMs > maxDurationMs) {
-            audioFileUse = await window.$mapi.ffmpeg.setMediaRatio(audioFileUse, "", {
+            audioFileUse = await ffmpegSetMediaRatio(audioFileUse, "", {
                 ratio: actualDurationMs / maxDurationMs,
             });
             cleans.push(audioFileUse);
         }
-        audioFileUse = await window.$mapi.ffmpeg.convertAudio(audioFileUse);
+        audioFileUse = await ffmpegConvertAudio(audioFileUse);
         cleans.push(audioFileUse);
         wavFiles.push({
             path: audioFileUse,
@@ -60,7 +196,7 @@ export const ffmpegMergeAudio = async (
             inputFilters.join(""),
             "amix=inputs=" + inputSources.length + ":duration=longest:normalize=0",
         ].join("");
-        await window.$mapi.ffmpeg.run([...inputs, "-filter_complex", filterComplex, output]);
+        await window.$mapi.app.spawnBinary('ffmpeg', [...inputs, "-filter_complex", filterComplex, output]);
     }
     // 检查合并后的音频是否存在
     if (!(await window.$mapi.file.exists(output, {isFullPath: true}))) {
@@ -74,7 +210,7 @@ export const ffmpegMergeAudio = async (
 
 export const ffmpegCombineVideoAudio = async (video: string, audio: string) => {
     const output = await window.$mapi.file.temp("mp4");
-    await window.$mapi.ffmpeg.run([
+    await window.$mapi.app.spawnBinary('ffmpeg', [
         "-i",
         video,
         "-i",
@@ -99,7 +235,7 @@ export const ffmpegCombineVideoAudio = async (video: string, audio: string) => {
 
 export const ffmpegVideoToAudio = async (video: string) => {
     const file = await window.$mapi.file.temp("mp3");
-    await window.$mapi.ffmpeg.run([
+    await window.$mapi.app.spawnBinary('ffmpeg', [
         "-y",
         "-i",
         video,

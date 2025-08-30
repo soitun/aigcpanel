@@ -15,7 +15,6 @@ import lang from "./lang/render";
 import user from "./user/render";
 import misc from "./misc/render";
 
-import ffmpeg from "./ffmpeg/render";
 import server from "./server/render";
 
 export const MAPI = {
@@ -36,8 +35,6 @@ export const MAPI = {
                 lang,
                 user,
                 misc,
-
-                ffmpeg,
                 server,
             });
             db.init();

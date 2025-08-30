@@ -1,3 +1,18 @@
+export const ffprobeGetMediaDuration = async (media: string, ms: boolean = false): Promise<number> => {
+    const res = await window.$mapi.app.spawnBinary("ffprobe", [
+        "-v", "error",
+        "-show_entries", "format=duration",
+        "-of", "default=noprint_wrappers=1:nokey=1",
+        media,
+    ]);
+    const info = await res.result();
+    const duration = parseFloat(info.trim());
+    if (isNaN(duration)) {
+        throw "Could not retrieve media duration";
+    }
+    return ms ? Math.ceil(duration * 1000) : duration;
+}
+
 export const ffprobeVideoInfo = async (video: string): Promise<{
     duration: number;
     width: number;
