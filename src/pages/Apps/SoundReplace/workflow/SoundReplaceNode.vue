@@ -52,7 +52,7 @@ const soundReplaceParamDialog = ref<InstanceType<typeof SoundReplaceParamDialog>
                             <icon-tool/>
                         </template>
                         {{ $t('查看任务') }}
-                        {{nodeRunData.taskId}}
+                        #{{nodeRunData.taskId}}
                     </a-button>
                 </div>
             </div>
