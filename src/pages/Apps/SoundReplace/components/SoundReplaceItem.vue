@@ -71,7 +71,7 @@ const onConfirm = async (taskId: number, records: any[]) => {
             </div>
             <div class="flex-grow"></div>
             <div class="ml-1">
-                <TaskDuration  v-if="record.status==='running'" :start="record.startTime" :end="record.endTime"/>
+                <TaskDuration v-if="record.status==='running'" :start="record.startTime" :end="record.endTime"/>
             </div>
             <div class="ml-1">
                 <TaskBizStatus :status="record.status" :status-msg="record.statusMsg"/>
@@ -146,45 +146,47 @@ const onConfirm = async (taskId: number, records: any[]) => {
             </div>
             <div class="flex-grow">
                 <TaskJobResultStepView :record="record" step="SoundGenerate">
-                    <div class="bg-gray-100 rounded-lg">
-                        <div class="max-h-96 overflow-y-auto p-2 rounded-lg">
-                            <div
-                                v-for="(rr, index) in record.jobResult?.SoundGenerate.records.filter((o, i) => {
+                    <template #successRunning>
+                        <div class="bg-gray-100 rounded-lg">
+                            <div class="max-h-96 overflow-y-auto p-2 rounded-lg">
+                                <div
+                                    v-for="(rr, index) in record.jobResult?.SoundGenerate?.records?.filter((o, i) => {
                                 return i < 2 || ToggleUtil.get('SoundReplace', record.id, false).value;
                             })"
-                                :key="index"
-                                class="flex mb-1"
-                            >
-                                <div class="w-6 flex-shrink-0">
-                                    <AudioPlayerButton v-if="rr.audio" :source="rr.audio"/>
-                                    <icon-refresh
-                                        v-else-if="record.jobResult?.step === 'SoundGenerate' && record.status === 'running'"
-                                        spin
-                                    />
-                                    <icon-info-circle v-else class="text-gray-400 text-xs"/>
+                                    :key="index"
+                                    class="flex mb-1"
+                                >
+                                    <div class="w-6 flex-shrink-0">
+                                        <AudioPlayerButton v-if="rr.audio" :source="rr.audio"/>
+                                        <icon-refresh
+                                            v-else-if="record.jobResult?.step === 'SoundGenerate' && record.status === 'running'"
+                                            spin
+                                        />
+                                        <icon-info-circle v-else class="text-gray-400 text-xs"/>
+                                    </div>
+                                    <div>{{ rr.text }}</div>
                                 </div>
-                                <div>{{ rr.text }}</div>
+                            </div>
+                            <div v-if="(record.jobResult?.SoundGenerate?.records?.length||0) > 5" class="p-2">
+                                <a-button
+                                    v-if="!ToggleUtil.get('SoundReplace', record.id, false).value"
+                                    size="mini"
+                                    @click="ToggleUtil.toggle('SoundReplace', record.id)"
+                                >
+                                    <template #icon>
+                                        <icon-down/>
+                                    </template>
+                                    {{ $t("展开") }}
+                                </a-button>
+                                <a-button v-else size="mini" @click="ToggleUtil.toggle('SoundReplace', record.id)">
+                                    <template #icon>
+                                        <icon-up/>
+                                    </template>
+                                    {{ $t("收起") }}
+                                </a-button>
                             </div>
                         </div>
-                        <div v-if="record.jobResult?.SoundGenerate.records!.length > 5" class="p-2">
-                            <a-button
-                                v-if="!ToggleUtil.get('SoundReplace', record.id, false).value"
-                                size="mini"
-                                @click="ToggleUtil.toggle('SoundReplace', record.id)"
-                            >
-                                <template #icon>
-                                    <icon-down/>
-                                </template>
-                                {{ $t("展开") }}
-                            </a-button>
-                            <a-button v-else size="mini" @click="ToggleUtil.toggle('SoundReplace', record.id)">
-                                <template #icon>
-                                    <icon-up/>
-                                </template>
-                                {{ $t("收起") }}
-                            </a-button>
-                        </div>
-                    </div>
+                    </template>
                 </TaskJobResultStepView>
                 <div class="mt-1 flex gap-1">
                     <SoundGenerateFormViewBody :data="record.modelConfig?.soundGenerate!"/>

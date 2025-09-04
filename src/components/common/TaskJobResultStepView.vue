@@ -16,6 +16,7 @@ const stepData = computed(() => {
 <template>
     <div v-if="stepData && stepData.status==='success'" class="w-full">
         <slot></slot>
+        <slot name="successRunning"></slot>
     </div>
     <div v-else-if="stepData && stepData.status==='pending'" class="w-full">
         <slot></slot>
@@ -27,6 +28,8 @@ const stepData = computed(() => {
             <icon-refresh spin/>
             {{ $t("处理中") }}
         </div>
+        <slot name="running"></slot>
+        <slot name="successRunning"></slot>
     </div>
     <div v-else-if="stepData && stepData.status === 'running' && record.status==='fail'"
          class="w-full bg-gray-100 rounded-lg p-1">

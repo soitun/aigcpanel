@@ -9,6 +9,7 @@ import {
 } from "../../../../module/Workflow/nodes/FunctionCall/lib";
 import SoundReplaceItemDialog from "../components/SoundReplaceItemDialog.vue";
 import SoundReplaceParamDialog from "../components/SoundReplaceParamDialog.vue";
+import TaskDialogViewButton from "../../../../components/common/TaskDialogViewButton.vue";
 
 const props = defineProps<FunctionCallNodeProps>();
 const emit = defineEmits<FunctionCallNodeEmits>();
@@ -45,15 +46,8 @@ const soundReplaceParamDialog = ref<InstanceType<typeof SoundReplaceParamDialog>
             </template>
             <div v-if="nodeRunData" class="mb-4">
                 <div class="">
-                    <a-button v-if="nodeRunData.taskId"
-                              @click="soundReplaceItemDialog.show(nodeRunData.taskId)"
-                              class="w-full">
-                        <template #icon>
-                            <icon-tool/>
-                        </template>
-                        {{ $t('查看任务') }}
-                        #{{nodeRunData.taskId}}
-                    </a-button>
+                    <TaskDialogViewButton :task-id="nodeRunData.taskId"
+                                          @click="soundReplaceItemDialog?.show(nodeRunData.taskId)"/>
                 </div>
             </div>
         </div>

@@ -1,11 +1,10 @@
 export const ffprobeGetMediaDuration = async (media: string, ms: boolean = false): Promise<number> => {
-    const res = await window.$mapi.app.spawnBinary("ffprobe", [
+    const info = await window.$mapi.app.spawnBinary("ffprobe", [
         "-v", "error",
         "-show_entries", "format=duration",
         "-of", "default=noprint_wrappers=1:nokey=1",
         media,
     ]);
-    const info = await res.result();
     const duration = parseFloat(info.trim());
     if (isNaN(duration)) {
         throw "Could not retrieve media duration";
@@ -19,14 +18,13 @@ export const ffprobeVideoInfo = async (video: string): Promise<{
     height: number;
     fps: number;
 }> => {
-    const res = await window.$mapi.app.spawnBinary("ffprobe", [
+    const info = await window.$mapi.app.spawnBinary("ffprobe", [
         "-v", "error",
         "-select_streams", "v:0",
         "-show_entries", "stream=width,height,r_frame_rate,duration",
         "-of", "default=noprint_wrappers=1:nokey=1",
         video,
     ]);
-    const info = await res.result();
     const lines = info.split("\n").map(line => line.trim()).filter(line => line.length > 0);
     if (lines.length < 4) {
         throw "Could not retrieve video info";
