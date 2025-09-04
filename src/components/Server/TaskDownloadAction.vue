@@ -4,6 +4,7 @@ import {t} from "../../lang";
 import {TaskRecord} from "../../service/TaskService";
 import {computed} from "vue";
 import {mapError} from "../../lib/error";
+import {FileUtil} from "../../lib/file";
 
 const props = defineProps<{
     record: TaskRecord;
@@ -17,7 +18,8 @@ const canDownload = computed(() => {
 });
 
 const doDownload = async () => {
-    const fileExt = await window.$mapi.file.ext(props.record.result.url);
+    let fromPath = props.record.result.url;
+    const fileExt = FileUtil.getExt(fromPath);
     let filePath = await window.$mapi.file.openSave({
         defaultPath: props.record.title + `.${fileExt}`,
     });
@@ -27,7 +29,6 @@ const doDownload = async () => {
     if (!filePath.endsWith(`.${fileExt}`)) {
         filePath = filePath + `.${fileExt}`;
     }
-    let fromPath = props.record.result.url;
     try {
         await window.$mapi.file.copy(fromPath, filePath, {
             isFullPath: true,

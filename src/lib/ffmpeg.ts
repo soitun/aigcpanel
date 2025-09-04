@@ -245,7 +245,7 @@ export const ffmpegVideoToAudio = async (video: string) => {
         "-ac",
         "1",
         "-ar",
-        "16000",
+        "44100",
         file,
     ]);
     if (!(await window.$mapi.file.exists(file, {isFullPath: true}))) {
