@@ -8,6 +8,8 @@ import {FileUtil} from "../../lib/file";
 
 const props = defineProps<{
     record: TaskRecord;
+    name?: string;
+    title?: string;
 }>();
 
 const canDownload = computed(() => {
@@ -18,7 +20,7 @@ const canDownload = computed(() => {
 });
 
 const doDownload = async () => {
-    let fromPath = props.record.result.url;
+    let fromPath = props.record.result[props.name || "url"];
     const fileExt = FileUtil.getExt(fromPath);
     let filePath = await window.$mapi.file.openSave({
         defaultPath: props.record.title + `.${fileExt}`,
@@ -42,10 +44,12 @@ const doDownload = async () => {
 </script>
 
 <template>
-    <a-tooltip :content="$t('下载')" mini>
+    <a-tooltip :content="title || $t('下载')" mini>
         <a-button class="mr-2" :disabled="!canDownload" @click="doDownload()">
             <template #icon>
-                <icon-download />
+                <slot name="icon">
+                    <icon-download />
+                </slot>
             </template>
         </a-button>
     </a-tooltip>

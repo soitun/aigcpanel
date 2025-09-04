@@ -1,4 +1,5 @@
 import {TaskJobResultStepStatus} from "../../../service/TaskService";
+import {AudioRecord} from "../../../lib/ffmpeg";
 
 export type SoundReplaceModelConfigType = {
     video: string;
@@ -33,7 +34,7 @@ export type SoundReplaceJobResultType = {
         status: TaskJobResultStepStatus,
         start: number;
         end: number;
-        records: { start: number; end: number; text: string; audio: string }[];
+        records: AudioRecord[];
     };
     Combine: {
         status: TaskJobResultStepStatus,

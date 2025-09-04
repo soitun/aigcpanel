@@ -134,16 +134,32 @@ const ffmpegConvertAudio = async (
     });
 };
 
+export type AudioRecord = {
+    start: number;
+    end: number;
+    text: string;
+    audio: string;
+    actualStart?: number;
+    actualEnd?: number;
+}
+
 export const ffmpegMergeAudio = async (
-    records: {
+    records: AudioRecord[],
+    recordMaxMs: number
+): Promise<{
+    output: string;
+    cleans: string[];
+    mergeRecords: AudioRecord[],
+}> => {
+    const cleans: string[] = [];
+    const mergeRecords: {
         start: number;
         end: number;
+        actualStart: number;
+        actualEnd: number;
         text: string;
         audio: string;
-    }[],
-    recordMaxMs: number
-) => {
-    const cleans: string[] = [];
+    }[] = [];
     const wavFiles: {
         path: string;
         start: number;
@@ -158,6 +174,14 @@ export const ffmpegMergeAudio = async (
         const startMs = currentRecord.start;
         const maxDurationMs = nextRecord ? nextRecord.start - startMs : recordMaxMs - startMs;
         const actualDurationMs = await ffprobeGetMediaDuration(currentRecord.audio, true);
+        mergeRecords.push({
+            start: currentRecord.start,
+            end: currentRecord.end,
+            actualStart: startMs,
+            actualEnd: startMs + Math.min(actualDurationMs, maxDurationMs),
+            text: currentRecord.text,
+            audio: currentRecord.audio,
+        });
         let audioFileUse = currentRecord.audio;
         // 如果音频时长超过限制，需要压缩
         if (actualDurationMs > maxDurationMs) {
@@ -205,6 +229,7 @@ export const ffmpegMergeAudio = async (
     return {
         output,
         cleans,
+        mergeRecords,
     };
 };
 
