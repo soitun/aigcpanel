@@ -16,7 +16,7 @@ const canDownload = computed(() => {
     if (!props.record) {
         return false;
     }
-    return props.record.status === "success" && props.record.result.url;
+    return props.record.status === "success" && props.record.result[props.name || 'url'];
 });
 
 const doDownload = async () => {
