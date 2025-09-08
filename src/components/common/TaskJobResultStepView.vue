@@ -17,10 +17,12 @@ const stepData = computed(() => {
     <div v-if="stepData && stepData.status==='success'" class="w-full">
         <slot></slot>
         <slot name="successRunning"></slot>
+        <slot name="successPending"></slot>
     </div>
     <div v-else-if="stepData && stepData.status==='pending'" class="w-full">
         <slot></slot>
         <slot name="pending"></slot>
+        <slot name="successPending"></slot>
     </div>
     <div v-else-if="stepData && stepData.status === 'running' && record.status==='running'"
          class="w-full bg-gray-100 rounded-lg p-1">
