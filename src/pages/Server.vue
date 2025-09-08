@@ -56,7 +56,7 @@ const typeName = (type: string) => {
                     <template #icon>
                         <icon-plus />
                     </template>
-                    {{ $t("添加模型服务") }}
+                    {{ $t("添加本地模型") }}
                 </a-button>
             </div>
         </div>
@@ -73,7 +73,7 @@ const typeName = (type: string) => {
                         <template #icon>
                             <icon-plus />
                         </template>
-                        {{ $t("添加模型服务") }}
+                        {{ $t("添加本地模型") }}
                     </a-button>
                     <a-button v-if="0" class="ml-1">
                         <template #icon>

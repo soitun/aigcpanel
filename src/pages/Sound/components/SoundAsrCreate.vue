@@ -5,6 +5,7 @@ import {Dialog} from "../../../lib/dialog";
 import {PermissionService} from "../../../service/PermissionService";
 import {TaskRecord, TaskService} from "../../../service/TaskService";
 import SoundAsrForm from "./SoundAsrForm.vue";
+import FileSelector from "../../../components/common/FileSelector.vue";
 
 const emit = defineEmits<{
     submitted: [];
@@ -91,14 +92,7 @@ const isSubmitting = ref(false);
                 </a-tooltip>
             </div>
             <div>
-                <div v-if="formData.audio" class="mb-2 text-sm text-gray-600">
-                    <i class="iconfont icon-file mr-1"></i>
-                    {{ formData.audio.split("/").pop() || formData.audio.split("\\").pop() }}
-                </div>
-                <a-button @click="onSelectAudioFile" class="w-96 max-w-full">
-                    <i class="iconfont icon-upload mr-2"></i>
-                    {{ formData.audio ? t("重新选择") : t("选择音频文件") }}({{ t("支持MP3、WAV格式") }})
-                </a-button>
+                <FileSelector :extensions="['mp3', 'wav']" v-model="formData.audio" />
             </div>
         </div>
         <SoundAsrForm ref="soundAsrForm" />

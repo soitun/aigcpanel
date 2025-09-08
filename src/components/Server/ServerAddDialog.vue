@@ -207,7 +207,7 @@ const emit = defineEmits({
         title-align="start"
     >
         <template #title>
-            {{ $t("添加模型服务") }}
+            {{ $t("添加本地模型") }}
         </template>
         <div>
             <div class="select-none" style="max-height: 70vh">
@@ -230,7 +230,7 @@ const emit = defineEmits({
                                 class="arco-btn arco-btn-secondary arco-btn-shape-square arco-btn-size-medium arco-btn-status-normal block w-full text-center py-1"
                             >
                                 <icon-cloud />
-                                {{ t("模型市场") }}
+                                {{ t("下载模型服务") }}
                             </a>
                         </div>
                         <div class="mt-2">
