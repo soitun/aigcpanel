@@ -6,7 +6,7 @@ import {Dialog} from "../../../../lib/dialog";
 import {TaskRecord, TaskService} from "../../../../service/TaskService";
 import SoundAsrForm from "../../../Sound/components/SoundAsrForm.vue";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
-import VideoSelector from "../../../../components/common/VideoSelector.vue";
+import FileSelector from "../../../../components/common/FileSelector.vue";
 
 const emit = defineEmits<{
     submitted: [];
@@ -62,7 +62,7 @@ const doSubmit = async () => {
                 </a-tooltip>
             </div>
             <div class="flex items-center gap-2">
-                <VideoSelector v-model="formData.video"/>
+                <FileSelector :extensions="['mp4']" v-model="formData.video"/>
             </div>
         </div>
         <SoundAsrForm ref="soundAsrForm"/>

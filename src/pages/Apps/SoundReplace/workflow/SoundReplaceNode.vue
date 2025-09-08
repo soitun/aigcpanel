@@ -7,15 +7,13 @@ import {
     FunctionCallNodeProps,
     useFunctionCallNode
 } from "../../../../module/Workflow/nodes/FunctionCall/lib";
-import SoundReplaceItemDialog from "../components/SoundReplaceItemDialog.vue";
 import SoundReplaceParamDialog from "../components/SoundReplaceParamDialog.vue";
 import TaskDialogViewButton from "../../../../components/common/TaskDialogViewButton.vue";
 
 const props = defineProps<FunctionCallNodeProps>();
 const emit = defineEmits<FunctionCallNodeEmits>();
 const {nodeData, nodeRunData, nodeUpdateData} = useFunctionCallNode(props, emit)
-const soundReplaceItemDialog = ref<InstanceType<typeof SoundReplaceItemDialog>>();
-const soundReplaceParamDialog = ref<InstanceType<typeof SoundReplaceParamDialog>>();
+const paramDialog = ref<InstanceType<typeof SoundReplaceParamDialog>>();
 </script>
 
 <template>
@@ -23,35 +21,18 @@ const soundReplaceParamDialog = ref<InstanceType<typeof SoundReplaceParamDialog>
         <div class="-mb-4">
             <SoundAsrFormView v-if="nodeData.soundAsr" :data="nodeData.soundAsr"/>
             <SoundGenerateFormView v-if="nodeData.soundGenerate" :data="nodeData.soundGenerate"/>
-            <template v-if="props.source==='view'">
-                <div v-if="!nodeData.soundAsr && !nodeData.soundGenerate"
-                     class="p-2 text-center text-xs text-gray-500 rounded-lg bg-gray-100 cursor-pointer mb-4">
-                    {{ $t("没有配置") }}
-                </div>
-            </template>
-            <template v-else-if="props.source==='config'">
-                <div v-if="!nodeData.soundAsr && !nodeData.soundGenerate"
-                     @click="soundReplaceParamDialog.show()"
-                     class="p-2 text-center text-xs text-gray-500 rounded-lg bg-gray-100 cursor-pointer mb-4">
-                    {{ $t("点击配置") }}
-                </div>
-                <div class="-mt-2 mb-4">
-                    <a-button size="mini" @click="soundReplaceParamDialog.show()">
-                        <template #icon>
-                            <icon-edit/>
-                        </template>
-                        {{ $t("修改") }}
-                    </a-button>
-                </div>
-            </template>
+            <a-button v-if="(!nodeData.soundAsr && !nodeData.soundGenerate) || (props.source==='config')"
+                      :class="props.source==='config'?'cursor-pointer':''"
+                      @click="props.source==='config'&&paramDialog.show()"
+                      size="small" class="w-full mb-4">
+                {{ props.source === 'config' ? $t("修改配置") : $t("没有配置") }}
+            </a-button>
             <div v-if="nodeRunData" class="mb-4">
                 <div class="">
-                    <TaskDialogViewButton :task-id="nodeRunData.taskId"
-                                          @click="soundReplaceItemDialog?.show(nodeRunData.taskId)"/>
+                    <TaskDialogViewButton :task-id="nodeRunData.taskId"/>
                 </div>
             </div>
         </div>
     </div>
-    <SoundReplaceItemDialog ref="soundReplaceItemDialog"/>
-    <SoundReplaceParamDialog ref="soundReplaceParamDialog" @update="nodeUpdateData"/>
+    <SoundReplaceParamDialog ref="paramDialog" @update="nodeUpdateData"/>
 </template>

@@ -12,7 +12,7 @@ const props = defineProps<{
 </script>
 
 <template>
-    <a-tag>
+    <a-tag class="rounded-lg" color="blue">
         <icon-file-audio/>
     </a-tag>
     <a-tag class="rounded-lg">时长 {{ TimeUtil.secondsToTime(data.audioDuration || 0) }}</a-tag>

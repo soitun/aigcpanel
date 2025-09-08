@@ -1,14 +1,9 @@
 import {defineAsyncComponent} from "vue";
-import {
-    NodeFunctionCall,
-    NodeRunController,
-    NodeRunParam,
-    NodeRunResult,
-    NodeRunResultStatus
-} from "../../../../module/Workflow/core/type";
+import {NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult} from "../../../../module/Workflow/core/type";
 import {SoundReplaceRun} from "../task";
 import {t} from "../../../../lang";
 import SoundReplaceIcon from "./../assets/icon.svg"
+import {workflowRun} from "../../common/workflow";
 
 export default <NodeFunctionCall>{
     name: "SoundReplace",
@@ -25,49 +20,37 @@ export default <NodeFunctionCall>{
     outputFields: [
         {
             type: "file",
-            name: "VideoResult",
+            name: "Video",
             fileExtensions: ["mp4"],
+        },
+        {
+            type: "file",
+            name: "Srt",
+            fileExtensions: ["srt"],
         }
     ],
     async run(controller: NodeRunController, param: NodeRunParam): Promise<NodeRunResult> {
         console.log('SoundReplace run', param);
-        const result: NodeRunResult = {
-            status: 'error' as NodeRunResultStatus,
-            statusMsg: t("未知错误"),
-            runOutputs: {},
-            runData: {},
-            pauseByType: '',
-            pauseById: '',
-        }
-        const taskRunData = {
-            taskId: param.runData?.['taskId'] || '',
-            video: param.runInputs['Video'],
-            title: param.node.properties?.title + '-' + param.node.id,
-            soundAsr: param.node.properties?.data?.soundAsr,
-            soundGenerate: param.node.properties?.data?.soundGenerate,
-        };
-        if (!taskRunData.video || !taskRunData.soundAsr || !taskRunData.soundGenerate) {
-            throw t("参数错误");
-        }
-        const res = await SoundReplaceRun(taskRunData);
-        result.runData!['taskId'] = res.taskId;
-        controller.updateNodeRunData(param.node.id, result.runData)
-        const taskResult = await res.result();
-        if (taskResult.code) {
-            result.status = 'error';
-            result.statusMsg = taskResult.msg || t("任务失败");
-        } else if (taskResult.data?.status === 'success') {
-            result.status = 'success';
-            result.runOutputs['VideoResult'] = taskResult.data.video
-        } else if (taskResult.data?.status === 'pause') {
-            result.status = 'pause';
-            result.pauseByType = 'task';
-            result.pauseById = res.taskId;
-        } else {
-            result.status = 'error';
-            result.statusMsg = taskResult.msg || t("任务失败");
-        }
-        return result
+        return workflowRun(
+            controller, param,
+            async () => {
+                const taskRunData = {
+                    taskId: param.runData?.['taskId'] || '',
+                    video: param.runInputs['Video'],
+                    title: param.node.properties?.title + '-' + param.node.id,
+                    soundAsr: param.node.properties?.data?.soundAsr,
+                    soundGenerate: param.node.properties?.data?.soundGenerate,
+                };
+                if (!taskRunData.video || !taskRunData.soundAsr || !taskRunData.soundGenerate) {
+                    throw t("参数错误");
+                }
+                return await SoundReplaceRun(taskRunData);
+            },
+            async (result, data) => {
+                result.runOutputs['Video'] = data.video
+                result.runOutputs['Srt'] = data.srt
+            }
+        );
     },
     async check(node) {
         if (!node.properties?.data?.soundAsr || !node.properties?.data?.soundGenerate) {

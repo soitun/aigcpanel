@@ -2,11 +2,15 @@ import {t} from "../../../lang";
 import {ObjectUtil} from "../../../lib/util";
 import {TaskRecord, TaskService, TaskType} from "../../../service/TaskService";
 import {useServerStore} from "../../../store/modules/server";
-import {TaskBiz, TaskChangeType, useTaskStore} from "../../../store/modules/task";
+import {TaskBiz, useTaskStore} from "../../../store/modules/task";
 import {SoundReplaceJobResultType, SoundReplaceModelConfigType} from "./type";
 import {ffmpegCombineVideoAudio, ffmpegMergeAudio, ffmpegVideoToAudio} from "../../../lib/ffmpeg";
 import {serverSoundAsr, serverSoundGenerate} from "../../../lib/server";
 import {ffprobeGetMediaDuration} from "../../../lib/ffprobe";
+import {generateSubtitleContent, generateSubTitleRecords} from "./util";
+
+import {TaskRunResult} from "../common/type";
+import {createTaskRunResult} from "../common/lib";
 
 const serverStore = useServerStore();
 const taskStore = useTaskStore();
@@ -21,11 +25,7 @@ export const SoundReplaceRun = async (
     }
 ): Promise<{
     taskId: string,
-    result: () => Promise<{
-        code: number,
-        msg: string,
-        data?: { status: 'success' | 'pause', video: string }
-    }>,
+    result: () => Promise<TaskRunResult>,
 }> => {
     console.log('SoundReplace.Run', data);
     let taskId = data.taskId;
@@ -46,49 +46,12 @@ export const SoundReplaceRun = async (
         };
         taskId = await TaskService.submit(record);
     }
-    const result = () => {
-        return new Promise<{
-            code: number,
-            msg: string,
-            data?: { status: 'success' | 'pause', video: string }
-        }>(resolve => {
-            const callback = (bizId: string, type: TaskChangeType) => {
-                if (bizId !== taskId) {
-                    return;
-                }
-                TaskService.get(bizId).then(task => {
-                    if (!task) {
-                        resolve({code: -1, msg: t("任务不存在")});
-                        taskStore.offChange('SoundReplace', callback);
-                        return;
-                    }
-                    if (task.status === 'success') {
-                        resolve({code: 0, msg: 'ok', data: {status: 'success', video: task.result.url}});
-                        taskStore.offChange('SoundReplace', callback);
-                        return;
-                    }
-                    if (task.status === 'pause') {
-                        resolve({code: 0, msg: '', data: {status: 'pause', video: ''}});
-                        taskStore.offChange('SoundReplace', callback);
-                        return;
-                    }
-                    if (task.status === 'fail') {
-                        resolve({code: -1, msg: task.statusMsg || t("任务失败")});
-                        taskStore.offChange('SoundReplace', callback);
-                        return;
-                    }
-                }).catch(error => {
-                    resolve({code: -1, msg: '' + error || t("任务获取失败")});
-                    taskStore.offChange('SoundReplace', callback);
-                })
-            }
-            taskStore.onChange('SoundReplace', callback);
-            callback(taskId, null!);
-        })
-    };
     return {
         taskId,
-        result,
+        result: await createTaskRunResult(taskId, (resultData, task) => {
+            resultData.video = task.result?.url;
+            resultData.srt = task.result?.srt;
+        }),
     }
 }
 
@@ -245,12 +208,17 @@ export const SoundReplace: TaskBiz = {
             const filesToClean: string[] = [];
             try {
                 // 创建合并后的音频文件
-                const {output, cleans} = await ffmpegMergeAudio(jobResult.SoundGenerate.records, videoDurationMs);
+                const {
+                    output,
+                    cleans,
+                    mergeRecords,
+                } = await ffmpegMergeAudio(jobResult.SoundGenerate.records, videoDurationMs);
                 filesToClean.push(...cleans);
                 jobResult.Combine.audio = await window.$mapi.file.hubSave(output, {
                     saveGroup: "part",
                     cleanOld: true,
                 });
+                jobResult.SoundGenerate.records = mergeRecords;
                 await TaskService.update(bizId, {jobResult});
                 // 使用合并后的音频替换视频的音频轨道
                 const url = await ffmpegCombineVideoAudio(modelConfig.video, jobResult.Combine.audio);
@@ -271,6 +239,11 @@ export const SoundReplace: TaskBiz = {
             }
         }
 
+        if (jobResult.step === "End") {
+            console.log("SoundReplace.End", jobResult);
+            return "success";
+        }
+
         throw `SoundReplace.runFunc: unknown jobResult.step: ${jobResult.step}`;
     },
     successFunc: async (bizId, bizParam) => {
@@ -282,11 +255,16 @@ export const SoundReplace: TaskBiz = {
                 statusMsg: t("任务未完成，需要手动确认文字"),
             });
         } else if (jobResult.step === "End") {
+            const subTitleRecords = generateSubTitleRecords(jobResult.SoundGenerate.records);
+            const subTitleContent = generateSubtitleContent(subTitleRecords);
             await TaskService.update(bizId, {
                 status: "success",
                 endTime: Date.now(),
                 result: {
                     url: await window.$mapi.file.hubSave(jobResult.Combine.file),
+                    srt: await window.$mapi.file.hubSaveContent(subTitleContent, {
+                        ext: 'srt',
+                    }),
                 },
             });
         } else {

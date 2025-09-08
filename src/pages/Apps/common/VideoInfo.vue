@@ -8,17 +8,21 @@ const props = defineProps<{
         videoHeight: number;
         videoDuration: number;
         videoFps: number;
+        width?: number;
+        height?: number;
+        duration?: number;
+        fps?: number;
     }
 }>();
 </script>
 
 <template>
-    <a-tag>
+    <a-tag class="rounded-lg" color="blue">
         <icon-file-video/>
     </a-tag>
-    <a-tag class="rounded-lg">分辨率 {{ data.videoWidth }} x {{ data.videoHeight }}</a-tag>
-    <a-tag class="rounded-lg">时长 {{ TimeUtil.secondsToTime(data.videoDuration || 0) }}</a-tag>
-    <a-tag class="rounded-lg">{{ (data.videoFps || 0).toFixed(2) }} FPS</a-tag>
+    <a-tag class="rounded-lg">分辨率 {{ data.width || data.videoWidth }} x {{ data.height || data.videoHeight }}</a-tag>
+    <a-tag class="rounded-lg">时长 {{ TimeUtil.secondsToTime(data.duration || data.videoDuration || 0) }}</a-tag>
+    <a-tag class="rounded-lg">{{ (data.fps || data.videoFps || 0).toFixed(2) }} FPS</a-tag>
 </template>
 
 <style scoped>

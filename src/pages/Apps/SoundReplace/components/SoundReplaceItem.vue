@@ -215,6 +215,11 @@ const onConfirm = async (taskId: number, records: any[]) => {
             </div>
             <div class="">
                 <TaskDownloadAction :record="record"/>
+                <TaskDownloadAction :record="record" name="srt" title="下载字幕">
+                    <template #icon>
+                        <icon-file/>
+                    </template>
+                </TaskDownloadAction>
                 <TaskDeleteAction
                     v-if="!dialog"
                     :record="record"

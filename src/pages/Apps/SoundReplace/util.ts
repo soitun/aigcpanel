@@ -22,12 +22,12 @@ export function generateSubtitleContent(records: AudioRecord[]): string {
 
 export function generateSubTitleRecords(
     records: AudioRecord[],
-    option: {
+    option?: {
         maxWords: number,
     }
 ): AudioRecord[] {
     option = Object.assign({
-        maxWords: 15,
+        maxWords: 18,
     }, option);
     const subtitles: AudioRecord[] = [];
     for (const record of records) {
