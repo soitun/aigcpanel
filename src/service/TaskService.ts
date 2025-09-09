@@ -267,8 +267,7 @@ export const TaskService = {
             }
         }
         for (const file of filesForClean) {
-            const f = window.$mapi.file.absolutePath(file);
-            await window.$mapi.file.deletes(f, {isDataPath: true});
+            await window.$mapi.file.deletes(file);
         }
         await window.$mapi.db.delete(
             `DELETE

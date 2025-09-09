@@ -36,9 +36,9 @@ export const StorageService = {
     async getByTitle(biz: StorageBiz, title: string): Promise<StorageRecord | null> {
         const record: any = await window.$mapi.db.first(
             `SELECT *
-                                         FROM ${this.tableName()}
-                                         WHERE biz = ?
-                                           AND title = ?`,
+             FROM ${this.tableName()}
+             WHERE biz = ?
+               AND title = ?`,
             [biz, title]
         );
         return this.decodeRecord(record);
@@ -46,8 +46,8 @@ export const StorageService = {
     async get(id: number): Promise<StorageRecord | null> {
         const record: any = await window.$mapi.db.first(
             `SELECT *
-                                         FROM ${this.tableName()}
-                                         WHERE id = ?`,
+             FROM ${this.tableName()}
+             WHERE id = ?`,
             [id]
         );
         return this.decodeRecord(record);
@@ -58,8 +58,8 @@ export const StorageService = {
         }
         const records: StorageRecord[] = await window.$mapi.db.select(
             `SELECT *
-                                          FROM ${this.tableName()}
-                                          WHERE id IN (${ids.join(",")})`,
+             FROM ${this.tableName()}
+             WHERE id IN (${ids.join(",")})`,
             []
         );
         return records.map(this.decodeRecord) as StorageRecord[];
@@ -67,9 +67,9 @@ export const StorageService = {
     async list(biz: StorageBiz): Promise<StorageRecord[]> {
         const records: StorageRecord[] = await window.$mapi.db.select(
             `SELECT *
-                                          FROM ${this.tableName()}
-                                          WHERE biz = ?
-                                          ORDER BY id DESC`,
+             FROM ${this.tableName()}
+             WHERE biz = ?
+             ORDER BY id DESC`,
             [biz]
         );
         return records.map(this.decodeRecord) as StorageRecord[];
@@ -82,7 +82,7 @@ export const StorageService = {
         const valuesPlaceholder = fields.map(f => "?");
         const id = await window.$mapi.db.insert(
             `INSERT INTO ${this.tableName()} (${fields.join(",")})
-                                                 VALUES (${valuesPlaceholder.join(",")})`,
+             VALUES (${valuesPlaceholder.join(",")})`,
             values
         );
     },
@@ -93,8 +93,8 @@ export const StorageService = {
         const set = fields.map(f => `${f} = ?`).join(",");
         return await window.$mapi.db.execute(
             `UPDATE ${this.tableName()}
-                                              SET ${set}
-                                              WHERE id = ?`,
+             SET ${set}
+             WHERE id = ?`,
             [...values, id]
         );
     },
@@ -113,21 +113,20 @@ export const StorageService = {
             }
         }
         for (const file of filesForClean) {
-            const f = window.$mapi.file.absolutePath(file);
-            await window.$mapi.file.deletes(f, {isDataPath: true});
+            await window.$mapi.file.deletes(file);
         }
         await window.$mapi.db.delete(
             `DELETE
-                                      FROM ${this.tableName()}
-                                      WHERE id = ?`,
+             FROM ${this.tableName()}
+             WHERE id = ?`,
             [record.id]
         );
     },
     async clear(biz: StorageBiz) {
         await window.$mapi.db.delete(
             `DELETE
-                                      FROM ${this.tableName()}
-                                      WHERE biz = ?`,
+             FROM ${this.tableName()}
+             WHERE biz = ?`,
             [biz]
         );
     },
