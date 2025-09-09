@@ -10,10 +10,7 @@ export enum TaskType {
     System = 2,
 }
 
-export type TaskRecord<
-    MODEL_CONFIG extends any = any,
-    JOB_RESULT extends any = any,
-> = {
+export type TaskRecord<MODEL_CONFIG extends any = any, JOB_RESULT extends any = any> = {
     id?: number;
 
     biz: TaskBiz;
@@ -271,7 +268,7 @@ export const TaskService = {
         }
         for (const file of filesForClean) {
             const f = window.$mapi.file.absolutePath(file);
-            await window.$mapi.file.deletes(f);
+            await window.$mapi.file.deletes(f, {isDataPath: true});
         }
         await window.$mapi.db.delete(
             `DELETE

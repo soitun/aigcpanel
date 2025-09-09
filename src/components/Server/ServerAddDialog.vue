@@ -95,7 +95,7 @@ const doSubmit = async () => {
     }
     const target = await window.$mapi.file.fullPath(`model/${modelInfo.value.name}-${modelInfo.value.version}`);
     const targetAbsolute = window.$mapi.file.absolutePath(target);
-    if (await window.$mapi.file.exists(targetAbsolute)) {
+    if (await window.$mapi.file.exists(targetAbsolute, {isDataPath: true})) {
         Dialog.tipError(t("模型相同版本已存在"));
         return;
     }

@@ -114,7 +114,7 @@ export const StorageService = {
         }
         for (const file of filesForClean) {
             const f = window.$mapi.file.absolutePath(file);
-            await window.$mapi.file.deletes(f);
+            await window.$mapi.file.deletes(f, {isDataPath: true});
         }
         await window.$mapi.db.delete(
             `DELETE
