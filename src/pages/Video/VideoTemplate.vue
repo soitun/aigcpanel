@@ -6,6 +6,7 @@ import {VideoTemplateRecord, VideoTemplateService} from "../../service/VideoTemp
 import VideoPlayer from "../../components/common/VideoPlayer.vue";
 import InputInlineEditor from "../../components/common/InputInlineEditor.vue";
 import VideoTemplateEditDialog from "./components/VideoTemplateEditDialog.vue";
+import VideoInfo from "../Apps/common/VideoInfo.vue";
 
 const editDialog = ref<InstanceType<typeof VideoTemplateEditDialog>>();
 const records = ref<VideoTemplateRecord[]>([]);
@@ -28,8 +29,7 @@ const doDelete = async (record: VideoTemplateRecord) => {
 };
 
 const onChangeTitle = async (record: VideoTemplateRecord, value: string) => {
-    record.name = value;
-    await VideoTemplateService.update(record);
+    await VideoTemplateService.update(record.id!, {name: value});
     await doRefresh();
 };
 
@@ -87,6 +87,9 @@ const onUpdate = async () => {
                             <div class="h-48 bg-black p-2 rounded-lg">
                                 <VideoPlayer :url="'file://' + r.video" />
                             </div>
+                        </div>
+                        <div class="flex gap-1">
+                            <VideoInfo :data="r.info" :label="false" :icon="false" />
                         </div>
                     </div>
                 </div>

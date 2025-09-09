@@ -4,7 +4,8 @@ import {Dialog} from "../../../lib/dialog";
 import {t} from "../../../lang";
 import VideoPlayer from "../../../components/common/VideoPlayer.vue";
 import {VideoTemplateRecord, VideoTemplateService} from "../../../service/VideoTemplateService";
-import {StringUtil} from "../../../lib/util";
+import {ffmpegVideoNormal} from "../../../lib/ffmpeg";
+import {ffprobeVideoInfo} from "../../../lib/ffprobe";
 
 const visible = ref(false);
 const videoPlayer = ref<InstanceType<typeof VideoPlayer> | null>(null);
@@ -44,13 +45,26 @@ const doSave = async () => {
         Dialog.tipError(t("名称重复"));
         return;
     }
-    const videoPathFull = await window.$mapi.file.hubSave(formData.value.video);
-    await VideoTemplateService.insert({
-        name: formData.value.name,
-        video: videoPathFull,
-    } as VideoTemplateRecord);
-    visible.value = false;
-    emit("update");
+    try {
+        Dialog.loadingOn(t("视频处理可能需要较长时间，请耐心等待"));
+        const normalPath = await ffmpegVideoNormal(formData.value.video, {
+            durationMax: 120,
+        });
+        const videoInfo = await ffprobeVideoInfo(normalPath);
+        const videoPathFull = await $mapi.file.hubSave(normalPath);
+        await VideoTemplateService.insert({
+            name: formData.value.name,
+            video: videoPathFull,
+            info: videoInfo,
+        } as VideoTemplateRecord);
+        visible.value = false;
+        emit("update");
+    } catch (e) {
+        console.error(e);
+        Dialog.tipError(t("视频处理失败，请选择其他视频") + ":" + e);
+    } finally {
+        Dialog.loadingOff();
+    }
 };
 
 defineExpose({

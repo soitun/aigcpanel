@@ -1,4 +1,4 @@
-import {ffprobeGetMediaDuration} from "./ffprobe";
+import {ffprobeGetMediaDuration, ffprobeVideoInfo} from "./ffprobe";
 
 export const ffmpegSetMediaRatio = async (
     input: string,
@@ -13,9 +13,9 @@ export const ffmpegSetMediaRatio = async (
         },
         option || {}
     );
-    const ext = await window.$mapi.file.ext(input);
+    const ext = await $mapi.file.ext(input);
     if (!output) {
-        output = await window.$mapi.file.temp(ext);
+        output = await $mapi.file.temp(ext);
     }
     const buildAtempoFilter = (ratio: number): string => {
         // atempo 只支持 0.5~2.0，超过需要多次串联
@@ -59,13 +59,13 @@ export const ffmpegSetMediaRatio = async (
         let buffer = "";
         let called = false;
         const endCheck = async () => {
-            if (await window.$mapi.file.exists(output)) {
+            if (await $mapi.file.exists(output)) {
                 resolve(output);
             } else {
                 reject("Failed to create output file");
             }
         };
-        const controller = await window.$mapi.app.spawnBinary("ffmpeg", args, {
+        const controller = await $mapi.app.spawnBinary("ffmpeg", args, {
             shell: false,
             stdout: (data: string) => {
                 // console.log("FFmpeg stdout:", data);
@@ -101,7 +101,7 @@ const ffmpegConvertAudio = async (
         option
     );
     if (!output) {
-        output = await window.$mapi.file.temp(option.format);
+        output = await $mapi.file.temp(option.format);
     }
     return new Promise<string>(async (resolve, reject) => {
         const args: string[] = [
@@ -117,7 +117,7 @@ const ffmpegConvertAudio = async (
             output,
         ];
         // console.log("FFmpeg convertAudio args:", args.join(" "));
-        const controller = await window.$mapi.app.spawnBinary("ffmpeg", args, {
+        const controller = await $mapi.app.spawnBinary("ffmpeg", args, {
             shell: false,
             stdout: (data: string) => {
                 // console.log("FFmpeg stdout:", data);
@@ -168,7 +168,7 @@ export const ffmpegMergeAudio = async (
     for (let i = 0; i < records.length; i++) {
         const currentRecord = records[i];
         const nextRecord = records[i + 1];
-        if (!currentRecord.audio || !(await window.$mapi.file.exists(currentRecord.audio))) {
+        if (!currentRecord.audio || !(await $mapi.file.exists(currentRecord.audio))) {
             throw `音频文件不存在: ${currentRecord.audio}`;
         }
         // 计算当前片段的时长限制
@@ -203,9 +203,9 @@ export const ffmpegMergeAudio = async (
         throw "没有生成任何音频文件";
     }
 
-    const output = await window.$mapi.file.temp("wav");
+    const output = await $mapi.file.temp("wav");
     if (wavFiles.length === 1) {
-        await window.$mapi.file.copy(wavFiles[0].path, output);
+        await $mapi.file.copy(wavFiles[0].path, output);
     } else if (wavFiles.length > 1) {
         const inputs: string[] = [];
         const inputSources: string[] = [];
@@ -221,10 +221,10 @@ export const ffmpegMergeAudio = async (
             inputFilters.join(""),
             "amix=inputs=" + inputSources.length + ":duration=longest:normalize=0",
         ].join("");
-        await window.$mapi.app.spawnBinary("ffmpeg", [...inputs, "-filter_complex", filterComplex, output]);
+        await $mapi.app.spawnBinary("ffmpeg", [...inputs, "-filter_complex", filterComplex, output]);
     }
     // 检查合并后的音频是否存在
-    if (!(await window.$mapi.file.exists(output))) {
+    if (!(await $mapi.file.exists(output))) {
         throw `音频合并失败: ${output}`;
     }
     return {
@@ -235,8 +235,8 @@ export const ffmpegMergeAudio = async (
 };
 
 export const ffmpegCombineVideoAudio = async (video: string, audio: string) => {
-    const output = await window.$mapi.file.temp("mp4");
-    await window.$mapi.app.spawnBinary("ffmpeg", [
+    const output = await $mapi.file.temp("mp4");
+    await $mapi.app.spawnBinary("ffmpeg", [
         "-i",
         video,
         "-i",
@@ -253,15 +253,15 @@ export const ffmpegCombineVideoAudio = async (video: string, audio: string) => {
         output,
     ]);
     // 检查最终视频是否生成成功
-    if (!(await window.$mapi.file.exists(output))) {
+    if (!(await $mapi.file.exists(output))) {
         throw `视频音频合成失败`;
     }
     return output;
 };
 
 export const ffmpegVideoToAudio = async (video: string) => {
-    const file = await window.$mapi.file.temp("mp3");
-    await window.$mapi.app.spawnBinary("ffmpeg", [
+    const file = await $mapi.file.temp("mp3");
+    await $mapi.app.spawnBinary("ffmpeg", [
         "-y",
         "-i",
         video,
@@ -274,8 +274,122 @@ export const ffmpegVideoToAudio = async (video: string) => {
         "44100",
         file,
     ]);
-    if (!(await window.$mapi.file.exists(file))) {
+    if (!(await $mapi.file.exists(file))) {
         throw "转换成为音频失败，请检查视频文件是否存在或ffmpeg是否正常工作";
     }
     return file;
 };
+
+export const ffmpegVideoNormal = async (input: string, option: {
+    widthMax?: number;
+    heightMax?: number;
+    fps?: number;
+    durationMax?: number;
+}): Promise<string> => {
+    option = Object.assign({
+        widthMax: 1920,
+        heightMax: 1920,
+        fps: 25,
+        durationMax: -1,
+    });
+    const ext = await $mapi.file.ext(input);
+    const output = await $mapi.file.temp(ext);
+    const {width, height, duration, fps} = await ffprobeVideoInfo(input);
+    let scaleFilter = "";
+    let targetWidth = width;
+    let targetHeight = height;
+    let targetFps = fps;
+    if (option.widthMax && width > option.widthMax) {
+        targetWidth = option.widthMax;
+        targetHeight = Math.round((option.widthMax / width) * height);
+    }
+    if (option.heightMax && targetHeight > option.heightMax) {
+        targetHeight = option.heightMax;
+        targetWidth = Math.round((option.heightMax / height) * targetWidth);
+    }
+    if (targetWidth !== width || targetHeight !== height) {
+        scaleFilter = `scale=${targetWidth}:${targetHeight}`;
+    }
+    if (option.fps && fps > option.fps) {
+        targetFps = option.fps;
+        scaleFilter += (scaleFilter ? "," : "") + `fps=${targetFps}`;
+    }
+    if (option.durationMax && option.durationMax > 0 && duration > option.durationMax) {
+        scaleFilter += (scaleFilter ? "," : "") + `trim=duration=${option.durationMax},setpts=PTS-STARTPTS`;
+    }
+    const args = [
+        "-i",
+        input,
+        "-vf",
+        scaleFilter || "null",
+        "-r",
+        targetFps.toString(),
+        "-preset",
+        "fast",
+        "-y",
+        output,
+    ];
+    // console.log("FFmpeg videoNormal args:", args.join(" "));
+    await $mapi.app.spawnBinary("ffmpeg", args);
+    if (!(await $mapi.file.exists(output))) {
+        throw "视频处理失败，请检查视频文件是否存在或ffmpeg是否正常工作";
+    }
+    return output;
+}
+
+export const ffmpegVideoNormal = async (input: string, option: {
+    widthMax?: number;
+    heightMax?: number;
+    fps?: number;
+    durationMax?: number;
+}): Promise<string> => {
+    option = Object.assign({
+        widthMax: 1920,
+        heightMax: 1920,
+        fps: 25,
+        durationMax: -1,
+    });
+    const ext = await $mapi.file.ext(input);
+    const output = await $mapi.file.temp(ext);
+    const {width, height, duration, fps} = await ffprobeVideoInfo(input);
+    let scaleFilter = "";
+    let targetWidth = width;
+    let targetHeight = height;
+    let targetFps = fps;
+    if (option.widthMax && width > option.widthMax) {
+        targetWidth = option.widthMax;
+        targetHeight = Math.round((option.widthMax / width) * height);
+    }
+    if (option.heightMax && targetHeight > option.heightMax) {
+        targetHeight = option.heightMax;
+        targetWidth = Math.round((option.heightMax / height) * targetWidth);
+    }
+    if (targetWidth !== width || targetHeight !== height) {
+        scaleFilter = `scale=${targetWidth}:${targetHeight}`;
+    }
+    if (option.fps && fps > option.fps) {
+        targetFps = option.fps;
+        scaleFilter += (scaleFilter ? "," : "") + `fps=${targetFps}`;
+    }
+    if (option.durationMax && option.durationMax > 0 && duration > option.durationMax) {
+        scaleFilter += (scaleFilter ? "," : "") + `trim=duration=${option.durationMax},setpts=PTS-STARTPTS`;
+    }
+    const args = [
+        "-i",
+        input,
+        "-vf",
+        scaleFilter || "null",
+        "-r",
+        targetFps.toString(),
+        "-preset",
+        "fast",
+        "-y",
+        output,
+    ];
+    // console.log("FFmpeg videoNormal args:", args.join(" "));
+    await $mapi.app.spawnBinary("ffmpeg", args);
+    if (!(await $mapi.file.exists(output))) {
+        throw "视频处理失败，请检查视频文件是否存在或ffmpeg是否正常工作";
+    }
+    return output;
+}

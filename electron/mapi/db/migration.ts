@@ -330,6 +330,13 @@ const versions = [
                 ADD COLUMN type INTEGER DEFAULT 1`);
         },
     },
+    {
+        version: 11,
+        up: async (db: DB) => {
+            await db.execute(`ALTER TABLE data_video_template
+                ADD COLUMN info TEXT`);
+        },
+    },
 ];
 
 export default {
