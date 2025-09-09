@@ -3,8 +3,8 @@ import {nextTick, onMounted, ref} from "vue";
 import FeedbackTicketButton from "../components/common/FeedbackTicketButton.vue";
 import {TimeUtil} from "../lib/util";
 import {TaskService} from "../service/TaskService";
-import {t} from "../lang";
 import Router from "../router";
+import {AllApps} from "./Apps/all";
 
 const loading = ref(true);
 
@@ -18,28 +18,6 @@ const usageData = ref({
     taskTotal: undefined as undefined | number,
     taskTotalToday: undefined as undefined | number,
 });
-
-const apps: {
-    title: string;
-    description: string;
-    url: string;
-}[] = [
-    {
-        title: t("声音替换"),
-        description: t("将视频中的人声替换为其他音色"),
-        url: "/sound?tab=soundReplace",
-    },
-    {
-        title: t("数字人一键合成"),
-        description: t("输入文本自动合成音频驱动口型合成视频"),
-        url: "/video?tab=videoGenFlow",
-    },
-    {
-        title: t("工具需求"),
-        description: t("更多工具提交需求给我们"),
-        url: "https://aigcpanel.com/wish",
-    },
-];
 
 const doUrl = (url: string) => {
     if (url.startsWith("http")) {
@@ -257,7 +235,7 @@ onMounted(async () => {
             </div>
             <div class="flex flex-wrap gap-5 mt-3">
                 <div
-                    v-for="(app, index) in apps"
+                    v-for="(app, index) in AllApps"
                     :key="index"
                     class="bg-white rounded-lg p-3 flex items-center flex-grow w-64 cursor-pointer border hover:shadow-xl"
                     @click="doUrl(app.url)"

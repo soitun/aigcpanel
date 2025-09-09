@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
+import InputInlineEditor from "../../components/common/InputInlineEditor.vue";
+import VideoPlayer from "../../components/common/VideoPlayer.vue";
 import {t} from "../../lang";
 import {Dialog} from "../../lib/dialog";
 import {VideoTemplateRecord, VideoTemplateService} from "../../service/VideoTemplateService";
-import VideoPlayer from "../../components/common/VideoPlayer.vue";
-import InputInlineEditor from "../../components/common/InputInlineEditor.vue";
-import VideoTemplateEditDialog from "./components/VideoTemplateEditDialog.vue";
 import VideoInfo from "../Apps/common/VideoInfo.vue";
+import VideoTemplateCloudDialog from "./components/VideoTemplateCloudDialog.vue";
+import VideoTemplateEditDialog from "./components/VideoTemplateEditDialog.vue";
 
 const editDialog = ref<InstanceType<typeof VideoTemplateEditDialog>>();
+const cloudDialog = ref<InstanceType<typeof VideoTemplateCloudDialog>>();
 const records = ref<VideoTemplateRecord[]>([]);
 const loading = ref(true);
 
@@ -46,7 +48,13 @@ const onUpdate = async () => {
                 <div class="text-gray-400 ml-3">{{ $t("管理多个数字人形象") }}</div>
             </div>
             <div class="flex items-center">
-                <a-button @click="editDialog?.add()">
+                <a-button @click="cloudDialog?.show()" class="ml-2">
+                    <template #icon>
+                        <icon-cloud />
+                    </template>
+                    {{ $t("云端形象") }}
+                </a-button>
+                <a-button @click="editDialog?.add()" class="ml-2">
                     <template #icon>
                         <icon-plus />
                     </template>
@@ -97,4 +105,5 @@ const onUpdate = async () => {
         </div>
     </div>
     <VideoTemplateEditDialog @update="onUpdate" ref="editDialog" />
+    <VideoTemplateCloudDialog @update="onUpdate" ref="cloudDialog" />
 </template>
