@@ -17,7 +17,7 @@ onMounted(() => {
                 :class="tab === 'knowledge' ? 'bg-gray-200' : ''"
                 @click="tab = 'knowledge'"
             >
-                <div class="text-base">
+                <div class="text-base flex items-center">
                     <div class="inline-block w-6">
                         <icon-book />
                     </div>
@@ -29,7 +29,7 @@ onMounted(() => {
                 :class="tab === 'monitor' ? 'bg-gray-200' : ''"
                 @click="tab = 'monitor'"
             >
-                <div class="text-base">
+                <div class="text-base flex items-center">
                     <div class="inline-block w-6">
                         <icon-command />
                     </div>
@@ -41,7 +41,7 @@ onMounted(() => {
                 :class="tab === 'event' ? 'bg-gray-200' : ''"
                 @click="tab = 'event'"
             >
-                <div class="text-base">
+                <div class="text-base flex items-center">
                     <div class="inline-block w-6">
                         <icon-message />
                     </div>
@@ -53,7 +53,7 @@ onMounted(() => {
                 :class="tab === 'liveTalk' ? 'bg-gray-200' : ''"
                 @click="tab = 'liveTalk'"
             >
-                <div class="text-base">
+                <div class="text-base flex items-center">
                     <div class="inline-block w-6">
                         <icon-history />
                     </div>

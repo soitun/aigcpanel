@@ -1,5 +1,4 @@
-export const LivePrompt = {
-    KnowledgeReplyGenerate: `
+export const LiveReplyGenerateContent = `
 你是一个知识助手，请帮我生成 {count} 段和以下内容相同含义的直播话术：
 
 {reply}
@@ -10,5 +9,4 @@ export const LivePrompt = {
     {"content": "内容1"},
     {"content": "内容2"}
 ]
-`,
-};
+`;

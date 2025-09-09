@@ -30,7 +30,7 @@ const dynamicComponent = computed(() => {
                 :class="tab === 'soundGenerate' ? 'bg-gray-200' : ''"
                 @click="tab = 'soundGenerate'"
             >
-                <div class="text-base truncate">
+                <div class="text-base truncate flex items-center">
                     <i class="iconfont icon-sound-generate w-6 inline-block"></i>
                     {{ t("声音合成") }}
                 </div>
@@ -40,7 +40,7 @@ const dynamicComponent = computed(() => {
                 :class="tab === 'soundAsr' ? 'bg-gray-200' : ''"
                 @click="tab = 'soundAsr'"
             >
-                <div class="text-base truncate">
+                <div class="text-base truncate flex items-center">
                     <i class="iconfont icon-asr w-6 inline-block"></i>
                     {{ t("语音识别") }}
                 </div>

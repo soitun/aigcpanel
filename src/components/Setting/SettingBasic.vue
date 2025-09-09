@@ -2,6 +2,9 @@
 import {changeLocale, getLocale, listLocales, t} from "../../lang";
 import {useSettingStore} from "../../store/modules/setting";
 import {onMounted, ref} from "vue";
+import DataConfigDialogButton from "../common/DataConfigDialogButton.vue";
+import {BlackWordsContent} from "../../config/blackWord";
+import {LiveReplyGenerateContent} from "../../config/liveReplyGenerate";
 
 const locale = ref("");
 
@@ -21,7 +24,7 @@ const onLocaleChange = (value: string) => {
     <a-form :model="{}" layout="vertical">
         <a-form-item field="name" :label="t('语言')">
             <a-select :model-value="locale as string" @change="onLocaleChange as any">
-                <a-option v-for="(l, lIndex) in locales" :key="l.name" :value="l.name">{{ l.label }} </a-option>
+                <a-option v-for="(l, lIndex) in locales" :key="l.name" :value="l.name">{{ l.label }}</a-option>
             </a-select>
         </a-form-item>
         <!--        <a-form-item field="name" :label="t('主题样式')">-->
@@ -41,6 +44,22 @@ const onLocaleChange = (value: string) => {
                 <a-radio value="hide">{{ t("隐藏窗口") }}</a-radio>
                 <a-radio value="">{{ t("每次询问") }}</a-radio>
             </a-radio-group>
+        </a-form-item>
+        <a-form-item field="name" :label="t('数据与配置')">
+            <div class="flex gap-1">
+                <DataConfigDialogButton
+                    title="直播违规词"
+                    name="BlackWordsContent"
+                    placeholder="多个词语请用英文逗号分隔"
+                    :default-value="BlackWordsContent"
+                />
+                <DataConfigDialogButton
+                    title="直播回复生成提示词"
+                    name="LiveReplyGenerateContent"
+                    placeholder="支持使用变量：{reply}"
+                    :default-value="LiveReplyGenerateContent"
+                />
+            </div>
         </a-form-item>
     </a-form>
 </template>

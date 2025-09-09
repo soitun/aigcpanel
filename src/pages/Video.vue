@@ -32,7 +32,7 @@ const dynamicComponent = computed(() => {
                 :class="tab === 'videoGen' ? 'bg-gray-200' : ''"
                 @click="tab = 'videoGen'"
             >
-                <div class="text-base truncate">
+                <div class="text-base truncate flex items-center">
                     <i class="iconfont icon-video w-6 inline-block"></i>
                     {{ t("数字人合成") }}
                 </div>
@@ -42,7 +42,7 @@ const dynamicComponent = computed(() => {
                 :class="tab === 'videoTemplate' ? 'bg-gray-200' : ''"
                 @click="tab = 'videoTemplate'"
             >
-                <div class="text-base truncate">
+                <div class="text-base truncate flex items-center">
                     <i class="iconfont icon-video-template w-6 inline-block"></i>
                     {{ t("数字人形象") }}
                 </div>
