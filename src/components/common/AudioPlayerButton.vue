@@ -1,10 +1,10 @@
 <template>
     <span @click="playing = !playing">
         <a v-if="!playing" class="play" href="javascript:;">
-            <icon-play-arrow/>
+            <icon-play-circle/>
         </a>
         <a v-if="playing" class="pause" href="javascript:;">
-            <icon-pause-circle-fill/>
+            <icon-pause-circle/>
         </a>
         <audio ref="audio" :src="audioSource" preload="none"></audio>
     </span>
