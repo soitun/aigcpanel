@@ -2,21 +2,15 @@ import {ComputedRef} from "@vue/reactivity";
 import {cloneDeep} from "lodash-es";
 import {defineStore} from "pinia";
 import {computed, ref, toRaw} from "vue";
-import {cloneDeep} from "lodash-es";
-import {ComputedRef} from "@vue/reactivity";
 import {TimeUtil, wait} from "../../lib/util";
 import {useTaskStore} from "./task";
 // import {useServerCloudStore} from "./serverCloud";
 import {Dialog} from "../../lib/dialog";
 import {t} from "../../lang";
-import {Dialog} from "../../lib/dialog";
-import {TimeUtil, wait} from "../../lib/util";
 import {StorageService} from "../../service/StorageService";
 import {TaskService} from "../../service/TaskService";
 import {EnumServerStatus, EnumServerType, ServerRecord, ServerRuntime} from "../../types/Server";
 import store from "../index";
-import {useServerCloudStore} from "./serverCloud";
-import {useTaskStore} from "./task";
 import {ServerInfo} from "../../../electron/mapi/server/type";
 
 // const serverCloudStore = useServerCloudStore()
@@ -367,8 +361,8 @@ export const serverStore = defineStore("server", {
                 }
             }
             if (record.type === EnumServerType.LOCAL) {
-                await window.$mapi.file.deletes(record.localPath as string,{
-                    isDataPath:true,
+                await window.$mapi.file.deletes(record.localPath as string, {
+                    isDataPath: true,
                 });
             }
             this.records.splice(index, 1);
