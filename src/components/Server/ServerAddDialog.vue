@@ -213,12 +213,12 @@ const emit = defineEmits({
                 <div v-if="!modelInfo.name">
                     <div class="px-3">
                         <div>
-                            <img class="w-48 h-48 object-contain m-auto" src="./../../assets/image/server-folder.svg"/>
+                            <img class="w-48 h-48 object-contain m-auto" src="./../../assets/image/server-folder.svg" />
                         </div>
                         <div class="flex gap-4">
                             <a-button @click="doSelectLocalDir" class="block w-full" :loading="loading">
                                 <template #icon>
-                                    <icon-folder/>
+                                    <icon-folder />
                                 </template>
                                 {{ t("选择本地模型") }}
                                 config.json
@@ -228,8 +228,8 @@ const emit = defineEmits({
                                 target="_blank"
                                 class="arco-btn arco-btn-secondary arco-btn-shape-square arco-btn-size-medium arco-btn-status-normal block w-full text-center py-1"
                             >
-                                <icon-cloud/>
-                                {{ t("下载模型服务") }}
+                                <icon-cloud />
+                                {{ t("下载模型") }}
                             </a>
                         </div>
                         <div class="mt-2">
@@ -287,7 +287,7 @@ const emit = defineEmits({
                         </div>
                     </div>
                     <div>
-                        <ServerAddResolvePanel ref="resolvePanel" :root="modelInfo.path"/>
+                        <ServerAddResolvePanel ref="resolvePanel" :root="modelInfo.path" />
                     </div>
                     <div class="pt-4 flex items-center">
                         <div>
@@ -299,13 +299,13 @@ const emit = defineEmits({
                                 @click="doSubmit"
                             >
                                 <template #icon>
-                                    <icon-check/>
+                                    <icon-check />
                                 </template>
                                 {{ $t("确认提交") }}
                             </a-button>
                             <a-button class="mr-2" v-if="!isImporting" @click="emptyModelInfo" :loading="loading">
                                 <template #icon>
-                                    <icon-redo/>
+                                    <icon-redo />
                                 </template>
                                 {{ $t("重新选择") }}
                             </a-button>

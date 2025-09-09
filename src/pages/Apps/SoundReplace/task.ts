@@ -149,6 +149,7 @@ export const SoundReplace: TaskBiz = {
             console.log("SoundReplace.Confirm", jobResult);
             jobResult.Confirm.status = "running";
             jobResult.Confirm.records = ObjectUtil.clone(jobResult.SoundAsr.records);
+            jobResult.SoundGenerate.records = null;
             jobResult.Confirm.status = "pending";
             await TaskService.update(bizId, {jobResult});
             return "success";
@@ -212,7 +213,7 @@ export const SoundReplace: TaskBiz = {
                     output,
                     cleans,
                     mergeRecords,
-                } = await ffmpegMergeAudio(jobResult.SoundGenerate.records, videoDurationMs);
+                } = await ffmpegMergeAudio(jobResult.SoundGenerate.records!, videoDurationMs);
                 filesToClean.push(...cleans);
                 jobResult.Combine.audio = await window.$mapi.file.hubSave(output, {
                     saveGroup: "part",
@@ -255,7 +256,7 @@ export const SoundReplace: TaskBiz = {
                 statusMsg: t("任务未完成，需要手动确认文字"),
             });
         } else if (jobResult.step === "End") {
-            const subTitleRecords = generateSubTitleRecords(jobResult.SoundGenerate.records);
+            const subTitleRecords = generateSubTitleRecords(jobResult.SoundGenerate.records!);
             const subTitleContent = generateSubtitleContent(subTitleRecords);
             await TaskService.update(bizId, {
                 status: "success",

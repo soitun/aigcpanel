@@ -3,23 +3,23 @@ import {TaskJobResultStepStatus, TaskRecord} from "../../service/TaskService";
 import {computed} from "vue";
 
 const props = defineProps<{
-    record: TaskRecord,
-    step: string,
+    record: TaskRecord;
+    step: string;
 }>();
 const stepData = computed(() => {
     return props.record.jobResult?.[props.step] as {
-        status: TaskJobResultStepStatus,
-    }
-})
+        status: TaskJobResultStepStatus;
+    };
+});
 </script>
 
 <template>
-    <div v-if="stepData && stepData.status==='success'" class="w-full">
+    <div v-if="stepData && stepData.status === 'success'" class="w-full">
         <slot></slot>
         <slot name="successRunning"></slot>
         <slot name="successPending"></slot>
     </div>
-    <div v-else-if="stepData && stepData.status==='pending'" class="w-full">
+    <div v-else-if="stepData && stepData.status === 'pending'" class="w-full">
         <slot></slot>
         <slot name="pending"></slot>
         <slot name="successPending"></slot>

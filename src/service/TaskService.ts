@@ -3,7 +3,16 @@ import {useTaskStore} from "../store/modules/task";
 
 const taskStore = useTaskStore();
 
-export type TaskBiz = never | "SoundGenerate" | "SoundAsr" | "VideoGen" | "VideoGenFlow" | "SoundReplace";
+export type TaskBiz =
+    | never
+    | "SoundGenerate"
+    | "SoundAsr"
+    | "VideoGen"
+    // sound apps
+    | "SubtitleTts"
+    | "SoundReplace"
+    // video apps
+    | "VideoGenFlow";
 
 export enum TaskType {
     User = 1,

@@ -9,14 +9,14 @@ import Router from "../router";
 const loading = ref(true);
 
 const usageData = ref({
-    soundGenerate: undefined,
-    soundGenerateToday: undefined,
-    soundAsr: undefined,
-    soundAsrToday: undefined,
-    videoGen: undefined,
-    videoGenToday: undefined,
-    taskTotal: undefined,
-    taskTotalToday: undefined,
+    soundGenerate: undefined as undefined | number,
+    soundGenerateToday: undefined as undefined | number,
+    soundAsr: undefined as undefined | number,
+    soundAsrToday: undefined as undefined | number,
+    videoGen: undefined as undefined | number,
+    videoGenToday: undefined as undefined | number,
+    taskTotal: undefined as undefined | number,
+    taskTotalToday: undefined as undefined | number,
 });
 
 const apps: {
@@ -262,6 +262,9 @@ onMounted(async () => {
                     class="bg-white rounded-lg p-3 flex items-center flex-grow w-64 cursor-pointer border hover:shadow-xl"
                     @click="doUrl(app.url)"
                 >
+                    <div>
+                        <img :src="app.icon" class="w-8 h-8 object-contain mr-3" />
+                    </div>
                     <div class="flex-grow">
                         <div class="font-bold text-lg mb-1">{{ app.title }}</div>
                         <div class="h-8 truncate overflow-hidden text-gray-500">

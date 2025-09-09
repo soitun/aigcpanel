@@ -59,13 +59,13 @@ export const ffmpegSetMediaRatio = async (
         let buffer = "";
         let called = false;
         const endCheck = async () => {
-            if (await window.$mapi.file.exists(output, {isDataPath: false})) {
+            if (await window.$mapi.file.exists(output)) {
                 resolve(output);
             } else {
                 reject("Failed to create output file");
             }
         };
-        const controller = await window.$mapi.app.spawnBinary('ffmpeg', args, {
+        const controller = await window.$mapi.app.spawnBinary("ffmpeg", args, {
             shell: false,
             stdout: (data: string) => {
                 // console.log("FFmpeg stdout:", data);
@@ -92,7 +92,8 @@ const ffmpegConvertAudio = async (
         format?: string;
     }
 ) => {
-    option = Object.assign({
+    option = Object.assign(
+        {
             channels: 1,
             sampleRate: 44100,
             format: "wav",
@@ -116,7 +117,7 @@ const ffmpegConvertAudio = async (
             output,
         ];
         // console.log("FFmpeg convertAudio args:", args.join(" "));
-        const controller = await window.$mapi.app.spawnBinary('ffmpeg', args, {
+        const controller = await window.$mapi.app.spawnBinary("ffmpeg", args, {
             shell: false,
             stdout: (data: string) => {
                 // console.log("FFmpeg stdout:", data);
@@ -141,7 +142,7 @@ export type AudioRecord = {
     audio: string;
     actualStart?: number;
     actualEnd?: number;
-}
+};
 
 export const ffmpegMergeAudio = async (
     records: AudioRecord[],
@@ -149,7 +150,7 @@ export const ffmpegMergeAudio = async (
 ): Promise<{
     output: string;
     cleans: string[];
-    mergeRecords: AudioRecord[],
+    mergeRecords: AudioRecord[];
 }> => {
     const cleans: string[] = [];
     const mergeRecords: {
@@ -167,7 +168,7 @@ export const ffmpegMergeAudio = async (
     for (let i = 0; i < records.length; i++) {
         const currentRecord = records[i];
         const nextRecord = records[i + 1];
-        if (!currentRecord.audio || !(await window.$mapi.file.exists(currentRecord.audio, {isDataPath: false}))) {
+        if (!currentRecord.audio || !(await window.$mapi.file.exists(currentRecord.audio))) {
             throw `音频文件不存在: ${currentRecord.audio}`;
         }
         // 计算当前片段的时长限制
@@ -204,7 +205,7 @@ export const ffmpegMergeAudio = async (
 
     const output = await window.$mapi.file.temp("wav");
     if (wavFiles.length === 1) {
-        await window.$mapi.file.copy(wavFiles[0].path, output, {isDataPath: false});
+        await window.$mapi.file.copy(wavFiles[0].path, output);
     } else if (wavFiles.length > 1) {
         const inputs: string[] = [];
         const inputSources: string[] = [];
@@ -220,10 +221,10 @@ export const ffmpegMergeAudio = async (
             inputFilters.join(""),
             "amix=inputs=" + inputSources.length + ":duration=longest:normalize=0",
         ].join("");
-        await window.$mapi.app.spawnBinary('ffmpeg', [...inputs, "-filter_complex", filterComplex, output]);
+        await window.$mapi.app.spawnBinary("ffmpeg", [...inputs, "-filter_complex", filterComplex, output]);
     }
     // 检查合并后的音频是否存在
-    if (!(await window.$mapi.file.exists(output, {isDataPath: false}))) {
+    if (!(await window.$mapi.file.exists(output))) {
         throw `音频合并失败: ${output}`;
     }
     return {
@@ -235,7 +236,7 @@ export const ffmpegMergeAudio = async (
 
 export const ffmpegCombineVideoAudio = async (video: string, audio: string) => {
     const output = await window.$mapi.file.temp("mp4");
-    await window.$mapi.app.spawnBinary('ffmpeg', [
+    await window.$mapi.app.spawnBinary("ffmpeg", [
         "-i",
         video,
         "-i",
@@ -252,7 +253,7 @@ export const ffmpegCombineVideoAudio = async (video: string, audio: string) => {
         output,
     ]);
     // 检查最终视频是否生成成功
-    if (!(await window.$mapi.file.exists(output, {isDataPath: false}))) {
+    if (!(await window.$mapi.file.exists(output))) {
         throw `视频音频合成失败`;
     }
     return output;
@@ -260,7 +261,7 @@ export const ffmpegCombineVideoAudio = async (video: string, audio: string) => {
 
 export const ffmpegVideoToAudio = async (video: string) => {
     const file = await window.$mapi.file.temp("mp3");
-    await window.$mapi.app.spawnBinary('ffmpeg', [
+    await window.$mapi.app.spawnBinary("ffmpeg", [
         "-y",
         "-i",
         video,
@@ -273,7 +274,7 @@ export const ffmpegVideoToAudio = async (video: string) => {
         "44100",
         file,
     ]);
-    if (!(await window.$mapi.file.exists(file, {isDataPath: false}))) {
+    if (!(await window.$mapi.file.exists(file))) {
         throw "转换成为音频失败，请检查视频文件是否存在或ffmpeg是否正常工作";
     }
     return file;

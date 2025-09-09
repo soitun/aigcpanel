@@ -1,8 +1,11 @@
 export const ffprobeGetMediaDuration = async (media: string, ms: boolean = false): Promise<number> => {
     const info = await window.$mapi.app.spawnBinary("ffprobe", [
-        "-v", "error",
-        "-show_entries", "format=duration",
-        "-of", "default=noprint_wrappers=1:nokey=1",
+        "-v",
+        "error",
+        "-show_entries",
+        "format=duration",
+        "-of",
+        "default=noprint_wrappers=1:nokey=1",
         media,
     ]);
     const duration = parseFloat(info.trim());
@@ -10,22 +13,31 @@ export const ffprobeGetMediaDuration = async (media: string, ms: boolean = false
         throw "Could not retrieve media duration";
     }
     return ms ? Math.ceil(duration * 1000) : duration;
-}
+};
 
-export const ffprobeVideoInfo = async (video: string): Promise<{
+export const ffprobeVideoInfo = async (
+    video: string
+): Promise<{
     duration: number;
     width: number;
     height: number;
     fps: number;
 }> => {
     const info = await window.$mapi.app.spawnBinary("ffprobe", [
-        "-v", "error",
-        "-select_streams", "v:0",
-        "-show_entries", "stream=width,height,r_frame_rate,duration",
-        "-of", "default=noprint_wrappers=1:nokey=1",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "stream=width,height,r_frame_rate,duration",
+        "-of",
+        "default=noprint_wrappers=1:nokey=1",
         video,
     ]);
-    const lines = info.split("\n").map(line => line.trim()).filter(line => line.length > 0);
+    const lines = info
+        .split("\n")
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
     if (lines.length < 4) {
         throw "Could not retrieve video info";
     }
@@ -38,4 +50,4 @@ export const ffprobeVideoInfo = async (video: string): Promise<{
         throw "Invalid video info data";
     }
     return {duration, width, height, fps};
-}
+};

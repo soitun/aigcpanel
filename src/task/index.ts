@@ -7,6 +7,7 @@ import {useTaskStore} from "../store/modules/task";
 import {SoundAsr} from "./SoundAsr";
 import {SoundGenerate} from "./SoundGenerate";
 import {VideoGen} from "./VideoGen";
+import {SubtitleTts, SubtitleTtsCleaner} from "../pages/Apps/SubtitleTts/task";
 
 const taskStore = useTaskStore();
 const serverStore = useServerStore();
@@ -16,14 +17,19 @@ export const tasks = {
     SoundGenerate,
     SoundAsr,
     VideoGen,
-    // apps
-    VideoGenFlow,
+    // sound apps
+    SubtitleTts,
     SoundReplace,
+    // video apps
+    VideoGenFlow,
 };
 
 export const taskCleaners = {
+    // sound cleaners
+    SubtitleTts: SubtitleTtsCleaner,
     SoundReplace: SoundReplaceCleaner,
-}
+    // video cleaners
+};
 
 export const TaskManager = {
     init() {
