@@ -8,6 +8,7 @@ import {SoundAsr} from "./SoundAsr";
 import {SoundGenerate} from "./SoundGenerate";
 import {VideoGen} from "./VideoGen";
 import {SubtitleTts, SubtitleTtsCleaner} from "../pages/Apps/SubtitleTts/task";
+import {LongTextTts, LongTextTtsCleaner} from "../pages/Apps/LongTextTts/task";
 
 const taskStore = useTaskStore();
 const serverStore = useServerStore();
@@ -18,6 +19,7 @@ export const tasks = {
     SoundAsr,
     VideoGen,
     // sound apps
+    LongTextTts,
     SubtitleTts,
     SoundReplace,
     // video apps
@@ -26,6 +28,7 @@ export const tasks = {
 
 export const taskCleaners = {
     // sound cleaners
+    LongTextTts: LongTextTtsCleaner,
     SubtitleTts: SubtitleTtsCleaner,
     SoundReplace: SoundReplaceCleaner,
     // video cleaners

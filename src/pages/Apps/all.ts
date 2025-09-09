@@ -1,20 +1,26 @@
 import {t} from "../../lang";
-import SoundReplace from "./SoundReplace/SoundReplace.vue";
+
+import LongTextTts from "./LongTextTts/LongTextTts.vue";
 import SubtitleTts from "./SubtitleTts/SubtitleTts.vue";
+import SoundReplace from "./SoundReplace/SoundReplace.vue";
+
 import VideoGenFlow from "./VideoGenFlow/VideoGenFlow.vue";
 
-import SoundReplaceIcon from "./SoundReplace/assets/icon.svg";
+import LongTextTtsIcon from "./LongTextTts/assets/icon.svg";
 import SubtitleTtsIcon from "./SubtitleTts/assets/icon.svg";
+import SoundReplaceIcon from "./SoundReplace/assets/icon.svg";
+
 import VideoGenFlowIcon from "./VideoGenFlow/assets/icon.svg";
+
 import FeedbackIcon from "./../../assets/image/feedback.svg";
 
 export const SoundApps = [
     {
-        name: "SoundReplace",
-        title: t("声音替换"),
-        description: t("将视频中的人声替换为其他音色"),
-        icon: SoundReplaceIcon,
-        component: SoundReplace,
+        name: "LongTextTts",
+        title: t("长文本转音频"),
+        description: t("将长文本内容转换为音频文件"),
+        icon: LongTextTtsIcon,
+        component: LongTextTts,
     },
     {
         name: "SubtitleTts",
@@ -22,6 +28,13 @@ export const SoundApps = [
         description: t("将字幕文件转换为音频文件"),
         icon: SubtitleTtsIcon,
         component: SubtitleTts,
+    },
+    {
+        name: "SoundReplace",
+        title: t("声音替换"),
+        description: t("将视频中的人声替换为其他音色"),
+        icon: SoundReplaceIcon,
+        component: SoundReplace,
     },
 ];
 

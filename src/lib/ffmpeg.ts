@@ -1,4 +1,4 @@
-import {ffprobeGetMediaDuration, ffprobeVideoInfo} from "./ffprobe";
+import {ffprobeGetMediaDuration} from "./ffprobe";
 
 export const ffmpegSetMediaRatio = async (
     input: string,
@@ -280,59 +280,40 @@ export const ffmpegVideoToAudio = async (video: string) => {
     return file;
 };
 
-export const ffmpegVideoNormal = async (input: string, option: {
-    widthMax?: number;
-    heightMax?: number;
-    fps?: number;
-    durationMax?: number;
-}): Promise<string> => {
-    option = Object.assign({
-        widthMax: 1920,
-        heightMax: 1920,
-        fps: 25,
-        durationMax: -1,
-    });
-    const ext = await $mapi.file.ext(input);
-    const output = await $mapi.file.temp(ext);
-    const {width, height, duration, fps} = await ffprobeVideoInfo(input);
-    let scaleFilter = "";
-    let targetWidth = width;
-    let targetHeight = height;
-    let targetFps = fps;
-    if (option.widthMax && width > option.widthMax) {
-        targetWidth = option.widthMax;
-        targetHeight = Math.round((option.widthMax / width) * height);
+export const ffmpegConcatAudio = async (
+    audios: string[],
+): Promise<string> => {
+    if (audios.length === 0) {
+        throw "没有提供任何音频文件";
     }
-    if (option.heightMax && targetHeight > option.heightMax) {
-        targetHeight = option.heightMax;
-        targetWidth = Math.round((option.heightMax / height) * targetWidth);
+    if (audios.length === 1) {
+        return audios[0];
     }
-    if (targetWidth !== width || targetHeight !== height) {
-        scaleFilter = `scale=${targetWidth}:${targetHeight}`;
-    }
-    if (option.fps && fps > option.fps) {
-        targetFps = option.fps;
-        scaleFilter += (scaleFilter ? "," : "") + `fps=${targetFps}`;
-    }
-    if (option.durationMax && option.durationMax > 0 && duration > option.durationMax) {
-        scaleFilter += (scaleFilter ? "," : "") + `trim=duration=${option.durationMax},setpts=PTS-STARTPTS`;
-    }
-    const args = [
+    const txtFile = await $mapi.file.temp("txt");
+    const lines = audios.map(audio => `file '${audio.replace(/'/g, "'\\''")}'`);
+    await $mapi.file.write(txtFile, lines.join("\n"));
+    const output = await $mapi.file.temp("mp3");
+    // mp3 128k 44100Hz 单声道
+    await $mapi.app.spawnBinary("ffmpeg", [
+        "-f",
+        "concat",
+        "-safe",
+        "0",
         "-i",
-        input,
-        "-vf",
-        scaleFilter || "null",
-        "-r",
-        targetFps.toString(),
-        "-preset",
-        "fast",
+        txtFile,
+        "-c",
+        "libmp3lame",
+        "-b:a",
+        "128k",
+        "-ar",
+        "44100",
+        "-ac",
+        "1",
         "-y",
         output,
-    ];
-    // console.log("FFmpeg videoNormal args:", args.join(" "));
-    await $mapi.app.spawnBinary("ffmpeg", args);
+    ]);
     if (!(await $mapi.file.exists(output))) {
-        throw "视频处理失败，请检查视频文件是否存在或ffmpeg是否正常工作";
+        throw "音频合并失败";
     }
     return output;
 }

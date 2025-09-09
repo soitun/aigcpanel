@@ -1,5 +1,5 @@
 export const ffprobeGetMediaDuration = async (media: string, ms: boolean = false): Promise<number> => {
-    const info = await window.$mapi.app.spawnBinary("ffprobe", [
+    const info = await $mapi.app.spawnBinary("ffprobe", [
         "-v",
         "error",
         "-show_entries",
@@ -23,7 +23,7 @@ export const ffprobeVideoInfo = async (
     height: number;
     fps: number;
 }> => {
-    const info = await window.$mapi.app.spawnBinary("ffprobe", [
+    const info = await $mapi.app.spawnBinary("ffprobe", [
         "-v",
         "error",
         "-select_streams",
@@ -51,3 +51,28 @@ export const ffprobeVideoInfo = async (
     }
     return {duration, width, height, fps};
 };
+
+export const ffprobeAudioInfo = async (audio: string): Promise<{
+    duration: number;
+    sampleRate: number;
+    channels: number;
+}> => {
+    const info = await $mapi.app.spawnBinary("ffprobe", [
+        "-v", "error",
+        "-select_streams", "a:0",
+        "-show_entries", "stream=sample_rate,channels,duration",
+        "-of", "default=noprint_wrappers=1:nokey=1",
+        audio,
+    ]);
+    const lines = info.split("\n").map(line => line.trim()).filter(line => line.length > 0);
+    if (lines.length < 3) {
+        throw "Could not retrieve audio info";
+    }
+    const sampleRate = parseInt(lines[0], 10);
+    const channels = parseInt(lines[1], 10);
+    const duration = parseFloat(lines[2]);
+    if (isNaN(sampleRate) || isNaN(channels) || isNaN(duration)) {
+        throw "Invalid audio info data";
+    }
+    return {duration, sampleRate, channels};
+}

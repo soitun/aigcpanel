@@ -9,6 +9,7 @@ export type TaskBiz =
     | "SoundAsr"
     | "VideoGen"
     // sound apps
+    | "LongTextTts"
     | "SubtitleTts"
     | "SoundReplace"
     // video apps
