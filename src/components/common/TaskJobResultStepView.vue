@@ -24,32 +24,35 @@ const stepData = computed(() => {
         <slot name="pending"></slot>
         <slot name="successPending"></slot>
     </div>
-    <div v-else-if="stepData && stepData.status === 'running' && record.status==='running'"
-         class="w-full bg-gray-100 rounded-lg p-1">
-        <div class="text-gray-400 text-xs">
-            <icon-refresh spin/>
+    <div
+        v-else-if="stepData && stepData.status === 'running' && record.status === 'running'"
+        class="w-full bg-gray-100 rounded-lg"
+    >
+        <div class="text-gray-400 text-xs p-2">
+            <icon-refresh spin />
             {{ $t("处理中") }}
         </div>
         <slot name="running"></slot>
         <slot name="successRunning"></slot>
     </div>
-    <div v-else-if="stepData && stepData.status === 'running' && record.status==='fail'"
-         class="w-full bg-gray-100 rounded-lg p-1">
-        <div class="text-red-400 text-xs">
-            <icon-info-circle/>
+    <div
+        v-else-if="stepData && stepData.status === 'running' && record.status === 'fail'"
+        class="w-full bg-gray-100 rounded-lg"
+    >
+        <div class="text-red-400 text-xs p-2">
+            <icon-info-circle />
             {{ $t("处理出错") }}
         </div>
     </div>
-    <div v-else-if="stepData && stepData.status === 'fail'"
-         class="w-full bg-gray-100 rounded-lg p-1">
-        <div class="text-red-400 text-xs">
-            <icon-info-circle/>
+    <div v-else-if="stepData && stepData.status === 'fail'" class="w-full bg-gray-100 rounded-lg">
+        <div class="text-red-400 text-xs p-2">
+            <icon-info-circle />
             {{ $t("处理出错") }}
         </div>
     </div>
-    <div v-else class="w-full bg-gray-100 rounded-lg p-1">
-        <div class="text-gray-400 text-xs">
-            <icon-info-circle/>
+    <div v-else class="w-full bg-gray-100 rounded-lg">
+        <div class="text-gray-400 text-xs p-2">
+            <icon-info-circle />
             {{ $t("未处理") }}
         </div>
     </div>
