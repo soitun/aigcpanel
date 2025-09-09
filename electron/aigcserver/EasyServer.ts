@@ -158,7 +158,7 @@ export const EasyServer = function (config: any) {
                                     Log.error("easyServer.timeout.stop.error", e);
                                 }
                             }
-                            this.ServerApi.file.appendText(this.ServerInfo.logFile, "timeout");
+                            this.ServerApi.file.appendText(this.ServerInfo.logFile, "timeout", {isDataPath: true});
                             resolve(undefined);
                         }, option.timeout * 1000);
                     }
@@ -173,7 +173,7 @@ export const EasyServer = function (config: any) {
                                 // check if has \n and process the buffer
                                 let lines = buffer.split("\n");
                                 buffer = lines.pop() || "";
-                                this.ServerApi.file.appendText(this.ServerInfo.logFile, _data);
+                                this.ServerApi.file.appendText(this.ServerInfo.logFile, _data, {isDataPath: true});
                                 const result = this.ServerApi.extractResultFromLogs(data.id, lines.join("\n") + "\n");
                                 if (result) {
                                     launcherResult.result = Object.assign(launcherResult.result, result);
@@ -184,7 +184,7 @@ export const EasyServer = function (config: any) {
                             },
                             stderr: _data => {
                                 // console.log('easyServer.stderr', _data)
-                                this.ServerApi.file.appendText(this.ServerInfo.logFile, _data);
+                                this.ServerApi.file.appendText(this.ServerInfo.logFile, _data, {isDataPath: true});
                                 launcherResult.result.error =
                                     AigcServerUtil.errorDetect(_data) || launcherResult.result.error;
                             },
@@ -195,7 +195,7 @@ export const EasyServer = function (config: any) {
                             },
                             error: (_data, code) => {
                                 // console.log('easyServer.error', _data)
-                                this.ServerApi.file.appendText(this.ServerInfo.logFile, `exit code ${code}`);
+                                this.ServerApi.file.appendText(this.ServerInfo.logFile, `exit code ${code}`, {isDataPath: true});
                                 clearTimeout(timer);
                                 resolve(undefined);
                             },
@@ -208,7 +208,7 @@ export const EasyServer = function (config: any) {
             resultData.end = Date.now();
             resultData.data = await resultDataCalculator(data, launcherResult);
             // console.log('easyServer.end', launcherResult)
-            await Files.deletes(configJsonPath, {isFullPath: true});
+            await Files.deletes(configJsonPath, {isDataPath: false});
             return {
                 code: 0,
                 msg: "ok",

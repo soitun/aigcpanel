@@ -337,7 +337,7 @@ const launcherSubmitAndQuery = async (
 
 const launcherPrepareConfigJson = async (data: any) => {
     const configJson = await Files.temp("json");
-    await Files.write(configJson, JSON.stringify(data), {isFullPath: true});
+    await Files.write(configJson, JSON.stringify(data), {isDataPath: false});
     return configJson;
 };
 
@@ -354,7 +354,7 @@ const launcherSubmitConfigJsonAndQuery = async (context: ServerContext, configDa
         },
         root: context.ServerInfo.localPath,
     });
-    await Files.deletes(configJsonPath, {isFullPath: true});
+    await Files.deletes(configJsonPath, {isDataPath: false});
     return result;
 };
 

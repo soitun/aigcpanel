@@ -28,7 +28,8 @@ const serverModule: {
     [key: string]: ServerContext;
 } = {};
 
-const init = () => {};
+const init = () => {
+};
 
 const getModule = async (
     serverInfo: ServerInfo,
@@ -64,7 +65,7 @@ const getModule = async (
                 let server = null;
                 if (
                     await Files.exists(serverPath, {
-                        isFullPath: true,
+                        isDataPath: false,
                     })
                 ) {
                     const module = await import(`file://${serverPath}`);
@@ -73,10 +74,10 @@ const getModule = async (
                 if (
                     !server &&
                     (await Files.exists(configPath, {
-                        isFullPath: true,
+                        isDataPath: false,
                     }))
                 ) {
-                    const configContent = await Files.read(configPath, {isFullPath: true});
+                    const configContent = await Files.read(configPath, {isDataPath: false});
                     try {
                         const config = JSON.parse(configContent);
                         if (config.entry === "__EasyServer__") {
@@ -100,7 +101,7 @@ const getModule = async (
                     server.ServerApi.event.sendChannel(server.ServerInfo.eventChannelName, {type, data});
                 };
                 server.sendLog = (data: any) => {
-                    server.ServerApi.file.appendText(server.ServerInfo.logFile, data);
+                    server.ServerApi.file.appendText(server.ServerInfo.logFile, data, {isDataPath: true});
                 };
                 serverModule[serverInfo.localPath] = server;
             }

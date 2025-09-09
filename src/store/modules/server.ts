@@ -186,10 +186,14 @@ export const serverStore = defineStore("server", {
             this.isReady = true;
         },
         async refresh() {
-            const dirs = await window.$mapi.file.list("model");
+            const dirs = await window.$mapi.file.list("model", {
+                isDataPath: true,
+            });
             const localRecords: ServerRecord[] = [];
             for (let dir of dirs) {
-                const config = await window.$mapi.file.read(`model/${dir.name}/config.json`);
+                const config = await window.$mapi.file.read(`model/${dir.name}/config.json`, {
+                    isDataPath: true,
+                });
                 let json;
                 try {
                     json = JSON.parse(config);
@@ -363,7 +367,9 @@ export const serverStore = defineStore("server", {
                 }
             }
             if (record.type === EnumServerType.LOCAL) {
-                await window.$mapi.file.deletes(record.localPath as string);
+                await window.$mapi.file.deletes(record.localPath as string,{
+                    isDataPath:true,
+                });
             }
             this.records.splice(index, 1);
             deleteServerRuntime(server);

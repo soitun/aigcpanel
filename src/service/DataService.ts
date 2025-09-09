@@ -12,11 +12,11 @@ export const DataService = {
     async saveBuffer(ext: string, data: Uint8Array) {
         const path = await window.$mapi.file.temp(ext);
         await window.$mapi.file.writeBuffer(path, data, {
-            isFullPath: true,
+            isDataPath: false,
         });
         const result = await this.saveFile(path);
         await window.$mapi.file.deletes(path, {
-            isFullPath: true,
+            isDataPath: false,
         });
         return result;
     },

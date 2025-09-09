@@ -144,7 +144,7 @@ const doSelectLocalDir = async () => {
     loading.value = true;
     try {
         const content = await window.$mapi.file.read(configPath, {
-            isFullPath: true,
+            isDataPath: false,
         });
         const serverPath = configPath.replace(/[\/\\]config.json$/, "");
         const json = JSON.parse(content);

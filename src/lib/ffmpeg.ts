@@ -59,7 +59,7 @@ export const ffmpegSetMediaRatio = async (
         let buffer = "";
         let called = false;
         const endCheck = async () => {
-            if (await window.$mapi.file.exists(output, {isFullPath: true})) {
+            if (await window.$mapi.file.exists(output, {isDataPath: false})) {
                 resolve(output);
             } else {
                 reject("Failed to create output file");
@@ -167,7 +167,7 @@ export const ffmpegMergeAudio = async (
     for (let i = 0; i < records.length; i++) {
         const currentRecord = records[i];
         const nextRecord = records[i + 1];
-        if (!currentRecord.audio || !(await window.$mapi.file.exists(currentRecord.audio, {isFullPath: true}))) {
+        if (!currentRecord.audio || !(await window.$mapi.file.exists(currentRecord.audio, {isDataPath: false}))) {
             throw `音频文件不存在: ${currentRecord.audio}`;
         }
         // 计算当前片段的时长限制
@@ -204,7 +204,7 @@ export const ffmpegMergeAudio = async (
 
     const output = await window.$mapi.file.temp("wav");
     if (wavFiles.length === 1) {
-        await window.$mapi.file.copy(wavFiles[0].path, output, {isFullPath: true});
+        await window.$mapi.file.copy(wavFiles[0].path, output, {isDataPath: false});
     } else if (wavFiles.length > 1) {
         const inputs: string[] = [];
         const inputSources: string[] = [];
@@ -223,7 +223,7 @@ export const ffmpegMergeAudio = async (
         await window.$mapi.app.spawnBinary('ffmpeg', [...inputs, "-filter_complex", filterComplex, output]);
     }
     // 检查合并后的音频是否存在
-    if (!(await window.$mapi.file.exists(output, {isFullPath: true}))) {
+    if (!(await window.$mapi.file.exists(output, {isDataPath: false}))) {
         throw `音频合并失败: ${output}`;
     }
     return {
@@ -252,7 +252,7 @@ export const ffmpegCombineVideoAudio = async (video: string, audio: string) => {
         output,
     ]);
     // 检查最终视频是否生成成功
-    if (!(await window.$mapi.file.exists(output, {isFullPath: true}))) {
+    if (!(await window.$mapi.file.exists(output, {isDataPath: false}))) {
         throw `视频音频合成失败`;
     }
     return output;
@@ -273,7 +273,7 @@ export const ffmpegVideoToAudio = async (video: string) => {
         "44100",
         file,
     ]);
-    if (!(await window.$mapi.file.exists(file, {isFullPath: true}))) {
+    if (!(await window.$mapi.file.exists(file, {isDataPath: false}))) {
         throw "转换成为音频失败，请检查视频文件是否存在或ffmpeg是否正常工作";
     }
     return file;

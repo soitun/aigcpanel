@@ -39,7 +39,7 @@ export const ServerLive: ServerContext = {
         // console.log('command', JSON.stringify(command))
         shellController = await this.ServerApi.app.spawnShell(command, {
             stdout: data => {
-                this.ServerApi.file.appendText(this.ServerInfo.logFile, data);
+                this.ServerApi.file.appendText(this.ServerInfo.logFile, data, {isDataPath: true});
                 const result = this.ServerApi.extractResultFromLogs("live", data);
                 if (result) {
                     if (result["Action"]) {
@@ -52,7 +52,7 @@ export const ServerLive: ServerContext = {
                 }
             },
             stderr: data => {
-                this.ServerApi.file.appendText(this.ServerInfo.logFile, data);
+                this.ServerApi.file.appendText(this.ServerInfo.logFile, data, {isDataPath: true});
             },
             success: data => {
                 // console.log('serverLive.success', {data})
@@ -60,7 +60,7 @@ export const ServerLive: ServerContext = {
             },
             error: (data, code) => {
                 // console.log('serverLive.error', {code, data})
-                this.ServerApi.file.appendText(this.ServerInfo.logFile, data);
+                this.ServerApi.file.appendText(this.ServerInfo.logFile, data, {isDataPath: true});
                 this.send("error", this.ServerInfo);
             },
             env,

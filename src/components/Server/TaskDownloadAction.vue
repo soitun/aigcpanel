@@ -33,7 +33,7 @@ const doDownload = async () => {
     }
     try {
         await window.$mapi.file.copy(fromPath, filePath, {
-            isFullPath: true,
+            isDataPath: false,
         });
     } catch (e) {
         Dialog.tipError(mapError(e));

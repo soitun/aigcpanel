@@ -40,14 +40,14 @@ const doDownload = async () => {
         await sleep(100);
         if (
             await window.$mapi.file.exists(targetPath, {
-                isFullPath: true,
+                isDataPath: false,
             })
         ) {
             continue;
         }
         try {
             await window.$mapi.file.copy(fromPath, targetPath, {
-                isFullPath: true,
+                isDataPath: false,
             });
         } catch (e) {
             errors.push(mapError(e));

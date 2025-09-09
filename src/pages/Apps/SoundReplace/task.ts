@@ -235,7 +235,7 @@ export const SoundReplace: TaskBiz = {
             } catch (error) {
                 throw error;
             } finally {
-                await window.$mapi.file.clean(filesToClean, {isFullPath: true});
+                await window.$mapi.file.clean(filesToClean, {isDataPath: false});
             }
         }
 
