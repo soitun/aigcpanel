@@ -1,6 +1,6 @@
-import {getDataContent} from "../components/common/dataConfig";
+import {getDataContent} from "../../../components/common/dataConfig";
 
-export const BlackWordsContent = [
+export const LiveBlackWordContent = [
     // 平台竞争对手
     "抖音",
     "快手",
@@ -35,9 +35,9 @@ export const BlackWordsContent = [
 ].join(",");
 
 // 检测文本中的违规词汇
-export const detectBlackWords = async (text: string): Promise<{word: string; index: number}[]> => {
-    const violations: {word: string; index: number}[] = [];
-    const content = await getDataContent("BlackWordsContent", BlackWordsContent);
+export const detectBlackWords = async (text: string): Promise<{ word: string; index: number }[]> => {
+    const violations: { word: string; index: number }[] = [];
+    const content = await getDataContent("LiveBlackWordContent", LiveBlackWordContent);
     const blackWords = content
         .split(",")
         .map(word => word.trim())

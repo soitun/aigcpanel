@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {detectBlackWords, highlightBlackWords} from "../../../config/blackWord";
+import {detectBlackWords, highlightBlackWords} from "../config/blackWord";
 import {StorageRecord} from "../../../service/StorageService";
 
 type RecordWithViolations = StorageRecord & {
-    violations: {word: string; index: number}[];
+    violations: { word: string; index: number }[];
     highlightedTitle: string;
     highlightedReply: string;
-    highlightedReplies: {value: string; highlightedValue: string}[];
+    highlightedReplies: { value: string; highlightedValue: string }[];
 };
 
 const visible = ref(false);
@@ -39,7 +39,6 @@ const calc = async () => {
             });
         }
     }
-    violationRecords.value = [];
 };
 
 const show = (allRecords: StorageRecord[]) => {
@@ -57,14 +56,14 @@ defineExpose({
     <a-modal v-model:visible="visible" width="90vw" :footer="false" title-align="start">
         <template #title>
             <div class="flex items-center">
-                <icon-exclamation-circle class="text-red-500 mr-2" />
+                <icon-exclamation-circle class="text-red-500 mr-2"/>
                 {{ $t("违规词检测结果") }}
                 <div class="ml-4 text-sm text-gray-500">共检测到 {{ violationRecords.length }} 条违规内容</div>
             </div>
         </template>
         <div class="-mx-4 -my-5 overflow-y" style="height: calc(100vh - 10rem)">
             <div v-if="violationRecords.length === 0" class="text-center py-48">
-                <icon-check-circle class="text-green-500 text-6xl mb-4" />
+                <icon-check-circle class="text-green-500 text-6xl mb-4"/>
                 <div class="text-xl font-bold text-green-600 mb-2">恭喜</div>
                 <div class="text-gray-500">未检测到任何违规词汇</div>
             </div>
@@ -72,7 +71,7 @@ defineExpose({
                 <div class="mb-2">
                     <a-alert type="warning" show-icon>
                         <template #icon>
-                            <icon-exclamation-circle />
+                            <icon-exclamation-circle/>
                         </template>
                         检测到 {{ violationRecords.length }} 条知识库内容包含违规词汇，建议及时修改避免直播风险
                     </a-alert>

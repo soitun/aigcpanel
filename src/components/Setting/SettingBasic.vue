@@ -3,8 +3,8 @@ import {changeLocale, getLocale, listLocales, t} from "../../lang";
 import {useSettingStore} from "../../store/modules/setting";
 import {onMounted, ref} from "vue";
 import DataConfigDialogButton from "../common/DataConfigDialogButton.vue";
-import {BlackWordsContent} from "../../config/blackWord";
-import {LiveReplyGenerateContent} from "../../config/liveReplyGenerate";
+import {LiveBlackWordContent} from "../../pages/Live/config/blackWord";
+import {LiveReplyGenerateContent} from "../../pages/Live/config/replyGenerate";
 import {SoundAsrResultOptimizedPrompt} from "../../pages/Sound/config/prompt";
 
 const locale = ref("");
@@ -50,21 +50,23 @@ const onLocaleChange = (value: string) => {
             <div class="flex gap-1">
                 <DataConfigDialogButton
                     title="直播违规词"
-                    name="BlackWordsContent"
+                    name="LiveBlackWordContent"
                     placeholder="多个词语请用英文逗号分隔"
-                    :default-value="BlackWordsContent"
+                    :default-value="LiveBlackWordContent"
                 />
                 <DataConfigDialogButton
                     title="直播回复生成提示词"
                     name="LiveReplyGenerateContent"
                     placeholder="支持使用变量：{reply}"
                     :default-value="LiveReplyGenerateContent"
+                    :param="{reply:'示例回复内容',count: '数量'}"
                 />
                 <DataConfigDialogButton
                     title="ASR结果优化提示词"
                     name="SoundReplaceAsrResultOptimizedPrompt"
                     placeholder="支持使用变量：{content}"
                     :default-value="SoundAsrResultOptimizedPrompt"
+                    :param="{content:'识别结果内容'}"
                 />
             </div>
         </a-form-item>
