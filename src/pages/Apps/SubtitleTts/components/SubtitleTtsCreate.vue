@@ -25,7 +25,7 @@ const doSubmit = async () => {
         Dialog.tipError(t("请选择SRT字幕文件"));
         return;
     }
-    const taskTitle = window.$mapi.file.pathToName(formData.value.srt, false);
+    const taskTitle = $mapi.file.pathToName(formData.value.srt, false);
     const record: TaskRecord = {
         biz: "SubtitleTts",
         title: taskTitle,

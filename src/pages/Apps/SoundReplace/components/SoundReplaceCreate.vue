@@ -31,7 +31,7 @@ const doSubmit = async () => {
         Dialog.tipError(t("请选择视频文件"));
         return;
     }
-    const taskTitle = window.$mapi.file.pathToName(formData.value.video, false);
+    const taskTitle = $mapi.file.pathToName(formData.value.video, false);
     const record: TaskRecord = {
         biz: "SoundReplace",
         title: taskTitle,

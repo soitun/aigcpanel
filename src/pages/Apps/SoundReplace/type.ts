@@ -24,6 +24,7 @@ export type SoundReplaceJobResultType = {
         status: TaskJobResultStepStatus,
         start: number;
         end: number;
+        duration: number;
         records: { start: number; end: number; text: string }[];
     };
     Confirm: {

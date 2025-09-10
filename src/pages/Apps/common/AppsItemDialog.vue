@@ -89,7 +89,7 @@ defineExpose({
                 {{ props.title || $t("记录查看") }}
             </div>
         </template>
-        <div class="h-[calc(100vh-10rem)] -my-6 -mx-4 p-3 overflow-y-auto">
+        <div v-if="visible" class="h-[calc(100vh-10rem)] -my-6 -mx-4 p-3 overflow-y-auto">
             <div v-if="loading&&!record" class="flex justify-center items-center p-8">
                 <icon-refresh spin class="mr-2"/>
                 {{ $t("加载中...") }}

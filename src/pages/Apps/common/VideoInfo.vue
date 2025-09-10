@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import {TimeUtil} from "../../../lib/util";
-import {t} from "../../../lang";
+import { t } from "../../../lang";
+import { TimeUtil } from "../../../lib/util";
 
 const props = withDefaults(
     defineProps<{
         label?: boolean;
         icon?: boolean;
-        data: {
-            videoWidth: number;
-            videoHeight: number;
-            videoDuration: number;
-            videoFps: number;
+        data?: {
+            videoWidth?: number;
+            videoHeight?: number;
+            videoDuration?: number;
+            videoFps?: number;
             width?: number;
             height?: number;
             duration?: number;
@@ -20,6 +20,7 @@ const props = withDefaults(
     {
         icon: true,
         label: true,
+        data: () => ({}),
     }
 );
 </script>
@@ -29,14 +30,14 @@ const props = withDefaults(
         <icon-file-video />
     </a-tag>
     <a-tag class="rounded-lg"
-        >{{ label ? t("分辨率") : "" }}{{ data.width || data.videoWidth || "?" }}x{{
-            data.height || data.videoHeight || "?"
+        >{{ label ? t("分辨率") : "" }}{{ data?.width || data?.videoWidth || "?" }}x{{
+            data?.height || data?.videoHeight || "?"
         }}
     </a-tag>
     <a-tag class="rounded-lg">
-        {{ label ? t("时长") : "" }}{{ TimeUtil.secondsToTime(data.duration || data.videoDuration || 0) }}
+        {{ label ? t("时长") : "" }}{{ TimeUtil.secondsToTime(data?.duration || data?.videoDuration || 0) }}
     </a-tag>
-    <a-tag class="rounded-lg">{{ (data.fps || data.videoFps || 0).toFixed(2) }} FPS</a-tag>
+    <a-tag class="rounded-lg">{{ (data?.fps || data?.videoFps || 0).toFixed(2) }} FPS</a-tag>
 </template>
 
 <style scoped></style>

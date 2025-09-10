@@ -108,7 +108,7 @@ export const SoundReplace: TaskBiz = {
             });
             taskStore.fireChange({biz: "SoundReplace", bizId}, "running");
             const output = await ffmpegVideoToAudio(modelConfig.video);
-            jobResult.ToAudio.file = await window.$mapi.file.hubSave(output, {
+            jobResult.ToAudio.file = await $mapi.file.hubSave(output, {
                 saveGroup: "part",
                 cleanOld: true,
             });
@@ -138,6 +138,7 @@ export const SoundReplace: TaskBiz = {
             }
             jobResult.SoundAsr.start = ret.start;
             jobResult.SoundAsr.end = ret.end;
+            jobResult.SoundAsr.duration = await ffprobeGetMediaDuration(modelConfig.video, true);
             jobResult.SoundAsr.records = ret.records;
             await TaskService.update(bizId, {jobResult});
             jobResult.step = "Confirm";
@@ -184,7 +185,7 @@ export const SoundReplace: TaskBiz = {
                 if (ret.type === "retry") {
                     return ret.type;
                 }
-                record.audio = await window.$mapi.file.hubSave(ret.url, {
+                record.audio = await $mapi.file.hubSave(ret.url, {
                     saveGroup: "part",
                     cleanOld: true,
                 });
@@ -215,7 +216,7 @@ export const SoundReplace: TaskBiz = {
                     mergeRecords,
                 } = await ffmpegMergeAudio(jobResult.SoundGenerate.records!, videoDurationMs);
                 filesToClean.push(...cleans);
-                jobResult.Combine.audio = await window.$mapi.file.hubSave(output, {
+                jobResult.Combine.audio = await $mapi.file.hubSave(output, {
                     saveGroup: "part",
                     cleanOld: true,
                 });
@@ -223,7 +224,7 @@ export const SoundReplace: TaskBiz = {
                 await TaskService.update(bizId, {jobResult});
                 // 使用合并后的音频替换视频的音频轨道
                 const url = await ffmpegCombineVideoAudio(modelConfig.video, jobResult.Combine.audio);
-                jobResult.Combine.file = await window.$mapi.file.hubSave(url, {
+                jobResult.Combine.file = await $mapi.file.hubSave(url, {
                     saveGroup: "part",
                     cleanOld: true,
                 });
@@ -236,7 +237,7 @@ export const SoundReplace: TaskBiz = {
             } catch (error) {
                 throw error;
             } finally {
-                await window.$mapi.file.clean(filesToClean, {isDataPath: false});
+                await $mapi.file.clean(filesToClean, {isDataPath: false});
             }
         }
 
@@ -262,14 +263,14 @@ export const SoundReplace: TaskBiz = {
                 status: "success",
                 endTime: Date.now(),
                 result: {
-                    url: await window.$mapi.file.hubSave(jobResult.Combine.file),
-                    srt: await window.$mapi.file.hubSaveContent(subTitleContent, {
+                    url: await $mapi.file.hubSave(jobResult.Combine.file),
+                    srt: await $mapi.file.hubSaveContent(subTitleContent, {
                         ext: 'srt',
                     }),
                 },
             });
         } else {
-            window.$mapi.log.error("SoundReplace.successFunc: unknown jobResult.step", jobResult.step);
+            $mapi.log.error("SoundReplace.successFunc: unknown jobResult.step", jobResult.step);
         }
     },
     failFunc: async (bizId, msg, bizParam) => {

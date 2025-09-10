@@ -90,7 +90,7 @@ export const LongTextTts: TaskBiz = {
             });
             taskStore.fireChange({biz: "LongTextTts", bizId}, "running");
 
-            jobResult.SplitText.records = splitText(modelConfig.text, 2);
+            jobResult.SplitText.records = splitText(modelConfig.text, 150)
             jobResult.SoundGenerate.records = null;
             jobResult.step = "SoundGenerate";
             jobResult.SplitText.status = "success";

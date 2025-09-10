@@ -126,7 +126,12 @@ const onConfirm = async (taskId: number, records: any[]) => {
                         <div class="mb-1">
                             <a-button
                                 type="primary"
-                                @click="soundAsrRecordsEditDialog?.edit(record.id!,record.jobResult?.Confirm.records!)">
+                                @click="soundAsrRecordsEditDialog?.edit(
+                                    record.id!,
+                                    record.jobResult?.Confirm.records!||[],
+                                    record.jobResult?.ToAudio.file,
+                                    record.jobResult?.SoundAsr.duration||0
+                                    )">
                                 <template #icon>
                                     <icon-check-circle/>
                                 </template>
