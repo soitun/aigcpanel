@@ -339,9 +339,6 @@ const aiOption: ModelGenerateButtonOptionType = {
         while (aiIndex.value < editingRecords.value.length) {
             const record = editingRecords.value[aiIndex.value];
             aiIndex.value++;
-            if (aiIndex.value > 10) {
-                break;
-            }
             if (record.text.trim()) {
                 return {
                     content: record.text.trim(),
@@ -459,6 +456,7 @@ defineExpose({
                                         :auto-size="{minRows: 1, maxRows: 3}"
                                         show-word-limit
                                         size="mini"
+                                        :textarea-attrs="{tabindex:index}"
                                         placeholder="输入文本"
                                     />
                                 </div>

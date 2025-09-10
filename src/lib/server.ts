@@ -9,7 +9,21 @@ export const serverSoundAsr = async (
     soundAsr: SoundAsrParamType,
     result: {},
     audio: string
-) => {
+): Promise<{
+    type: string;
+    start: number;
+    end: number;
+    records: any[];
+}> => {
+    const cacheRecords = await $mapi.file.cacheGet<any[]>({soundAsr, audio});
+    if (cacheRecords) {
+        return {
+            type: "success",
+            start: 0,
+            end: 0,
+            records: cacheRecords,
+        }
+    }
     const server = await serverStore.getByKey(soundAsr.serverKey);
     if (!server) {
         throw `SoundAsr server not found: ${soundAsr.serverKey}`;
@@ -38,6 +52,7 @@ export const serverSoundAsr = async (
             if (!ret.records || !ret.records.length) {
                 throw "SoundAsr 识别结果为空，请检查音频文件是否正常";
             }
+            await $mapi.file.cacheSet({soundAsr, audio}, ret.records);
             break;
         case "retry":
             break;
@@ -53,7 +68,21 @@ export const serverSoundGenerate = async (
     soundGenerate: SoundGenerateParamType,
     result: {},
     text: string
-) => {
+): Promise<{
+    type: string;
+    start: number;
+    end: number;
+    url: string;
+}> => {
+    const cacheUrl = await $mapi.file.cacheGetPath({soundGenerate, text});
+    if (cacheUrl) {
+        return {
+            type: "success",
+            start: 0,
+            end: 0,
+            url: cacheUrl,
+        }
+    }
     const server = await serverStore.getByNameVersion(soundGenerate.serverName, soundGenerate.serverVersion);
     if (!server) {
         throw "SoundGenerate server not found: " + soundGenerate.serverName;
@@ -92,6 +121,10 @@ export const serverSoundGenerate = async (
     switch (res.data.type) {
         case "success":
             ret.url = res.data.data.url;
+            if (!ret.url) {
+                throw "SoundGenerate 生成结果为空，请检查参数是否正确";
+            }
+            await $mapi.file.cacheSet({soundGenerate, text}, ret.url);
             break;
         case "retry":
             break;
