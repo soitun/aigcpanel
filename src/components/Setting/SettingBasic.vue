@@ -5,6 +5,7 @@ import {onMounted, ref} from "vue";
 import DataConfigDialogButton from "../common/DataConfigDialogButton.vue";
 import {BlackWordsContent} from "../../config/blackWord";
 import {LiveReplyGenerateContent} from "../../config/liveReplyGenerate";
+import {SoundAsrResultOptimizedPrompt} from "../../pages/Sound/config/prompt";
 
 const locale = ref("");
 
@@ -58,6 +59,12 @@ const onLocaleChange = (value: string) => {
                     name="LiveReplyGenerateContent"
                     placeholder="支持使用变量：{reply}"
                     :default-value="LiveReplyGenerateContent"
+                />
+                <DataConfigDialogButton
+                    title="ASR结果优化提示词"
+                    name="SoundReplaceAsrResultOptimizedPrompt"
+                    placeholder="支持使用变量：{content}"
+                    :default-value="SoundAsrResultOptimizedPrompt"
                 />
             </div>
         </a-form-item>
