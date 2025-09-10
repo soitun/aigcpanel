@@ -316,18 +316,20 @@ export const liveStore = defineStore("live", {
                 });
             }
             const flowVideos: any[] = [];
-            const storageFlowVideos = (await StorageService.list("LiveKnowledge")).filter(s => {
-                return s.content.type === "flowVideo" && s.content.enable;
-            });
-            if (!(storageFlowVideos && storageFlowVideos.length > 0)) {
-                throw "没有选择循环素材";
-            }
-            for (const s of storageFlowVideos) {
-                flowVideos.push({
-                    id: "FlowVideo" + s.id,
-                    title: s.title,
-                    video: s.content.url,
+            if (this.localConfig.video.enable) {
+                const storageFlowVideos = (await StorageService.list("LiveKnowledge")).filter(s => {
+                    return s.content.type === "flowVideo" && s.content.enable;
                 });
+                if (!(storageFlowVideos && storageFlowVideos.length > 0)) {
+                    throw "没有选择循环素材";
+                }
+                for (const s of storageFlowVideos) {
+                    flowVideos.push({
+                        id: "FlowVideo" + s.id,
+                        title: s.title,
+                        video: s.content.url,
+                    });
+                }
             }
             const flowTalks: any[] = [];
             const storageFlowTalks = (await StorageService.list("LiveKnowledge")).filter(s => {
@@ -517,7 +519,8 @@ export const liveStore = defineStore("live", {
 });
 
 const live = liveStore(store);
-live.init().then(() => {});
+live.init().then(() => {
+});
 
 export const useLiveStore = () => {
     return live;
