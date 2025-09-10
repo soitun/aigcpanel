@@ -278,7 +278,7 @@ const doSplit = () => {
         endSeconds: record.endSeconds,
     };
     record.end = newRecord.start - 1;
-    record.endSeconds = newRecord.startSeconds - 0.01;
+    record.endSeconds = newRecord.startSeconds - 0.001;
     editingRecords.value.splice(currentIndex.value + 1, 0, newRecord);
     nextTick(() => {
         onTimeUpdate();

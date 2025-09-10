@@ -185,6 +185,7 @@ export const TaskService = {
         record.startTime = TimeUtil.timestampMS();
         const fields = [
             "biz",
+            "type",
             "title",
             "status",
             "statusMsg",
