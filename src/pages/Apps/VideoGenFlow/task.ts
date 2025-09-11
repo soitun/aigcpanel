@@ -3,6 +3,7 @@ import {TaskService} from "../../../service/TaskService";
 import {useServerStore} from "../../../store/modules/server";
 import {TaskBiz} from "../../../store/modules/task";
 import {VideoGenFlowModelConfigType} from "./type";
+import {replaceSoundGenerateText} from "../../../lib/server";
 
 const serverStore = useServerStore();
 
@@ -49,7 +50,7 @@ export const VideoGenFlow: TaskBiz = {
                     id: serverStore.generateTaskId("VideoGenFlow", bizId),
                     result: record.result,
                     param: modelConfig.soundGenerate.ttsParam,
-                    text: modelConfig.text,
+                    text: await replaceSoundGenerateText(modelConfig.text),
                 },
                 {
                     taskIdResultKey: "soundTtsTaskId",
@@ -84,7 +85,7 @@ export const VideoGenFlow: TaskBiz = {
                     id: serverStore.generateTaskId("VideoGenFlow", bizId),
                     result: record.result,
                     param: modelConfig.soundGenerate.cloneParam,
-                    text: modelConfig.text,
+                    text: await replaceSoundGenerateText(modelConfig.text),
                     promptAudio: modelConfig.soundGenerate.promptUrl,
                     promptText: modelConfig.soundGenerate.promptText,
                 },

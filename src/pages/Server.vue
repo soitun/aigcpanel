@@ -40,7 +40,7 @@ const typeName = (type: string) => {
 </script>
 
 <template>
-    <div class="pb-device-container bg-white p-8 min-h-full relative select-none">
+    <div class="pb-device-container bg-white p-6 min-h-full relative select-none">
         <div class="mb-4 flex items-center">
             <div class="text-3xl font-bold flex-grow">
                 {{ $t("模型") }}
@@ -60,7 +60,7 @@ const typeName = (type: string) => {
                 </a-button>
             </div>
         </div>
-        <div class="-mx-2">
+        <div>
             <div v-if="!serverStore.records.length" class="py-20">
                 <div class="text-center">
                     <img class="h-32 m-auto opacity-50" src="./../assets/image/server-empty.svg" />
@@ -102,8 +102,8 @@ const typeName = (type: string) => {
                     </div>
                 </div>
             </div>
-            <div v-else class="flex flex-wrap">
-                <div v-for="record in serverStore.records" class="w-full lg:w-1/2 2xl:w-1/3 p-3">
+            <div v-else class="flex flex-wrap -mx-2">
+                <div v-for="record in serverStore.records" class="w-full lg:w-1/2 2xl:w-1/3 p-2 mb-1">
                     <div class="rounded-xl shadow border p-4">
                         <div class="flex items-center">
                             <div class="flex-grow">

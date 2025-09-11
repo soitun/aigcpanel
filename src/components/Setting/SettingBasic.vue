@@ -6,6 +6,8 @@ import DataConfigDialogButton from "../common/DataConfigDialogButton.vue";
 import {LiveBlackWordContent} from "../../pages/Live/config/blackWord";
 import {LiveReplyGenerateContent} from "../../pages/Live/config/replyGenerate";
 import {SoundAsrResultOptimizedPrompt} from "../../pages/Sound/config/prompt";
+import {SoundGenerateReplaceContent} from "../../pages/Sound/config/replaceContent";
+import SoundGeneratePreviewBox from "../../pages/Sound/components/SoundGeneratePreviewBox.vue";
 
 const locale = ref("");
 
@@ -68,6 +70,11 @@ const onLocaleChange = (value: string) => {
                     :default-value="SoundAsrResultOptimizedPrompt"
                     :param="{content:'识别结果内容'}"
                 />
+                <DataConfigDialogButton
+                    title="声音合成优化"
+                    name="SoundGenerateReplaceContent"
+                    help="声音合成时会自动把文本中的“键”替换为“值”，可用于修正发音"
+                    :default-value="SoundGenerateReplaceContent"/>
             </div>
         </a-form-item>
     </a-form>

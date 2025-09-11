@@ -1,5 +1,7 @@
 import {useServerStore} from "../store/modules/server";
 import {TaskBiz} from "../service/TaskService";
+import {getDataContent} from "../components/common/dataConfig";
+import {SoundGenerateReplaceContent} from "../pages/Sound/config/replaceContent";
 
 const serverStore = useServerStore();
 
@@ -62,6 +64,24 @@ export const serverSoundAsr = async (
     return ret;
 };
 
+export const replaceSoundGenerateText = async (text: string): Promise<string> => {
+    if (!text) {
+        return text;
+    }
+    const param = await getDataContent<{
+        key: string,
+        value: string
+    }[]>('SoundGenerateReplaceContent', SoundGenerateReplaceContent);
+    if (!param || !param.length) {
+        return text;
+    }
+    for (const p of param) {
+        // replace all
+        text = text.replaceAll(p.key, p.value);
+    }
+    return text;
+}
+
 export const serverSoundGenerate = async (
     biz: TaskBiz,
     bizId: string,
@@ -74,6 +94,7 @@ export const serverSoundGenerate = async (
     end: number;
     url: string;
 }> => {
+    text = await replaceSoundGenerateText(text);
     const cacheUrl = await $mapi.file.cacheGetPath({soundGenerate, text});
     if (cacheUrl) {
         return {

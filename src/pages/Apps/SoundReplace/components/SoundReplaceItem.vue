@@ -18,6 +18,7 @@ import SoundGenerateFormViewBody from "../../../Sound/components/SoundGenerateFo
 import {useTaskStore} from "../../../../store/modules/task";
 import {SoundReplaceJobResultType, SoundReplaceModelConfigType} from "../type";
 import TaskJobResultStepView from "../../../../components/common/TaskJobResultStepView.vue";
+import ItemsLimitedView from "../../../../components/common/ItemsLimitedView.vue";
 
 const taskStore = useTaskStore()
 const props = defineProps<{
@@ -129,7 +130,7 @@ const onConfirm = async (taskId: number, records: any[]) => {
                                 @click="soundAsrRecordsEditDialog?.edit(
                                     record.id!,
                                     record.jobResult?.Confirm.records!||[],
-                                    record.jobResult?.ToAudio.file,
+                                    record.jobResult?.ToAudio.file!,
                                     record.jobResult?.SoundAsr.duration||0
                                     )">
                                 <template #icon>
@@ -152,44 +153,20 @@ const onConfirm = async (taskId: number, records: any[]) => {
             <div class="flex-grow">
                 <TaskJobResultStepView :record="record" step="SoundGenerate">
                     <template #successRunning>
-                        <div class="bg-gray-100 rounded-lg">
-                            <div class="max-h-96 overflow-y-auto p-2 rounded-lg">
-                                <div
-                                    v-for="(rr, index) in record.jobResult?.SoundGenerate?.records?.filter((o, i) => {
-                                return i < 2 || ToggleUtil.get('SoundReplace', record.id, false).value;
-                            })"
-                                    :key="index"
-                                    class="flex mb-1"
-                                >
-                                    <div class="w-6 flex-shrink-0">
-                                        <AudioPlayerButton v-if="rr.audio" :source="rr.audio"/>
-                                        <icon-refresh
-                                            v-else-if="record.jobResult?.step === 'SoundGenerate' && record.status === 'running'"
-                                            spin
-                                        />
-                                        <icon-info-circle v-else class="text-gray-400 text-xs"/>
+                        <div class="bg-gray-100 rounded-lg p-2">
+                            <ItemsLimitedView toggle-biz="SoundReplace"
+                                              :toggle-id="record.id!"
+                                              :records="record.jobResult?.SoundGenerate?.records||[]">
+                                <template #default="{item}">
+                                    <div class="flex items-start mb-1">
+                                        <div class="w-6 flex-shrink-0">
+                                            <AudioPlayerButton v-if="item.audio" :source="item.audio"/>
+                                            <icon-info-circle v-else class="text-gray-400 text-xs"/>
+                                        </div>
+                                        <div class="text-xs">{{ item.text }}</div>
                                     </div>
-                                    <div>{{ rr.text }}</div>
-                                </div>
-                            </div>
-                            <div v-if="(record.jobResult?.SoundGenerate?.records?.length||0) > 5" class="p-2">
-                                <a-button
-                                    v-if="!ToggleUtil.get('SoundReplace', record.id, false).value"
-                                    size="mini"
-                                    @click="ToggleUtil.toggle('SoundReplace', record.id)"
-                                >
-                                    <template #icon>
-                                        <icon-down/>
-                                    </template>
-                                    {{ $t("展开") }}
-                                </a-button>
-                                <a-button v-else size="mini" @click="ToggleUtil.toggle('SoundReplace', record.id)">
-                                    <template #icon>
-                                        <icon-up/>
-                                    </template>
-                                    {{ $t("收起") }}
-                                </a-button>
-                            </div>
+                                </template>
+                            </ItemsLimitedView>
                         </div>
                     </template>
                 </TaskJobResultStepView>
@@ -234,5 +211,7 @@ const onConfirm = async (taskId: number, records: any[]) => {
             </div>
         </div>
     </div>
-    <SoundAsrRecordsEditDialog ref="soundAsrRecordsEditDialog" :save-title="$t('保存并继续')" @save="onConfirm"/>
+    <SoundAsrRecordsEditDialog ref="soundAsrRecordsEditDialog"
+                               :sound-generate="record.modelConfig?.soundGenerate!"
+                               :save-title="$t('保存并继续')" @save="onConfirm"/>
 </template>

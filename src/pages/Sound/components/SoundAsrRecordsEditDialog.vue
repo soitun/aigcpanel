@@ -6,6 +6,9 @@ import {TimeUtil} from "../../../lib/util";
 import ModelGenerateButton, {ModelGenerateButtonOptionType} from "../../../module/Model/ModelGenerateButton.vue";
 import {SoundAsrResultOptimizedPrompt} from "../config/prompt";
 import SoundAsrRecordsSubtitlePreviewDialog from "./SoundAsrRecordsSubtitlePreviewDialog.vue";
+import {SoundGenerateReplaceContent} from "../config/replaceContent";
+import DataConfigDialogButton from "../../../components/common/DataConfigDialogButton.vue";
+import SoundGeneratePreviewBox from "./SoundGeneratePreviewBox.vue";
 
 interface AsrRecord {
     start: number;
@@ -23,6 +26,10 @@ const props = defineProps({
         type: String,
         default: t("保存"),
     },
+    soundGenerate: {
+        type: Object,
+        default: () => null,
+    }
 });
 
 const emit = defineEmits<{
@@ -61,7 +68,12 @@ const totalWords = computed(() => {
     return editingRecords.value.reduce((sum, record) => sum + record.text.length, 0);
 });
 
-const edit = (taskId: number, records: AsrRecord[], audio: string, duration: number) => {
+const edit = (
+    taskId: number,
+    records: AsrRecord[],
+    audio: string,
+    duration: number
+) => {
     currentRecords.value = records;
     currentTaskId.value = taskId || 0;
     currentAudio.value = `file://${audio}`;
@@ -404,11 +416,13 @@ defineExpose({
                         allow-clear
                     />
                     <a-button size="small" class="px-2" @click="onFindReplace" :disabled="!findText.trim()">
-                        {{ $t("批量替换") }}
+                        <template #icon>
+                            <icon-check/>
+                        </template>
                     </a-button>
                     <a-button size="small" class="px-2" type="primary" @click="doMergeBlanks"
                               :disabled="!hasConsecutiveBlanks">
-                        {{ $t("一键合并空白") }}
+                        {{ $t("合并空白") }}
                     </a-button>
                     <a-button size="small" class="px-2" type="primary" @click="doSplit" :disabled="currentIndex === -1">
                         {{ $t("分割") }}
@@ -419,8 +433,18 @@ defineExpose({
                     </a-button>
                     <a-button size="small" class="px-2" type="primary"
                               @click="previewDialog?.show(editingRecords);">
-                        {{ $t("预览字幕") }}
+                        {{ $t("字幕") }}
                     </a-button>
+                    <DataConfigDialogButton
+                        size="small"
+                        title="声音合成优化"
+                        name="SoundGenerateReplaceContent"
+                        help="声音合成时会自动把文本中的“键”替换为“值”，可用于修正发音"
+                        :default-value="SoundGenerateReplaceContent">
+                        <div class="mb-2">
+                            <SoundGeneratePreviewBox :sound-generate="soundGenerate as any"/>
+                        </div>
+                    </DataConfigDialogButton>
                     <ModelGenerateButton
                         biz="SoundReplaceAsrResultOptimizedPrompt"
                         title="AI一键优化"

@@ -2,6 +2,7 @@ import {DataService} from "../service/DataService";
 import {TaskService} from "../service/TaskService";
 import {useServerStore} from "../store/modules/server";
 import {TaskBiz} from "../store/modules/task";
+import {replaceSoundGenerateText} from "../lib/server";
 
 const serverStore = useServerStore();
 
@@ -20,14 +21,14 @@ export const SoundGenerate: TaskBiz = {
                 id: serverStore.generateTaskId(record.modelConfig.type, bizId),
                 result: record.result,
                 param: record.modelConfig.ttsParam,
-                text: record.modelConfig.text,
+                text: await replaceSoundGenerateText(record.modelConfig.text),
             });
         } else {
             res = await serverStore.call(serverInfo, "soundClone", {
                 id: serverStore.generateTaskId(record.modelConfig.type, bizId),
                 result: record.result,
                 param: record.modelConfig.cloneParam,
-                text: record.modelConfig.text,
+                text: await replaceSoundGenerateText(record.modelConfig.text),
                 promptAudio: record.modelConfig.promptUrl,
                 promptText: record.modelConfig.promptText,
             });
