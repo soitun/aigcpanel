@@ -39,7 +39,8 @@ const type = computed(() => {
 <template>
     <a-button @click="doShow()" :size="size">
         <template #icon>
-            <icon-settings/>
+            <icon-unordered-list v-if="type==='keyValueList'"/>
+            <icon-file v-else/>
         </template>
         {{ title }}
     </a-button>

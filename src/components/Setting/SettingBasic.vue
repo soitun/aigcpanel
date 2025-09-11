@@ -48,35 +48,6 @@ const onLocaleChange = (value: string) => {
                 <a-radio value="">{{ t("每次询问") }}</a-radio>
             </a-radio-group>
         </a-form-item>
-        <a-form-item field="name" :label="t('数据与配置')">
-            <div class="flex gap-1">
-                <DataConfigDialogButton
-                    title="直播违规词"
-                    name="LiveBlackWordContent"
-                    placeholder="多个词语请用英文逗号分隔"
-                    :default-value="LiveBlackWordContent"
-                />
-                <DataConfigDialogButton
-                    title="直播回复生成提示词"
-                    name="LiveReplyGenerateContent"
-                    placeholder="支持使用变量：{reply}"
-                    :default-value="LiveReplyGenerateContent"
-                    :param="{reply:'示例回复内容',count: '数量'}"
-                />
-                <DataConfigDialogButton
-                    title="ASR结果优化提示词"
-                    name="SoundReplaceAsrResultOptimizedPrompt"
-                    placeholder="支持使用变量：{content}"
-                    :default-value="SoundAsrResultOptimizedPrompt"
-                    :param="{content:'识别结果内容'}"
-                />
-                <DataConfigDialogButton
-                    title="声音合成优化"
-                    name="SoundGenerateReplaceContent"
-                    help="声音合成时会自动把文本中的“键”替换为“值”，可用于修正发音"
-                    :default-value="SoundGenerateReplaceContent"/>
-            </div>
-        </a-form-item>
     </a-form>
 </template>
 

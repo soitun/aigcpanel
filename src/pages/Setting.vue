@@ -5,6 +5,11 @@ import {TabContentScroller} from "../lib/ui";
 import SettingBasic from "../components/Setting/SettingBasic.vue";
 import SettingEnv from "../components/Setting/SettingEnv.vue";
 import SettingAbout from "../components/Setting/SettingAbout.vue";
+import {LiveBlackWordContent} from "./Live/config/blackWord";
+import {LiveReplyGenerateContent} from "./Live/config/replyGenerate";
+import {SoundAsrResultOptimizedPrompt} from "./Sound/config/prompt";
+import {SoundGenerateReplaceContent} from "./Sound/config/replaceContent";
+import DataConfigDialogButton from "../components/common/DataConfigDialogButton.vue";
 
 let tabContentScroller: TabContentScroller | null = null;
 const contentContainer = ref<HTMLElement | null>(null);
@@ -48,6 +53,12 @@ onBeforeUnmount(() => {
                     {{ t("基础设置") }}
                 </div>
             </div>
+            <div data-section="data" class="p-2 rounded-lg mb-4 cursor-pointer">
+                <div class="text-base">
+                    <icon-tool />
+                    {{ t("数据配置") }}
+                </div>
+            </div>
             <div data-section="env" class="p-2 rounded-lg mb-4 cursor-pointer">
                 <div class="text-base">
                     <icon-code />
@@ -71,6 +82,39 @@ onBeforeUnmount(() => {
                     <div class="text-base font-bold mb-4">{{ t("基础设置") }}</div>
                     <div>
                         <SettingBasic />
+                    </div>
+                </div>
+                <div class="border-b border-solid border-gray-200 my-6"></div>
+                <div data-section="data" class="scroll-mt-4">
+                    <div class="text-base font-bold mb-4">{{ t("数据配置") }}</div>
+                    <div>
+                        <div class="flex gap-1">
+                            <DataConfigDialogButton
+                                title="直播违规词"
+                                name="LiveBlackWordContent"
+                                placeholder="多个词语请用英文逗号分隔"
+                                :default-value="LiveBlackWordContent"
+                            />
+                            <DataConfigDialogButton
+                                title="直播回复生成提示词"
+                                name="LiveReplyGenerateContent"
+                                placeholder="支持使用变量：{reply}"
+                                :default-value="LiveReplyGenerateContent"
+                                :param="{reply:'示例回复内容',count: '数量'}"
+                            />
+                            <DataConfigDialogButton
+                                title="ASR结果优化提示词"
+                                name="SoundReplaceAsrResultOptimizedPrompt"
+                                placeholder="支持使用变量：{content}"
+                                :default-value="SoundAsrResultOptimizedPrompt"
+                                :param="{content:'识别结果内容'}"
+                            />
+                            <DataConfigDialogButton
+                                title="声音合成优化"
+                                name="SoundGenerateReplaceContent"
+                                help="声音合成时会自动把文本中的“键”替换为“值”，可用于修正发音"
+                                :default-value="SoundGenerateReplaceContent"/>
+                        </div>
                     </div>
                 </div>
                 <div class="border-b border-solid border-gray-200 my-6"></div>
