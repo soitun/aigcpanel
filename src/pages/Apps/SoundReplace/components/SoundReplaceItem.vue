@@ -122,7 +122,7 @@ const onConfirm = async (taskId: number, records: any[]) => {
                             <TextTruncateView :max-length="40" :text="confirmText"/>
                         </div>
                     </div>
-                    <template #pending>
+                    <template #successPending>
                         <div class="mb-1">
                             <a-button
                                 type="primary"

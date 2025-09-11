@@ -15,6 +15,8 @@ export type TaskBiz =
     // video apps
     | "VideoGenFlow";
 
+export type TaskJobResultStepStatus = undefined | "queue" | "pending" | "running" | "success" | "fail";
+
 export enum TaskType {
     User = 1,
     System = 2,

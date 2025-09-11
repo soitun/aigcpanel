@@ -35,7 +35,10 @@ export type SoundReplaceJobResultType = {
         status: TaskJobResultStepStatus,
         start: number;
         end: number;
-        records: AudioRecord[] | null;
+        records: (AudioRecord & {
+            actualStart: number;
+            actualEnd: number;
+        })[] | null;
     };
     Combine: {
         status: TaskJobResultStepStatus,

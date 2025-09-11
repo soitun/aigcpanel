@@ -140,8 +140,6 @@ export type AudioRecord = {
     end: number;
     text: string;
     audio: string;
-    actualStart?: number;
-    actualEnd?: number;
 };
 
 export const ffmpegMergeAudio = async (
@@ -150,17 +148,16 @@ export const ffmpegMergeAudio = async (
 ): Promise<{
     output: string;
     cleans: string[];
-    mergeRecords: AudioRecord[];
-}> => {
-    const cleans: string[] = [];
-    const mergeRecords: {
-        start: number;
-        end: number;
+    mergeRecords: (AudioRecord & {
         actualStart: number;
         actualEnd: number;
-        text: string;
-        audio: string;
-    }[] = [];
+    })[];
+}> => {
+    const cleans: string[] = [];
+    const mergeRecords: (AudioRecord & {
+        actualStart: number;
+        actualEnd: number;
+    })[] = [];
     const wavFiles: {
         path: string;
         start: number;

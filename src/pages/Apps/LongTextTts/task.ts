@@ -123,7 +123,7 @@ export const LongTextTts: TaskBiz = {
                 }
                 record.audio = await $mapi.file.hubSave(ret.url, {
                     saveGroup: "part",
-                    cleanOld: true,
+
                 });
                 await TaskService.update(bizId, {jobResult});
             }
@@ -147,7 +147,7 @@ export const LongTextTts: TaskBiz = {
                 const audio = await ffmpegConcatAudio(jobResult.SoundGenerate.records!.map(r => r.audio));
                 jobResult.Combine.audio = await $mapi.file.hubSave(audio, {
                     saveGroup: "part",
-                    cleanOld: true,
+
                 });
                 jobResult.step = "End";
                 jobResult.Combine.status = "success";

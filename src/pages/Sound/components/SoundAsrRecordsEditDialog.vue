@@ -5,6 +5,7 @@ import {Dialog} from "../../../lib/dialog";
 import {TimeUtil} from "../../../lib/util";
 import ModelGenerateButton, {ModelGenerateButtonOptionType} from "../../../module/Model/ModelGenerateButton.vue";
 import {SoundAsrResultOptimizedPrompt} from "../config/prompt";
+import SoundAsrRecordsSubtitlePreviewDialog from "./SoundAsrRecordsSubtitlePreviewDialog.vue";
 
 interface AsrRecord {
     start: number;
@@ -41,6 +42,9 @@ const sliderMax = ref(0);
 const sliderValue = ref(0);
 const selectedIndexes = ref<number[]>([]);
 const lastSelectedIndex = ref<number>(-1);
+
+// 预览对话框引用
+const previewDialog = ref<InstanceType<typeof SoundAsrRecordsSubtitlePreviewDialog> | null>(null);
 
 // 计算属性：检查是否有连续的空白片段
 const hasConsecutiveBlanks = computed(() => {
@@ -399,17 +403,23 @@ defineExpose({
                         style="width:100px"
                         allow-clear
                     />
-                    <a-button size="small" @click="onFindReplace" :disabled="!findText.trim()">
+                    <a-button size="small" class="px-2" @click="onFindReplace" :disabled="!findText.trim()">
                         {{ $t("批量替换") }}
                     </a-button>
-                    <a-button size="small" type="primary" @click="doMergeBlanks" :disabled="!hasConsecutiveBlanks">
+                    <a-button size="small" class="px-2" type="primary" @click="doMergeBlanks"
+                              :disabled="!hasConsecutiveBlanks">
                         {{ $t("一键合并空白") }}
                     </a-button>
-                    <a-button size="small" type="primary" @click="doSplit" :disabled="currentIndex === -1">
+                    <a-button size="small" class="px-2" type="primary" @click="doSplit" :disabled="currentIndex === -1">
                         {{ $t("分割") }}
                     </a-button>
-                    <a-button size="small" type="primary" @click="doMerge" :disabled="selectedIndexes.length < 2">
+                    <a-button size="small" class="px-2" type="primary" @click="doMerge"
+                              :disabled="selectedIndexes.length < 2">
                         {{ $t("合并") }}
+                    </a-button>
+                    <a-button size="small" class="px-2" type="primary"
+                              @click="previewDialog?.show(editingRecords);">
+                        {{ $t("预览字幕") }}
                     </a-button>
                     <ModelGenerateButton
                         biz="SoundReplaceAsrResultOptimizedPrompt"
@@ -481,4 +491,5 @@ defineExpose({
             </div>
         </div>
     </a-modal>
+    <SoundAsrRecordsSubtitlePreviewDialog ref="previewDialog"/>
 </template>

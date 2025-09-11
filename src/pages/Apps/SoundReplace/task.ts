@@ -7,7 +7,7 @@ import {SoundReplaceJobResultType, SoundReplaceModelConfigType} from "./type";
 import {ffmpegCombineVideoAudio, ffmpegMergeAudio, ffmpegVideoToAudio} from "../../../lib/ffmpeg";
 import {serverSoundAsr, serverSoundGenerate} from "../../../lib/server";
 import {ffprobeGetMediaDuration} from "../../../lib/ffprobe";
-import {generateSubtitleContent, generateSubTitleRecords} from "./util";
+import {subtitleGenerateSrtContent, subtitleGenerateRecords} from "../../../lib/subtitle";
 
 import {TaskRunResult} from "../common/type";
 import {createTaskRunResult} from "../common/lib";
@@ -110,7 +110,7 @@ export const SoundReplace: TaskBiz = {
             const output = await ffmpegVideoToAudio(modelConfig.video);
             jobResult.ToAudio.file = await $mapi.file.hubSave(output, {
                 saveGroup: "part",
-                cleanOld: true,
+
             });
             jobResult.step = "SoundAsr";
             jobResult.ToAudio.status = "success";
@@ -164,6 +164,8 @@ export const SoundReplace: TaskBiz = {
                 jobResult.SoundGenerate.records = jobResult.Confirm.records.map(item => ({
                     ...item,
                     audio: "",
+                    actualStart: 0,
+                    actualEnd: 0,
                 }));
             }
             await TaskService.update(bizId, {
@@ -187,7 +189,6 @@ export const SoundReplace: TaskBiz = {
                 }
                 record.audio = await $mapi.file.hubSave(ret.url, {
                     saveGroup: "part",
-                    cleanOld: true,
                 });
                 await TaskService.update(bizId, {jobResult});
             }
@@ -218,7 +219,6 @@ export const SoundReplace: TaskBiz = {
                 filesToClean.push(...cleans);
                 jobResult.Combine.audio = await $mapi.file.hubSave(output, {
                     saveGroup: "part",
-                    cleanOld: true,
                 });
                 jobResult.SoundGenerate.records = mergeRecords;
                 await TaskService.update(bizId, {jobResult});
@@ -226,7 +226,7 @@ export const SoundReplace: TaskBiz = {
                 const url = await ffmpegCombineVideoAudio(modelConfig.video, jobResult.Combine.audio);
                 jobResult.Combine.file = await $mapi.file.hubSave(url, {
                     saveGroup: "part",
-                    cleanOld: true,
+
                 });
                 jobResult.step = "End";
                 jobResult.Combine.status = "success";
@@ -257,8 +257,14 @@ export const SoundReplace: TaskBiz = {
                 statusMsg: t("任务未完成，需要手动确认文字"),
             });
         } else if (jobResult.step === "End") {
-            const subTitleRecords = generateSubTitleRecords(jobResult.SoundGenerate.records!);
-            const subTitleContent = generateSubtitleContent(subTitleRecords);
+            const subTitleRecords = subtitleGenerateRecords(jobResult.SoundGenerate.records!.map(o => {
+                return {
+                    ...o,
+                    start: o.actualStart!,
+                    end: o.actualEnd!,
+                }
+            }));
+            const subTitleContent = subtitleGenerateSrtContent(subTitleRecords);
             await TaskService.update(bizId, {
                 status: "success",
                 endTime: Date.now(),

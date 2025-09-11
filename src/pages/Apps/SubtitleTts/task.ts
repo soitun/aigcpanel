@@ -124,7 +124,7 @@ export const SubtitleTts: TaskBiz = {
                 }
                 record.audio = await $mapi.file.hubSave(ret.url, {
                     saveGroup: "part",
-                    cleanOld: true,
+
                 });
                 await TaskService.update(bizId, {jobResult});
             }
@@ -157,7 +157,7 @@ export const SubtitleTts: TaskBiz = {
                 jobResult.Combine.records = mergeRecords;
                 jobResult.Combine.audio = await $mapi.file.hubSave(output, {
                     saveGroup: "part",
-                    cleanOld: true,
+
                 });
                 jobResult.step = "End";
                 jobResult.Combine.status = "success";
