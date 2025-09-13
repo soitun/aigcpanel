@@ -1,5 +1,6 @@
 import {TimeUtil} from "../lib/util";
 import {useTaskStore} from "../store/modules/task";
+import {groupThrottle} from "../lib/groupThrottle";
 
 const taskStore = useTaskStore();
 
@@ -220,21 +221,32 @@ export const TaskService = {
         );
         return id;
     },
+    updatePercent: groupThrottle(async (id: string, percent: number) => {
+        // console.log('TaskService.updatePercent', {id, percent});
+        const {updates, biz} = await TaskService.update(id, {result: {percent}});
+        taskStore.fireChange({
+            biz: biz!, bizId: id,
+        }, 'change');
+    }, 3000),
     async update(
         id: number | string,
         record: Partial<TaskRecord>,
         option?: {
             mergeResult?: boolean;
         }
-    ) {
+    ): Promise<{
+        updates: number,
+        biz: string | null,
+    }> {
         option = Object.assign(
             {
                 mergeResult: true,
             },
             option
         );
+        let recordOld: TaskRecord | null = null;
         if ("result" in record || "jobResult" in record || "startTime" in record) {
-            const recordOld = await this.get(id);
+            recordOld = await this.get(id);
             if (option.mergeResult) {
                 if ("result" in record) {
                     record.result = mergeData(recordOld?.result, record.result);
@@ -253,12 +265,16 @@ export const TaskService = {
         const fields = Object.keys(record);
         const values = fields.map(f => record[f]);
         const set = fields.map(f => `${f} = ?`).join(",");
-        return await window.$mapi.db.execute(
+        const updates = await window.$mapi.db.execute(
             `UPDATE ${this.tableName()}
              SET ${set}
              WHERE id = ?`,
             [...values, id]
         );
+        return {
+            updates,
+            biz: recordOld ? recordOld.biz : null,
+        }
     },
     async delete(record: TaskRecord) {
         const filesForClean: string[] = [];

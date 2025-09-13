@@ -27,7 +27,7 @@ export type TaskRecordRunStatus = "retry" | "success" | "querying";
 
 export type TaskRecordQueryStatus = "running" | "success" | "fail";
 
-export type TaskChangeType = "running" | "success" | "fail";
+export type TaskChangeType = "running" | "success" | "fail" | "change";
 
 export type TaskRecord = {
     id: string;
