@@ -44,7 +44,9 @@ export type TaskRecord<MODEL_CONFIG extends any = any, JOB_RESULT extends any = 
     param?: any;
     jobResult?: JOB_RESULT;
     modelConfig?: MODEL_CONFIG;
-    result?: any;
+    result?: {
+        percent: number
+    } & any;
 
     runtime?: TaskRuntime;
 };
