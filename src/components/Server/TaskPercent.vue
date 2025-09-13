@@ -7,6 +7,6 @@ const props = defineProps<{
 
 <template>
     <div class="bg-gray-100 text-sm rounded-full px-2 leading-8">
-        {{ percent ? (percent * 100).toFixed(2) + '%' : '-' }}
+        {{ ((percent || 0) * 100).toFixed(2) }}%
     </div>
 </template>

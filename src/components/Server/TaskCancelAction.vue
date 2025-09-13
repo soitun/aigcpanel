@@ -4,9 +4,9 @@ import {t} from "../../lang";
 import {sleep} from "../../lib/util";
 import {TaskRecord} from "../../service/TaskService";
 import {computed} from "vue";
-import {useServerStore} from "../../store/modules/server";
+import {useTaskStore} from "../../store/modules/task";
 
-const serverStore = useServerStore();
+const taskStore = useTaskStore();
 
 const props = defineProps<{
     record: TaskRecord;
@@ -14,15 +14,15 @@ const props = defineProps<{
 
 const doCancel = async () => {
     const record = props.record;
-    Dialog.loadingOn(t("正在停止运行"));
+    Dialog.loadingOn(t("正在取消任务"));
     try {
+        taskStore.requestCancel(record.biz, record.id as any);
         await sleep(500);
-        await serverStore.cancelByNameVersion(record.serverName, record.serverVersion);
         Dialog.loadingOff();
-        Dialog.tipSuccess(t("停止运行成功"));
+        Dialog.tipSuccess(t("已发送停止请求，请等待运行停止"));
     } catch (e) {
         Dialog.loadingOff();
-        Dialog.tipError(t("停止运行失败"));
+        Dialog.tipError(t("取消任务失败"));
     }
 };
 const isCloud = computed(() => {
@@ -31,10 +31,10 @@ const isCloud = computed(() => {
 </script>
 
 <template>
-    <a-tooltip v-if="!isCloud && record.status === 'running'" :content="$t('停止运行')" mini>
+    <a-tooltip v-if="!isCloud && record.status === 'running'" :content="$t('取消任务')" mini>
         <a-button class="mr-2" type="primary" status="danger" @click="doCancel()">
             <template #icon>
-                <icon-record-stop />
+                <icon-record-stop/>
             </template>
         </a-button>
     </a-tooltip>

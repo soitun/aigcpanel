@@ -1,6 +1,7 @@
 import {TimeUtil} from "../lib/util";
 import {useTaskStore} from "../store/modules/task";
 import {groupThrottle} from "../lib/groupThrottle";
+import {t} from "../lang";
 
 const taskStore = useTaskStore();
 
@@ -228,6 +229,11 @@ export const TaskService = {
             biz: biz!, bizId: id,
         }, 'change');
     }, 3000),
+    cancelCheck: (biz: TaskBiz, bizId: string) => {
+        if (taskStore.shouldCancel(biz, bizId)) {
+            throw t('任务已取消');
+        }
+    },
     async update(
         id: number | string,
         record: Partial<TaskRecord>,

@@ -176,6 +176,15 @@ export const serverStore = defineStore("server", {
                     return record.type !== EnumServerType.CLOUD;
                 });
             });
+            taskStore.onChange(null, (bizId, type) => {
+                if (type === 'requestCancel') {
+                    TaskService.get(bizId).then(record => {
+                        if (record && record.serverName && record.serverVersion) {
+                            this.cancelByNameVersion(record.serverName, record.serverVersion).then();
+                        }
+                    })
+                }
+            })
             await this.refresh();
             this.isReady = true;
         },

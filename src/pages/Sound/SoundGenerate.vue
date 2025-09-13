@@ -49,14 +49,14 @@ onMounted(async () => {
                 <a-tooltip :content="$t('清空历史')" position="right" mini>
                     <a-button class="ml-1">
                         <template #icon>
-                            <icon-delete />
+                            <icon-delete/>
                         </template>
                     </a-button>
                 </a-tooltip>
             </div>
         </div>
         <div>
-            <SoundGenerateCreate @submitted="doRefresh" />
+            <SoundGenerateCreate @submitted="doRefresh"/>
             <div v-if="records.length > 0">
                 <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
                     <div class="flex-grow flex items-center">
@@ -69,8 +69,8 @@ onMounted(async () => {
                                 {{ $t("全选") }}
                             </a-checkbox>
                         </div>
-                        <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh" />
-                        <TaskBatchDownloadAction :records="checkRecords" />
+                        <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh"/>
+                        <TaskBatchDownloadAction :records="checkRecords"/>
                     </div>
                     <div>
                         <a-pagination
@@ -87,7 +87,7 @@ onMounted(async () => {
                         <div class="flex items-center">
                             <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
                                 <div class="mr-2 h-8 pt-0.5">
-                                    <a-checkbox v-model="r['_check']" />
+                                    <a-checkbox v-model="r['_check']"/>
                                 </div>
                                 <div class="">
                                     <TaskTitleField
@@ -99,39 +99,39 @@ onMounted(async () => {
                             </div>
                             <div class="flex-grow"></div>
                             <div class="ml-1">
-                                <TaskDuration :start="r.startTime" :end="r.endTime" />
+                                <TaskDuration :start="r.startTime" :end="r.endTime"/>
                             </div>
                             <div class="ml-1">
-                                <TaskBizStatus :status="r.status" :status-msg="r.statusMsg" />
+                                <TaskBizStatus :status="r.status" :status-msg="r.statusMsg"/>
                             </div>
                         </div>
                         <div class="mt-3 flex gap-1 flex-wrap">
-                            <ServerNameVersion :record="r" />
-                            <SoundGenerateFormViewBody :data="r.modelConfig" />
-                            <ServerTaskResultParam :record="r as any" />
+                            <ServerNameVersion :record="r"/>
+                            <SoundGenerateFormViewBody :data="r.modelConfig"/>
+                            <ServerTaskResultParam :record="r as any"/>
                         </div>
                         <div class="mt-4">
                             <div class="bg-gray-100 rounded-lg p-2">
-                                <TextTruncateView :text="r.modelConfig.text" />
+                                <TextTruncateView :text="r.modelConfig.text"/>
                             </div>
                         </div>
                         <div class="pt-4" v-if="r.result && r.result.url">
-                            <AudioPlayer show-wave :url="'file://' + r.result.url" />
+                            <AudioPlayer show-wave :url="'file://' + r.result.url"/>
                         </div>
                         <div class="pt-4 flex items-center">
                             <div class="text-gray-400 flex-grow">
-                                <timeago :datetime="r['createdAt'] * 1000" />
+                                <timeago :datetime="r['createdAt'] * 1000"/>
                             </div>
                             <div class="">
-                                <TaskDownloadAction :record="r" />
-                                <TaskDeleteAction :record="r" @update="doRefresh" />
-                                <TaskCancelAction :record="r" />
+                                <TaskDownloadAction :record="r"/>
+                                <TaskDeleteAction :record="r" @update="doRefresh"/>
+                                <TaskCancelAction :record="r"/>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <m-empty v-else :text="$t('暂无声音合成任务')" />
+            <m-empty v-else :text="$t('暂无声音合成任务')"/>
         </div>
     </div>
 </template>
