@@ -1,5 +1,5 @@
 import {TimeUtil} from "../lib/util";
-import {useTaskStore} from "../store/modules/task";
+import {TaskChangeType, useTaskStore} from "../store/modules/task";
 import {groupThrottle} from "../lib/groupThrottle";
 import {t} from "../lang";
 
@@ -228,12 +228,27 @@ export const TaskService = {
         taskStore.fireChange({
             biz: biz!, bizId: id,
         }, 'change');
-    }, 3000),
+    }, 3000, {
+        trailing: true,
+    }),
     cancelCheck: (biz: TaskBiz, bizId: string) => {
         if (taskStore.shouldCancel(biz, bizId)) {
             throw t('任务已取消');
         }
     },
+    updateDelayAndFireChange: groupThrottle(async (
+        id: string,
+        record: Partial<TaskRecord>,
+        fireChangeType: TaskChangeType = "running",
+        option?: {
+            mergeResult?: boolean;
+        }
+    ) => {
+        const {updates, biz} = await TaskService.update(id, record, option);
+        taskStore.fireChange({biz: biz!, bizId: id}, fireChangeType);
+    }, 1000, {
+        trailing: true,
+    }),
     async update(
         id: number | string,
         record: Partial<TaskRecord>,
