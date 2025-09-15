@@ -1,13 +1,14 @@
-import {defineAsyncComponent} from "vue";
-import {t} from "../../../../lang";
-import {NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult} from "../../../../module/Workflow/core/type";
-import {workflowRun} from "../../common/workflow";
-import {LongTextTtsRun} from "../task";
+import { defineAsyncComponent } from "vue";
+import { t } from "../../../../lang";
+import { NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult } from "../../../../module/Workflow/core/type";
+import { workflowRun } from "../../common/workflow";
+import { LongTextTtsRun } from "../task";
 import LongTextTtsIcon from "./../assets/icon.svg";
 
 export default <NodeFunctionCall>{
     name: "LongTextTts",
     title: t("长文本转音频"),
+    description: "将长文本转换为音频",
     icon: LongTextTtsIcon,
     comp: defineAsyncComponent(() => import("./LongTextTtsNode.vue")),
     inputFields: [

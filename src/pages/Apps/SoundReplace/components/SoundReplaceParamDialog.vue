@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import {ref} from "vue";
-import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
+import { nextTick, ref } from "vue";
 import SoundAsrForm from "../../../Sound/components/SoundAsrForm.vue";
+import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 
 const soundAsrForm = ref<InstanceType<typeof SoundAsrForm>>();
 const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(null);
+
+const props = defineProps<{
+}>();
 
 const visible = ref(false);
 const emit = defineEmits<{
@@ -32,8 +35,16 @@ const doSubmit = async () => {
 };
 
 defineExpose({
-    show: () => {
+    show: (data?: any) => {
         visible.value = true;
+        nextTick(() => {
+            if (data?.soundAsr) {
+                soundAsrForm.value?.setValue(data.soundAsr);
+            }
+            if (data?.soundGenerate) {
+                soundGenerateForm.value?.setValue(data.soundGenerate);
+            }
+        });
     },
 });
 

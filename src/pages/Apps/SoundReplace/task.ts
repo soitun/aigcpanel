@@ -7,7 +7,7 @@ import {SoundReplaceJobResultType, SoundReplaceModelConfigType} from "./type";
 import {ffmpegCombineVideoAudio, ffmpegMergeAudio, ffmpegVideoToAudio} from "../../../lib/ffmpeg";
 import {serverSoundAsr, serverSoundGenerate} from "../../../lib/server";
 import {ffprobeGetMediaDuration} from "../../../lib/ffprobe";
-import {subtitleGenerateSrtContent, subtitleGenerateRecords} from "../../../lib/subtitle";
+import {subtitleGenerateRecords, subtitleGenerateSrtContent} from "../../../lib/subtitle";
 
 import {TaskRunResult} from "../common/type";
 import {createTaskRunResult} from "../common/lib";
@@ -98,6 +98,7 @@ export const SoundReplace: TaskBiz = {
         jobResult.Confirm = jobResult.Confirm || {status: "queue"};
         jobResult.SoundGenerate = jobResult.SoundGenerate || {status: "queue"};
         jobResult.Combine = jobResult.Combine || {status: "queue"};
+        jobResult.CombineConfirm = jobResult.CombineConfirm || {status: "queue"};
 
         if (jobResult.step === "ToAudio") {
             console.log("SoundReplace.ToAudio", jobResult);
@@ -108,10 +109,7 @@ export const SoundReplace: TaskBiz = {
             });
             taskStore.fireChange({biz: "SoundReplace", bizId}, "running");
             const output = await ffmpegVideoToAudio(modelConfig.video);
-            jobResult.ToAudio.file = await $mapi.file.hubSave(output, {
-                saveGroup: "part",
-
-            });
+            jobResult.ToAudio.file = await $mapi.file.hubSave(output);
             jobResult.step = "SoundAsr";
             jobResult.ToAudio.status = "success";
             await TaskService.update(bizId, {jobResult});
@@ -160,7 +158,7 @@ export const SoundReplace: TaskBiz = {
             console.log("SoundReplace.SoundGenerate", jobResult);
             jobResult.Confirm.status = "success";
             jobResult.SoundGenerate.status = "running";
-            if (!jobResult.SoundGenerate.records) {
+            if (!jobResult.SoundGenerate.records || !jobResult.SoundGenerate.records.length) {
                 jobResult.SoundGenerate.records = jobResult.Confirm.records.map(item => ({
                     ...item,
                     audio: "",
@@ -187,9 +185,7 @@ export const SoundReplace: TaskBiz = {
                 if (ret.type === "retry") {
                     return ret.type;
                 }
-                record.audio = await $mapi.file.hubSave(ret.url, {
-                    saveGroup: "part",
-                });
+                record.audio = await $mapi.file.hubSave(ret.url);
                 await TaskService.update(bizId, {jobResult});
             }
             jobResult.step = "Combine";
@@ -217,28 +213,38 @@ export const SoundReplace: TaskBiz = {
                     mergeRecords,
                 } = await ffmpegMergeAudio(jobResult.SoundGenerate.records!, videoDurationMs);
                 filesToClean.push(...cleans);
-                jobResult.Combine.audio = await $mapi.file.hubSave(output, {
-                    saveGroup: "part",
-                });
+                jobResult.Combine.audio = await $mapi.file.hubSave(output);
                 jobResult.SoundGenerate.records = mergeRecords;
                 await TaskService.update(bizId, {jobResult});
                 // 使用合并后的音频替换视频的音频轨道
                 const url = await ffmpegCombineVideoAudio(modelConfig.video, jobResult.Combine.audio);
-                jobResult.Combine.file = await $mapi.file.hubSave(url, {
-                    saveGroup: "part",
-
-                });
-                jobResult.step = "End";
+                jobResult.Combine.file = await $mapi.file.hubSave(url);
+                jobResult.step = "CombineConfirm";
                 jobResult.Combine.status = "success";
                 await TaskService.update(bizId, {
                     jobResult,
                 });
-                return "success";
             } catch (error) {
                 throw error;
             } finally {
                 await $mapi.file.clean(filesToClean, {isDataPath: false});
             }
+        }
+
+        if (jobResult.step === "CombineConfirm") {
+            // user task auto confirm
+            if (record.type === TaskType.System) {
+                jobResult.CombineConfirm.status = "running";
+                jobResult.CombineConfirm.status = "pending";
+                await TaskService.update(bizId, {
+                    jobResult,
+                });
+                return "success";
+            }
+            jobResult.CombineConfirm.status = "success";
+            await TaskService.update(bizId, {
+                jobResult,
+            });
         }
 
         if (jobResult.step === "End") {
@@ -255,6 +261,11 @@ export const SoundReplace: TaskBiz = {
             await TaskService.update(bizId, {
                 status: "pause",
                 statusMsg: t("任务未完成，需要手动确认文字"),
+            });
+        } else if (jobResult.step === "CombineConfirm") {
+            await TaskService.update(bizId, {
+                status: "pause",
+                statusMsg: t("任务未完成，需要手动确认终稿"),
             });
         } else if (jobResult.step === "End") {
             const subTitleRecords = subtitleGenerateRecords(jobResult.SoundGenerate.records!.map(o => {

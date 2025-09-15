@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import { nextTick, ref } from "vue";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 
 const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(null);
+
+const props = defineProps<{
+}>();
 
 const visible = ref(false);
 const emit = defineEmits<{
@@ -24,8 +27,13 @@ const doSubmit = async () => {
 };
 
 defineExpose({
-    show: () => {
+    show: (data?: any) => {
         visible.value = true;
+        nextTick(() => {
+            if (data?.soundGenerate) {
+                soundGenerateForm.value?.setValue(data.soundGenerate);
+            }
+        });
     },
 });
 

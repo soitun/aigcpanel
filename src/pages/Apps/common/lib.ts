@@ -1,7 +1,7 @@
-import {TaskRunResult} from "./type";
-import {TaskChangeType, useTaskStore} from "../../../store/modules/task";
-import {TaskRecord, TaskService} from "../../../service/TaskService";
-import {t} from "../../../lang";
+import { t } from "../../../lang";
+import { TaskRecord, TaskService } from "../../../service/TaskService";
+import { TaskChangeType, useTaskStore } from "../../../store/modules/task";
+import { TaskRunResult } from "./type";
 
 const taskStore = useTaskStore();
 

@@ -11,7 +11,6 @@ import AudioPlayer from "../../../../components/common/AudioPlayer.vue";
 import AudioPlayerButton from "../../../../components/common/AudioPlayerButton.vue";
 import TaskBizStatus from "../../../../components/common/TaskBizStatus.vue";
 import VideoPlayer from "../../../../components/common/VideoPlayer.vue";
-import {ToggleUtil} from "../../../../lib/toggle";
 import {TaskRecord, TaskService} from "../../../../service/TaskService";
 import SoundAsrRecordsEditDialog from "../../../Sound/components/SoundAsrRecordsEditDialog.vue";
 import SoundGenerateFormViewBody from "../../../Sound/components/SoundGenerateFormViewBody.vue";
@@ -47,16 +46,32 @@ const onConfirm = async (taskId: number, records: any[]) => {
         jobResult: {
             step: "SoundGenerate",
             Confirm: {records,},
+            SoundGenerate: {records: []},
         },
     });
     await taskStore.dispatch("SoundReplace", taskId + "");
     props.onRefresh();
 };
+
+const doCombineConfirm = async () => {
+    await TaskService.update(props.record.id!, {
+        statusMsg: "",
+        jobResult: {
+            step: "End",
+            CombineConfirm: {
+                status: "success",
+            }
+        },
+    });
+    await taskStore.dispatch("SoundReplace", props.record.id + "");
+    props.onRefresh();
+};
+
 </script>
 
 <template>
     <div class="rounded-xl shadow border p-4 mb-4 hover:shadow-lg">
-        <div class="flex items-center">
+        <div class="flex gap-1 items-center">
             <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
                 <div v-if="!dialog" class="mr-2 h-8 pt-0.5">
                     <a-checkbox v-model="record['_check']"/>
@@ -71,12 +86,8 @@ const onConfirm = async (taskId: number, records: any[]) => {
                 </div>
             </div>
             <div class="flex-grow"></div>
-            <div class="ml-1">
-                <TaskDuration v-if="record.status==='running'" :start="record.startTime" :end="record.endTime"/>
-            </div>
-            <div class="ml-1">
-                <TaskBizStatus :status="record.status" :status-msg="record.statusMsg"/>
-            </div>
+            <TaskDuration :start="record.startTime" :end="record.endTime"/>
+            <TaskBizStatus :status="record.status" :status-msg="record.statusMsg"/>
         </div>
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">
@@ -134,9 +145,9 @@ const onConfirm = async (taskId: number, records: any[]) => {
                                     record.jobResult?.SoundAsr.duration||0
                                     )">
                                 <template #icon>
-                                    <icon-check-circle/>
+                                    <icon-pen/>
                                 </template>
-                                {{ $t("修改确认文字") }}
+                                {{ $t("手动确认文字") }}
                             </a-button>
                         </div>
                     </template>
@@ -185,6 +196,30 @@ const onConfirm = async (taskId: number, records: any[]) => {
             <TaskJobResultStepView :record="record" step="Combine">
                 <div class="bg-gray-100 rounded-lg p-2 w-full h-96">
                     <VideoPlayer :url="record.jobResult?.Combine.file"/>
+                </div>
+                <div class="mt-1 flex gap-2">
+                    <a-button
+                        type="primary"
+                        @click="soundAsrRecordsEditDialog?.edit(
+                                    record.id!,
+                                    record.jobResult?.Confirm.records!||[],
+                                    record.jobResult?.Combine.file!,
+                                    record.jobResult?.SoundAsr.duration||0
+                                    )">
+                        <template #icon>
+                            <icon-pen/>
+                        </template>
+                        {{ $t("重新校验文字") }}
+                    </a-button>
+                    <a-button
+                        v-if="record.jobResult?.CombineConfirm?.status==='pending'"
+                        type="primary"
+                        @click="doCombineConfirm">
+                        <template #icon>
+                            <icon-check/>
+                        </template>
+                        {{ $t("确认无误完成") }}
+                    </a-button>
                 </div>
             </TaskJobResultStepView>
         </div>

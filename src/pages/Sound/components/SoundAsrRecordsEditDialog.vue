@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {computed, nextTick, ref} from "vue";
+import DataConfigDialogButton from "../../../components/common/DataConfigDialogButton.vue";
 import {t} from "../../../lang";
 import {Dialog} from "../../../lib/dialog";
 import {TimeUtil} from "../../../lib/util";
 import ModelGenerateButton, {ModelGenerateButtonOptionType} from "../../../module/Model/ModelGenerateButton.vue";
 import {SoundAsrResultOptimizedPrompt} from "../config/prompt";
-import SoundAsrRecordsSubtitlePreviewDialog from "./SoundAsrRecordsSubtitlePreviewDialog.vue";
 import {SoundGenerateReplaceContent} from "../config/replaceContent";
-import DataConfigDialogButton from "../../../components/common/DataConfigDialogButton.vue";
+import SoundAsrRecordsSubtitlePreviewDialog from "./SoundAsrRecordsSubtitlePreviewDialog.vue";
 import SoundGeneratePreviewBox from "./SoundGeneratePreviewBox.vue";
 
 interface AsrRecord {
@@ -40,15 +40,18 @@ const visible = ref(false);
 const editingRecords = ref<EditingAsrRecord[]>([]);
 const currentRecords = ref<AsrRecord[]>([]);
 const currentTaskId = ref<number>(0);
-const currentAudio = ref<string>("");
+const currentMedia = ref<string>("");
 const currentDuration = ref<number>(0);
 const currentIndex = ref<number>(-1);
-const audioRef = ref<HTMLAudioElement | null>(null);
+const mediaRef = ref<HTMLAudioElement | HTMLVideoElement | null>(null);
 const sliderMin = ref(0);
 const sliderMax = ref(0);
 const sliderValue = ref(0);
 const selectedIndexes = ref<number[]>([]);
 const lastSelectedIndex = ref<number>(-1);
+
+// 每分钟字数，用于计算maxLength
+const wordsPerMinute = ref(250);
 
 // 预览对话框引用
 const previewDialog = ref<InstanceType<typeof SoundAsrRecordsSubtitlePreviewDialog> | null>(null);
@@ -65,18 +68,37 @@ const hasConsecutiveBlanks = computed(() => {
 
 // 计算属性：总字数统计
 const totalWords = computed(() => {
-    return editingRecords.value.reduce((sum, record) => sum + record.text.length, 0);
+    return editingRecords.value.reduce((sum, record) => sum + calculateCustomLength(record.text), 0);
 });
+
+// 计算自定义长度：英文单词算两个长度，汉字算1个，字符不算
+const calculateCustomLength = (text: string): number => {
+    let length = 0;
+    // 汉字算1个
+    const chineseChars = text.match(/[\u4e00-\u9fa5]/g);
+    if (chineseChars) length += chineseChars.length;
+    // 英文单词算2个
+    const englishWords = text.match(/\b[a-zA-Z]+\b/g);
+    if (englishWords) length += englishWords.length * 2;
+    // 其他字符不算
+    return length;
+};
+
+// 计算maxLength，根据记录时长和每分钟字数
+const getMaxLength = (record: EditingAsrRecord) => {
+    const durationSeconds = (record.endSeconds || 0) - (record.startSeconds || 0);
+    return Math.floor(durationSeconds * wordsPerMinute.value / 60);
+};
 
 const edit = (
     taskId: number,
     records: AsrRecord[],
-    audio: string,
+    audioOrVideo: string,
     duration: number
 ) => {
     currentRecords.value = records;
     currentTaskId.value = taskId || 0;
-    currentAudio.value = `file://${audio}`;
+    currentMedia.value = `file://${audioOrVideo}`;
     currentDuration.value = duration || 0;
     currentIndex.value = -1;
     selectedIndexes.value = [];
@@ -183,14 +205,15 @@ const onFindReplace = () => {
 
 // 点击记录跳转到音频时间
 const onRecordClick = (record: EditingAsrRecord) => {
-    if (audioRef.value) {
-        audioRef.value.currentTime = record.startSeconds || 0;
+    if (mediaRef.value) {
+        mediaRef.value.currentTime = record.startSeconds || 0;
+        mediaRef.value.play();
     }
 };
 
 // 音频时间更新，高亮当前记录
 const onTimeUpdate = () => {
-    const currentTime = audioRef.value?.currentTime || 0;
+    const currentTime = mediaRef.value?.currentTime || 0;
     const newIndex = editingRecords.value.findIndex((record) =>
         (record.startSeconds || 0) <= currentTime && currentTime < (record.endSeconds || 0)
     );
@@ -213,8 +236,8 @@ const onTimeUpdate = () => {
 
 // 滑动条变化
 const onSliderChange = (value: number) => {
-    if (audioRef.value) {
-        audioRef.value.currentTime = value;
+    if (mediaRef.value) {
+        mediaRef.value.currentTime = value;
     }
 };
 
@@ -231,7 +254,7 @@ const doMerge = () => {
         Dialog.tipError('只能合并连续的记录');
         return;
     }
-    const text = editingRecords.value.slice(first, last + 1).map(r => r.text).join('；');
+    const text = editingRecords.value.slice(first, last + 1).map(r => r.text).filter(t => t).join('；');
     const merged = {
         start: editingRecords.value[first].start,
         end: editingRecords.value[last].end,
@@ -274,6 +297,79 @@ const doMergeBlanks = () => {
 
     editingRecords.value = newRecords;
     Dialog.tipSuccess("已合并连续空白片段");
+};
+
+// 一键优化时间线
+const doOptimizeTimeline = () => {
+    let successCount = 0;
+    let failCount = 0;
+
+    for (let i = 0; i < editingRecords.value.length; i++) {
+        const record = editingRecords.value[i];
+        const maxLength = getMaxLength(record);
+        if (calculateCustomLength(record.text) > maxLength) {
+            if (i + 1 < editingRecords.value.length && editingRecords.value[i + 1].text.trim() === '') {
+                // 计算需要额外时间
+                const extraWords = calculateCustomLength(record.text) - maxLength;
+                const extraTime = extraWords * 60 / wordsPerMinute.value; // 秒
+
+                // 下一句的时长
+                const nextDuration = (editingRecords.value[i + 1].endSeconds || 0) - (editingRecords.value[i + 1].startSeconds || 0);
+
+                // 实际挪的时间
+                const moveTime = Math.min(extraTime, nextDuration);
+
+                if (moveTime > 0) {
+                    if (moveTime >= nextDuration) {
+                        // 下一句时间会被完全占用，删除下一句
+                        record.endSeconds = editingRecords.value[i + 1].endSeconds;
+                        record.end = secondsToMs(record.endSeconds || 0);
+                        editingRecords.value.splice(i + 1, 1);
+                        i--; // 调整索引，因为删除了一个元素
+                    } else {
+                        // 延长本句
+                        record.endSeconds = (record.endSeconds || 0) + moveTime;
+                        record.end = secondsToMs(record.endSeconds);
+
+                        // 缩短下一句
+                        editingRecords.value[i + 1].startSeconds = (editingRecords.value[i + 1].startSeconds || 0) + moveTime;
+                        editingRecords.value[i + 1].start = secondsToMs(editingRecords.value[i + 1].startSeconds || 0);
+                    }
+                    successCount++;
+                } else {
+                    failCount++;
+                }
+            } else {
+                failCount++;
+            }
+        }
+    }
+
+    Dialog.tipSuccess(`优化完成，成功修复 ${successCount} 句，失败 ${failCount} 句`);
+};
+
+// 合并到前一条
+const doMergeToPrevious = (index: number) => {
+    if (index <= 0) return;
+    const current = editingRecords.value[index];
+    const previous = editingRecords.value[index - 1];
+    // 合并文本，如果当前有文本，用分号连接
+    if (current.text.trim()) {
+        previous.text += (previous.text.trim() ? '；' : '') + current.text.trim();
+    }
+    // 更新结束时间
+    previous.end = current.end;
+    previous.endSeconds = current.endSeconds;
+    // 删除当前记录
+    editingRecords.value.splice(index, 1);
+    // 更新选择状态
+    selectedIndexes.value = selectedIndexes.value.filter(i => i !== index).map(i => i > index ? i - 1 : i);
+    if (currentIndex.value === index) {
+        currentIndex.value = index - 1;
+    } else if (currentIndex.value > index) {
+        currentIndex.value--;
+    }
+    lastSelectedIndex.value = lastSelectedIndex.value > index ? lastSelectedIndex.value - 1 : lastSelectedIndex.value;
 };
 
 // 分割当前记录
@@ -381,7 +477,32 @@ defineExpose({
 <template>
     <a-modal v-model:visible="visible" width="95vw" title-align="start">
         <template #title>
-            {{ $t("编辑识别结果") }}
+            <div class="flex items-center gap-4">
+                <div class="font-bold mr-2">
+                    {{ $t("编辑识别结果") }}
+                </div>
+                <div class="flex items-center">
+                    <span class="text-sm mr-2">{{ $t("每分钟字数") }}:</span>
+                    <a-input-number
+                        v-model="wordsPerMinute"
+                        :min="1"
+                        :max="1000"
+                        size="small"
+                        style="width:80px"
+                    />
+                </div>
+                <DataConfigDialogButton
+                    size="small"
+                    title="声音合成优化"
+                    name="SoundGenerateReplaceContent"
+                    help="声音合成时会自动把文本中的“键”替换为“值”，可用于修正发音"
+                    :default-value="SoundGenerateReplaceContent">
+                    <div class="mb-2">
+                        <SoundGeneratePreviewBox :sound-generate="soundGenerate as any"/>
+                    </div>
+                </DataConfigDialogButton>
+                <div class="text-sm text-gray-500">{{ $t("共{count}字", {count: totalWords}) }}</div>
+            </div>
         </template>
         <template #footer>
             <a-button @click="doCancel">{{ $t("取消") }}</a-button>
@@ -389,10 +510,19 @@ defineExpose({
         </template>
         <div v-if="visible" class="flex flex-col gap-1 h-full -mx-4 -my-5" style="height:calc(100vh - 12rem);">
 
-            <div class="bg-gray-100 p-2 border-b rounded-lg">
+            <div class="bg-gray-100 p-2 border-b rounded-lg" v-if="currentMedia">
+                <video
+                    ref="mediaRef"
+                    v-if="currentMedia.endsWith('mp4')"
+                    :src="currentMedia"
+                    controls
+                    class="w-full h-32"
+                    @timeupdate="onTimeUpdate"
+                ></video>
                 <audio
-                    ref="audioRef"
-                    :src="currentAudio"
+                    ref="mediaRef"
+                    v-else
+                    :src="currentMedia"
                     controls
                     class="w-full"
                     @timeupdate="onTimeUpdate"
@@ -400,7 +530,7 @@ defineExpose({
             </div>
 
             <div class="bg-white rounded-lg p-2 flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1">
                     <a-input
                         v-model="findText"
                         :placeholder="$t('查找')"
@@ -430,28 +560,24 @@ defineExpose({
                     <a-button size="small" class="px-2" type="primary" @click="doMerge"
                               :disabled="selectedIndexes.length < 2">
                         {{ $t("合并") }}
+                        <span v-if="selectedIndexes.length">
+                            ({{ selectedIndexes.length }})
+                        </span>
                     </a-button>
                     <a-button size="small" class="px-2" type="primary"
                               @click="previewDialog?.show(editingRecords);">
                         {{ $t("字幕") }}
                     </a-button>
-                    <DataConfigDialogButton
-                        size="small"
-                        title="声音合成优化"
-                        name="SoundGenerateReplaceContent"
-                        help="声音合成时会自动把文本中的“键”替换为“值”，可用于修正发音"
-                        :default-value="SoundGenerateReplaceContent">
-                        <div class="mb-2">
-                            <SoundGeneratePreviewBox :sound-generate="soundGenerate as any"/>
-                        </div>
-                    </DataConfigDialogButton>
+                    <a-button size="small" class="px-2" type="primary"
+                              @click="doOptimizeTimeline">
+                        {{ $t("一键优化时间线") }}
+                    </a-button>
                     <ModelGenerateButton
                         biz="SoundReplaceAsrResultOptimizedPrompt"
                         title="AI一键优化"
                         :option="aiOption"
                     />
                 </div>
-                <div class="text-sm text-gray-500">{{ $t("共{count}字", {count: totalWords}) }}</div>
             </div>
 
             <div class="flex-grow overflow-y-auto border rounded-lg p-2">
@@ -475,22 +601,40 @@ defineExpose({
                         <div class="flex items-start">
                             <div class="flex-grow">
                                 <div class="flex items-center mb-1">
-                                    <a-tag class="rounded-lg mr-3">
+                                    <a-tag class="rounded-lg mr-3"
+                                           :color="calculateCustomLength(record.text) > getMaxLength(record)?'red':undefined">
                                         {{ index + 1 }}
                                     </a-tag>
-                                    <div class="text-xs text-gray-600 font-mono select-none"
-                                         @click.stop="onRecordSelect(index, $event)">
+                                    <div class="flex-grow text-xs text-gray-600 font-mono select-none">
                                         {{ TimeUtil.msToTime(record.start) }} - {{ TimeUtil.msToTime(record.end) }}
                                     </div>
+                                    <div class="flex items-center gap-3" @click.stop>
+                                        <div class="text-xs font-mono bg-gray-100 rounded-lg px-2 leading-6"
+                                             :class="{'bg-red-100 text-red-600': calculateCustomLength(record.text) > getMaxLength(record)}">
+                                            {{ calculateCustomLength(record.text) }}
+                                            /
+                                            {{ getMaxLength(record) }}
+                                        </div>
+                                        <a-button v-if="index>0" size="mini" @click="doMergeToPrevious(index)">
+                                            <template #icon>
+                                                <icon-arrow-up/>
+                                            </template>
+                                            合并到前一条
+                                        </a-button>
+                                        <a-checkbox
+                                            :model-value="selectedIndexes.includes(index)"
+                                            @change="(checked) => onCheckboxChange(index, checked)"
+                                            class="ml-2 self-start"
+                                        />
+                                    </div>
                                 </div>
-                                <div class="text-sm">
+                                <div class="text-sm" @click.stop>
                                     <a-textarea
                                         v-model="record.text"
-                                        :max-length="1000"
                                         :auto-size="{minRows: 1, maxRows: 3}"
-                                        show-word-limit
                                         size="mini"
                                         :textarea-attrs="{tabindex:index}"
+                                        show-word-limit
                                         placeholder="输入文本"
                                     />
                                 </div>
@@ -504,11 +648,6 @@ defineExpose({
                                     />
                                 </div>
                             </div>
-                            <a-checkbox
-                                :checked="selectedIndexes.includes(index)"
-                                @change="(checked) => onCheckboxChange(index, checked)"
-                                class="ml-2 self-start"
-                            />
                         </div>
                     </div>
                 </div>

@@ -121,10 +121,7 @@ export const LongTextTts: TaskBiz = {
                 if (ret.type === "retry") {
                     return ret.type;
                 }
-                record.audio = await $mapi.file.hubSave(ret.url, {
-                    saveGroup: "part",
-
-                });
+                record.audio = await $mapi.file.hubSave(ret.url);
                 await TaskService.update(bizId, {jobResult});
             }
             jobResult.step = "Combine";
@@ -145,10 +142,7 @@ export const LongTextTts: TaskBiz = {
             const filesToClean: string[] = [];
             try {
                 const audio = await ffmpegConcatAudio(jobResult.SoundGenerate.records!.map(r => r.audio));
-                jobResult.Combine.audio = await $mapi.file.hubSave(audio, {
-                    saveGroup: "part",
-
-                });
+                jobResult.Combine.audio = await $mapi.file.hubSave(audio);
                 jobResult.step = "End";
                 jobResult.Combine.status = "success";
                 await TaskService.update(bizId, {

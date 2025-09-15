@@ -14,7 +14,8 @@ export type SoundReplaceJobResultType = {
     // 3 确认 Confirm
     // 4 合成 SoundGenerate
     // 5 替换 Combine
-    step: "ToAudio" | "SoundAsr" | "Confirm" | "SoundGenerate" | "Combine" | "End";
+    // 6 替换确认 CombineConfirm
+    step: "ToAudio" | "SoundAsr" | "Confirm" | "SoundGenerate" | "Combine" | "CombineConfirm" | "End";
 
     ToAudio: {
         status: TaskJobResultStepStatus,
@@ -45,4 +46,7 @@ export type SoundReplaceJobResultType = {
         audio: string;
         file: string;
     };
+    CombineConfirm:{
+        status: TaskJobResultStepStatus,
+    }
 };

@@ -104,7 +104,7 @@ const subtitleText = computed(() => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file-audio/>
-                    {{ $t("音频合并") }}
+                    {{ $t("视频添加音频") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Combine">

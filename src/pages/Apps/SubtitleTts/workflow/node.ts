@@ -8,6 +8,7 @@ import SubtitleTtsIcon from "./../assets/icon.svg";
 export default <NodeFunctionCall>{
     name: "SubtitleTts",
     title: t("字幕转音频"),
+    description: "将字幕文件转换为音频文件",
     icon: SubtitleTtsIcon,
     comp: defineAsyncComponent(() => import("./SubtitleTtsNode.vue")),
     inputFields: [

@@ -1,13 +1,14 @@
 import {defineAsyncComponent} from "vue";
-import {NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult} from "../../../../module/Workflow/core/type";
-import {SoundReplaceRun} from "../task";
 import {t} from "../../../../lang";
-import SoundReplaceIcon from "./../assets/icon.svg"
+import {NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult} from "../../../../module/Workflow/core/type";
 import {workflowRun} from "../../common/workflow";
+import {SoundReplaceRun} from "../task";
+import SoundReplaceIcon from "./../assets/icon.svg";
 
 export default <NodeFunctionCall>{
     name: "SoundReplace",
     title: t("声音替换"),
+    description: "替换视频中的音频",
     icon: SoundReplaceIcon,
     comp: defineAsyncComponent(() => import("./SoundReplaceNode.vue")),
     inputFields: [

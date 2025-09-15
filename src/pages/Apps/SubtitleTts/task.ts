@@ -122,10 +122,7 @@ export const SubtitleTts: TaskBiz = {
                 if (ret.type === "retry") {
                     return ret.type;
                 }
-                record.audio = await $mapi.file.hubSave(ret.url, {
-                    saveGroup: "part",
-
-                });
+                record.audio = await $mapi.file.hubSave(ret.url);
                 await TaskService.update(bizId, {jobResult});
             }
             jobResult.step = "Combine";
@@ -155,10 +152,7 @@ export const SubtitleTts: TaskBiz = {
                 );
                 filesToClean.push(...cleans);
                 jobResult.Combine.records = mergeRecords;
-                jobResult.Combine.audio = await $mapi.file.hubSave(output, {
-                    saveGroup: "part",
-
-                });
+                jobResult.Combine.audio = await $mapi.file.hubSave(output);
                 jobResult.step = "End";
                 jobResult.Combine.status = "success";
                 await TaskService.update(bizId, {

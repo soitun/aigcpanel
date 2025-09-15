@@ -39,7 +39,6 @@ const doLoad = async () => {
             Dialog.tipError(t("未找到记录"));
             return;
         }
-        onShow();
     } catch (error) {
         Dialog.tipError(t("加载记录失败 {error}", {error}));
     } finally {
@@ -69,10 +68,11 @@ const onClose = () => {
 };
 
 defineExpose({
-    show: (id: number) => {
+    show: async (id: number) => {
         currentId.value = id;
         visible.value = true;
-        doLoad();
+        await doLoad();
+        onShow();
     },
 });
 </script>
