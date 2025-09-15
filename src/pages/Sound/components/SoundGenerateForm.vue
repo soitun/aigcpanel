@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import {onMounted, ref, watch} from "vue";
+import { onMounted, ref, watch } from "vue";
 import ParamForm from "../../../components/common/ParamForm.vue";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
 import ServerSelector from "../../../components/Server/ServerSelector.vue";
-import {t} from "../../../lang";
-import {Dialog} from "../../../lib/dialog";
-import {StorageUtil} from "../../../lib/storage";
-import {StorageService} from "../../../service/StorageService";
-import {useServerStore} from "../../../store/modules/server";
-import {EnumServerStatus} from "../../../types/Server";
+import { t } from "../../../lang";
+import { Dialog } from "../../../lib/dialog";
+import { StorageUtil } from "../../../lib/storage";
+import { StorageService } from "../../../service/StorageService";
+import { useServerStore } from "../../../store/modules/server";
+import { EnumServerStatus } from "../../../types/Server";
 import SoundPromptDialog from "./SoundPromptDialog.vue";
 import SoundPromptSelector from "./SoundPromptSelector.vue";
 
@@ -123,8 +123,30 @@ const getValue = async (): Promise<SoundGenerateParamType | undefined> => {
     return data;
 };
 
+const setValue = (data: Partial<SoundGenerateParamType>) => {
+    if (data.type !== undefined) {
+        formData.value.type = data.type;
+    }
+    if (data.ttsServerKey !== undefined) {
+        formData.value.ttsServerKey = data.ttsServerKey;
+    }
+    if (data.cloneServerKey !== undefined) {
+        formData.value.cloneServerKey = data.cloneServerKey;
+    }
+    if (data.promptId !== undefined) {
+        formData.value.promptId = data.promptId;
+    }
+    if (data.ttsParam !== undefined) {
+        ttsParamForm.value?.setValue(data.ttsParam);
+    }
+    if (data.cloneParam !== undefined) {
+        cloneParamForm.value?.setValue(data.cloneParam);
+    }
+};
+
 defineExpose({
     getValue,
+    setValue,
 });
 </script>
 
