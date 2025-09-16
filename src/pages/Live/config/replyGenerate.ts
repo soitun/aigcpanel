@@ -3,7 +3,7 @@ export const LiveReplyGenerateContent = `
 
 {reply}
 
-请以JSON的格式返回，不要返回任何多余的内容，格式如下：
+请以JSON的格式返回，不要返回任何多余的Markdown格式，格式如下：
 
 [
     {"content": "内容1"},

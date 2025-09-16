@@ -95,14 +95,12 @@ watch(
                         @click="doSelectProvider(p.id)"
                     >
                         <div class="mr-2">
-                            <a-avatar
-                                v-if="p.logo"
-                                :image-url="p.logo"
-                                :size="20"
-                                shape="square"
-                                style="border: 1px solid #ccc"
-                            />
-                            <a-avatar v-else :size="20" shape="square" :style="{backgroundColor: '#3370ff'}">
+                            <img v-if="p.logo"
+                                 class="w-[20px] h-[20px] rounded"
+                                 style="background:#EEE;border:1px solid #EEE;"
+                                 :src="p.logo"/>
+                            <a-avatar v-else :size="20" shape="square"
+                                      :style="{backgroundColor: '#3370ff'}">
                                 {{ p.title }}
                             </a-avatar>
                         </div>
@@ -190,14 +188,14 @@ watch(
                         </div>
                     </div>
                 </div>
-                <div class="mb-3 flex items-center" v-if="provider.id === 'buildIn'">
+                <div class="mb-3 flex border rounded p-3 items-center" v-if="provider.id === 'buildIn'">
                     <div class="flex-grow">
-                        <icon-check/>
-                        {{ $t("内置模型无需配置可直接使用") }}
-                    </div>
-                    <div>
                         {{ $t("可用Token") }}
                         <span class="font-bold">{{ ((userStore.data.lmApi?.quota || 0) / 1000).toFixed(2) }}K</span>
+                    </div>
+                    <div class="text-gray-400">
+                        <icon-check class="text-green-600" />
+                        {{ $t("内置模型无需配置可直接使用") }}
                     </div>
                     <div>
                         <a-button class="ml-2" @click="doUser">
