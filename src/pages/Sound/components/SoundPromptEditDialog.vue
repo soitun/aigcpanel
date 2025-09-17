@@ -95,7 +95,7 @@ const emit = defineEmits({
                             <div class="w-full">
                                 <div class="mb-3">
                                     <a-alert>
-                                        {{ $t("参考声音需要大于 3s 小于 30s，保证声音清晰可见") }}
+                                        {{ $t("参考声音控制在 6～20s，保证声音清晰可见") }}
                                     </a-alert>
                                 </div>
                                 <div class="mb-3">
