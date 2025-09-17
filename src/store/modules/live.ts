@@ -13,6 +13,11 @@ import {mapError} from "../../lib/error";
 
 const serverStore = useServerStore();
 
+export const liveModels = [
+    {value: "wav2lip256", title: "Wav2Lip标准版"},
+    {value: "wav2lip384", title: "Wav2Lip清晰版"},
+]
+
 const SCENE_ID = "live";
 const EMPTY_LIVE_STATUS = {
     id: SCENE_ID,
@@ -86,6 +91,7 @@ export const liveStore = defineStore("live", {
             }[],
         },
         localConfig: {
+            model: "wav2lip256" as typeof liveModels[number]["value"],
             mode: "avatar" as "avatar" | "audio",
             avatar: {
                 width: 720,
@@ -127,7 +133,9 @@ export const liveStore = defineStore("live", {
     }),
     actions: {
         async init() {
-            const localConfig = await window.$mapi.storage.get("live", "config", {});
+            const localConfig = await $mapi.storage.get("live", "config", {});
+            // console.log('live.init', localConfig)
+            this.localConfig.model = localConfig.model || this.localConfig.model;
             this.localConfig.mode = localConfig.mode || this.localConfig.mode;
             this.localConfig.avatar.width = localConfig.avatar?.width || this.localConfig.avatar.width;
             this.localConfig.avatar.height = localConfig.avatar?.height || this.localConfig.avatar.height;
@@ -160,7 +168,7 @@ export const liveStore = defineStore("live", {
             await this.statusUpdate();
         },
         async saveLocalConfig() {
-            await window.$mapi.storage.set("live", "config", ObjectUtil.clone(this.localConfig));
+            await $mapi.storage.set("live", "config", ObjectUtil.clone(this.localConfig));
         },
         async onKnowledgeUpdate() {
             if (this.status !== "running") {
@@ -256,7 +264,7 @@ export const liveStore = defineStore("live", {
                 };
             }
             const serverInfo = await serverStore.serverInfo(this.server);
-            return await window.$mapi.server.callFunctionWithException(serverInfo, "apiRequest", {
+            return await $mapi.server.callFunctionWithException(serverInfo, "apiRequest", {
                 id: "live",
                 result: {},
                 url,
@@ -276,7 +284,7 @@ export const liveStore = defineStore("live", {
                 if (!["server-live-indextts"].includes(server.name)) {
                     continue;
                 }
-                const res = await window.$mapi.server.config(await serverStore.serverInfo(server));
+                const res = await $mapi.server.config(await serverStore.serverInfo(server));
                 if (res.code) {
                     Dialog.tipError(mapError(res.msg));
                     continue;
@@ -408,6 +416,7 @@ export const liveStore = defineStore("live", {
             // console.log('live.start', this.localConfig)
             const configPost = {
                 id: SCENE_ID,
+                model: this.localConfig.model,
                 avatar: {
                     enable: this.localConfig.mode === "avatar",
                     width: this.localConfig.avatar.width,
@@ -435,7 +444,7 @@ export const liveStore = defineStore("live", {
                 data: await this.buildData(),
             };
             const configPostContent = JSON.stringify(configPost, null, 2);
-            await window.$mapi.file.write("data-live-last.json", configPostContent);
+            await $mapi.file.write("data-live-last.json", configPostContent);
             this.status = "starting";
             this.statusMsg = "";
             const res = await this.apiRequest("scene/start", {
@@ -502,7 +511,7 @@ export const liveStore = defineStore("live", {
             await this.saveLocalConfig();
             window.__page.offBroadcast("MonitorEvent", this.onMonitorBroadcast);
             window.__page.onBroadcast("MonitorEvent", this.onMonitorBroadcast);
-            await window.$mapi.app.windowOpen("monitor", {
+            await $mapi.app.windowOpen("monitor", {
                 title: "直播监听",
                 width: 1300,
                 height: 800,
@@ -513,7 +522,7 @@ export const liveStore = defineStore("live", {
             });
         },
         async stopMonitor() {
-            await window.$mapi.app.windowClose("monitor");
+            await $mapi.app.windowClose("monitor");
         },
     },
 });
