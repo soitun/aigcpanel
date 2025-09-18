@@ -2,11 +2,9 @@
 import {computed, onMounted, ref} from "vue";
 import {t} from "../lang";
 import Router from "../router";
-import VideoGenFlow from "./Apps/VideoGenFlow/VideoGenFlow.vue";
 import VideoGen from "./Video/VideoGen.vue";
 import VideoTemplate from "./Video/VideoTemplate.vue";
 import {VideoApps} from "./Apps/all";
-import SoundAsr from "./Sound/SoundAsr.vue";
 
 const tab = ref("");
 
@@ -54,15 +52,15 @@ const dynamicComponent = computed(() => {
                 @click="tab = s.name"
             >
                 <div class="text-base truncate flex items-center">
-                    <img :src="s.icon" class="w-4 h-4 mr-2 object-contain" />
+                    <img :src="s.icon" class="w-4 h-4 mr-2 object-contain"/>
                     {{ s.title }}
                 </div>
             </div>
         </div>
         <div class="flex-grow h-full overflow-y-auto">
-            <VideoGen v-if="tab === 'videoGen'" />
-            <VideoTemplate v-else-if="tab === 'videoTemplate'" />
-            <component v-else :is="dynamicComponent" />
+            <VideoGen v-if="tab === 'videoGen'"/>
+            <VideoTemplate v-else-if="tab === 'videoTemplate'"/>
+            <component v-else :is="dynamicComponent"/>
         </div>
     </div>
 </template>

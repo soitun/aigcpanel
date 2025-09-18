@@ -76,7 +76,7 @@ const doSubmit = async () => {
             <a-textarea
                 v-model="formData.prompt"
                 :placeholder="$t('请输入生成图像的提示')"
-                :auto-size="{ minRows: 3, maxRows: 10 }"
+                :auto-size="{ minRows: 2, maxRows: 10 }"
             />
         </div>
         <div class="flex">

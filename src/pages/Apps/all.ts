@@ -12,6 +12,11 @@ import SoundReplaceIcon from "./SoundReplace/assets/icon.svg";
 
 import VideoGenFlowIcon from "./VideoGenFlow/assets/icon.svg";
 
+import TextToImage from "./TextToImage/TextToImage.vue";
+import TextToImageIcon from "./TextToImage/assets/icon.svg";
+import ImageToImage from "./ImageToImage/ImageToImage.vue";
+import ImageToImageIcon from "./ImageToImage/assets/icon.svg";
+
 import FeedbackIcon from "./../../assets/image/feedback.svg";
 
 export const SoundApps = [
@@ -48,6 +53,23 @@ export const VideoApps = [
     },
 ];
 
+export const ImageApps = [
+    {
+        name: "TextToImage",
+        title: t("文生图"),
+        description: t("根据文本描述生成图片"),
+        icon: TextToImageIcon,
+        component: TextToImage,
+    },
+    {
+        name: "ImageToImage",
+        title: t("图生图"),
+        description: t("根据输入图片+描述提示生成新的图片"),
+        icon: ImageToImageIcon,
+        component: ImageToImage,
+    }
+];
+
 export const AllApps = [
     ...(SoundApps.map(app => ({
         ...app,
@@ -56,6 +78,10 @@ export const AllApps = [
     ...(VideoApps.map(app => ({
         ...app,
         url: `/video?tab=${app.name}`,
+    })) as any),
+    ...(ImageApps.map(app => ({
+        ...app,
+        url: `/image?tab=${app.name}`,
     })) as any),
     {
         title: t("工具需求"),

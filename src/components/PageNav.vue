@@ -23,6 +23,8 @@ const activeTab = computed(() => {
             return "sound";
         case "/video":
             return "video";
+        case "/image":
+            return "image";
         case "/live":
             return "live";
         case "/tool":
@@ -103,6 +105,17 @@ const doUser = async () => {
                     <i class="iconfont icon-video text-xl"></i>
                 </div>
                 <div class="text-sm">{{ $t("视频") }}</div>
+            </a>
+            <a
+                class="page-nav-item block text-center py-3"
+                :class="activeTab === 'image' ? 'active' : ''"
+                @click="$router.push('/image')"
+                href="javascript:;"
+            >
+                <div>
+                    <icon-image class="text-xl" />
+                </div>
+                <div class="text-sm">{{ $t("图片") }}</div>
             </a>
             <a
                 class="page-nav-item block text-center py-3"

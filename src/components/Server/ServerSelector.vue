@@ -62,6 +62,11 @@ watch(
                     </div>
                 </div>
             </a-option>
+            <a-option v-if="recordsFilter.length === 0" disabled>
+                <div class="text-xs py-2">
+                    {{ $t("没有可用本地模型") }}
+                </div>
+            </a-option>
         </a-optgroup>
         <a-optgroup :label="$t('升级Pro版，畅享云模型')"></a-optgroup>
         <template #label="{data}">
