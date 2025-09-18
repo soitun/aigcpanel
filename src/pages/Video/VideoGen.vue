@@ -52,14 +52,14 @@ const doRefresh = async () => {
                 <a-tooltip v-if="0" :content="$t('清空历史')" position="right" mini>
                     <a-button class="ml-1">
                         <template #icon>
-                            <icon-delete />
+                            <icon-delete/>
                         </template>
                     </a-button>
                 </a-tooltip>
             </div>
         </div>
         <div>
-            <VideoGenCreate ref="videoGenCreate" @submitted="doRefresh" />
+            <VideoGenCreate ref="videoGenCreate" @submitted="doRefresh"/>
             <div v-if="records.length > 0">
                 <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
                     <div class="flex-grow flex items-center">
@@ -72,8 +72,8 @@ const doRefresh = async () => {
                                 {{ $t("全选") }}
                             </a-checkbox>
                         </div>
-                        <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh" />
-                        <TaskBatchDownloadAction :records="checkRecords" />
+                        <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh"/>
+                        <TaskBatchDownloadAction :records="checkRecords"/>
                     </div>
                     <div>
                         <a-pagination
@@ -87,10 +87,10 @@ const doRefresh = async () => {
                 </div>
                 <div v-for="r in recordsForPage" :key="r.id">
                     <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
-                        <div class="flex items-center">
+                        <div class="flex items-center gap-1">
                             <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
                                 <div class="mr-2 h-8 pt-0.5">
-                                    <a-checkbox v-model="r['_check']" />
+                                    <a-checkbox v-model="r['_check']"/>
                                 </div>
                                 <div class="">
                                     <TaskTitleField
@@ -101,19 +101,15 @@ const doRefresh = async () => {
                                 </div>
                             </div>
                             <div class="flex-grow"></div>
-                            <div class="ml-1">
-                                <TaskDuration :start="r.startTime" :end="r.endTime" />
-                            </div>
-                            <div class="ml-1">
-                                <TaskBizStatus :status="r.status" :status-msg="r.statusMsg" />
-                            </div>
+                            <TaskDuration :start="r.startTime" :end="r.endTime"/>
+                            <TaskBizStatus :status="r.status" :status-msg="r.statusMsg"/>
                         </div>
                         <div class="mt-3 flex gap-1">
-                            <ServerNameVersion :record="r" />
-                            <VideoGenFormViewBody :data="r.modelConfig" />
-                            <ServerTaskResultParam :record="r as any" />
+                            <ServerNameVersion :record="r"/>
+                            <VideoGenFormViewBody :data="r.modelConfig"/>
+                            <ServerTaskResultParam :record="r as any"/>
                         </div>
-                        <div class="pt-4 flex">
+                        <div class="pt-2 flex">
                             <div class="flex-grow">
                                 <div v-if="r.modelConfig.soundType === 'soundGenerate'">
                                     <div class="mb-2">
@@ -123,43 +119,43 @@ const doRefresh = async () => {
                                         </a-tag>
                                     </div>
                                     <div class="bg-gray-100 rounded-lg p-2 mb-3">
-                                        <TextTruncateView :text="r.modelConfig.soundGenerateText" />
+                                        <TextTruncateView :text="r.modelConfig.soundGenerateText"/>
                                     </div>
                                 </div>
                                 <div v-if="r.modelConfig.soundType === 'soundCustom'">
                                     <div class="mb-2">
                                         <a-tag class="rounded-lg">
-                                            <icon-file />
+                                            <icon-file/>
                                             {{ $t("本地文件") }}
                                         </a-tag>
                                     </div>
                                     <div class="flex-grow">
-                                        <AudioPlayer :url="`file://${r.modelConfig.soundCustomFile}`" />
+                                        <AudioPlayer :url="`file://${r.modelConfig.soundCustomFile}`"/>
                                     </div>
                                 </div>
                             </div>
                             <div class="flex-shrink-0 ml-8">
                                 <div class="p-2 rounded shadow bg-gray-300" v-if="r.result.url">
                                     <div class="w-48 h-48">
-                                        <VideoPlayer :url="'file://' + r.result.url" />
+                                        <VideoPlayer :url="'file://' + r.result.url"/>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="pt-4 flex items-center">
                             <div class="text-gray-400 flex-grow">
-                                <timeago :datetime="r['createdAt'] * 1000" />
+                                <timeago :datetime="r['createdAt'] * 1000"/>
                             </div>
                             <div class="">
-                                <TaskDownloadAction :record="r" />
-                                <TaskDeleteAction :record="r" @update="doRefresh" />
-                                <TaskCancelAction :record="r" />
+                                <TaskDownloadAction :record="r"/>
+                                <TaskDeleteAction :record="r" @update="doRefresh"/>
+                                <TaskCancelAction :record="r"/>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <m-empty v-else />
+            <m-empty v-else/>
         </div>
     </div>
 </template>

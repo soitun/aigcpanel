@@ -84,7 +84,7 @@ onMounted(async () => {
                 </div>
                 <div v-for="r in recordsForPage" :key="r.id">
                     <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
-                        <div class="flex items-center">
+                        <div class="flex items-center gap-1">
                             <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
                                 <div class="mr-2 h-8 pt-0.5">
                                     <a-checkbox v-model="r['_check']"/>
@@ -98,12 +98,8 @@ onMounted(async () => {
                                 </div>
                             </div>
                             <div class="flex-grow"></div>
-                            <div class="ml-1">
-                                <TaskDuration :start="r.startTime" :end="r.endTime"/>
-                            </div>
-                            <div class="ml-1">
-                                <TaskBizStatus :status="r.status" :status-msg="r.statusMsg"/>
-                            </div>
+                            <TaskDuration :start="r.startTime" :end="r.endTime"/>
+                            <TaskBizStatus :status="r.status" :status-msg="r.statusMsg"/>
                         </div>
                         <div class="mt-3 flex gap-1 flex-wrap">
                             <ServerNameVersion :record="r"/>

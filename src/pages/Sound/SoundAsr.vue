@@ -89,7 +89,7 @@ const onEditSave = async (taskId: number, records: AsrRecord[]) => {
             </div>
         </div>
         <div>
-            <SoundAsrCreate @submitted="doRefresh" />
+            <SoundAsrCreate @submitted="doRefresh"/>
             <div v-if="records.length > 0">
                 <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
                     <div class="flex-grow flex items-center">
@@ -102,8 +102,8 @@ const onEditSave = async (taskId: number, records: AsrRecord[]) => {
                                 {{ $t("全选") }}
                             </a-checkbox>
                         </div>
-                        <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh" />
-                        <TaskBatchDownloadAction :records="checkRecords" />
+                        <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh"/>
+                        <TaskBatchDownloadAction :records="checkRecords"/>
                     </div>
                     <div>
                         <a-pagination
@@ -117,10 +117,10 @@ const onEditSave = async (taskId: number, records: AsrRecord[]) => {
                 </div>
                 <div v-for="r in recordsForPage" :key="r.id">
                     <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
-                        <div class="flex items-center">
+                        <div class="flex items-center gap-1">
                             <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
                                 <div class="mr-2 h-8 pt-0.5">
-                                    <a-checkbox v-model="r['_check']" />
+                                    <a-checkbox v-model="r['_check']"/>
                                 </div>
                                 <div class="">
                                     <TaskTitleField
@@ -131,33 +131,29 @@ const onEditSave = async (taskId: number, records: AsrRecord[]) => {
                                 </div>
                             </div>
                             <div class="flex-grow"></div>
-                            <div class="ml-1">
-                                <TaskDuration :start="r.startTime" :end="r.endTime" />
-                            </div>
-                            <div class="ml-1">
-                                <TaskBizStatus :status="r.status" :status-msg="r.statusMsg" />
-                            </div>
+                            <TaskDuration :start="r.startTime" :end="r.endTime"/>
+                            <TaskBizStatus :status="r.status" :status-msg="r.statusMsg"/>
                         </div>
                         <div class="mt-3 flex gap-1 flex-wrap">
-                            <ServerNameVersion :record="r" />
-                            <ServerTaskResultParam :record="r as any" />
+                            <ServerNameVersion :record="r"/>
+                            <ServerTaskResultParam :record="r as any"/>
                         </div>
 
                         <div v-if="r.result && r.runtime?.text" class="mt-3">
                             <div class="bg-gray-100 rounded-lg p-2">
-                                <TextTruncateView :text="r.runtime?.text" />
+                                <TextTruncateView :text="r.runtime?.text"/>
                             </div>
                         </div>
 
                         <div class="pt-4 flex items-center">
                             <div class="text-gray-400 flex-grow">
-                                <timeago :datetime="r['createdAt'] * 1000" />
+                                <timeago :datetime="r['createdAt'] * 1000"/>
                             </div>
                             <div class="">
                                 <a-tooltip v-if="r.result && r.runtime?.text" :content="$t('复制文本')" mini>
                                     <a-button class="mr-2" @click="doCopy(r.runtime?.text)" title="复制识别结果">
                                         <template #icon>
-                                            <icon-copy />
+                                            <icon-copy/>
                                         </template>
                                     </a-button>
                                 </a-tooltip>
@@ -168,9 +164,9 @@ const onEditSave = async (taskId: number, records: AsrRecord[]) => {
                                         "
                                         class="mr-2"
                                     >
-                                        <icon-download />
+                                        <icon-download/>
                                         <template #icon>
-                                            <icon-down />
+                                            <icon-down/>
                                         </template>
                                         <template #content>
                                             <a-doption
@@ -196,21 +192,21 @@ const onEditSave = async (taskId: number, records: AsrRecord[]) => {
                                         title="编辑识别结果"
                                     >
                                         <template #icon>
-                                            <icon-edit />
+                                            <icon-edit/>
                                         </template>
                                     </a-button>
                                 </a-tooltip>
-                                <TaskDeleteAction :record="r" @update="doRefresh" />
-                                <TaskCancelAction :record="r" />
+                                <TaskDeleteAction :record="r" @update="doRefresh"/>
+                                <TaskCancelAction :record="r"/>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <m-empty v-else :text="$t('暂无语音识别任务')" />
+            <m-empty v-else :text="$t('暂无语音识别任务')"/>
         </div>
 
         <!-- 编辑弹窗 -->
-        <SoundAsrRecordsEditDialog ref="soundAsrRecordsEditDialog" @save="onEditSave" />
+        <SoundAsrRecordsEditDialog ref="soundAsrRecordsEditDialog" @save="onEditSave"/>
     </div>
 </template>

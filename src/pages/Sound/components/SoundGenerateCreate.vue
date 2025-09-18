@@ -7,6 +7,9 @@ import {Dialog} from "../../../lib/dialog";
 import {t} from "../../../lang";
 import {TaskRecord, TaskService} from "../../../service/TaskService";
 import {PermissionService} from "../../../service/PermissionService";
+import ModelGenerateButton from "../../../module/Model/ModelGenerateButton.vue";
+import ModelAgentButton from "../../../module/Model/ModelAgentButton.vue";
+import {SoundGenerateTextPrompt} from "../config/prompt";
 
 const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm>>();
 const formData = ref({
@@ -55,7 +58,7 @@ const doSubmit = async () => {
     emit("submitted");
 };
 
-const doSubmitBatch = async (records: {text: string}[]) => {
+const doSubmitBatch = async (records: { text: string }[]) => {
     const value = await soundGenerateForm.value?.getValue();
     if (!value) {
         return;
@@ -103,7 +106,7 @@ const emit = defineEmits({
                 :placeholder="$t('输入语音内容开始合成')"
             ></a-textarea>
         </div>
-        <SoundGenerateForm ref="soundGenerateForm" />
+        <SoundGenerateForm ref="soundGenerateForm"/>
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 {{ $t("开始合成") }}
@@ -113,6 +116,7 @@ const emit = defineEmits({
                 :confirm-text="$t('提交合成')"
                 @submit="doSubmitBatch"
             />
+            <ModelAgentButton biz="SoundGenerateTextPrompt" :prompt-default="SoundGenerateTextPrompt"/>
         </div>
     </div>
 </template>
