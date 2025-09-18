@@ -50,3 +50,25 @@ declare type VideoGenParamType = {
     videoTemplateName: string;
     videoTemplateUrl: string;
 };
+
+declare type TextToImageParamType = {
+    serverName: string;
+    serverTitle: string;
+    serverVersion: string;
+    type: "TextToImage";
+    serverKey: string;
+    param: {
+        [key: string]: any;
+    };
+};
+
+declare type ImageToImageParamType = {
+    serverName: string;
+    serverTitle: string;
+    serverVersion: string;
+    type: "ImageToImage";
+    serverKey: string;
+    param: {
+        [key: string]: any;
+    };
+};

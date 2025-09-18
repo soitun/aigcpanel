@@ -15,6 +15,8 @@ export type TaskBiz =
     | "SubtitleTts"
     | "SoundReplace"
     // video apps
+    | "TextToImage"
+    | "ImageToImage"
     | "VideoGenFlow";
 
 export type TaskJobResultStepStatus = undefined | "queue" | "pending" | "running" | "success" | "fail";

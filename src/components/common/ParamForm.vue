@@ -142,9 +142,18 @@ defineExpose({
             </a-input>
         </div>
         <div v-else-if="item.type === 'inputNumber'" class="w-24 mr-3">
-            <a-input-number :placeholder="item.placeholder" size="small" v-model="item.value" :disabled="props.disabled"
-                            :min="item.min" :max="item.max">
-            </a-input-number>
+            <div class="flex items-center gap-1">
+                <a-input-number :placeholder="item.placeholder" size="small" v-model="item.value"
+                                :disabled="props.disabled"
+                                :min="item.min" :max="item.max">
+                </a-input-number>
+                <a-tooltip v-if="item.name==='seed'"
+                           :content="$t('点击生成随机种子，种子相同则生成的结果相同')">
+                    <icon-refresh
+                        @click="item.value = Math.floor(Math.random() * 1000000)"
+                        class="cursor-pointer text-gray-400 w-4 h-4"/>
+                </a-tooltip>
+            </div>
         </div>
         <div v-else-if="item.type === 'select'" class="mr-3">
             <a-select :placeholder="item.placeholder" size="small" style="width: auto" :disabled="props.disabled"

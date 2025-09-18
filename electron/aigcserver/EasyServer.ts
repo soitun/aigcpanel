@@ -35,7 +35,8 @@ export const EasyServer = function (config: any) {
     this.send = function (type: SendType, data: any) {
         this.ServerApi.event.sendChannel(this.ServerInfo.eventChannelName, {type, data});
     };
-    this.init = async function () {};
+    this.init = async function () {
+    };
     this.config = async function () {
         return {
             code: 0,
@@ -330,6 +331,63 @@ export const EasyServer = function (config: any) {
                 }
                 return {
                     records: launcherResult.result.records,
+                };
+            }
+        );
+    };
+    this.textToImage = async function (data: ServerFunctionDataType) {
+        // console.log('textToImage', {data, serverInfo: this.ServerInfo})
+        return this._callFunc(
+            data,
+            async (data: ServerFunctionDataType) => {
+                return {
+                    id: data.id,
+                    mode: "local",
+                    modelConfig: {
+                        type: "textToImage",
+                        prompt: data.prompt,
+                        param: data.param,
+                    },
+                };
+            },
+            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+                if (!("url" in launcherResult.result)) {
+                    if (launcherResult.result.error) {
+                        throw launcherResult.result.error;
+                    }
+                    throw "执行失败，请查看模型日志";
+                }
+                return {
+                    url: launcherResult.result.url,
+                };
+            }
+        );
+    };
+    this.imageToImage = async function (data: ServerFunctionDataType) {
+        // console.log('imageToImage', {data, serverInfo: this.ServerInfo})
+        return this._callFunc(
+            data,
+            async (data: ServerFunctionDataType) => {
+                return {
+                    id: data.id,
+                    mode: "local",
+                    modelConfig: {
+                        type: "imageToImage",
+                        image: data.image,
+                        prompt: data.prompt,
+                        param: data.param,
+                    },
+                };
+            },
+            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+                if (!("url" in launcherResult.result)) {
+                    if (launcherResult.result.error) {
+                        throw launcherResult.result.error;
+                    }
+                    throw "执行失败，请查看模型日志";
+                }
+                return {
+                    url: launcherResult.result.url,
                 };
             }
         );

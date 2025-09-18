@@ -1,29 +1,39 @@
-import {useServerStore} from "../store/modules/server";
-import {TaskBiz} from "../service/TaskService";
 import {getDataContent} from "../components/common/dataConfig";
 import {SoundGenerateReplaceContent} from "../pages/Sound/config/replaceContent";
+import {TaskBiz} from "../service/TaskService";
+import {useServerStore} from "../store/modules/server";
 
 const serverStore = useServerStore();
+
+type ServerCallOptionType = {
+    cache: boolean,
+}
 
 export const serverSoundAsr = async (
     biz: TaskBiz,
     bizId: string,
     soundAsr: SoundAsrParamType,
     result: {},
-    audio: string
+    audio: string,
+    option?: ServerCallOptionType
 ): Promise<{
     type: string;
     start: number;
     end: number;
     records: any[];
 }> => {
-    const cacheRecords = await $mapi.file.cacheGet<any[]>({soundAsr, audio});
-    if (cacheRecords) {
-        return {
-            type: "success",
-            start: 0,
-            end: 0,
-            records: cacheRecords,
+    option = Object.assign({
+        cache: true,
+    }, option) as ServerCallOptionType;
+    if (option.cache) {
+        const cacheRecords = await $mapi.file.cacheGet<any[]>({soundAsr, audio});
+        if (cacheRecords) {
+            return {
+                type: "success",
+                start: 0,
+                end: 0,
+                records: cacheRecords,
+            }
         }
     }
     const server = await serverStore.getByKey(soundAsr.serverKey);
@@ -31,7 +41,7 @@ export const serverSoundAsr = async (
         throw `SoundAsr server not found: ${soundAsr.serverKey}`;
     }
     const serverInfo = await serverStore.serverInfo(server);
-    const res = await window.$mapi.server.callFunctionWithException(serverInfo, "asr", {
+    const res = await $mapi.server.callFunctionWithException(serverInfo, "asr", {
         id: serverStore.generateTaskId(biz, bizId),
         result: result,
         param: soundAsr.param,
@@ -87,7 +97,8 @@ export const serverSoundGenerate = async (
     bizId: string,
     soundGenerate: SoundGenerateParamType,
     result: {},
-    text: string
+    text: string,
+    option?: ServerCallOptionType
 ): Promise<{
     type: string;
     start: number;
@@ -95,13 +106,18 @@ export const serverSoundGenerate = async (
     url: string;
 }> => {
     text = await replaceSoundGenerateText(text);
-    const cacheUrl = await $mapi.file.cacheGetPath({soundGenerate, text});
-    if (cacheUrl) {
-        return {
-            type: "success",
-            start: 0,
-            end: 0,
-            url: cacheUrl,
+    option = Object.assign({
+        cache: true,
+    }, option) as ServerCallOptionType;
+    if (option.cache) {
+        const cacheUrl = await $mapi.file.cacheGetPath({soundGenerate, text});
+        if (cacheUrl) {
+            return {
+                type: "success",
+                start: 0,
+                end: 0,
+                url: cacheUrl,
+            }
         }
     }
     const server = await serverStore.getByNameVersion(soundGenerate.serverName, soundGenerate.serverVersion);
@@ -146,6 +162,134 @@ export const serverSoundGenerate = async (
                 throw "SoundGenerate 生成结果为空，请检查参数是否正确";
             }
             await $mapi.file.cacheSet({soundGenerate, text}, ret.url);
+            break;
+        case "retry":
+            break;
+        default:
+            throw `unknown res.data.type : ${res.data.type}`;
+    }
+    return ret;
+};
+
+export const serverTextToImage = async (
+    biz: TaskBiz,
+    bizId: string,
+    textToImage: TextToImageParamType,
+    result: {},
+    prompt: string,
+    option?: ServerCallOptionType
+): Promise<{
+    type: string;
+    start: number;
+    end: number;
+    url: string;
+}> => {
+    option = Object.assign({
+        cache: true,
+    }, option) as ServerCallOptionType;
+    if (option.cache) {
+        const cacheUrl = await $mapi.file.cacheGetPath({textToImage, prompt});
+        if (cacheUrl) {
+            return {
+                type: "success",
+                start: 0,
+                end: 0,
+                url: cacheUrl,
+            }
+        }
+    }
+    const server = await serverStore.getByNameVersion(textToImage.serverName, textToImage.serverVersion);
+    if (!server) {
+        throw "TextToImage server not found: " + textToImage.serverName;
+    }
+    const serverInfo = await serverStore.serverInfo(server);
+    const res = await serverStore.call(serverInfo, "textToImage", {
+        id: serverStore.generateTaskId(biz, bizId),
+        result: result,
+        param: textToImage.param,
+        prompt: prompt,
+    });
+    if (res.code) {
+        throw res.msg || "TextToImage fail";
+    }
+    const ret = {
+        type: res.data.type,
+        start: 0,
+        end: 0,
+        url: "",
+    };
+    switch (res.data.type) {
+        case "success":
+            ret.url = res.data.data.url;
+            if (!ret.url) {
+                throw "TextToImage 生成结果为空，请检查参数是否正确";
+            }
+            await $mapi.file.cacheSet({textToImage, prompt}, ret.url);
+            break;
+        case "retry":
+            break;
+        default:
+            throw `unknown res.data.type : ${res.data.type}`;
+    }
+    return ret;
+};
+
+export const serverImageToImage = async (
+    biz: TaskBiz,
+    bizId: string,
+    imageToImage: ImageToImageParamType,
+    result: {},
+    prompt: string,
+    image: string,
+    option?: ServerCallOptionType
+): Promise<{
+    type: string;
+    start: number;
+    end: number;
+    url: string;
+}> => {
+    option = Object.assign({
+        cache: true,
+    }, option) as ServerCallOptionType;
+    if (option.cache) {
+        const cacheUrl = await $mapi.file.cacheGetPath({imageToImage, prompt, image});
+        if (cacheUrl) {
+            return {
+                type: "success",
+                start: 0,
+                end: 0,
+                url: cacheUrl,
+            }
+        }
+    }
+    const server = await serverStore.getByNameVersion(imageToImage.serverName, imageToImage.serverVersion);
+    if (!server) {
+        throw "ImageToImage server not found: " + imageToImage.serverName;
+    }
+    const serverInfo = await serverStore.serverInfo(server);
+    const res = await serverStore.call(serverInfo, "imageToImage", {
+        id: serverStore.generateTaskId(biz, bizId),
+        result: result,
+        param: imageToImage.param,
+        prompt: prompt,
+        image: image,
+    });
+    if (res.code) {
+        throw res.msg || "ImageToImage fail";
+    }
+    const ret = {
+        type: res.data.type,
+        start: 0,
+        end: 0,
+        url: "",
+    };
+    switch (res.data.type) {
+        case "success":
+            ret.url = res.data.data.url;
+            if (!ret.url) {
+                throw "ImageToImage 生成结果为空，请检查参数是否正确";
+            }
+            await $mapi.file.cacheSet({imageToImage, prompt, image}, ret.url);
             break;
         case "retry":
             break;

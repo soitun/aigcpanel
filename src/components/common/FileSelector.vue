@@ -17,12 +17,12 @@ const doSelectFile = async () => {
     if (!result) {
         return;
     }
-    const ext = FileUtil.getExt(result || '');
+    const ext = FileUtil.getExt((result || '') as string);
     if (!props.extensions.includes(ext)) {
         Dialog.tipError(t("请选择{extensions}格式的文件", {extensions: props.extensions.join(',')}));
         return;
     }
-    emit("update:modelValue", result);
+    emit("update:modelValue", result as string);
 };
 const name = computed(() => {
     return FileUtil.getBaseName(props.modelValue, true);
