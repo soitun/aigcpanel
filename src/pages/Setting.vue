@@ -7,7 +7,11 @@ import SettingEnv from "../components/Setting/SettingEnv.vue";
 import SettingAbout from "../components/Setting/SettingAbout.vue";
 import {LiveBlackWordContent} from "./Live/config/blackWord";
 import {LiveReplyGenerateContent} from "./Live/config/replyGenerate";
-import {SoundAsrResultOptimizedPrompt} from "./Sound/config/prompt";
+import {
+    SoundAsrResultOptimizedPrompt,
+    SoundGenerateTextFormItems,
+    SoundGenerateTextPrompt
+} from "./Sound/config/prompt";
 import {SoundGenerateReplaceContent} from "./Sound/config/replaceContent";
 import DataConfigDialogButton from "../components/common/DataConfigDialogButton.vue";
 
@@ -49,25 +53,25 @@ onBeforeUnmount(() => {
         >
             <div data-section="basic" class="p-2 rounded-lg mb-4 cursor-pointer menu-active">
                 <div class="text-base">
-                    <icon-settings />
+                    <icon-settings/>
                     {{ t("基础设置") }}
                 </div>
             </div>
             <div data-section="data" class="p-2 rounded-lg mb-4 cursor-pointer">
                 <div class="text-base">
-                    <icon-tool />
+                    <icon-tool/>
                     {{ t("数据配置") }}
                 </div>
             </div>
             <div data-section="env" class="p-2 rounded-lg mb-4 cursor-pointer">
                 <div class="text-base">
-                    <icon-code />
+                    <icon-code/>
                     {{ t("环境设置") }}
                 </div>
             </div>
             <div data-section="about" class="p-2 rounded-lg mb-4 cursor-pointer">
                 <div class="text-base">
-                    <icon-user />
+                    <icon-user/>
                     {{ t("关于软件") }}
                 </div>
             </div>
@@ -81,7 +85,7 @@ onBeforeUnmount(() => {
                 <div data-section="basic" class="scroll-mt-4">
                     <div class="text-base font-bold mb-4">{{ t("基础设置") }}</div>
                     <div>
-                        <SettingBasic />
+                        <SettingBasic/>
                     </div>
                 </div>
                 <div class="border-b border-solid border-gray-200 my-6"></div>
@@ -114,6 +118,11 @@ onBeforeUnmount(() => {
                                 name="SoundGenerateReplaceContent"
                                 help="声音合成时会自动把文本中的“键”替换为“值”，可用于修正发音"
                                 :default-value="SoundGenerateReplaceContent"/>
+                            <DataConfigDialogButton
+                                title="声音合成内容生成"
+                                name="SoundGenerateTextPrompt"
+                                :param="SoundGenerateTextFormItems.map(i => ({name: i.name, label: i.label}))"
+                                :default-value="SoundGenerateTextPrompt"/>
                         </div>
                     </div>
                 </div>
@@ -121,7 +130,7 @@ onBeforeUnmount(() => {
                 <div data-section="env" class="scroll-mt-4">
                     <div class="text-base font-bold mb-4">{{ t("环境设置") }}</div>
                     <div>
-                        <SettingEnv />
+                        <SettingEnv/>
                     </div>
                 </div>
                 <div class="border-b border-solid border-gray-200 my-6 dark:border-gray-700"></div>
@@ -130,7 +139,7 @@ onBeforeUnmount(() => {
                         {{ t("关于软件") }}
                     </div>
                     <div class="">
-                        <SettingAbout />
+                        <SettingAbout/>
                     </div>
                 </div>
             </div>

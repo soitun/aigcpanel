@@ -2,12 +2,6 @@
 import {changeLocale, getLocale, listLocales, t} from "../../lang";
 import {useSettingStore} from "../../store/modules/setting";
 import {onMounted, ref} from "vue";
-import DataConfigDialogButton from "../common/DataConfigDialogButton.vue";
-import {LiveBlackWordContent} from "../../pages/Live/config/blackWord";
-import {LiveReplyGenerateContent} from "../../pages/Live/config/replyGenerate";
-import {SoundAsrResultOptimizedPrompt} from "../../pages/Sound/config/prompt";
-import {SoundGenerateReplaceContent} from "../../pages/Sound/config/replaceContent";
-import SoundGeneratePreviewBox from "../../pages/Sound/components/SoundGeneratePreviewBox.vue";
 
 const locale = ref("");
 
