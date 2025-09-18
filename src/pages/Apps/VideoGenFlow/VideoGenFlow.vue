@@ -51,14 +51,14 @@ onMounted(() => {
                 <a-tooltip v-if="0" :content="$t('清空历史')" position="right" mini>
                     <a-button class="ml-1">
                         <template #icon>
-                            <icon-delete />
+                            <icon-delete/>
                         </template>
                     </a-button>
                 </a-tooltip>
             </div>
         </div>
         <div>
-            <VideoGenFlowCreate ref="videoGenFlowCreate" @submitted="doRefresh" />
+            <VideoGenFlowCreate ref="videoGenFlowCreate" @submitted="doRefresh"/>
             <div v-if="records.length > 0">
                 <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
                     <div class="flex-grow flex items-center">
@@ -71,8 +71,8 @@ onMounted(() => {
                                 {{ $t("全选") }}
                             </a-checkbox>
                         </div>
-                        <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh" />
-                        <TaskBatchDownloadAction :records="checkRecords" />
+                        <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh"/>
+                        <TaskBatchDownloadAction :records="checkRecords"/>
                     </div>
                     <div>
                         <a-pagination
@@ -86,10 +86,10 @@ onMounted(() => {
                 </div>
                 <div v-for="r in recordsForPage" :key="r.id">
                     <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
-                        <div class="flex items-center">
+                        <div class="flex items-center gap-1">
                             <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
                                 <div class="mr-2 h-8 pt-0.5">
-                                    <a-checkbox v-model="r['_check']" />
+                                    <a-checkbox v-model="r['_check']"/>
                                 </div>
                                 <div class="">
                                     <TaskTitleField
@@ -100,27 +100,23 @@ onMounted(() => {
                                 </div>
                             </div>
                             <div class="flex-grow"></div>
-                            <div class="ml-1">
-                                <TaskDuration :start="r.startTime" :end="r.endTime" />
-                            </div>
-                            <div class="ml-1">
-                                <TaskBizStatus :status="r.status" :status-msg="r.statusMsg" />
-                            </div>
+                            <TaskDuration :start="r.startTime" :end="r.endTime"/>
+                            <TaskBizStatus :status="r.status" :status-msg="r.statusMsg"/>
                         </div>
                         <div class="mt-3 flex gap-1">
-                            <ServerNameVersion :record="r" />
-                            <VideoGenFormViewBody :data="r.modelConfig" />
+                            <ServerNameVersion :record="r"/>
+                            <VideoGenFormViewBody :data="r.modelConfig"/>
                         </div>
                         <div class="mt-3 flex gap-1" v-if="r.modelConfig.soundGenerate">
-                            <SoundGenerateFormViewBody :data="r.modelConfig.soundGenerate" />
+                            <SoundGenerateFormViewBody :data="r.modelConfig.soundGenerate"/>
                         </div>
                         <div class="pt-4 flex">
                             <div class="flex-grow">
                                 <div class="bg-gray-100 rounded-lg p-2 mb-3">
-                                    <TextTruncateView :text="r.modelConfig.text" />
+                                    <TextTruncateView :text="r.modelConfig.text"/>
                                 </div>
                                 <div v-if="r.status === 'success' && r.result.urlSound">
-                                    <AudioPlayer show-wave :url="'file://' + r.result.urlSound" />
+                                    <AudioPlayer show-wave :url="'file://' + r.result.urlSound"/>
                                 </div>
                             </div>
                             <div class="flex-shrink-0 ml-8">
@@ -129,24 +125,24 @@ onMounted(() => {
                                     v-if="r.status === 'success' && r.result.url"
                                 >
                                     <div class="w-48 h-48" v-if="r.result.url">
-                                        <VideoPlayer :url="'file://' + r.result.url" />
+                                        <VideoPlayer :url="'file://' + r.result.url"/>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="pt-4 flex items-center">
                             <div class="text-gray-400 flex-grow">
-                                <timeago :datetime="r['createdAt'] * 1000" />
+                                <timeago :datetime="r['createdAt'] * 1000"/>
                             </div>
                             <div class="">
-                                <TaskDownloadAction :record="r" />
-                                <TaskDeleteAction :record="r" @update="doRefresh" />
+                                <TaskDownloadAction :record="r"/>
+                                <TaskDeleteAction :record="r" @update="doRefresh"/>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <m-empty v-else />
+            <m-empty v-else/>
         </div>
     </div>
 </template>

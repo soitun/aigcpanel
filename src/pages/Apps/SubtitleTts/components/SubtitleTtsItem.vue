@@ -31,7 +31,7 @@ const subtitleText = computed(() => {
 
 <template>
     <div class="rounded-xl shadow border p-4 mb-4 hover:shadow-lg">
-        <div class="flex items-center">
+        <div class="flex items-center gap-1">
             <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
                 <div v-if="!dialog" class="mr-2 h-8 pt-0.5">
                     <a-checkbox v-model="record['_check']"/>
@@ -46,12 +46,8 @@ const subtitleText = computed(() => {
                 </div>
             </div>
             <div class="flex-grow"></div>
-            <div class="ml-1">
-                <TaskDuration v-if="record.status==='running'" :start="record.startTime" :end="record.endTime"/>
-            </div>
-            <div class="ml-1">
-                <TaskBizStatus :status="record.status" :status-msg="record.statusMsg"/>
-            </div>
+            <TaskDuration v-if="record.status==='running'" :start="record.startTime" :end="record.endTime"/>
+            <TaskBizStatus :status="record.status" :status-msg="record.statusMsg"/>
         </div>
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">

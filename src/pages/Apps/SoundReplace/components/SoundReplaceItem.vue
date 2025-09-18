@@ -9,15 +9,15 @@ import TaskTitleField from "../../../../components/Server/TaskTitleField.vue";
 import TextTruncateView from "../../../../components/TextTruncateView.vue";
 import AudioPlayer from "../../../../components/common/AudioPlayer.vue";
 import AudioPlayerButton from "../../../../components/common/AudioPlayerButton.vue";
+import ItemsLimitedView from "../../../../components/common/ItemsLimitedView.vue";
 import TaskBizStatus from "../../../../components/common/TaskBizStatus.vue";
-import VideoPlayer from "../../../../components/common/VideoPlayer.vue";
+import TaskJobResultStepView from "../../../../components/common/TaskJobResultStepView.vue";
 import {TaskRecord, TaskService} from "../../../../service/TaskService";
+import {useTaskStore} from "../../../../store/modules/task";
 import SoundAsrRecordsEditDialog from "../../../Sound/components/SoundAsrRecordsEditDialog.vue";
 import SoundGenerateFormViewBody from "../../../Sound/components/SoundGenerateFormViewBody.vue";
-import {useTaskStore} from "../../../../store/modules/task";
 import {SoundReplaceJobResultType, SoundReplaceModelConfigType} from "../type";
-import TaskJobResultStepView from "../../../../components/common/TaskJobResultStepView.vue";
-import ItemsLimitedView from "../../../../components/common/ItemsLimitedView.vue";
+import VideoPreviewBox from "../../../../components/common/VideoPreviewBox.vue";
 
 const taskStore = useTaskStore()
 const props = defineProps<{
@@ -194,8 +194,8 @@ const doCombineConfirm = async () => {
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Combine">
-                <div class="bg-gray-100 rounded-lg p-2 w-full h-96">
-                    <VideoPlayer :url="record.jobResult?.Combine.file"/>
+                <div>
+                    <VideoPreviewBox :url="record.jobResult?.Combine.file"/>
                 </div>
                 <div class="mt-1 flex gap-2">
                     <a-button

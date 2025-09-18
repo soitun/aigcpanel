@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import {ref} from "vue";
 import FileSelector from "../../../../components/common/FileSelector.vue";
-import { dataAutoSaveDraft } from "../../../../components/common/util";
-import { t } from "../../../../lang";
-import { Dialog } from "../../../../lib/dialog";
-import { TaskRecord, TaskService } from "../../../../service/TaskService";
+import {dataAutoSaveDraft} from "../../../../components/common/util";
+import {t} from "../../../../lang";
+import {Dialog} from "../../../../lib/dialog";
+import {TaskRecord, TaskService} from "../../../../service/TaskService";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 
 const emit = defineEmits<{

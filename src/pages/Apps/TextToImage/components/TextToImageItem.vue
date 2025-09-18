@@ -4,18 +4,16 @@ import TaskDeleteAction from "../../../../components/Server/TaskDeleteAction.vue
 import TaskDownloadAction from "../../../../components/Server/TaskDownloadAction.vue";
 import TaskDuration from "../../../../components/Server/TaskDuration.vue";
 import TaskTitleField from "../../../../components/Server/TaskTitleField.vue";
-import TextTruncateView from "../../../../components/TextTruncateView.vue";
-import AudioPlayer from "../../../../components/common/AudioPlayer.vue";
-import AudioPlayerButton from "../../../../components/common/AudioPlayerButton.vue";
-import ItemsLimitedView from "../../../../components/common/ItemsLimitedView.vue";
 import TaskBizStatus from "../../../../components/common/TaskBizStatus.vue";
 import TaskJobResultStepView from "../../../../components/common/TaskJobResultStepView.vue";
 import {TaskRecord} from "../../../../service/TaskService";
-import SoundGenerateFormViewBody from "../../../Sound/components/SoundGenerateFormViewBody.vue";
-import {LongTextTtsJobResultType, LongTextTtsModelConfigType} from "../type";
+import TextToImageFormViewBody from "../../common/TextToImageFormViewBody.vue";
+import {TextToImageJobResultType, TextToImageModelConfigType} from "../type";
+import TextTruncateView from "../../../../components/TextTruncateView.vue";
+import ImagePreviewBox from "../../../../components/common/ImagePreviewBox.vue";
 
 const props = defineProps<{
-    record: TaskRecord<LongTextTtsModelConfigType, LongTextTtsJobResultType>;
+    record: TaskRecord<TextToImageModelConfigType, TextToImageJobResultType>;
     dialog: boolean;
     onRefresh: () => void;
 }>();
@@ -46,13 +44,13 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file/>
-                    {{ $t("分割文本") }}
+                    {{ $t("处理图像") }}
                 </div>
             </div>
             <div class="flex-grow pt-1">
-                <TaskJobResultStepView :record="record" step="SplitText">
+                <TaskJobResultStepView :record="record" step="Prepare">
                     <div class="bg-gray-100 rounded-lg p-2">
-                        <TextTruncateView :text="record.modelConfig.text"/>
+                        <TextTruncateView :text="record.modelConfig?.prompt!"/>
                     </div>
                 </TaskJobResultStepView>
             </div>
@@ -60,48 +58,19 @@ const props = defineProps<{
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
-                    <icon-file-audio/>
-                    {{ $t("音频合成") }}
+                    <icon-file-image/>
+                    {{ $t("图像生成") }}
                 </div>
             </div>
             <div class="flex-grow">
-                <TaskJobResultStepView :record="record" step="SoundGenerate">
-                    <template #successRunning>
-                        <div class="bg-gray-100 rounded-lg p-2">
-                            <ItemsLimitedView toggle-biz="LongTextTts"
-                                              :toggle-id="record.id!"
-                                              :records="record.jobResult?.SoundGenerate?.records||[]">
-                                <template #default="{item}">
-                                    <div class="flex items-start mb-1">
-                                        <div class="w-6 flex-shrink-0">
-                                            <AudioPlayerButton v-if="item.audio" :source="item.audio"/>
-                                            <icon-info-circle v-else class="text-gray-400 text-xs"/>
-                                        </div>
-                                        <div class="text-xs">{{ item.text }}</div>
-                                    </div>
-                                </template>
-                            </ItemsLimitedView>
-                        </div>
-                    </template>
+                <TaskJobResultStepView :record="record" step="Generate">
+                    <div>
+                        <ImagePreviewBox :url="record.jobResult?.Generate?.image!"/>
+                    </div>
                 </TaskJobResultStepView>
                 <div class="mt-1 flex gap-1">
-                    <SoundGenerateFormViewBody :data="record.modelConfig?.soundGenerate!"/>
+                    <TextToImageFormViewBody :data="record.modelConfig?.textToImage"/>
                 </div>
-            </div>
-        </div>
-        <div class="mt-3 flex">
-            <div class="w-24 flex-shrink-0">
-                <div class="inline-block text-center">
-                    <icon-file-audio/>
-                    {{ $t("合并音频") }}
-                </div>
-            </div>
-            <div class="flex-grow">
-                <TaskJobResultStepView :record="record" step="Combine">
-                    <div>
-                        <AudioPlayer :url="record.result?.url"/>
-                    </div>
-                </TaskJobResultStepView>
             </div>
         </div>
         <div class="pt-4 flex items-center">

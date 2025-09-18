@@ -9,6 +9,8 @@ import {SoundGenerate} from "./SoundGenerate";
 import {VideoGen} from "./VideoGen";
 import {SubtitleTts, SubtitleTtsCleaner} from "../pages/Apps/SubtitleTts/task";
 import {LongTextTts, LongTextTtsCleaner} from "../pages/Apps/LongTextTts/task";
+import {TextToImage, TextToImageCleaner} from "../pages/Apps/TextToImage/task";
+import {ImageToImage, ImageToImageCleaner} from "../pages/Apps/ImageToImage/task";
 
 const taskStore = useTaskStore();
 const serverStore = useServerStore();
@@ -24,6 +26,8 @@ export const tasks = {
     SoundReplace,
     // video apps
     VideoGenFlow,
+    TextToImage,
+    ImageToImage,
 };
 
 export const taskCleaners = {
@@ -32,6 +36,8 @@ export const taskCleaners = {
     SubtitleTts: SubtitleTtsCleaner,
     SoundReplace: SoundReplaceCleaner,
     // video cleaners
+    TextToImage: TextToImageCleaner,
+    ImageToImage: ImageToImageCleaner,
 };
 
 export const TaskManager = {

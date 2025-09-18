@@ -1,22 +1,15 @@
 <script setup lang="ts">
 import {onMounted, ref, watch} from "vue";
-import ParamForm from "../../../../components/common/ParamForm.vue";
 import {t} from "../../../../lang";
 import {Dialog} from "../../../../lib/dialog";
 import {StorageUtil} from "../../../../lib/storage";
 import {PermissionService} from "../../../../service/PermissionService";
 import {TaskRecord, TaskService} from "../../../../service/TaskService";
-import {useServerStore} from "../../../../store/modules/server";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 import VideoGenForm from "../../../Video/components/VideoGenForm.vue";
 
-const serverStore = useServerStore();
 const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(null);
 const videoGenForm = ref<InstanceType<typeof VideoGenForm> | null>(null);
-const videoParamForm = ref<InstanceType<typeof ParamForm> | null>(null);
-
-const videoModelConfig = ref(null);
-const videoParam = ref([]);
 
 const formData = ref({
     text: "",
