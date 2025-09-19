@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import {EnumServerStatus, ServerRecord} from "../../types/Server";
 import ServerActionSettingDialog from "./ServerActionSettingDialog.vue";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 
 const props = defineProps<{
     record: ServerRecord;
 }>();
 const actionSettingDialog = ref<InstanceType<typeof ServerActionSettingDialog> | null>(null);
+const disabled = computed(() => {
+    if (props.record.autoStart) {
+        if (props.record.runtime.autoStartStatus === EnumServerStatus.RUNNING) {
+            return true;
+        }
+        return false;
+    }
+    return props.record.status !== EnumServerStatus.STOPPED && props.record.status !== EnumServerStatus.ERROR;
+});
 </script>
 
 <template>
@@ -14,14 +23,12 @@ const actionSettingDialog = ref<InstanceType<typeof ServerActionSettingDialog> |
         <a-button
             class="mr-2"
             @click="actionSettingDialog?.show()"
-            :disabled="
-                props.record.status !== EnumServerStatus.STOPPED && props.record.status !== EnumServerStatus.ERROR
-            "
+            :disabled="disabled"
         >
             <template #icon>
-                <icon-settings />
+                <icon-settings/>
             </template>
         </a-button>
     </a-tooltip>
-    <ServerActionSettingDialog :record="props.record" ref="actionSettingDialog" />
+    <ServerActionSettingDialog :record="props.record" ref="actionSettingDialog"/>
 </template>

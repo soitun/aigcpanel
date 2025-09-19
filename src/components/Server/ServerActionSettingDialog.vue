@@ -14,7 +14,13 @@ const visible = ref(false);
 const settings = ref<any>([]);
 const setting = ref({});
 const readonly = computed(() => {
-    return ![EnumServerStatus.STOPPED, EnumServerStatus.ERROR].includes(props.record.status);
+    if (props.record.autoStart) {
+        if (props.record.runtime.autoStartStatus === EnumServerStatus.RUNNING) {
+            return true;
+        }
+        return false;
+    }
+    return props.record.status !== EnumServerStatus.STOPPED && props.record.status !== EnumServerStatus.ERROR;
 });
 const gpus = ref<
     {
@@ -59,18 +65,18 @@ defineExpose({
             {{ $t("设置") }}
         </template>
         <template #footer>
-            <a-button type="primary" :disabled="readonly" @click="doSubmit">{{ $t("确定") }} </a-button>
+            <a-button type="primary" :disabled="readonly" @click="doSubmit">{{ $t("确定") }}</a-button>
         </template>
         <div>
             <a-form :model="{}">
                 <div v-for="fs in settings">
                     <a-form-item v-if="fs.type === 'text'" :field="fs.name" :label="fs.title">
-                        <a-input :placeholder="fs.placeholder" :readonly="readonly" v-model="setting[fs.name]" />
+                        <a-input :placeholder="fs.placeholder" :readonly="readonly" v-model="setting[fs.name]"/>
                     </a-form-item>
                     <a-form-item v-else-if="fs.type === 'radio'" :field="fs.name" :label="fs.title">
                         <a-radio-group v-model="setting[fs.name]" :disabled="readonly">
                             <a-radio v-for="option in fs.options" :key="option.value" :value="option.value"
-                                >{{ option.label }}
+                            >{{ option.label }}
                             </a-radio>
                         </a-radio-group>
                     </a-form-item>

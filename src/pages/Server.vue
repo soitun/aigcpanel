@@ -122,7 +122,7 @@ const typeName = (type: string) => {
                             <div>
                                 <ServerStatus
                                     :status="record.status"
-                                    :auto-start="record.autoStart"
+                                    :auto-start="record.autoStart!"
                                     :runtime="record.runtime"
                                 />
                             </div>
