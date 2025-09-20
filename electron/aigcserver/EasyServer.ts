@@ -190,10 +190,9 @@ export const EasyServer = function (config: any) {
                     // console.log('easyServer.success', _data)
                     clearTimeout(timer);
                     controller = null;
-                    if (!hasMoreQueue()) {
-                        if (controllerWatching.resolve && !controllerWatching.promiseResolved) {
-                            controllerWatching.resolve(undefined);
-                        }
+                    hasMoreQueue()
+                    if (controllerWatching.reject && !controllerWatching.promiseResolved) {
+                        controllerWatching.reject(undefined);
                     }
                 },
                 error: (_data, code) => {
