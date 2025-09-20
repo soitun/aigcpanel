@@ -197,14 +197,13 @@ export const EasyServer = function (config: any) {
                     }
                 },
                 error: (_data, code) => {
-                    // console.log('easyServer.error', _data)
+                    // console.log('easyServer.error', {_data, controllerWatching})
                     this.ServerApi.file.appendText(this.ServerInfo.logFile, `exit code ${code}`, {isDataPath: true});
                     clearTimeout(timer);
                     controller = null;
-                    if (!hasMoreQueue()) {
-                        if (controllerWatching.reject && !controllerWatching.promiseResolved) {
-                            controllerWatching.reject(undefined);
-                        }
+                    hasMoreQueue()
+                    if (controllerWatching.reject && !controllerWatching.promiseResolved) {
+                        controllerWatching.reject(undefined);
                     }
                 },
             })
