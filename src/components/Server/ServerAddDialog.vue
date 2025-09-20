@@ -8,6 +8,7 @@ import {useServerStore} from "../../store/modules/server";
 import {VersionUtil} from "../../lib/util";
 import {AppConfig} from "../../config";
 import ServerAddResolvePanel from "./ServerAddResolvePanel.vue";
+import {isDev} from "../../lib/env";
 
 const resolvePanel = ref<InstanceType<typeof ServerAddResolvePanel> | null>(null);
 
@@ -93,8 +94,8 @@ const doSubmit = async () => {
     if (!modelInfo.value.path) {
         return;
     }
-    const target = await window.$mapi.file.fullPath(`model/${modelInfo.value.name}-${modelInfo.value.version}`);
-    if (await window.$mapi.file.exists(target)) {
+    const target = await $mapi.file.fullPath(`model/${modelInfo.value.name}-${modelInfo.value.version}`);
+    if (await $mapi.file.exists(target)) {
         Dialog.tipError(t("模型相同版本已存在"));
         return;
     }
@@ -103,11 +104,11 @@ const doSubmit = async () => {
         Dialog.tipError(t("模型相同版本已存在"));
         return;
     }
-    if (window.$mapi.app.platformName() !== modelInfo.value.platformName) {
+    if ($mapi.app.platformName() !== modelInfo.value.platformName && !isDev) {
         Dialog.tipError(t("模型平台不匹配"));
         return;
     }
-    if (window.$mapi.app.platformArch() !== modelInfo.value.platformArch) {
+    if ($mapi.app.platformArch() !== modelInfo.value.platformArch && !isDev) {
         Dialog.tipError(t("模型架构不匹配"));
         return;
     }
@@ -129,7 +130,7 @@ const doSubmit = async () => {
 };
 
 const doSelectLocalDir = async () => {
-    const configPath = await window.$mapi.file.openFile({
+    const configPath = await $mapi.file.openFile({
         filters: [{name: "config.json", extensions: ["json"]}],
     });
     if (!configPath) {
@@ -142,7 +143,7 @@ const doSelectLocalDir = async () => {
     emptyModelInfo();
     loading.value = true;
     try {
-        const content = await window.$mapi.file.read(configPath, {
+        const content = await $mapi.file.read(configPath, {
             isDataPath: false,
         });
         const serverPath = configPath.replace(/[\/\\]config.json$/, "");
@@ -161,7 +162,7 @@ const doSelectLocalDir = async () => {
         modelInfo.value.functions = json.functions || [];
         modelInfo.value.settings = json.settings || {};
         modelInfo.value.setting = json.setting || {};
-        modelInfo.value.isSupport = await window.$mapi.server.isSupport({
+        modelInfo.value.isSupport = await $mapi.server.isSupport({
             localPath: serverPath,
             name: modelInfo.value.name,
         } as any);
@@ -169,10 +170,10 @@ const doSelectLocalDir = async () => {
             logStatus.value = "";
         } else {
             logStatus.value = t("模型不支持");
-            if (modelInfo.value.platformName !== window.$mapi.app.platformName()) {
+            if (modelInfo.value.platformName !== $mapi.app.platformName()) {
                 logStatus.value += `(${t("平台不匹配")})`;
             }
-            if (modelInfo.value.platformArch !== window.$mapi.app.platformArch()) {
+            if (modelInfo.value.platformArch !== $mapi.app.platformArch()) {
                 logStatus.value += `(${t("芯片架构不匹配")})`;
             }
         }
@@ -213,12 +214,12 @@ const emit = defineEmits({
                 <div v-if="!modelInfo.name">
                     <div class="px-3">
                         <div>
-                            <img class="w-48 h-48 object-contain m-auto" src="./../../assets/image/server-folder.svg" />
+                            <img class="w-48 h-48 object-contain m-auto" src="./../../assets/image/server-folder.svg"/>
                         </div>
                         <div class="flex gap-4">
                             <a-button @click="doSelectLocalDir" class="block w-full" :loading="loading">
                                 <template #icon>
-                                    <icon-folder />
+                                    <icon-folder/>
                                 </template>
                                 {{ t("选择本地模型") }}
                                 config.json
@@ -228,7 +229,7 @@ const emit = defineEmits({
                                 target="_blank"
                                 class="arco-btn arco-btn-secondary arco-btn-shape-square arco-btn-size-medium arco-btn-status-normal block w-full text-center py-1"
                             >
-                                <icon-cloud />
+                                <icon-cloud/>
                                 {{ t("下载模型") }}
                             </a>
                         </div>
@@ -287,7 +288,7 @@ const emit = defineEmits({
                         </div>
                     </div>
                     <div>
-                        <ServerAddResolvePanel ref="resolvePanel" :root="modelInfo.path" />
+                        <ServerAddResolvePanel ref="resolvePanel" :root="modelInfo.path"/>
                     </div>
                     <div class="pt-4 flex items-center">
                         <div>
@@ -299,13 +300,13 @@ const emit = defineEmits({
                                 @click="doSubmit"
                             >
                                 <template #icon>
-                                    <icon-check />
+                                    <icon-check/>
                                 </template>
                                 {{ $t("确认提交") }}
                             </a-button>
                             <a-button class="mr-2" v-if="!isImporting" @click="emptyModelInfo" :loading="loading">
                                 <template #icon>
-                                    <icon-redo />
+                                    <icon-redo/>
                                 </template>
                                 {{ $t("重新选择") }}
                             </a-button>

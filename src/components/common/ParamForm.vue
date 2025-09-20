@@ -22,6 +22,7 @@ type FieldBasicType = {
         value: string;
         label: string;
     }>;
+    opt?: ('randomValue' | 'seed')[]
 };
 
 type FieldBasicModelType = FieldBasicType & {
@@ -46,6 +47,15 @@ watch(
                 itemClone["speakerParamValue"] = {};
             }
             let value = itemClone.defaultValue;
+            if (item.opt) {
+                if (item.opt.includes('randomValue')) {
+                    if (item.type === 'inputNumber') {
+                        const min = item.min || 0;
+                        const max = item.max || 1000000;
+                        value = Math.floor(Math.random() * (max - min + 1)) + min;
+                    }
+                }
+            }
             if (typeof value === 'undefined') {
                 value = null;
             }
@@ -141,13 +151,14 @@ defineExpose({
             <a-input :placeholder="item.placeholder" size="small" :disabled="props.disabled" v-model="item.value">
             </a-input>
         </div>
-        <div v-else-if="item.type === 'inputNumber'" class="w-24 mr-3">
+        <div v-else-if="item.type === 'inputNumber'" class="w-32 mr-3">
             <div class="flex items-center gap-1">
-                <a-input-number :placeholder="item.placeholder" size="small" v-model="item.value"
+                <a-input-number :placeholder="item.placeholder" size="small"
+                                v-model="item.value"
                                 :disabled="props.disabled"
                                 :min="item.min" :max="item.max">
                 </a-input-number>
-                <a-tooltip v-if="item.name==='seed'"
+                <a-tooltip v-if="item.opt && item.opt.includes('seed')"
                            :content="$t('点击生成随机种子，种子相同则生成的结果相同')">
                     <icon-refresh
                         @click="item.value = Math.floor(Math.random() * 1000000)"
