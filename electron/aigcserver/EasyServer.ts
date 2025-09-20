@@ -11,7 +11,15 @@ type LauncherResultType = {
 };
 
 export const EasyServer = function (config: any) {
+    const me = this;
     let controller: any = null;
+    let controllerWatching = {
+        id: null as string | null,
+        launcherResult: null as LauncherResultType | null,
+        resolve: null as ((value: any) => void) | null,
+        reject: null as ((reason?: any) => void) | null,
+        promiseResolved: false,
+    };
     this.serverConfig = config as {
         easyServer: {
             entry: string;
@@ -67,6 +75,150 @@ export const EasyServer = function (config: any) {
     this.cancel = async function () {
         controller.stop();
     };
+    this._controllerRunIfNeeded = async function (
+        configJsonPath: string | null,
+        option: {
+            timeout: number;
+        }
+    ) {
+        if (!controller) {
+            let command = [];
+            command.push(this.serverConfig.easyServer.entry);
+            if (this.serverConfig.easyServer.entryArgs) {
+                command = command.concat(this.serverConfig.easyServer.entryArgs);
+            }
+            for (let i = 0; i < command.length; i++) {
+                command[i] = command[i].replace("${CONFIG}", `"${configJsonPath}"`);
+                command[i] = command[i].replace("${ROOT}", this.ServerInfo.localPath);
+            }
+            const envMap = {};
+            // console.log('EasyServer', this.serverConfig.easyServer)
+            if (this.serverConfig.easyServer.entry === "launcher") {
+                const systemEnv = await this.ServerApi.env();
+                // console.log('EasyServer.systemEnv', systemEnv)
+                for (const k in systemEnv) {
+                    envMap[k] = systemEnv[k];
+                }
+            }
+            envMap["PATH"] = this.ServerApi.getPathEnv([
+                `${this.ServerInfo.localPath}`,
+                `${this.ServerInfo.localPath}/binary`,
+            ]);
+            envMap["PYTHONIOENCODING"] = "utf-8";
+            envMap["AIGCPANEL_SERVER_PLACEHOLDER_CONFIG"] = configJsonPath;
+            envMap["AIGCPANEL_SERVER_PLACEHOLDER_ROOT"] = this.ServerInfo.localPath;
+            if (this.serverConfig.easyServer.envs) {
+                for (const e of this.serverConfig.easyServer.envs) {
+                    let pcs = e.split("=");
+                    const key = pcs.shift();
+                    envMap[key] = pcs.join("=");
+                }
+            }
+            for (const k in envMap) {
+                envMap[k] = envMap[k].replace("${CONFIG}", `"${configJsonPath}"`);
+                envMap[k] = envMap[k].replace("${ROOT}", this.ServerInfo.localPath);
+            }
+            const hasMoreQueue = async () => {
+                const queueRoot = this.ServerInfo.localPath + `/aigcpanel-queue/`;
+                const files = await Files.list(queueRoot);
+                const validQueueFiles = files.filter(f => f.name.match(/\.queue\.json$/));
+                if (validQueueFiles.length > 0) {
+                    const configJson = await Files.temp("json");
+                    await Files.copy(validQueueFiles[0].pathname, configJson);
+                    await Files.deletes(validQueueFiles[0].pathname);
+                    this._controllerRunIfNeeded(configJson, option);
+                    return true;
+                }
+                return false;
+            };
+            let timer = null;
+            if (option.timeout > 0) {
+                timer = setTimeout(() => {
+                    if (controller) {
+                        try {
+                            controller.stop();
+                        } catch (e) {
+                            Log.error("easyServer.timeout.stop.error", e);
+                        }
+                    }
+                    this.ServerApi.file.appendText(this.ServerInfo.logFile, "timeout", {isDataPath: true});
+                    if (controllerWatching.resolve) {
+                        controllerWatching.resolve(undefined);
+                    }
+                }, option.timeout * 1000);
+            }
+            let buffer = "";
+            controller = await this.ServerApi.app.spawnShell(command, {
+                env: envMap,
+                cwd: this.ServerInfo.localPath,
+                stdout: _data => {
+                    // console.log('easyServer.stdout', _data)
+                    buffer += _data;
+                    // check if has \n and process the buffer
+                    let lines = buffer.split("\n");
+                    buffer = lines.pop() || "";
+                    this.ServerApi.file.appendText(this.ServerInfo.logFile, _data, {isDataPath: true});
+                    const result = this.ServerApi.extractResultFromLogs(controllerWatching.id, lines.join("\n") + "\n");
+                    if (result) {
+                        if (controllerWatching.launcherResult) {
+                            controllerWatching.launcherResult.result = Object.assign(controllerWatching.launcherResult.result, result);
+                        }
+                        if (controllerWatching.id) {
+                            this.send("taskResult", {id: controllerWatching.id, result});
+                        }
+                    }
+                    if (controllerWatching.launcherResult) {
+                        controllerWatching.launcherResult.result.error =
+                            AigcServerUtil.errorDetect(_data) || controllerWatching.launcherResult.result.error;
+                        if (controllerWatching.launcherResult.result && controllerWatching.launcherResult.result['End']) {
+                            if (controllerWatching.resolve && !controllerWatching.promiseResolved) {
+                                controllerWatching.promiseResolved = true;
+                                controllerWatching.resolve(undefined);
+                            }
+                        }
+                    }
+                },
+                stderr: _data => {
+                    // console.log('easyServer.stderr', _data)
+                    this.ServerApi.file.appendText(this.ServerInfo.logFile, _data, {isDataPath: true});
+                    if (controllerWatching.launcherResult) {
+                        controllerWatching.launcherResult.result.error =
+                            AigcServerUtil.errorDetect(_data) || controllerWatching.launcherResult.result.error;
+                    }
+                },
+                success: _data => {
+                    // console.log('easyServer.success', _data)
+                    clearTimeout(timer);
+                    controller = null;
+                    if (!hasMoreQueue()) {
+                        if (controllerWatching.resolve && !controllerWatching.promiseResolved) {
+                            controllerWatching.resolve(undefined);
+                        }
+                    }
+                },
+                error: (_data, code) => {
+                    // console.log('easyServer.error', _data)
+                    this.ServerApi.file.appendText(this.ServerInfo.logFile, `exit code ${code}`, {isDataPath: true});
+                    clearTimeout(timer);
+                    controller = null;
+                    if (!hasMoreQueue()) {
+                        if (controllerWatching.reject && !controllerWatching.promiseResolved) {
+                            controllerWatching.reject(undefined);
+                        }
+                    }
+                },
+            })
+        } else if (configJsonPath) {
+            const queueName = `${Date.now()}.queue.json`;
+            const queuePath = this.ServerInfo.localPath + `/aigcpanel-queue/${queueName}`;
+            await Files.copy(configJsonPath, queuePath);
+            this.ServerApi.file.appendText(
+                this.ServerInfo.logFile,
+                `Another task is running, queued at ${queueName}`,
+                {isDataPath: true}
+            );
+        }
+    };
     this._callFunc = async function (
         data: ServerFunctionDataType,
         configCalculator: (data: ServerFunctionDataType) => Promise<any>,
@@ -104,42 +256,6 @@ export const EasyServer = function (config: any) {
             const configData = await configCalculator(data);
             configData.setting = this.ServerInfo.setting;
             configJsonPath = await this.ServerApi.launcherPrepareConfigJson(configData);
-            let command = [];
-            command.push(this.serverConfig.easyServer.entry);
-            if (this.serverConfig.easyServer.entryArgs) {
-                command = command.concat(this.serverConfig.easyServer.entryArgs);
-            }
-            for (let i = 0; i < command.length; i++) {
-                command[i] = command[i].replace("${CONFIG}", `"${configJsonPath}"`);
-                command[i] = command[i].replace("${ROOT}", this.ServerInfo.localPath);
-            }
-            const envMap = {};
-            // console.log('EasyServer', this.serverConfig.easyServer)
-            if (this.serverConfig.easyServer.entry === "launcher") {
-                const systemEnv = await this.ServerApi.env();
-                // console.log('EasyServer.systemEnv', systemEnv)
-                for (const k in systemEnv) {
-                    envMap[k] = systemEnv[k];
-                }
-            }
-            envMap["PATH"] = this.ServerApi.getPathEnv([
-                `${this.ServerInfo.localPath}`,
-                `${this.ServerInfo.localPath}/binary`,
-            ]);
-            envMap["PYTHONIOENCODING"] = "utf-8";
-            envMap["AIGCPANEL_SERVER_PLACEHOLDER_CONFIG"] = configJsonPath;
-            envMap["AIGCPANEL_SERVER_PLACEHOLDER_ROOT"] = this.ServerInfo.localPath;
-            if (this.serverConfig.easyServer.envs) {
-                for (const e of this.serverConfig.easyServer.envs) {
-                    let pcs = e.split("=");
-                    const key = pcs.shift();
-                    envMap[key] = pcs.join("=");
-                }
-            }
-            for (const k in envMap) {
-                envMap[k] = envMap[k].replace("${CONFIG}", `"${configJsonPath}"`);
-                envMap[k] = envMap[k].replace("${ROOT}", this.ServerInfo.localPath);
-            }
             // console.log('EasyServer.envMap', envMap)
             const launcherResult: LauncherResultType = {
                 result: {},
@@ -148,68 +264,18 @@ export const EasyServer = function (config: any) {
             // console.log('easyServer.start', JSON.stringify({command, envMap, configData}))
             await (async () => {
                 return new Promise((resolve, reject) => {
-                    let timer = null;
-                    controller = null;
-                    if (option.timeout > 0) {
-                        timer = setTimeout(() => {
-                            if (controller) {
-                                try {
-                                    controller.stop();
-                                } catch (e) {
-                                    Log.error("easyServer.timeout.stop.error", e);
-                                }
-                            }
-                            this.ServerApi.file.appendText(this.ServerInfo.logFile, "timeout", {isDataPath: true});
-                            resolve(undefined);
-                        }, option.timeout * 1000);
-                    }
-                    let buffer = "";
-                    this.ServerApi.app
-                        .spawnShell(command, {
-                            env: envMap,
-                            cwd: this.ServerInfo.localPath,
-                            stdout: _data => {
-                                // console.log('easyServer.stdout', _data)
-                                buffer += _data;
-                                // check if has \n and process the buffer
-                                let lines = buffer.split("\n");
-                                buffer = lines.pop() || "";
-                                this.ServerApi.file.appendText(this.ServerInfo.logFile, _data, {isDataPath: true});
-                                const result = this.ServerApi.extractResultFromLogs(data.id, lines.join("\n") + "\n");
-                                if (result) {
-                                    launcherResult.result = Object.assign(launcherResult.result, result);
-                                    this.send("taskResult", {id: data.id, result});
-                                }
-                                launcherResult.result.error =
-                                    AigcServerUtil.errorDetect(_data) || launcherResult.result.error;
-                            },
-                            stderr: _data => {
-                                // console.log('easyServer.stderr', _data)
-                                this.ServerApi.file.appendText(this.ServerInfo.logFile, _data, {isDataPath: true});
-                                launcherResult.result.error =
-                                    AigcServerUtil.errorDetect(_data) || launcherResult.result.error;
-                            },
-                            success: _data => {
-                                // console.log('easyServer.success', _data)
-                                clearTimeout(timer);
-                                resolve(undefined);
-                            },
-                            error: (_data, code) => {
-                                // console.log('easyServer.error', _data)
-                                this.ServerApi.file.appendText(this.ServerInfo.logFile, `exit code ${code}`, {isDataPath: true});
-                                clearTimeout(timer);
-                                resolve(undefined);
-                            },
-                        })
-                        .then(c => {
-                            controller = c;
-                        });
+                    controllerWatching.id = data.id;
+                    controllerWatching.launcherResult = launcherResult;
+                    controllerWatching.resolve = resolve;
+                    controllerWatching.reject = reject;
+                    controllerWatching.promiseResolved = false;
+                    me._controllerRunIfNeeded(configJsonPath, option);
                 });
             })();
             resultData.end = Date.now();
             resultData.data = await resultDataCalculator(data, launcherResult);
             // console.log('easyServer.end', launcherResult)
-            await Files.deletes(configJsonPath, {isDataPath: false});
+            await Files.deletes(configJsonPath);
             return {
                 code: 0,
                 msg: "ok",

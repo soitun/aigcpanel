@@ -280,11 +280,6 @@ export const TaskService = {
                     record.jobResult = mergeData(recordOld?.jobResult, record.jobResult);
                 }
             }
-            if ("startTime" in record) {
-                if (recordOld?.startTime) {
-                    delete record.startTime;
-                }
-            }
         }
         record = this.encodeRecord(record as TaskRecord);
         const fields = Object.keys(record);
