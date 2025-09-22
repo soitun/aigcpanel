@@ -175,6 +175,13 @@ ipcMain.handle("server:cancel", async (event, serverInfo: ServerInfo) => {
     }
 });
 
+ipcMain.handle("server:deletes", async (event, serverInfo: ServerInfo) => {
+    if (serverModule[serverInfo.localPath]) {
+        delete serverModule[serverInfo.localPath];
+    }
+    return true;
+});
+
 ipcMain.handle("server:config", async (event, serverInfo: ServerInfo) => {
     const module = await getModule(serverInfo);
     try {

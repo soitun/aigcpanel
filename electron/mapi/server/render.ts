@@ -29,6 +29,10 @@ const cancel = async (serverInfo: ServerInfo) => {
     return ipcRenderer.invoke("server:cancel", serverInfo);
 };
 
+const deletes = async (serverInfo: ServerInfo) => {
+    return ipcRenderer.invoke("server:deletes", serverInfo);
+}
+
 const config = async (serverInfo: ServerInfo) => {
     return ipcRenderer.invoke("server:config", serverInfo);
 };
@@ -56,6 +60,7 @@ export default {
     ping,
     stop,
     cancel,
+    deletes,
     config,
     callFunction,
     callFunctionWithException,

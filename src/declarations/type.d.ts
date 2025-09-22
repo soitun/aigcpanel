@@ -365,6 +365,7 @@ type DefsMapi = {
         start: (serverInfo: ServerInfo) => Promise<void>;
         stop: (serverInfo: ServerInfo) => Promise<void>;
         cancel: (serverInfo: ServerInfo) => Promise<void>;
+        deletes: (serverInfo: ServerInfo) => Promise<void>;
         ping: (serverInfo: ServerInfo) => Promise<boolean>;
         config: (serverInfo: ServerInfo) => Promise<any>;
         callFunction: (

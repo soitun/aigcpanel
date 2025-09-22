@@ -94,7 +94,7 @@ const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime)
                         };
                         Dialog.tipError(data.msg || msgMap[data.type]);
                         setTimeout(() => {
-                            window.$mapi.user.open().then();
+                            $mapi.user.open().then();
                         }, 2000);
                         break;
                 }
@@ -153,7 +153,7 @@ const updateRunningServerCount = async () => {
     const count = serverStoreInstance.records.filter(r => {
         return r.type === EnumServerType.LOCAL_DIR && r.status === EnumServerStatus.RUNNING && !r.autoStart;
     }).length;
-    await window.$mapi.server.runningServerCount(count);
+    await $mapi.server.runningServerCount(count);
 };
 
 export const serverStore = defineStore("server", {
@@ -167,7 +167,7 @@ export const serverStore = defineStore("server", {
             // await serverCloudStore.waitReady()
         },
         async init() {
-            await window.$mapi.storage.get("server", "records", []).then(records => {
+            await $mapi.storage.get("server", "records", []).then(records => {
                 records.forEach((record: ServerRecord) => {
                     record.status = createServerStatus(record);
                     record.runtime = getServerRuntimeComputedValue(record);
@@ -189,12 +189,12 @@ export const serverStore = defineStore("server", {
             this.isReady = true;
         },
         async refresh() {
-            const dirs = await window.$mapi.file.list("model", {
+            const dirs = await $mapi.file.list("model", {
                 isDataPath: true,
             });
             const localRecords: ServerRecord[] = [];
             for (let dir of dirs) {
-                const config = await window.$mapi.file.read(`model/${dir.name}/config.json`, {
+                const config = await $mapi.file.read(`model/${dir.name}/config.json`, {
                     isDataPath: true,
                 });
                 let json;
@@ -295,7 +295,7 @@ export const serverStore = defineStore("server", {
             }.log`;
             serverRuntime.eventChannelName = createEventChannel(server);
             const serverInfo = await this.serverInfo(server);
-            await window.$mapi.server.start(serverInfo);
+            await $mapi.server.start(serverInfo);
             let pingTimeout = 60 * 5 * 1000;
             let pingStart = TimeUtil.timestampMS();
             const pingCheck = () => {
@@ -303,10 +303,10 @@ export const serverStore = defineStore("server", {
                 if (now - pingStart > pingTimeout) {
                     // console.log('ping.timeout')
                     serverRuntime.status = EnumServerStatus.ERROR;
-                    window.$mapi.server.stop(serverInfo);
+                    $mapi.server.stop(serverInfo);
                     return;
                 }
-                window.$mapi.server
+                $mapi.server
                     .ping(serverInfo)
                     .then(success => {
                         if (success) {
@@ -332,7 +332,7 @@ export const serverStore = defineStore("server", {
             serverRuntime.status = EnumServerStatus.STOPPING;
             const serverInfo = await this.serverInfo(server);
             serverInfo.logFile = serverRuntime.logFile;
-            await window.$mapi.server.stop(serverInfo);
+            await $mapi.server.stop(serverInfo);
         },
         async cancel(server: ServerRecord) {
             const record = this.findRecord(server);
@@ -343,7 +343,7 @@ export const serverStore = defineStore("server", {
             const serverRuntime = getOrCreateServerRuntime(server);
             const serverInfo = await this.serverInfo(server);
             serverInfo.logFile = serverRuntime.logFile;
-            await window.$mapi.server.cancel(serverInfo);
+            await $mapi.server.cancel(serverInfo);
         },
         async updateSetting(key: string, setting: any) {
             const record = this.records.find(record => record.key === key);
@@ -369,8 +369,10 @@ export const serverStore = defineStore("server", {
                     throw new Error("StatusError");
                 }
             }
+            const serverInfo = await this.serverInfo(server);
+            $mapi.server.deletes(serverInfo).then();
             if (record.type === EnumServerType.LOCAL) {
-                await window.$mapi.file.deletes(record.localPath as string, {
+                await $mapi.file.deletes(record.localPath as string, {
                     isDataPath: true,
                 });
             }
@@ -394,7 +396,7 @@ export const serverStore = defineStore("server", {
                 record.status = undefined;
                 record.runtime = undefined;
             });
-            await window.$mapi.storage.set("server", "records", savedRecords);
+            await $mapi.storage.set("server", "records", savedRecords);
         },
         async getByKey(key: string): Promise<ServerRecord | undefined> {
             // if (key.startsWith('Cloud')) {
@@ -424,7 +426,7 @@ export const serverStore = defineStore("server", {
             option?: ServerCallFunctionOption
         ): Promise<ServerCallFunctionResult> {
             await this.callStart(serverInfo);
-            const res = await window.$mapi.server.callFunctionWithException(serverInfo, method, data, option);
+            const res = await $mapi.server.callFunctionWithException(serverInfo, method, data, option);
             await this.callEnd(serverInfo);
             return res;
         },
@@ -459,7 +461,7 @@ export const serverStore = defineStore("server", {
                 config: JSON.parse(JSON.stringify(server)),
             };
             if (server.type === EnumServerType.LOCAL) {
-                result.localPath = await window.$mapi.file.fullPath(server.localPath as string);
+                result.localPath = await $mapi.file.fullPath(server.localPath as string);
             } else if (server.type === EnumServerType.LOCAL_DIR) {
                 result.localPath = server.localPath as string;
             } else if (server.type === EnumServerType.CLOUD) {
