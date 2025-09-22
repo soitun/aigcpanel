@@ -18,6 +18,7 @@ import SoundGenerateCreate from "./components/SoundGenerateCreate.vue";
 import SoundGenerateFormViewBody from "./components/SoundGenerateFormViewBody.vue";
 import ServerNameVersion from "../../components/Server/ServerNameVersion.vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
+import TaskContinueAction from "../../components/Server/TaskContinueAction.vue";
 
 const {page, records, recordsForPage} = usePaginate<TaskRecord>();
 
@@ -122,6 +123,7 @@ onMounted(async () => {
                                 <TaskDownloadAction :record="r"/>
                                 <TaskDeleteAction :record="r" @update="doRefresh"/>
                                 <TaskCancelAction :record="r"/>
+                                <TaskContinueAction :record="r" @update="doRefresh"/>
                             </div>
                         </div>
                     </div>

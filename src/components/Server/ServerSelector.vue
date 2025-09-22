@@ -14,6 +14,14 @@ const props = defineProps<{
 const recordsFilter = computed(() => {
     return serverStore.records.filter(s => s.functions.includes(props.functionName));
 });
+const valueAutoStart = computed(() => {
+    const server = serverStore.records.find(s => s.key === select.value?.modelValue);
+    return server?.autoStart;
+});
+const valueAutoStartStatus = computed(() => {
+    const server = serverStore.records.find(s => s.key === select.value?.modelValue);
+    return server?.runtime.autoStartStatus || EnumServerStatus.STOPPED;
+});
 const valueStatus = computed(() => {
     return serverStore.records.find(s => s.key === select.value.modelValue)?.status || EnumServerStatus.STOPPED;
 });
@@ -52,8 +60,16 @@ watch(
             <a-option v-for="server in recordsFilter" :key="server.key" :value="server.key">
                 <div class="flex items-center py-2 flex-nowrap truncate no-wrap">
                     <div
-                        v-if="server.status === EnumServerStatus.RUNNING"
-                        class="w-2 h-2 bg-green-700 rounded-full mr-1 flex-shrink-0"
+                        v-if="server.autoStart&&server.runtime.autoStartStatus === EnumServerStatus.RUNNING"
+                        class="w-2 h-2 bg-green-500 rounded-full mr-1 flex-shrink-0"
+                    ></div>
+                    <div
+                        v-else-if="server.autoStart&&server.runtime.autoStartStatus !== EnumServerStatus.RUNNING"
+                        class="w-2 h-2 bg-blue-500 rounded-full mr-1 flex-shrink-0"
+                    ></div>
+                    <div
+                        v-else-if="server.status === EnumServerStatus.RUNNING"
+                        class="w-2 h-2 bg-blue-500 rounded-full mr-1 flex-shrink-0 animate-pulse"
                     ></div>
                     <div v-else class="w-2 h-2 bg-red-700 rounded-full mr-1 flex-shrink-0"></div>
                     <div class="text-xs flex-grow">

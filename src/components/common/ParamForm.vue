@@ -148,7 +148,9 @@ defineExpose({
             </a-popover>
         </div>
         <div v-if="item.type === 'input'" class="w-48 mr-3">
-            <a-input :placeholder="item.placeholder" size="small" :disabled="props.disabled" v-model="item.value">
+            <a-input :placeholder="item.placeholder"
+                     allow-clear
+                     size="small" :disabled="props.disabled" v-model="item.value">
             </a-input>
         </div>
         <div v-else-if="item.type === 'inputNumber'" class="w-32 mr-3">
@@ -174,7 +176,7 @@ defineExpose({
                 </a-option>
             </a-select>
         </div>
-        <div v-else-if="item.type === 'switch'" class="w-48 mr-3">
+        <div v-else-if="item.type === 'switch'" class="mr-3">
             <a-switch v-model="item.value" :disabled="props.disabled" size="small"/>
         </div>
         <div v-else-if="item.type === 'slider'" class="w-48 mr-3">
