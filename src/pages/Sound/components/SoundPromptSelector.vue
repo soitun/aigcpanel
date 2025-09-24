@@ -18,18 +18,30 @@ const props = defineProps({
         required: true,
         default: 0,
     },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
 });
 const emit = defineEmits(["update:modelValue"]);
 const onSelect = (id: number) => {
     emit("update:modelValue", id);
+};
+const doSelect = () => {
+    if (props.disabled) {
+        return;
+    }
+    soundPromptDialog.value?.show();
 };
 </script>
 
 <template>
     <div class="flex items-center">
         <div
-            @click="soundPromptDialog?.show()"
-            class="mr-1 h-8 leading-8 px-3 rounded-lg cursor-pointer truncate bg-gray-100 hover:bg-gray-200 min-w-64">
+            @click="doSelect()"
+            class="mr-1 h-8 leading-8 px-3 rounded-lg cursor-pointer truncate bg-gray-100 hover:bg-gray-200 min-w-64"
+            :class="disabled ? 'cursor-not-allowed bg-gray-50 hover:bg-gray-50 text-gray-400' : ''"
+        >
             {{ records.find(s => s.id === props.modelValue)?.title || "选择音色" }}
         </div>
         <AudioPlayerButton

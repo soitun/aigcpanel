@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import {cloneDeep} from "lodash-es";
-import {ref, watch} from "vue";
+import {nextTick, ref, watch} from "vue";
 import {t} from "../../lang";
 import {Dialog} from "../../lib/dialog";
 import SpeakerSelector from "./SpeakerSelector.vue";
+import SoundPromptSelector from "../../pages/Sound/components/SoundPromptSelector.vue";
 
 type FieldBasicType = {
     name: string;
     title: string;
     icon: string;
-    type: "select" | "input" | "inputNumber" | "switch" | "slider" | "speaker";
+    type: "select"
+        | "input"
+        | "inputNumber"
+        | "switch"
+        | "slider"
+        | "speaker";
     defaultValue: any;
     placeholder: string;
     required: boolean;
@@ -42,10 +48,10 @@ watch(
     value => {
         formData.value = value?.map(item => {
             const itemClone = cloneDeep(item);
-            if (itemClone.type === "speaker") {
-                itemClone["speakerParam"] = [];
-                itemClone["speakerParamValue"] = {};
-            }
+            // if (itemClone.type === "speaker") {
+            //     itemClone["speakerParam"] = [];
+            //     itemClone["speakerParamValue"] = {};
+            // }
             let value = itemClone.defaultValue;
             if (item.opt) {
                 if (item.opt.includes('randomValue')) {
@@ -70,6 +76,11 @@ watch(
         deep: true,
     }
 );
+watch(() => formData.value, () => {
+    nextTick(() => {
+        emit('change', getValue());
+    })
+}, {immediate: false, deep: true});
 
 const getValue = () => {
     const result = {};
@@ -77,9 +88,9 @@ const getValue = () => {
         result[item.name] = item.value;
         result['_' + item.name] = item.title;
         if (item.type === "speaker") {
-            for (const k in item["speakerParamValue"]) {
-                result[k] = item["speakerParamValue"][k];
-            }
+            // for (const k in item["speakerParamValue"]) {
+            //     result[k] = item["speakerParamValue"][k];
+            // }
             result[`__${item.name}`] = item["speaker"]?.["title"] || item.value;
         }
     });
@@ -104,24 +115,26 @@ const validate = () => {
     return true;
 };
 
-const onSpeakerDataUpdate = (name, data) => {
-    const {param, speaker} = data;
-    const item = formData.value.find(item => item.name === name);
-    if (item) {
-        item["speaker"] = speaker;
-        item["speakerParam"] = param;
-        const value = {};
-        param.forEach(paramItem => {
-            value[paramItem.name] = null;
-            if (!paramItem.type || paramItem.type === "select") {
-                if (paramItem.option && paramItem.option.length > 0) {
-                    value[paramItem.name] = paramItem.option[0].value;
-                }
-            }
-        });
-        item["speakerParamValue"] = value;
-    }
-};
+const emit = defineEmits(['change']);
+
+// const onSpeakerDataUpdate = (name, data) => {
+//     const {param, speaker} = data;
+//     const item = formData.value.find(item => item.name === name);
+//     if (item) {
+//         item["speaker"] = speaker;
+//         item["speakerParam"] = param;
+//         const value = {};
+//         param.forEach(paramItem => {
+//             value[paramItem.name] = null;
+//             if (!paramItem.type || paramItem.type === "select") {
+//                 if (paramItem.option && paramItem.option.length > 0) {
+//                     value[paramItem.name] = paramItem.option[0].value;
+//                 }
+//             }
+//         });
+//         item["speakerParamValue"] = value;
+//     }
+// };
 
 defineExpose({
     getValue,
@@ -183,10 +196,15 @@ defineExpose({
             <a-slider v-model="item.value" :marks="item.sliderMarks" show-tooltip :min="item.min" :max="item.max"
                       :disabled="props.disabled" :step="item.step"/>
         </div>
-        <div v-else-if="item.type === 'speaker'" class="w-48 mr-3">
+        <div v-else-if="item.type === 'speaker'" class="mr-3">
             <SpeakerSelector v-model="item.value" :speakers="item['speakers']" :disabled="props.disabled"
-                             @on-data-update="onSpeakerDataUpdate(item.name, $event)"/>
+            />
+            <!-- @on-data-update="onSpeakerDataUpdate(item.name, $event)" -->
         </div>
+        <div v-else-if="item.type === 'soundPromptId'">
+            <SoundPromptSelector v-model="item.value" :disabled="props.disabled"/>
+        </div>
+        <!--
         <div v-for="speakerParam in item['speakerParam']">
             <div v-if="!speakerParam.type || speakerParam.type === 'select'" class="mr-3">
                 <a-select size="small" :disabled="props.disabled"
@@ -197,6 +215,7 @@ defineExpose({
                 </a-select>
             </div>
         </div>
+        -->
     </div>
 </template>
 

@@ -14,7 +14,7 @@ import {mapError} from "../../lib/error";
 const serverStore = useServerStore();
 
 export const liveModels = [
-    {value: "wav2lip256", title: "Wav2Lip标准版"},
+    {value: "wav2lip", title: "Wav2Lip标准版"},
     {value: "wav2lip384", title: "Wav2Lip清晰版"},
 ]
 
@@ -91,7 +91,7 @@ export const liveStore = defineStore("live", {
             }[],
         },
         localConfig: {
-            model: "wav2lip256" as typeof liveModels[number]["value"],
+            model: "wav2lip" as typeof liveModels[number]["value"],
             mode: "avatar" as "avatar" | "audio",
             avatar: {
                 width: 720,
