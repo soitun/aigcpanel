@@ -242,6 +242,7 @@ export const SoundReplace: TaskBiz = {
                 return "success";
             }
             jobResult.CombineConfirm.status = "success";
+            jobResult.step = "End";
             await TaskService.update(bizId, {
                 jobResult,
             });

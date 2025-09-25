@@ -123,7 +123,7 @@ const doCombineConfirm = async () => {
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
-                    <i class="iconfont icon-video-text"></i>
+                    <icon-ordered-list />
                     {{ $t("重排确认") }}
                 </div>
             </div>

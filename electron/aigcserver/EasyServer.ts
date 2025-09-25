@@ -127,9 +127,7 @@ export const EasyServer = function (config: any) {
                     await Files.copy(validQueueFiles[0].pathname, configJson);
                     await Files.deletes(validQueueFiles[0].pathname);
                     this._controllerRunIfNeeded(configJson, option);
-                    return true;
                 }
-                return false;
             };
             let timer = null;
             if (option.timeout > 0) {
@@ -142,8 +140,8 @@ export const EasyServer = function (config: any) {
                         }
                     }
                     this.ServerApi.file.appendText(this.ServerInfo.logFile, "timeout", {isDataPath: true});
-                    if (controllerWatching.resolve) {
-                        controllerWatching.resolve(undefined);
+                    if (controllerWatching.reject) {
+                        controllerWatching.reject(undefined);
                     }
                 }, option.timeout * 1000);
             }
@@ -191,8 +189,9 @@ export const EasyServer = function (config: any) {
                     clearTimeout(timer);
                     controller = null;
                     hasMoreQueue()
-                    if (controllerWatching.reject && !controllerWatching.promiseResolved) {
-                        controllerWatching.reject(undefined);
+                    if (controllerWatching.resolve && !controllerWatching.promiseResolved) {
+                        controllerWatching.promiseResolved = true;
+                        controllerWatching.resolve(undefined);
                     }
                 },
                 error: (_data, code) => {
@@ -202,6 +201,7 @@ export const EasyServer = function (config: any) {
                     controller = null;
                     hasMoreQueue()
                     if (controllerWatching.reject && !controllerWatching.promiseResolved) {
+                        controllerWatching.promiseResolved = true;
                         controllerWatching.reject(undefined);
                     }
                 },

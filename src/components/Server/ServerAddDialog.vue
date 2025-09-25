@@ -31,6 +31,7 @@ const modelInfo = ref({
     settings: [],
     setting: {},
     isSupport: false,
+    config: {} as Record<string, any>,
 });
 const isImporting = ref(false);
 const logStatus = ref("");
@@ -69,6 +70,7 @@ const emptyModelInfo = () => {
     modelInfo.value.settings = [];
     modelInfo.value.setting = {};
     modelInfo.value.isSupport = false;
+    modelInfo.value.config = {};
     resolvePanel.value?.reset();
 };
 
@@ -87,6 +89,7 @@ const doSubmitLocalDir = async () => {
         localPath: modelInfo.value.path,
         settings: modelInfo.value.settings,
         setting: modelInfo.value.setting,
+        config: modelInfo.value.config,
     } as ServerRecord);
 };
 
@@ -162,6 +165,7 @@ const doSelectLocalDir = async () => {
         modelInfo.value.functions = json.functions || [];
         modelInfo.value.settings = json.settings || {};
         modelInfo.value.setting = json.setting || {};
+        modelInfo.value.config = json;
         modelInfo.value.isSupport = await $mapi.server.isSupport({
             localPath: serverPath,
             name: modelInfo.value.name,

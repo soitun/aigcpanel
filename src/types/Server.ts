@@ -38,6 +38,9 @@ export type ServerRecord = {
     cloudConfig?: any;
     status?: any;
     runtime?: ServerRuntime | any;
+    config?: {
+        [key: string]: any;
+    }
 };
 
 export type ServerRuntime = {

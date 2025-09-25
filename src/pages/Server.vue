@@ -48,13 +48,13 @@ const typeName = (type: string) => {
             <div class="flex items-center">
                 <a-button class="ml-1" @click="modelSettingDialog?.show()">
                     <template #icon>
-                        <icon-command />
+                        <icon-command/>
                     </template>
                     {{ $t("大模型设置") }}
                 </a-button>
                 <a-button v-if="serverStore.records.length > 0" class="ml-1" @click="addDialog?.show()">
                     <template #icon>
-                        <icon-plus />
+                        <icon-plus/>
                     </template>
                     {{ $t("添加本地模型") }}
                 </a-button>
@@ -63,7 +63,7 @@ const typeName = (type: string) => {
         <div>
             <div v-if="!serverStore.records.length" class="py-20">
                 <div class="text-center">
-                    <img class="h-32 m-auto opacity-50" src="./../assets/image/server-empty.svg" />
+                    <img class="h-32 m-auto opacity-50" src="./../assets/image/server-empty.svg"/>
                 </div>
                 <div class="mt-5 text-center text-gray-400">
                     <div>{{ $t("暂时还没有模型，请添加模型~") }}</div>
@@ -71,19 +71,19 @@ const typeName = (type: string) => {
                 <div class="mt-5 text-center">
                     <a-button class="ml-1" @click="addDialog?.show()">
                         <template #icon>
-                            <icon-plus />
+                            <icon-plus/>
                         </template>
                         {{ $t("添加本地模型") }}
                     </a-button>
                     <a-button v-if="0" class="ml-1">
                         <template #icon>
-                            <icon-apps />
+                            <icon-apps/>
                         </template>
                         {{ $t("添加云端模型") }}
                     </a-button>
                     <a-button class="mx-1" @click="helpShow = true">
                         <template #icon>
-                            <icon-book class="mr-1" />
+                            <icon-book class="mr-1"/>
                         </template>
                         {{ $t("如何添加模型？") }}
                     </a-button>
@@ -95,7 +95,7 @@ const typeName = (type: string) => {
                         <div class="pt-3">
                             {{ $t("更多内容，请查看") }}
                             <a href="javascript:;" class="text-link" @click="doHelp">
-                                <icon-book />
+                                <icon-book/>
                                 {{ $t("在线文档") }}
                             </a>
                         </div>
@@ -119,7 +119,11 @@ const typeName = (type: string) => {
                                     <div class="inline-block rounded-3xl bg-gray-100 px-3">v{{ record.version }}</div>
                                 </div>
                             </div>
-                            <div>
+                            <div class="flex items-center gap-1">
+                                <a-tooltip v-if="record.config?.mode?.type==='watch'"
+                                           :content="$t('连续调用加速已开启')">
+                                    <icon-thunderbolt/>
+                                </a-tooltip>
                                 <ServerStatus
                                     :status="record.status"
                                     :auto-start="record.autoStart!"
@@ -129,7 +133,8 @@ const typeName = (type: string) => {
                         </div>
                         <div class="h-12 pt-4">
                             <div class="text-gray-400 text-sm">
-                                <a-tag v-for="label in functionToLabels(record.functions)" class="mr-1">
+                                <a-tag v-for="label in functionToLabels(record.functions)"
+                                       class="mr-1 rounded-lg">
                                     {{ label }}
                                 </a-tag>
                             </div>
@@ -140,16 +145,16 @@ const typeName = (type: string) => {
                                     v-if="!record.autoStart && record.type === EnumServerType.LOCAL_DIR"
                                     :record="record"
                                 />
-                                <ServerActionLog :record="record" />
-                                <ServerActionDelete :record="record" @update="doRefresh" />
-                                <ServerActionInfo :record="record" />
+                                <ServerActionLog :record="record"/>
+                                <ServerActionDelete :record="record" @update="doRefresh"/>
+                                <ServerActionInfo :record="record"/>
                                 <ServerActionSetting
                                     v-if="record.settings && Object.keys(record.settings).length > 0"
                                     :record="record"
                                 />
                             </div>
                             <div>
-                                <ServerStartTime :record="record" />
+                                <ServerStartTime :record="record"/>
                             </div>
                         </div>
                     </div>

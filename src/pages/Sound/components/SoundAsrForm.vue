@@ -103,7 +103,7 @@ defineExpose({
                 </div>
             </div>
         </div>
-        <div class="flex items-center m t-2" v-if="param && param.length > 0">
+        <div class="flex items-center mt-2" v-if="param && param.length > 0">
             <ParamForm ref="paramForm" :param="param" />
         </div>
     </div>

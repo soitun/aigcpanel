@@ -16,15 +16,19 @@ const visible = ref(false);
 const show = async () => {
     visible.value = true;
     const serverInfo = await serverStore.serverInfo(props.record);
-    const res = await window.$mapi.server.config(serverInfo);
+    const res = await $mapi.server.config(serverInfo);
     httpUrl.value = res.data?.httpUrl || "";
     content.value = buildServerContent(res.data);
 };
 
 const doOpenHttpUrl = () => {
     if (httpUrl.value) {
-        window.$mapi.app.openExternal(httpUrl.value);
+        $mapi.app.openExternal(httpUrl.value);
     }
+};
+
+const doOpenDir = (path: string) => {
+    $mapi.app.openPath(path);
 };
 
 defineExpose({
@@ -73,7 +77,8 @@ defineExpose({
                         </div>
                         <div
                             v-if="record.type === EnumServerType.LOCAL_DIR"
-                            class="rounded py-1 px-1 text-xs bg-gray-100"
+                            class="rounded-lg py-1 px-1 text-xs bg-gray-100 cursor-pointer"
+                            @click="doOpenDir(props.record.localPath!)"
                         >
                             {{ props.record.localPath }}
                         </div>
@@ -82,7 +87,7 @@ defineExpose({
                 <div class="flex mb-4">
                     <div class="w-20">{{ $t("功能") }}</div>
                     <div>
-                        <a-tag v-for="label in functionToLabels(record.functions)" class="mr-1">
+                        <a-tag v-for="label in functionToLabels(record.functions)" class="mr-1 rounded-lg">
                             {{ label }}
                         </a-tag>
                     </div>

@@ -24,7 +24,7 @@ const processedUrl = computed(() => {
 });
 
 const currentWidth = computed(() => (isZoomed.value ? props.largeWidth || "100%" : props.width || "10rem"));
-const currentHeight = computed(() => (isZoomed.value ? props.largeHeight || "90vh" : props.height || "10rem"));
+const currentHeight = computed(() => (isZoomed.value ? props.largeHeight || "70vh" : props.height || "10rem"));
 
 const toggleZoom = () => {
     isZoomed.value = !isZoomed.value;
