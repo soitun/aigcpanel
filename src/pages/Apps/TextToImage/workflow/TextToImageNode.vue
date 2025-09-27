@@ -19,7 +19,7 @@ const paramDialog = ref<InstanceType<typeof TextToImageParamDialog>>();
     <div class="p-2 relative">
         <div>
             <TextToImageFormView v-if="nodeData.textToImage" :data="nodeData.textToImage"/>
-            <div class="flex gap-2 items-center">
+            <div class="flex gap-1 items-center">
                 <a-button v-if="props.source==='config'" @click="paramDialog?.show(nodeData)" size="small">
                     <template #icon>
                         <icon-settings/>

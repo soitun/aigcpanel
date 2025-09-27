@@ -7,11 +7,11 @@ const props = defineProps<{
 </script>
 
 <template>
-    <div class="mb-4">
+    <div class="mb-1">
         <div class="font-bold mb-2">
             {{ $t("文生图配置") }}
         </div>
-        <div>
+        <div class="flex gap-1 flex-wrap">
             <TextToImageFormViewBody :data="data" />
         </div>
     </div>
