@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import {ref} from "vue";
-import {dataAutoSaveDraft} from "../../../../components/common/util";
-import {t} from "../../../../lang";
-import {Dialog} from "../../../../lib/dialog";
-import {TaskRecord, TaskService} from "../../../../service/TaskService";
+import { ref } from "vue";
+import { dataAutoSaveDraft } from "../../../../components/common/util";
+import { Dialog } from "../../../../lib/dialog";
+import { TaskRecord, TaskService } from "../../../../service/TaskService";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 
 const emit = defineEmits<{
@@ -21,7 +20,7 @@ const doSubmit = async () => {
         return;
     }
     if (!formData.value.text.trim()) {
-        Dialog.tipError(t("请输入长文本"));
+        Dialog.tipError("请输入长文本");
         return;
     }
     const taskTitle = formData.value.text.substring(0, 20) + "...";
@@ -40,7 +39,7 @@ const doSubmit = async () => {
     await TaskService.submit(record);
     formData.value.text = "";
     emit("submitted");
-    Dialog.tipSuccess(t("任务已提交"));
+    Dialog.tipSuccess("任务已提交");
     clearDraft();
 };
 </script>
@@ -48,10 +47,10 @@ const doSubmit = async () => {
 <template>
     <div class="rounded-xl shadow border p-4">
         <div class="mb-4">
-            <div class="mb-2 font-bold">{{ $t("长文本") }}</div>
+            <div class="mb-2 font-bold">{{ "长文本" }}</div>
             <a-textarea
                 v-model="formData.text"
-                :placeholder="$t('请输入要转换为音频的长文本')"
+                :placeholder="'请输入要转换为音频的长文本'"
                 :auto-size="{ minRows: 6, maxRows: 20 }"
             />
         </div>
@@ -59,7 +58,7 @@ const doSubmit = async () => {
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 <i class="iconfont icon-submit mr-2"></i>
-                {{ t("提交任务") }}
+                {{ "提交任务" }}
             </a-button>
         </div>
     </div>

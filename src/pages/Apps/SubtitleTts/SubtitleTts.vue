@@ -49,8 +49,8 @@ const doRefresh = async () => {
     <div class="p-5">
         <div class="app-header mb-4 flex items-center">
             <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">{{ $t("字幕转音频") }}</div>
-                <div class="text-gray-400 ml-3">{{ $t("将SRT字幕文件转换为音频") }}</div>
+                <div class="text-3xl font-bold">{{ "字幕转音频" }}</div>
+                <div class="text-gray-400 ml-3">{{ "将SRT字幕文件转换为音频" }}</div>
             </div>
             <ToggleButton v-model="stepsVisible"/>
         </div>
@@ -68,7 +68,7 @@ const doRefresh = async () => {
                                 :model-value="isAllChecked"
                                 :indeterminate="isIndeterminate"
                                 @change="onCheckAll">
-                                {{ $t("全选") }}
+                                {{ "全选" }}
                             </a-checkbox>
                         </div>
                         <TaskBatchDeleteAction

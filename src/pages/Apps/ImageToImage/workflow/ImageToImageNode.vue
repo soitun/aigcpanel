@@ -24,7 +24,7 @@ const paramDialog = ref<InstanceType<typeof ImageToImageParamDialog>>();
                     <template #icon>
                         <icon-settings/>
                     </template>
-                    {{ $t('设置')}}
+                    {{ '设置'}}
                 </a-button>
                 <TaskDialogViewButton :task-id="nodeRunData.taskId"/>
             </div>

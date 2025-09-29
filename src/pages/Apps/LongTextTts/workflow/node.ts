@@ -1,13 +1,12 @@
-import { defineAsyncComponent } from "vue";
-import { t } from "../../../../lang";
-import { NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult } from "../../../../module/Workflow/core/type";
-import { workflowRun } from "../../common/workflow";
-import { LongTextTtsRun } from "../task";
+import {defineAsyncComponent} from "vue";
+import {NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult} from "../../../../module/Workflow/core/type";
+import {workflowRun} from "../../common/workflow";
+import {LongTextTtsRun} from "../task";
 import LongTextTtsIcon from "./../assets/icon.svg";
 
 export default <NodeFunctionCall>{
     name: "LongTextTts",
-    title: t("长文本转音频"),
+    title: "长文本转音频",
     description: "将长文本转换为音频",
     icon: LongTextTtsIcon,
     comp: defineAsyncComponent(() => import("./LongTextTtsNode.vue")),
@@ -36,7 +35,10 @@ export default <NodeFunctionCall>{
                     soundGenerate: param.node.properties?.data?.soundGenerate,
                 };
                 if (!taskRunData.text || !taskRunData.soundGenerate) {
-                    throw t("参数错误");
+                    const missing: string[] = [];
+                    if (!taskRunData.text) missing.push("长文本");
+                    if (!taskRunData.soundGenerate) missing.push("声音生成服务");
+                    throw `参数错误：缺少 ${missing.join(", ")}`;
                 }
                 return await LongTextTtsRun(taskRunData);
             },
@@ -47,10 +49,10 @@ export default <NodeFunctionCall>{
     },
     async check(node) {
         if (!node.properties?.data?.soundGenerate) {
-            throw t("请配置声音生成服务");
+            throw "请配置声音生成服务";
         }
         if (node.properties?.inputFields?.[0].value === '') {
-            throw t("请输入长文本参数");
+            throw "请输入长文本参数";
         }
     }
 }

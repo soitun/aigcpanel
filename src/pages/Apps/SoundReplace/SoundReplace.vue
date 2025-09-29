@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import { onMounted, ref } from "vue";
 import TaskBatchDeleteAction from "../../../components/Server/TaskBatchDeleteAction.vue";
 import TaskBatchDownloadAction from "../../../components/Server/TaskBatchDownloadAction.vue";
-import {useCheckAll} from "../../../components/common/check-all";
-import {usePaginate} from "../../../hooks/paginate";
-import {useTaskChangeRefresh} from "../../../hooks/task";
-import {TaskRecord, TaskService} from "../../../service/TaskService";
+import ToggleButton from "../../../components/common/ToggleButton.vue";
+import { useCheckAll } from "../../../components/common/check-all";
+import { usePaginate } from "../../../hooks/paginate";
+import { useTaskChangeRefresh } from "../../../hooks/task";
+import { TaskRecord, TaskService } from "../../../service/TaskService";
+import { TaskChangeType } from "../../../store/modules/task";
+import Steps from "../common/Steps.vue";
 import SoundReplaceCreate from "./components/SoundReplaceCreate.vue";
 import SoundReplaceItem from "./components/SoundReplaceItem.vue";
-import Steps from "../common/Steps.vue";
-import ToggleButton from "../../../components/common/ToggleButton.vue";
-import {TaskChangeType} from "../../../store/modules/task";
 
 const {page, records, recordsForPage} = usePaginate<TaskRecord>({
     pageSize: 10,
@@ -49,8 +49,8 @@ const doRefresh = async () => {
     <div class="p-5">
         <div class="app-header mb-4 flex items-center">
             <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">{{ $t("声音替换") }}</div>
-                <div class="text-gray-400 ml-3">{{ $t("使用新声音替换已有视频的声音") }}</div>
+                <div class="text-3xl font-bold">声音替换</div>
+                <div class="text-gray-400 ml-3">使用新声音替换已有视频的声音</div>
             </div>
             <ToggleButton v-model="stepsVisible"/>
         </div>
@@ -69,7 +69,7 @@ const doRefresh = async () => {
                                 :model-value="isAllChecked"
                                 :indeterminate="isIndeterminate"
                                 @change="onCheckAll">
-                                {{ $t("全选") }}
+                                全选
                             </a-checkbox>
                         </div>
                         <TaskBatchDeleteAction

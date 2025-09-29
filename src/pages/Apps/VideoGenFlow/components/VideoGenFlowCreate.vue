@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import {onMounted, ref, watch} from "vue";
-import {t} from "../../../../lang";
-import {Dialog} from "../../../../lib/dialog";
-import {StorageUtil} from "../../../../lib/storage";
-import {PermissionService} from "../../../../service/PermissionService";
-import {TaskRecord, TaskService} from "../../../../service/TaskService";
+import { onMounted, ref, watch } from "vue";
+import { Dialog } from "../../../../lib/dialog";
+import { StorageUtil } from "../../../../lib/storage";
+import { PermissionService } from "../../../../service/PermissionService";
+import { TaskRecord, TaskService } from "../../../../service/TaskService";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 import VideoGenForm from "../../../Video/components/VideoGenForm.vue";
 
@@ -59,7 +58,7 @@ const doSubmit = async () => {
     }
     // console.log('VideoGenFlow.submit',JSON.stringify(record))
     const id = await TaskService.submit(record);
-    Dialog.tipSuccess(t("任务已经提交成功，等待视频生成完成"));
+    Dialog.tipSuccess("任务已经提交成功，等待视频生成完成");
     formData.value.text = "";
     emit("submitted");
 };
@@ -77,12 +76,12 @@ const emit = defineEmits({
             <a-textarea
                 v-model="formData.text"
                 :auto-size="{minRows: 2}"
-                :placeholder="$t('输入语音内容开始生成视频')"
+                :placeholder="'输入语音内容开始生成视频'"
             ></a-textarea>
         </div>
         <div>
             <a-button class="mr-2" type="primary" @click="doSubmit">
-                {{ $t("开始生成视频") }}
+                开始生成视频
             </a-button>
         </div>
     </div>

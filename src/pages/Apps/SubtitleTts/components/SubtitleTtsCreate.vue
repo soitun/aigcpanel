@@ -2,7 +2,6 @@
 import {ref} from "vue";
 import FileSelector from "../../../../components/common/FileSelector.vue";
 import {dataAutoSaveDraft} from "../../../../components/common/util";
-import {t} from "../../../../lang";
 import {Dialog} from "../../../../lib/dialog";
 import {TaskRecord, TaskService} from "../../../../service/TaskService";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
@@ -22,7 +21,7 @@ const doSubmit = async () => {
         return;
     }
     if (!formData.value.srt) {
-        Dialog.tipError(t("请选择SRT字幕文件"));
+        Dialog.tipError("请选择SRT字幕文件");
         return;
     }
     const taskTitle = $mapi.file.pathToName(formData.value.srt, false);
@@ -41,7 +40,7 @@ const doSubmit = async () => {
     await TaskService.submit(record);
     formData.value.srt = "";
     emit("submitted");
-    Dialog.tipSuccess(t("任务已提交"));
+    Dialog.tipSuccess("任务已提交");
     clearDraft();
 };
 </script>
@@ -50,7 +49,7 @@ const doSubmit = async () => {
     <div class="rounded-xl shadow border p-4">
         <div class="mb-4 flex items-start">
             <div class="pt-1 w-5">
-                <a-tooltip :content="$t('SRT字幕文件')" mini>
+                <a-tooltip :content="'SRT字幕文件'" mini>
                     <icon-file />
                 </a-tooltip>
             </div>
@@ -62,7 +61,7 @@ const doSubmit = async () => {
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 <i class="iconfont icon-submit mr-2"></i>
-                {{ t("提交任务") }}
+                {{ "提交任务" }}
             </a-button>
         </div>
     </div>

@@ -44,11 +44,11 @@ onMounted(() => {
     <div class="p-5">
         <div class="app-header mb-4 flex items-center">
             <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">{{ $t("数字人一键合成") }}</div>
-                <div class="text-gray-400 ml-3">{{ $t("快速完成文本输入→音频合成→数字人合成") }}</div>
+                <div class="text-3xl font-bold">数字人一键合成</div>
+                <div class="text-gray-400 ml-3">快速完成文本输入→音频合成→数字人合成</div>
             </div>
             <div class="flex items-center">
-                <a-tooltip v-if="0" :content="$t('清空历史')" position="right" mini>
+                <a-tooltip v-if="0" :content="'清空历史'" position="right" mini>
                     <a-button class="ml-1">
                         <template #icon>
                             <icon-delete/>
@@ -68,7 +68,7 @@ onMounted(() => {
                                 :indeterminate="isIndeterminate"
                                 @change="onCheckAll"
                             >
-                                {{ $t("全选") }}
+                                全选
                             </a-checkbox>
                         </div>
                         <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh"/>

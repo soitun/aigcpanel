@@ -1,16 +1,15 @@
-import {t} from "../../../lang";
+import {ffmpegCombineVideoAudio, ffmpegMergeAudio, ffmpegVideoToAudio} from "../../../lib/ffmpeg";
+import {ffprobeGetMediaDuration} from "../../../lib/ffprobe";
+import {serverSoundAsr, serverSoundGenerate} from "../../../lib/server";
+import {subtitleGenerateRecords, subtitleGenerateSrtContent} from "../../../lib/subtitle";
 import {ObjectUtil} from "../../../lib/util";
 import {TaskRecord, TaskService, TaskType} from "../../../service/TaskService";
 import {useServerStore} from "../../../store/modules/server";
 import {TaskBiz, useTaskStore} from "../../../store/modules/task";
 import {SoundReplaceJobResultType, SoundReplaceModelConfigType} from "./type";
-import {ffmpegCombineVideoAudio, ffmpegMergeAudio, ffmpegVideoToAudio} from "../../../lib/ffmpeg";
-import {serverSoundAsr, serverSoundGenerate} from "../../../lib/server";
-import {ffprobeGetMediaDuration} from "../../../lib/ffprobe";
-import {subtitleGenerateRecords, subtitleGenerateSrtContent} from "../../../lib/subtitle";
 
-import {TaskRunResult} from "../common/type";
 import {createTaskRunResult} from "../common/lib";
+import {TaskRunResult} from "../common/type";
 
 const serverStore = useServerStore();
 const taskStore = useTaskStore();
@@ -171,25 +170,46 @@ export const SoundReplace: TaskBiz = {
                 status: "running",
             });
             taskStore.fireChange({biz: "SoundReplace", bizId}, "running");
-            for (const record of jobResult.SoundGenerate.records) {
-                if (record.audio) {
-                    continue;
+            while (true) {
+                let taskRecord = await TaskService.get(bizId as any);
+                let i = -1;
+                const recordsLength = taskRecord!.jobResult.SoundGenerate.records.length;
+                for (i = 0; i < recordsLength; i++) {
+                    if (!taskRecord!.jobResult.SoundGenerate.records[i].audio) {
+                        break;
+                    }
+                }
+                if (i < 0 || i >= recordsLength) {
+                    break;
                 }
                 const ret = await serverSoundGenerate(
                     "SoundReplace",
                     bizId,
                     modelConfig.soundGenerate,
                     {},
-                    record.text
+                    taskRecord!.jobResult.SoundGenerate.records[i].text
                 );
                 if (ret.type === "retry") {
                     return ret.type;
                 }
-                record.audio = await $mapi.file.hubSave(ret.url);
-                await TaskService.update(bizId, {jobResult});
+                taskRecord = await TaskService.get(bizId as any);
+                // 可能被重置了
+                if (recordsLength !== taskRecord!.jobResult.SoundGenerate.records.length) {
+                    continue;
+                }
+                taskRecord!.jobResult.SoundGenerate.records[i].audio = await $mapi.file.hubSave(ret.url);
+                await TaskService.update(bizId, {
+                    jobResult: {
+                        SoundGenerate: {
+                            records: taskRecord!.jobResult.SoundGenerate.records
+                        }
+                    }
+                });
             }
             jobResult.step = "Combine";
             jobResult.SoundGenerate.status = "success";
+            const taskRecord = await TaskService.get(bizId as any);
+            jobResult.SoundGenerate.records = taskRecord!.jobResult.SoundGenerate.records;
             await TaskService.update(bizId, {jobResult});
         }
 
@@ -261,12 +281,12 @@ export const SoundReplace: TaskBiz = {
         if (jobResult.step === "Confirm") {
             await TaskService.update(bizId, {
                 status: "pause",
-                statusMsg: t("任务未完成，需要手动确认文字"),
+                statusMsg: "任务未完成，需要手动确认文字",
             });
         } else if (jobResult.step === "CombineConfirm") {
             await TaskService.update(bizId, {
                 status: "pause",
-                statusMsg: t("任务未完成，需要手动确认终稿"),
+                statusMsg: "任务未完成，需要手动确认终稿",
             });
         } else if (jobResult.step === "End") {
             const subTitleRecords = subtitleGenerateRecords(jobResult.SoundGenerate.records!.map(o => {

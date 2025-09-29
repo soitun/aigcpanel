@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import {onMounted, ref, watch} from "vue";
 import ParamForm from "../../../components/common/ParamForm.vue";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
 import ServerSelector from "../../../components/Server/ServerSelector.vue";
-import { t } from "../../../lang";
-import { Dialog } from "../../../lib/dialog";
-import { StorageUtil } from "../../../lib/storage";
-import { useServerStore } from "../../../store/modules/server";
-import { EnumServerStatus } from "../../../types/Server";
+import {Dialog} from "../../../lib/dialog";
+import {StorageUtil} from "../../../lib/storage";
+import {useServerStore} from "../../../store/modules/server";
+import {EnumServerStatus} from "../../../types/Server";
 
 const serverStore = useServerStore();
 const formData = ref({
@@ -44,11 +43,11 @@ const getValue = async (): Promise<ImageToImageParamType | undefined> => {
 
     const server = await serverStore.getByKey(data.serverKey);
     if (!server) {
-        Dialog.tipError(t("请选择图生图模型"));
+        Dialog.tipError("请选择图生图模型");
         return;
     }
     if (server.status !== EnumServerStatus.RUNNING) {
-        Dialog.tipError(t("图生图模型未启动"));
+        Dialog.tipError("图生图模型未启动");
         return;
     }
 
@@ -58,7 +57,7 @@ const getValue = async (): Promise<ImageToImageParamType | undefined> => {
     data.param = paramForm.value ? paramForm.value.getValue() : {};
 
     if (!data.param) {
-        Dialog.tipError(t("图生图参数不正确"));
+        Dialog.tipError("图生图参数不正确");
         return;
     }
 
@@ -86,11 +85,11 @@ defineExpose({
             <div class="inline-block w-5">
                 <icon-settings />
             </div>
-            {{ $t("图生图配置") }}
+            图生图配置
         </div>
         <div class="flex items-start min-h-8 max-w-lg w-full gap-1">
             <div class="pt-2">
-                <a-tooltip :content="$t('图生图模型')" mini>
+                <a-tooltip :content="'图生图模型'" mini>
                     <i class="iconfont icon-server"></i>
                 </a-tooltip>
             </div>

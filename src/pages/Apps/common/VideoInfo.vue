@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { t } from "../../../lang";
-import { TimeUtil } from "../../../lib/util";
+import {TimeUtil} from "../../../lib/util";
 
 const props = withDefaults(
     defineProps<{
@@ -30,12 +29,12 @@ const props = withDefaults(
         <icon-file-video />
     </a-tag>
     <a-tag class="rounded-lg"
-        >{{ label ? t("分辨率") : "" }}{{ data?.width || data?.videoWidth || "?" }}x{{
+        >{{ label ? "分辨率" : "" }}{{ data?.width || data?.videoWidth || "?" }}x{{
             data?.height || data?.videoHeight || "?"
         }}
     </a-tag>
     <a-tag class="rounded-lg">
-        {{ label ? t("时长") : "" }}{{ TimeUtil.secondsToTime(data?.duration || data?.videoDuration || 0) }}
+        {{ label ? "时长" : "" }}{{ TimeUtil.secondsToTime(data?.duration || data?.videoDuration || 0) }}
     </a-tag>
     <a-tag class="rounded-lg">{{ (data?.fps || data?.videoFps || 0).toFixed(2) }} FPS</a-tag>
 </template>

@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import {ref} from "vue";
-import {dataAutoSaveDraft} from "../../../../components/common/util";
-import {t} from "../../../../lang";
-import {Dialog} from "../../../../lib/dialog";
-import {TaskRecord, TaskService} from "../../../../service/TaskService";
+import { ref } from "vue";
+import FileSelector from "../../../../components/common/FileSelector.vue";
+import { dataAutoSaveDraft } from "../../../../components/common/util";
+import { Dialog } from "../../../../lib/dialog";
+import { TaskRecord, TaskService } from "../../../../service/TaskService";
 import SoundAsrForm from "../../../Sound/components/SoundAsrForm.vue";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
-import FileSelector from "../../../../components/common/FileSelector.vue";
 
 const emit = defineEmits<{
     submitted: [];
@@ -28,7 +27,7 @@ const doSubmit = async () => {
         return;
     }
     if (!formData.value.video) {
-        Dialog.tipError(t("请选择视频文件"));
+        Dialog.tipError("请选择视频文件");
         return;
     }
     const taskTitle = $mapi.file.pathToName(formData.value.video, false);
@@ -48,7 +47,7 @@ const doSubmit = async () => {
     await TaskService.submit(record);
     formData.value.video = "";
     emit("submitted");
-    Dialog.tipSuccess(t("任务已提交"));
+    Dialog.tipSuccess("任务已提交");
     clearDraft();
 };
 </script>
@@ -57,7 +56,7 @@ const doSubmit = async () => {
     <div class="rounded-xl shadow border p-4">
         <div class="mb-4 flex items-start">
             <div class="pt-1 w-5">
-                <a-tooltip :content="$t('视频文件')" mini>
+                <a-tooltip :content="'视频文件'" mini>
                     <i class="iconfont icon-video"></i>
                 </a-tooltip>
             </div>
@@ -70,7 +69,7 @@ const doSubmit = async () => {
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 <i class="iconfont icon-submit mr-2"></i>
-                {{ t("提交任务") }}
+                提交任务
             </a-button>
         </div>
     </div>

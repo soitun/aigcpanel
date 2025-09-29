@@ -1,13 +1,12 @@
-import { defineAsyncComponent } from "vue";
-import { t } from "../../../../lang";
-import { NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult } from "../../../../module/Workflow/core/type";
-import { workflowRun } from "../../common/workflow";
-import { ImageToImageRun } from "../task";
+import {defineAsyncComponent} from "vue";
+import {NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult} from "../../../../module/Workflow/core/type";
+import {workflowRun} from "../../common/workflow";
+import {ImageToImageRun} from "../task";
 import ImageToImageIcon from "./../assets/icon.svg";
 
 export default <NodeFunctionCall>{
     name: "ImageToImage",
-    title: t("图生图"),
+    title: "图生图",
     description: "将图像转换为图像",
     icon: ImageToImageIcon,
     comp: defineAsyncComponent(() => import("./ImageToImageNode.vue")),
@@ -42,7 +41,11 @@ export default <NodeFunctionCall>{
                     imageToImage: param.node.properties?.data?.imageToImage,
                 };
                 if (!taskRunData.image || !taskRunData.prompt || !taskRunData.imageToImage) {
-                    throw t("参数错误");
+                    const missing: string[] = [];
+                    if (!taskRunData.image) missing.push("图像");
+                    if (!taskRunData.prompt) missing.push("提示文本");
+                    if (!taskRunData.imageToImage) missing.push("图像生成服务");
+                    throw `参数错误：缺少 ${missing.join(", ")}`;
                 }
                 return await ImageToImageRun(taskRunData);
             },
@@ -53,13 +56,13 @@ export default <NodeFunctionCall>{
     },
     async check(node) {
         if (!node.properties?.data?.imageToImage) {
-            throw t("请配置图像生成服务");
+            throw "请配置图像生成服务";
         }
         if (node.properties?.inputFields?.[0].value === '') {
-            throw t("请输入图像参数");
+            throw "请输入图像参数";
         }
         if (node.properties?.inputFields?.[1].value === '') {
-            throw t("请输入提示参数");
+            throw "请输入提示参数";
         }
     }
 }

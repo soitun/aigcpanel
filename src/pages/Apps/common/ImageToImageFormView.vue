@@ -9,7 +9,7 @@ const props = defineProps<{
 <template>
     <div class="mb-4">
         <div class="font-bold mb-2">
-            {{ $t("图生图配置") }}
+            图生图配置
         </div>
         <div>
             <ImageToImageFormViewBody :data="data" />

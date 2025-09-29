@@ -6,7 +6,7 @@ import {
     FunctionCallNodeProps,
     useFunctionCallNode
 } from "../../../../module/Workflow/nodes/FunctionCall/lib";
-import TextToImageFormView from "../../../common/TextToImageFormView.vue";
+import TextToImageFormView from "../../common/TextToImageFormView.vue";
 import TextToImageParamDialog from "../components/TextToImageParamDialog.vue";
 
 const props = defineProps<FunctionCallNodeProps>();
@@ -24,7 +24,7 @@ const paramDialog = ref<InstanceType<typeof TextToImageParamDialog>>();
                     <template #icon>
                         <icon-settings/>
                     </template>
-                    {{ $t('设置')}}
+                    设置
                 </a-button>
                 <TaskDialogViewButton :task-id="nodeRunData.taskId"/>
             </div>

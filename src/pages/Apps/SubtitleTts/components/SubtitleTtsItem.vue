@@ -53,7 +53,7 @@ const subtitleText = computed(() => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file/>
-                    {{ $t("解析字幕") }}
+                    解析字幕
                 </div>
             </div>
             <div class="flex-grow pt-1">
@@ -68,7 +68,7 @@ const subtitleText = computed(() => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file-audio/>
-                    {{ $t("音频合成") }}
+                    音频合成
                 </div>
             </div>
             <div class="flex-grow">
@@ -100,7 +100,7 @@ const subtitleText = computed(() => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file-audio/>
-                    {{ $t("视频添加音频") }}
+                    合成音频
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Combine">

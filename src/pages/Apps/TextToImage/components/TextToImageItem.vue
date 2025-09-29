@@ -4,13 +4,13 @@ import TaskDeleteAction from "../../../../components/Server/TaskDeleteAction.vue
 import TaskDownloadAction from "../../../../components/Server/TaskDownloadAction.vue";
 import TaskDuration from "../../../../components/Server/TaskDuration.vue";
 import TaskTitleField from "../../../../components/Server/TaskTitleField.vue";
-import TaskBizStatus from "../../../../components/common/TaskBizStatus.vue";
-import TaskJobResultStepView from "../../../../components/common/TaskJobResultStepView.vue";
-import {TaskRecord} from "../../../../service/TaskService";
-import TextToImageFormViewBody from "../../common/TextToImageFormViewBody.vue";
-import {TextToImageJobResultType, TextToImageModelConfigType} from "../type";
 import TextTruncateView from "../../../../components/TextTruncateView.vue";
 import ImagePreviewBox from "../../../../components/common/ImagePreviewBox.vue";
+import TaskBizStatus from "../../../../components/common/TaskBizStatus.vue";
+import TaskJobResultStepView from "../../../../components/common/TaskJobResultStepView.vue";
+import { TaskRecord } from "../../../../service/TaskService";
+import TextToImageFormViewBody from "../../common/TextToImageFormViewBody.vue";
+import { TextToImageJobResultType, TextToImageModelConfigType } from "../type";
 
 const props = defineProps<{
     record: TaskRecord<TextToImageModelConfigType, TextToImageJobResultType>;
@@ -44,7 +44,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file/>
-                    {{ $t("处理图像") }}
+                    {{ "处理图像" }}
                 </div>
             </div>
             <div class="flex-grow pt-1">
@@ -59,7 +59,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file-image/>
-                    {{ $t("图像生成") }}
+                    {{ "图像生成" }}
                 </div>
             </div>
             <div class="flex-grow">

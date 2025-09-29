@@ -1,13 +1,12 @@
-import { defineAsyncComponent } from "vue";
-import { t } from "../../../../lang";
-import { NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult } from "../../../../module/Workflow/core/type";
-import { workflowRun } from "../../common/workflow";
-import { SubtitleTtsRun } from "../task";
+import {defineAsyncComponent} from "vue";
+import {NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult} from "../../../../module/Workflow/core/type";
+import {workflowRun} from "../../common/workflow";
+import {SubtitleTtsRun} from "../task";
 import SubtitleTtsIcon from "./../assets/icon.svg";
 
 export default <NodeFunctionCall>{
     name: "SubtitleTts",
-    title: t("字幕转音频"),
+    title: "字幕转音频",
     description: "将字幕文件转换为音频文件",
     icon: SubtitleTtsIcon,
     comp: defineAsyncComponent(() => import("./SubtitleTtsNode.vue")),
@@ -37,7 +36,10 @@ export default <NodeFunctionCall>{
                     soundGenerate: param.node.properties?.data?.soundGenerate,
                 };
                 if (!taskRunData.srt || !taskRunData.soundGenerate) {
-                    throw t("参数错误");
+                    const missing: string[] = [];
+                    if (!taskRunData.srt) missing.push("字幕文件");
+                    if (!taskRunData.soundGenerate) missing.push("声音生成服务");
+                    throw `参数错误：缺少 ${missing.join(", ")}`;
                 }
                 return await SubtitleTtsRun(taskRunData);
             },
@@ -48,10 +50,10 @@ export default <NodeFunctionCall>{
     },
     async check(node) {
         if (!node.properties?.data?.soundGenerate) {
-            throw t("请配置声音生成服务");
+            throw "请配置声音生成服务";
         }
         if (node.properties?.inputFields?.[0].value === '') {
-            throw t("请输入字幕文件参数");
+            throw "请输入字幕文件参数";
         }
     }
 }

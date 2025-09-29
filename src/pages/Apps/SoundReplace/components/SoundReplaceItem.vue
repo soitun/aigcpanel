@@ -12,12 +12,12 @@ import AudioPlayerButton from "../../../../components/common/AudioPlayerButton.v
 import ItemsLimitedView from "../../../../components/common/ItemsLimitedView.vue";
 import TaskBizStatus from "../../../../components/common/TaskBizStatus.vue";
 import TaskJobResultStepView from "../../../../components/common/TaskJobResultStepView.vue";
+import VideoPreviewBox from "../../../../components/common/VideoPreviewBox.vue";
 import {TaskRecord, TaskService} from "../../../../service/TaskService";
 import {useTaskStore} from "../../../../store/modules/task";
 import SoundAsrRecordsEditDialog from "../../../Sound/components/SoundAsrRecordsEditDialog.vue";
 import SoundGenerateFormViewBody from "../../../Sound/components/SoundGenerateFormViewBody.vue";
 import {SoundReplaceJobResultType, SoundReplaceModelConfigType} from "../type";
-import VideoPreviewBox from "../../../../components/common/VideoPreviewBox.vue";
 
 const taskStore = useTaskStore()
 const props = defineProps<{
@@ -67,6 +67,37 @@ const doCombineConfirm = async () => {
     props.onRefresh();
 };
 
+const doDeleteConfirmRecordItem = async (index: number) => {
+    const record = await TaskService.get(props.record.id!);
+    record?.jobResult?.Confirm?.records?.splice(index, 1);
+    record?.jobResult?.SoundGenerate?.records?.splice(index, 1);
+    await TaskService.update(props.record.id!, {
+        jobResult: {
+            Confirm: {records: record?.jobResult?.Confirm?.records},
+            SoundGenerate: {records: record?.jobResult?.SoundGenerate?.records},
+        },
+    });
+    props.onRefresh();
+};
+
+const doSaveConfirmRecordItem = async (index: number, text: string) => {
+    const record = await TaskService.get(props.record.id!);
+    if (record?.jobResult?.Confirm?.records && record?.jobResult?.Confirm?.records[index]) {
+        record.jobResult.Confirm.records[index].text = text;
+    }
+    if (record?.jobResult?.SoundGenerate?.records && record?.jobResult?.SoundGenerate?.records[index]) {
+        record.jobResult.SoundGenerate.records[index].text = text;
+        record.jobResult.SoundGenerate.records[index].audio = null;
+    }
+    await TaskService.update(props.record.id!, {
+        jobResult: {
+            Confirm: {records: record?.jobResult?.Confirm?.records},
+            SoundGenerate: {records: record?.jobResult?.SoundGenerate?.records},
+        },
+    });
+    props.onRefresh();
+};
+
 </script>
 
 <template>
@@ -93,7 +124,7 @@ const doCombineConfirm = async () => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <i class="iconfont icon-sound-prompt"></i>
-                    {{ $t("提取音频") }}
+                    提取音频
                 </div>
             </div>
             <div class="flex-grow pt-1">
@@ -106,7 +137,7 @@ const doCombineConfirm = async () => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <i class="iconfont icon-asr"></i>
-                    {{ $t("语音识别") }}
+                    语音识别
                 </div>
             </div>
             <div class="flex-grow pt-1">
@@ -123,8 +154,8 @@ const doCombineConfirm = async () => {
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
-                    <icon-ordered-list />
-                    {{ $t("重排确认") }}
+                    <icon-ordered-list/>
+                    重排确认
                 </div>
             </div>
             <div class="flex-grow pt-1">
@@ -147,7 +178,7 @@ const doCombineConfirm = async () => {
                                 <template #icon>
                                     <icon-pen/>
                                 </template>
-                                {{ $t("手动确认文字") }}
+                                手动确认文字
                             </a-button>
                         </div>
                     </template>
@@ -158,7 +189,7 @@ const doCombineConfirm = async () => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <i class="iconfont icon-sound"></i>
-                    {{ $t("声音合成") }}
+                    声音合成
                 </div>
             </div>
             <div class="flex-grow">
@@ -168,11 +199,32 @@ const doCombineConfirm = async () => {
                             <ItemsLimitedView toggle-biz="SoundReplace"
                                               :toggle-id="record.id!"
                                               :records="record.jobResult?.SoundGenerate?.records||[]">
-                                <template #default="{item}">
+                                <template #default="{item,index}">
                                     <div class="flex items-start mb-1">
-                                        <div class="w-6 flex-shrink-0">
+                                        <div class="w-6 flex-shrink-0 -mt-0.5">
                                             <AudioPlayerButton v-if="item.audio" :source="item.audio"/>
                                             <icon-info-circle v-else class="text-gray-400 text-xs"/>
+                                        </div>
+                                        <div class="w-6 flex-shrink-0 -mt-0.5">
+                                            <a-popover title="修改文字" placement="right" trigger="click">
+                                                <a href="javascript:;">
+                                                    <icon-pen-fill class="text-gray-500"/>
+                                                </a>
+                                                <template #content>
+                                                    <a-input
+                                                        :default-value="item.text"
+                                                        class="w-96"
+                                                        size="small"
+                                                        placeholder="请输入文字"
+                                                        @keydown.enter.prevent="doSaveConfirmRecordItem(index, $event.target.value)"
+                                                    />
+                                                </template>
+                                            </a-popover>
+                                        </div>
+                                        <div class="w-6 flex-shrink-0 -mt-0.5">
+                                            <a href="javascript:;" @click="doDeleteConfirmRecordItem(index)">
+                                                <icon-delete class="text-red-500"/>
+                                            </a>
                                         </div>
                                         <div class="text-xs">{{ item.text }}</div>
                                     </div>
@@ -190,12 +242,12 @@ const doCombineConfirm = async () => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <i class="iconfont icon-video"></i>
-                    {{ $t("视频合成") }}
+                    视频合成
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Combine">
                 <div>
-                    <VideoPreviewBox :url="record.jobResult?.Combine.file"/>
+                    <VideoPreviewBox :url="record.jobResult?.Combine.file!"/>
                 </div>
                 <div class="mt-1 flex gap-2">
                     <a-button
@@ -209,7 +261,7 @@ const doCombineConfirm = async () => {
                         <template #icon>
                             <icon-pen/>
                         </template>
-                        {{ $t("重新校验文字") }}
+                        重新校验文字
                     </a-button>
                     <a-button
                         v-if="record.jobResult?.CombineConfirm?.status==='pending'"
@@ -218,7 +270,7 @@ const doCombineConfirm = async () => {
                         <template #icon>
                             <icon-check/>
                         </template>
-                        {{ $t("确认无误完成") }}
+                        确认无误完成
                     </a-button>
                 </div>
             </TaskJobResultStepView>
@@ -248,5 +300,5 @@ const doCombineConfirm = async () => {
     </div>
     <SoundAsrRecordsEditDialog ref="soundAsrRecordsEditDialog"
                                :sound-generate="record.modelConfig?.soundGenerate!"
-                               :save-title="$t('保存并继续')" @save="onConfirm"/>
+                               :save-title="'保存并继续'" @save="onConfirm"/>
 </template>

@@ -1,13 +1,12 @@
-import {defineAsyncComponent} from "vue";
-import {t} from "../../../../lang";
-import {NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult} from "../../../../module/Workflow/core/type";
-import {workflowRun} from "../../common/workflow";
-import {SoundReplaceRun} from "../task";
+import { defineAsyncComponent } from "vue";
+import { NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult } from "../../../../module/Workflow/core/type";
+import { workflowRun } from "../../common/workflow";
+import { SoundReplaceRun } from "../task";
 import SoundReplaceIcon from "./../assets/icon.svg";
 
 export default <NodeFunctionCall>{
     name: "SoundReplace",
-    title: t("声音替换"),
+    title: "声音替换",
     description: "替换视频中的音频",
     icon: SoundReplaceIcon,
     comp: defineAsyncComponent(() => import("./SoundReplaceNode.vue")),
@@ -43,7 +42,11 @@ export default <NodeFunctionCall>{
                     soundGenerate: param.node.properties?.data?.soundGenerate,
                 };
                 if (!taskRunData.video || !taskRunData.soundAsr || !taskRunData.soundGenerate) {
-                    throw t("参数错误");
+                    const missing: string[] = [];
+                    if (!taskRunData.video) missing.push("视频");
+                    if (!taskRunData.soundAsr) missing.push("声音识别服务");
+                    if (!taskRunData.soundGenerate) missing.push("声音生成服务");
+                    throw `参数错误：缺少 ${missing.join(", ")}`;
                 }
                 return await SoundReplaceRun(taskRunData);
             },
@@ -55,10 +58,10 @@ export default <NodeFunctionCall>{
     },
     async check(node) {
         if (!node.properties?.data?.soundAsr || !node.properties?.data?.soundGenerate) {
-            throw t("请配置声音识别和声音生成服务");
+            throw "请配置声音识别和声音生成服务";
         }
         if (node.properties?.inputFields?.[0].value === '') {
-            throw t("请输入视频参数");
+            throw "请输入视频参数";
         }
     }
 }

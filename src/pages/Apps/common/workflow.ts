@@ -1,10 +1,4 @@
-import {
-    NodeRunController,
-    NodeRunParam,
-    NodeRunResult,
-    NodeRunResultStatus
-} from "../../../module/Workflow/core/type";
-import {t} from "../../../lang";
+import {NodeRunController, NodeRunParam, NodeRunResult, NodeRunResultStatus} from "../../../module/Workflow/core/type";
 
 type TaskRunnerResultBaseType = {
     code: number,
@@ -26,7 +20,7 @@ export const workflowRun = async <TaskRunnerResultType extends TaskRunnerResultB
 ): Promise<NodeRunResult> => {
     const result: NodeRunResult = {
         status: 'error' as NodeRunResultStatus,
-        statusMsg: t("未知错误"),
+        statusMsg: "未知错误",
         runOutputs: {},
         runData: {},
         pauseByType: '',
@@ -38,7 +32,7 @@ export const workflowRun = async <TaskRunnerResultType extends TaskRunnerResultB
     const taskResult = await res.result();
     if (taskResult.code) {
         result.status = 'error';
-        result.statusMsg = taskResult.msg || t("任务失败");
+        result.statusMsg = taskResult.msg || "任务失败";
     } else if (taskResult.data?.status === 'success') {
         result.status = 'success';
         await taskSuccessCallback(result, taskResult.data);
@@ -48,7 +42,7 @@ export const workflowRun = async <TaskRunnerResultType extends TaskRunnerResultB
         result.pauseById = res.taskId;
     } else {
         result.status = 'error';
-        result.statusMsg = taskResult.msg || t("任务失败");
+        result.statusMsg = taskResult.msg || "任务失败";
     }
     return result
 }

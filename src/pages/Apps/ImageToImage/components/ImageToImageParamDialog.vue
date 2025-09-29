@@ -43,13 +43,13 @@ defineExpose({
     <a-modal
         v-model:visible="visible"
         title-align="start"
-        :title="$t('图生图设置')"
+        :title="'图生图设置'"
         width="600px"
         :destroyOnClose="true">
         <template #footer>
             <div class="flex justify-end space-x-2">
-                <a-button @click="visible = false">{{ $t("取消") }}</a-button>
-                <a-button type="primary" @click="doSubmit">{{ $t("保存") }}</a-button>
+                <a-button @click="visible = false">取消</a-button>
+                <a-button type="primary" @click="doSubmit">保存</a-button>
             </div>
         </template>
         <div v-if="visible" class="space-y-4 overflow-y-auto" style="max-height: calc(100vh - 10rem)">

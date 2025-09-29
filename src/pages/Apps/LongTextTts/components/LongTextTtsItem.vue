@@ -10,9 +10,9 @@ import AudioPlayerButton from "../../../../components/common/AudioPlayerButton.v
 import ItemsLimitedView from "../../../../components/common/ItemsLimitedView.vue";
 import TaskBizStatus from "../../../../components/common/TaskBizStatus.vue";
 import TaskJobResultStepView from "../../../../components/common/TaskJobResultStepView.vue";
-import {TaskRecord} from "../../../../service/TaskService";
+import { TaskRecord } from "../../../../service/TaskService";
 import SoundGenerateFormViewBody from "../../../Sound/components/SoundGenerateFormViewBody.vue";
-import {LongTextTtsJobResultType, LongTextTtsModelConfigType} from "../type";
+import { LongTextTtsJobResultType, LongTextTtsModelConfigType } from "../type";
 
 const props = defineProps<{
     record: TaskRecord<LongTextTtsModelConfigType, LongTextTtsJobResultType>;
@@ -46,7 +46,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file/>
-                    {{ $t("分割文本") }}
+                    {{ "分割文本" }}
                 </div>
             </div>
             <div class="flex-grow pt-1">
@@ -61,7 +61,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file-audio/>
-                    {{ $t("音频合成") }}
+                    {{ "音频合成" }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -93,7 +93,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file-audio/>
-                    {{ $t("合并音频") }}
+                    {{ "合并音频" }}
                 </div>
             </div>
             <div class="flex-grow">
