@@ -94,7 +94,7 @@ async function createWindow() {
     }
     if (hasSplashWindow) {
         AppRuntime.splashWindow = new BrowserWindow({
-            title: AppConfig.name,
+            title: AppConfig.title,
             width: 600,
             height: 350,
             transparent: true,
@@ -107,7 +107,7 @@ async function createWindow() {
     }
     AppRuntime.mainWindow = new BrowserWindow({
         show: !hasSplashWindow,
-        title: AppConfig.name,
+        title: AppConfig.title,
         ...(!isPackaged ? {icon} : {}),
         frame: false,
         transparent: false,

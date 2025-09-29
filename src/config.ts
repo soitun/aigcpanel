@@ -5,6 +5,7 @@ const BASE_URL = "https://aigcpanel.com";
 
 export const AppConfig = {
     name: "AIGCPanel",
+    title: "AIGCPanel",
     slogan: "一站式AI数字人系统",
     version: packageJson.version,
     website: `${BASE_URL}`,

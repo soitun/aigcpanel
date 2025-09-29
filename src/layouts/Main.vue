@@ -55,7 +55,7 @@ onMounted(() => {
                     <img src="/logo.svg" class="w-4 t-4" />
                 </div>
                 <div class="p-2 flex-grow">
-                    {{ AppConfig.name }}
+                    {{ AppConfig.title }}
                     <span class="bg-gray-200 text-gray-500 rounded-lg px-1 inline-block">{{ $t("社区版") }}</span>
                 </div>
             </div>
