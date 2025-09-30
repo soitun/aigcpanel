@@ -138,10 +138,10 @@ export const ffmpegOptimized = async (
         const controller = $mapi.app.spawnBinary("ffmpeg", optimizedArgs, {
             shell: false,
             stdout: (data: string) => {
-                // console.log("FFmpeg stdout:", data);
+                console.log("FFmpeg stdout:", data);
             },
             stderr: (data: string) => {
-                // console.log("FFmpeg stderr:", data);
+                console.log("FFmpeg stderr:", data);
                 if (option?.onProgress && totalDuration > 0) {
                     const timeMatch = data.match(/time=(\d+):(\d+):(\d+\.\d+)/);
                     if (timeMatch) {

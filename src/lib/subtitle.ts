@@ -36,7 +36,7 @@ export function subtitleGenerateRecords(
         for (const char of text) {
             if (/[\u4e00-\u9fff]/.test(char)) { // 中文字符
                 length += 1;
-            } else if (/[a-zA-Z]/.test(char)) {
+            } else if (/[a-zA-Z0-9]/.test(char)) {
                 letterCount += 1;
             }
             // 标点和空格不算
@@ -138,11 +138,12 @@ export function subtitleGenerateRecords(
     const subtitles: AudioRecord[] = [];
     for (const record of records) {
         // 根据标点符号和空格分割成部分
-        const parts = record.text.split(/([。！？，,\s]+)/g).filter(p => p.trim().length > 0);
+        const parts = record.text.split(/([。！？，,\s]+)/g).filter(p => p.length > 0);
         const readableParts: string[] = [];
         for (let i = 0; i < parts.length; i += 2) {
             readableParts.push(parts[i]);
         }
+        // console.log('parts', {parts, readableParts});
 
         // 拼接可读部分
         const subtitleTexts: string[] = [];
@@ -150,9 +151,11 @@ export function subtitleGenerateRecords(
         let currentLength = 0;
         for (const part of readableParts) {
             const partLength = calculateLength(part);
+            // console.log('part', {part, partLength, currentLength, currentText});
             if (partLength > option.lineLimit) {
                 // 分割 part
                 const subParts = splitPart(part, option.lineLimit);
+                // console.log('subParts',{subParts})
                 for (const subPart of subParts) {
                     const subLength = calculateLength(subPart);
                     if (currentLength + subLength <= option.lineLimit) {
