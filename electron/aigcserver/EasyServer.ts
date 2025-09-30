@@ -381,6 +381,7 @@ export const EasyServer = function (config: any) {
                     id: data.id,
                     mode: "local",
                     modelConfig: {
+                        type: 'asr',
                         audio: data.audio,
                         param: data.param,
                     },
