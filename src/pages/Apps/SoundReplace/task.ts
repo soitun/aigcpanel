@@ -205,11 +205,10 @@ export const SoundReplace: TaskBiz = {
                         }
                     }
                 });
+                jobResult.SoundGenerate.records = taskRecord!.jobResult.SoundGenerate.records;
             }
             jobResult.step = "Combine";
             jobResult.SoundGenerate.status = "success";
-            const taskRecord = await TaskService.get(bizId as any);
-            jobResult.SoundGenerate.records = taskRecord!.jobResult.SoundGenerate.records;
             await TaskService.update(bizId, {jobResult});
         }
 

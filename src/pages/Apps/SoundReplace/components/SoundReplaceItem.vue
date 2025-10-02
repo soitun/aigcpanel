@@ -82,6 +82,7 @@ const doDeleteConfirmRecordItem = async (index: number) => {
 
 const doSaveConfirmRecordItem = async (index: number, text: string) => {
     const record = await TaskService.get(props.record.id!);
+    console.log('doSaveConfirmRecordItem', JSON.stringify({index, text, jobResult: record?.jobResult}));
     if (record?.jobResult?.Confirm?.records && record?.jobResult?.Confirm?.records[index]) {
         record.jobResult.Confirm.records[index].text = text;
     }
@@ -95,6 +96,7 @@ const doSaveConfirmRecordItem = async (index: number, text: string) => {
             SoundGenerate: {records: record?.jobResult?.SoundGenerate?.records},
         },
     });
+    // console.log('doSaveConfirmRecordItem.end', JSON.stringify({index, text, jobResult: record?.jobResult}));
     props.onRefresh();
 };
 
@@ -300,5 +302,5 @@ const doSaveConfirmRecordItem = async (index: number, text: string) => {
     </div>
     <SoundAsrRecordsEditDialog ref="soundAsrRecordsEditDialog"
                                :sound-generate="record.modelConfig?.soundGenerate!"
-                               :save-title="'保存并继续'" @save="onConfirm"/>
+                               save-title="保存并合成" @save="onConfirm"/>
 </template>
