@@ -35,6 +35,7 @@ src/lang/source-use.json
 /_delete
 .vscode
 
+/share-binary/
 /electron/resources/extra/linux-arm64/
 /electron/resources/extra/linux-x86/
 /electron/resources/extra/osx-arm64/
