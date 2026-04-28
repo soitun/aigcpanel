@@ -348,6 +348,15 @@ type DefsMapi = {
             data?: any;
         }) => Promise<any>;
     };
+    httpserver: {
+        status: () => Promise<{running: boolean; port: number}>;
+        start: (port?: number) => Promise<{code: number; msg?: string}>;
+        stop: () => Promise<{code: number}>;
+        getPort: () => Promise<number>;
+        setPort: (port: number) => Promise<{code: number}>;
+        getEnabled: () => Promise<boolean>;
+        setEnabled: (enabled: boolean) => Promise<{code: number}>;
+    };
     server: {
         listGpus: () => Promise<
             {

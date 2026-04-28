@@ -23,6 +23,8 @@ import {executeHooks} from "../lib/hooks";
 import {DevToolsManager} from "../lib/devtools";
 import {AppsMain} from "../mapi/app/main";
 import {ServerMain} from "../mapi/server/main";
+import {HttpServerMain} from "../mapi/httpserver/main";
+import ConfigMain from "../mapi/config/main";
 
 const isDummyNew = isDummy;
 
@@ -198,6 +200,13 @@ app.whenReady()
         MAPI.ready();
         ConfigMenu.ready();
         ConfigTray.ready();
+        ConfigMain.get("httpServerEnabled", true).then((enabled: boolean) => {
+            if (enabled) {
+                HttpServerMain.start().catch((err: any) => {
+                    Log.error("HttpServer auto-start failed", err);
+                });
+            }
+        });
         app.on("browser-window-created", (_, window) => {
             optimizer.watchWindowShortcuts(window);
         });

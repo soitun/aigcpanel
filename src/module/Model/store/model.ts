@@ -437,7 +437,10 @@ export const modelStore = defineStore("model", {
         sync: debounce(async () => {
             const providerData = {};
             model.providers.forEach(provider => {
-                providerData[provider.id] = ObjectUtil.clone(provider.data);
+                providerData[provider.id] = {
+                    ...ObjectUtil.clone(provider.data),
+                    apiUrl: provider.apiUrl || "",
+                };
                 if (provider.id === "buildIn") {
                     providerData[provider.id].apiKey = "";
                 }

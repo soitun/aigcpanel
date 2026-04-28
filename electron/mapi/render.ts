@@ -15,6 +15,7 @@ import user from "./user/render";
 import misc from "./misc/render";
 
 import server from "./server/render";
+import httpserver from "./httpserver/render";
 
 export const MAPI = {
     init(env: typeof AppEnv = null) {
@@ -34,6 +35,7 @@ export const MAPI = {
                 user,
                 misc,
                 server,
+                httpserver,
             });
             db.init();
             event.init();
