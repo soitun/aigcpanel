@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import {StorageUtil} from "../../../lib/storage";
+import { onMounted, ref } from "vue";
+import { StorageUtil } from "../../../lib/storage";
 import SoundGenerateForm from "./SoundGenerateForm.vue";
 import BatchTextareaInputAction from "../../../components/BatchTextareaInputAction.vue";
-import {Dialog} from "../../../lib/dialog";
-import {t} from "../../../lang";
-import {TaskRecord, TaskService} from "../../../service/TaskService";
-import {PermissionService} from "../../../service/PermissionService";
+import { Dialog } from "../../../lib/dialog";
+import { t } from "../../../lang";
+import { TaskRecord, TaskService } from "../../../service/TaskService";
+import { PermissionService } from "../../../service/PermissionService";
 import ModelAgentButton from "../../../module/Model/ModelAgentButton.vue";
-import {SoundGenerateTextFormItems, SoundGenerateTextPrompt} from "../config/prompt";
+import {
+    SoundGenerateTextFormItems,
+    SoundGenerateTextPrompt,
+} from "../config/prompt";
 
 const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm>>();
 const formData = ref({
@@ -101,17 +104,19 @@ const emit = defineEmits({
         <div class="mb-1">
             <a-textarea
                 v-model="formData.text"
-                :auto-size="{minRows: 2}"
+                :auto-size="{ minRows: 2 }"
                 :placeholder="$t('hint.inputVoiceSynthesis')"
             ></a-textarea>
         </div>
         <div class="mb-2 flex gap-1">
-            <ModelAgentButton biz="SoundGenerateTextPrompt"
-                              @result="formData.text = $event"
-                              :form-items="SoundGenerateTextFormItems"
-                              :prompt-default="SoundGenerateTextPrompt"/>
+            <ModelAgentButton
+                biz="SoundGenerateTextPrompt"
+                @result="formData.text = $event"
+                :form-items="SoundGenerateTextFormItems"
+                :prompt-default="SoundGenerateTextPrompt"
+            />
         </div>
-        <SoundGenerateForm ref="soundGenerateForm"/>
+        <SoundGenerateForm ref="soundGenerateForm" />
         <div class="flex gap-1">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 {{ $t("task.startSynthesis") }}

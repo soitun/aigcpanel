@@ -1,29 +1,31 @@
 <script setup lang="ts">
 import AppsItemDialog from "../../pages/Apps/common/AppsItemDialog.vue";
-import {ref} from "vue";
+import { ref } from "vue";
 
 const props = defineProps<{
-    taskId: string | number | undefined,
-    title?: string
-}>()
+    taskId: string | number | undefined;
+    title?: string;
+}>();
 const itemDialog = ref<InstanceType<typeof AppsItemDialog>>();
 </script>
 
 <template>
-    <a-button :disabled="!taskId"
-              @click="itemDialog?.show(taskId as any)"
-              size="small"
-              class="w-full">
+    <a-button
+        :disabled="!taskId"
+        @click="itemDialog?.show(taskId as any)"
+        size="small"
+        class="w-full"
+    >
         <template #icon>
-            <icon-tool/>
+            <icon-tool />
         </template>
         <template v-if="taskId">
-            {{ $t('task.view') }}
+            {{ $t("task.view") }}
             #{{ taskId }}
         </template>
         <template v-else>
-            {{ $t('status.notRunning') }}
+            {{ $t("status.notRunning") }}
         </template>
     </a-button>
-    <AppsItemDialog ref="itemDialog" :title="title || $t('task.details')"/>
+    <AppsItemDialog ref="itemDialog" :title="title || $t('task.details')" />
 </template>

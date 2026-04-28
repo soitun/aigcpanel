@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {TimeUtil} from "../../../lib/util";
+import { TimeUtil } from "../../../lib/util";
 
 const props = withDefaults(
     defineProps<{
@@ -14,7 +14,7 @@ const props = withDefaults(
     {
         icon: true,
         label: true,
-    }
+    },
 );
 </script>
 
@@ -22,7 +22,10 @@ const props = withDefaults(
     <a-tag v-if="icon" class="rounded-lg" color="blue">
         <icon-file-audio />
     </a-tag>
-    <a-tag class="rounded-lg">{{ label ? "时长" : "" }}{{ TimeUtil.secondsToTime(data.audioDuration || 0) }}</a-tag>
+    <a-tag class="rounded-lg"
+        >{{ label ? "时长" : ""
+        }}{{ TimeUtil.secondsToTime(data.audioDuration || 0) }}</a-tag
+    >
     <a-tag class="rounded-lg">{{ data.audioChannels }} Channels</a-tag>
     <a-tag class="rounded-lg">{{ data.audioSampleRate }} Hz</a-tag>
 </template>

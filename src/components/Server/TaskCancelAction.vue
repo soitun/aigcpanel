@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {Dialog} from "../../lib/dialog";
-import {t} from "../../lang";
-import {sleep} from "../../lib/util";
-import {TaskRecord} from "../../service/TaskService";
-import {computed} from "vue";
-import {useTaskStore} from "../../store/modules/task";
+import { Dialog } from "../../lib/dialog";
+import { t } from "../../lang";
+import { sleep } from "../../lib/util";
+import { TaskRecord } from "../../service/TaskService";
+import { computed } from "vue";
+import { useTaskStore } from "../../store/modules/task";
 
 const taskStore = useTaskStore();
 
@@ -31,10 +31,19 @@ const isCloud = computed(() => {
 </script>
 
 <template>
-    <a-tooltip v-if="!isCloud && record.status === 'running'" :content="$t('task.cancel')" mini>
-        <a-button class="mr-2" type="primary" status="danger" @click="doCancel()">
+    <a-tooltip
+        v-if="!isCloud && record.status === 'running'"
+        :content="$t('task.cancel')"
+        mini
+    >
+        <a-button
+            class="mr-2"
+            type="primary"
+            status="danger"
+            @click="doCancel()"
+        >
             <template #icon>
-                <icon-record-stop/>
+                <icon-record-stop />
             </template>
         </a-button>
     </a-tooltip>

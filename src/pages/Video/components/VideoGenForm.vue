@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import {onMounted, ref, watch} from "vue";
+import { onMounted, ref, watch } from "vue";
 import ParamForm from "../../../components/common/ParamForm.vue";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
 import ServerSelector from "../../../components/Server/ServerSelector.vue";
-import {t} from "../../../lang";
-import {Dialog} from "../../../lib/dialog";
-import {StorageUtil} from "../../../lib/storage";
-import {useServerStore} from "../../../store/modules/server";
-import {EnumServerStatus} from "../../../types/Server";
+import { t } from "../../../lang";
+import { Dialog } from "../../../lib/dialog";
+import { StorageUtil } from "../../../lib/storage";
+import { useServerStore } from "../../../store/modules/server";
+import { EnumServerStatus } from "../../../types/Server";
 import VideoTemplateSelector from "./VideoTemplateSelector.vue";
-import {VideoTemplateService} from "../../../service/VideoTemplateService";
+import { VideoTemplateService } from "../../../service/VideoTemplateService";
 
 const serverStore = useServerStore();
 const formData = ref({
@@ -32,12 +32,12 @@ onMounted(async () => {
 
 watch(
     () => formData.value,
-    async value => {
+    async (value) => {
         StorageUtil.set("VideoGenForm.formData", value);
     },
     {
         deep: true,
-    }
+    },
 );
 
 const getValue = async (): Promise<VideoGenParamType | undefined> => {
@@ -58,7 +58,9 @@ const getValue = async (): Promise<VideoGenParamType | undefined> => {
         Dialog.tipError(t("hint.selectVideo"));
         return;
     }
-    const videoTemplate = await VideoTemplateService.get(formData.value.videoTemplateId);
+    const videoTemplate = await VideoTemplateService.get(
+        formData.value.videoTemplateId,
+    );
     if (!videoTemplate) {
         Dialog.tipError(t("hint.selectVideo"));
         return;
@@ -98,10 +100,17 @@ defineExpose({
                 </a-tooltip>
             </div>
             <div class="mr-2 w-96 flex-shrink-0">
-                <ServerSelector v-model="formData.serverKey" @update="onServerUpdate" functionName="videoGen" />
+                <ServerSelector
+                    v-model="formData.serverKey"
+                    @update="onServerUpdate"
+                    functionName="videoGen"
+                />
             </div>
             <div>
-                <ServerContentInfoAction :config="modelConfig as any" func="videoGen" />
+                <ServerContentInfoAction
+                    :config="modelConfig as any"
+                    func="videoGen"
+                />
             </div>
         </div>
         <div class="flex items-center h-12 mb-2">

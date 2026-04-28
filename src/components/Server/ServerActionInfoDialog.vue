@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {ref} from "vue";
-import {buildServerContent, functionToLabels} from "../../lib/aigcpanel";
-import {useServerStore} from "../../store/modules/server";
-import {EnumServerType, ServerRecord} from "../../types/Server";
+import { ref } from "vue";
+import { buildServerContent, functionToLabels } from "../../lib/aigcpanel";
+import { useServerStore } from "../../store/modules/server";
+import { EnumServerType, ServerRecord } from "../../types/Server";
 
 const serverStore = useServerStore();
 const props = defineProps<{
@@ -37,7 +37,12 @@ defineExpose({
 </script>
 
 <template>
-    <a-modal v-model:visible="visible" width="40rem" :footer="false" title-align="start">
+    <a-modal
+        v-model:visible="visible"
+        width="40rem"
+        :footer="false"
+        title-align="start"
+    >
         <template #title>
             {{ $t("model.info") }}
         </template>
@@ -47,7 +52,9 @@ defineExpose({
                     <div class="w-20">{{ $t("model.model") }}</div>
                     <div class="flex flex-wrap items-center">
                         <div class="mr-2 mb-1">{{ props.record.title }}</div>
-                        <div class="mr-2 text-sm bg-gray-100 px-2 leading-6 inline-block rounded-lg mb-1">
+                        <div
+                            class="mr-2 text-sm bg-gray-100 px-2 leading-6 inline-block rounded-lg mb-1"
+                        >
                             v{{ props.record.version }}
                         </div>
                         <div
@@ -66,33 +73,48 @@ defineExpose({
                                 <i class="iconfont icon-desktop mr-1"></i>
                                 {{ $t("model.localModel") }}
                             </div>
-                            <div v-else-if="record.type === EnumServerType.LOCAL_DIR">
+                            <div
+                                v-else-if="
+                                    record.type === EnumServerType.LOCAL_DIR
+                                "
+                            >
                                 <i class="iconfont icon-folder mr-1"></i>
                                 {{ $t("setting.localModelDir") }}
                             </div>
-                            <div v-else-if="record.type === EnumServerType.CLOUD">
+                            <div
+                                v-else-if="record.type === EnumServerType.CLOUD"
+                            >
                                 <i class="iconfont icon-network mr-1"></i>
                                 {{ $t("model.cloudModel") }}
                             </div>
-                            <div v-else-if="record.type === EnumServerType.REMOTE">
+                            <div
+                                v-else-if="
+                                    record.type === EnumServerType.REMOTE
+                                "
+                            >
                                 <icon-cloud class="mr-1"></icon-cloud>
                                 {{ $t("model.cloudModel") }}
                             </div>
                         </div>
-                        <div v-if="record.type === EnumServerType.LOCAL_DIR"
+                        <div
+                            v-if="record.type === EnumServerType.LOCAL_DIR"
                             class="rounded-lg py-1 px-1 text-xs bg-gray-100 cursor-pointer"
-                            @click="doOpenDir(props.record.localPath!)">
+                            @click="doOpenDir(props.record.localPath!)"
+                        >
                             {{ props.record.localPath }}
                         </div>
                         <div v-else-if="record.type === EnumServerType.REMOTE">
-                            {{ props.record.remoteConfig.url}}
+                            {{ props.record.remoteConfig.url }}
                         </div>
                     </div>
                 </div>
                 <div class="flex mb-4">
                     <div class="w-20">{{ $t("common.feature") }}</div>
                     <div>
-                        <a-tag v-for="label in functionToLabels(record.functions)" class="mr-1 rounded-lg">
+                        <a-tag
+                            v-for="label in functionToLabels(record.functions)"
+                            class="mr-1 rounded-lg"
+                        >
                             {{ label }}
                         </a-tag>
                     </div>
@@ -115,7 +137,9 @@ defineExpose({
                 <div class="flex mb-4" v-if="content">
                     <div class="w-20">{{ $t("common.description") }}</div>
                     <div class="flex-grow">
-                        <div class="w-full max-h-32 p-3 overflow-auto text-sm bg-gray-100 leading-6 rounded-lg">
+                        <div
+                            class="w-full max-h-32 p-3 overflow-auto text-sm bg-gray-100 leading-6 rounded-lg"
+                        >
                             <div v-html="content"></div>
                         </div>
                     </div>

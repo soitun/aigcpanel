@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {TaskRecord, TaskService} from "../../service/TaskService";
+import { TaskRecord, TaskService } from "../../service/TaskService";
 import InputInlineEditor from "../common/InputInlineEditor.vue";
 
 const props = defineProps({
@@ -34,10 +34,17 @@ const onTitleClick = () => {
 
 <template>
     <div class="flex items-center">
-        <div class="truncate flex-grow max-w-96 cursor-pointer" @click="onTitleClick">
+        <div
+            class="truncate flex-grow max-w-96 cursor-pointer"
+            @click="onTitleClick"
+        >
             {{ record.title }}
         </div>
-        <InputInlineEditor v-if="!disabled" :value="record.title" @change="onEditTitle">
+        <InputInlineEditor
+            v-if="!disabled"
+            :value="record.title"
+            @change="onEditTitle"
+        >
             <a class="ml-1 text-gray-400" href="javascript:;">
                 <icon-pen />
             </a>

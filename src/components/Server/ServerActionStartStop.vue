@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {useServerStore} from "../../store/modules/server";
-import {EnumServerStatus, ServerRecord} from "../../types/Server";
+import { useServerStore } from "../../store/modules/server";
+import { EnumServerStatus, ServerRecord } from "../../types/Server";
 
 const serverStore = useServerStore();
 
@@ -40,7 +40,10 @@ const doStop = async () => {
     <a-tooltip :content="$t('common.stopService')" mini>
         <a-button
             class="mr-2"
-            v-if="record.status === EnumServerStatus.RUNNING || record.status === EnumServerStatus.STOPPING"
+            v-if="
+                record.status === EnumServerStatus.RUNNING ||
+                record.status === EnumServerStatus.STOPPING
+            "
             :loading="record.status === EnumServerStatus.STOPPING"
             type="primary"
             status="danger"

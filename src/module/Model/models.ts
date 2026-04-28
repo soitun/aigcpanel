@@ -129,7 +129,7 @@ import XirangModelLogo from "./assets/image/models/xirang.png";
 import XirangModelLogoDark from "./assets/image/models/xirang_dark.png";
 import YiModelLogo from "./assets/image/models/yi.png";
 import YiModelLogoDark from "./assets/image/models/yi_dark.png";
-import {Model} from "./types";
+import { Model } from "./types";
 
 export function getModelLogo(modelId: string) {
     const isLight = true;
@@ -513,11 +513,26 @@ export const SystemModels: Record<string, Partial<Model>[]> = {
     ],
     alayanew: [],
     openai: [
-        {id: "gpt-4.5-preview", provider: "openai", name: "gpt-4.5-preview", group: "gpt-4.5"},
-        {id: "gpt-4o", provider: "openai", name: "GPT-4o", group: "GPT 4o"},
-        {id: "gpt-4o-mini", provider: "openai", name: "GPT-4o-mini", group: "GPT 4o"},
-        {id: "o1-mini", provider: "openai", name: "o1-mini", group: "o1"},
-        {id: "o1-preview", provider: "openai", name: "o1-preview", group: "o1"},
+        {
+            id: "gpt-4.5-preview",
+            provider: "openai",
+            name: "gpt-4.5-preview",
+            group: "gpt-4.5",
+        },
+        { id: "gpt-4o", provider: "openai", name: "GPT-4o", group: "GPT 4o" },
+        {
+            id: "gpt-4o-mini",
+            provider: "openai",
+            name: "GPT-4o-mini",
+            group: "GPT 4o",
+        },
+        { id: "o1-mini", provider: "openai", name: "o1-mini", group: "o1" },
+        {
+            id: "o1-preview",
+            provider: "openai",
+            name: "o1-preview",
+            group: "o1",
+        },
     ],
     "azure-openai": [
         {
@@ -952,8 +967,18 @@ export const SystemModels: Record<string, Partial<Model>[]> = {
         },
     ],
     yi: [
-        {id: "yi-lightning", name: "Yi Lightning", provider: "yi", group: "yi-lightning"},
-        {id: "yi-vision-v2", name: "Yi Vision v2", provider: "yi", group: "yi-vision"},
+        {
+            id: "yi-lightning",
+            name: "Yi Lightning",
+            provider: "yi",
+            group: "yi-lightning",
+        },
+        {
+            id: "yi-vision-v2",
+            name: "Yi Vision v2",
+            provider: "yi",
+            group: "yi-vision",
+        },
     ],
     zhipu: [
         {
@@ -1096,16 +1121,36 @@ export const SystemModels: Record<string, Partial<Model>[]> = {
         },
     ],
     bailian: [
-        {id: "qwen-vl-plus", name: "qwen-vl-plus", provider: "dashscope", group: "qwen-vl"},
+        {
+            id: "qwen-vl-plus",
+            name: "qwen-vl-plus",
+            provider: "dashscope",
+            group: "qwen-vl",
+        },
         {
             id: "qwen-coder-plus",
             name: "qwen-coder-plus",
             provider: "dashscope",
             group: "qwen-coder",
         },
-        {id: "qwen-turbo", name: "qwen-turbo", provider: "dashscope", group: "qwen-turbo"},
-        {id: "qwen-plus", name: "qwen-plus", provider: "dashscope", group: "qwen-plus"},
-        {id: "qwen-max", name: "qwen-max", provider: "dashscope", group: "qwen-max"},
+        {
+            id: "qwen-turbo",
+            name: "qwen-turbo",
+            provider: "dashscope",
+            group: "qwen-turbo",
+        },
+        {
+            id: "qwen-plus",
+            name: "qwen-plus",
+            provider: "dashscope",
+            group: "qwen-plus",
+        },
+        {
+            id: "qwen-max",
+            name: "qwen-max",
+            provider: "dashscope",
+            group: "qwen-max",
+        },
     ],
     stepfun: [
         {

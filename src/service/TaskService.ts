@@ -1,7 +1,7 @@
-import {TimeUtil} from "../lib/util";
-import {TaskChangeType, useTaskStore} from "../store/modules/task";
-import {groupThrottle} from "../lib/groupThrottle";
-import {t} from "../lang";
+import { TimeUtil } from "../lib/util";
+import { TaskChangeType, useTaskStore } from "../store/modules/task";
+import { groupThrottle } from "../lib/groupThrottle";
+import { t } from "../lang";
 
 const taskStore = useTaskStore();
 
@@ -19,14 +19,23 @@ export type TaskBiz =
     | "ImageToImage"
     | "VideoGenFlow";
 
-export type TaskJobResultStepStatus = undefined | "queue" | "pending" | "running" | "success" | "fail";
+export type TaskJobResultStepStatus =
+    | undefined
+    | "queue"
+    | "pending"
+    | "running"
+    | "success"
+    | "fail";
 
 export enum TaskType {
     User = 1,
     System = 2,
 }
 
-export type TaskRecord<MODEL_CONFIG extends any = any, JOB_RESULT extends any = any> = {
+export type TaskRecord<
+    MODEL_CONFIG extends any = any,
+    JOB_RESULT extends any = any,
+> = {
     id?: number;
 
     biz: TaskBiz;
@@ -47,7 +56,7 @@ export type TaskRecord<MODEL_CONFIG extends any = any, JOB_RESULT extends any = 
     jobResult?: JOB_RESULT;
     modelConfig?: MODEL_CONFIG;
     result?: {
-        percent: number
+        percent: number;
     } & any;
 
     runtime?: TaskRuntime;
@@ -71,7 +80,10 @@ const mergeData = (oldData: any, newData: any) => {
         if (key in newData) {
             if (Array.isArray(newData[key])) {
                 result[key] = newData[key];
-            } else if (typeof newData[key] === "object" && newData[key] !== null) {
+            } else if (
+                typeof newData[key] === "object" &&
+                newData[key] !== null
+            ) {
                 result[key] = mergeData(oldData[key], newData[key]);
             } else {
                 result[key] = newData[key];
@@ -109,7 +121,9 @@ export const TaskService = {
             ...record,
             param: JSON.parse(record.param ? record.param : "{}"),
             jobResult: JSON.parse(record.jobResult ? record.jobResult : "{}"),
-            modelConfig: JSON.parse(record.modelConfig ? record.modelConfig : "{}"),
+            modelConfig: JSON.parse(
+                record.modelConfig ? record.modelConfig : "{}",
+            ),
             result: JSON.parse(record.result ? record.result : "{}"),
         } as TaskRecord;
     },
@@ -133,24 +147,27 @@ export const TaskService = {
             `SELECT *
              FROM ${this.tableName()}
              WHERE id = ?`,
-            [id]
+            [id],
         );
         return this.decodeRecord(record);
     },
-    async list(biz: TaskBiz, type: TaskType = TaskType.User): Promise<TaskRecord[]> {
+    async list(
+        biz: TaskBiz,
+        type: TaskType = TaskType.User,
+    ): Promise<TaskRecord[]> {
         const records: TaskRecord[] = await window.$mapi.db.select(
             `SELECT *
              FROM ${this.tableName()}
              WHERE biz = ?
                AND type = ?
              ORDER BY id DESC`,
-            [biz, type]
+            [biz, type],
         );
         return records.map(this.decodeRecord) as TaskRecord[];
     },
     async listByStatus(
         biz: TaskBiz,
-        statusList: ("queue" | "wait" | "running" | "success" | "fail")[]
+        statusList: ("queue" | "wait" | "running" | "success" | "fail")[],
     ): Promise<TaskRecord[]> {
         if (!statusList || statusList.length === 0) {
             return [];
@@ -161,7 +178,7 @@ export const TaskService = {
              WHERE biz = ?
                AND status IN (${statusList.map(() => "?").join(",")})
              ORDER BY id DESC`,
-            [biz, ...statusList]
+            [biz, ...statusList],
         );
         return records.map(this.decodeRecord) as TaskRecord[];
     },
@@ -172,7 +189,7 @@ export const TaskService = {
              WHERE biz = ?
                AND (status = 'running' OR status = 'wait' OR status = 'queue')
              ORDER BY id DESC`,
-            [biz]
+            [biz],
         );
         // console.log('TaskService.restoreForTask', records.length)
         for (let record of records) {
@@ -184,7 +201,7 @@ export const TaskService = {
                     status: "queue",
                     runStart: record.startTime,
                     queryInterval: 5 * 1000,
-                }
+                },
             );
         }
     },
@@ -209,12 +226,12 @@ export const TaskService = {
             record.type = TaskType.User;
         }
         record = this.encodeRecord(record);
-        const values = fields.map(f => record[f]);
-        const valuesPlaceholder = fields.map(f => "?");
+        const values = fields.map((f) => record[f]);
+        const valuesPlaceholder = fields.map((f) => "?");
         const id = await window.$mapi.db.insert(
             `INSERT INTO ${this.tableName()} (${fields.join(",")})
              VALUES (${valuesPlaceholder.join(",")})`,
-            values
+            values,
         );
         await taskStore.dispatch(
             record.biz,
@@ -222,79 +239,104 @@ export const TaskService = {
             {},
             {
                 queryInterval: 5 * 1000,
-            }
+            },
         );
         return id;
     },
-    updatePercent: groupThrottle(async (id: string, percent: number) => {
-        // console.log('TaskService.updatePercent', {id, percent});
-        const {updates, biz} = await TaskService.update(id, {result: {percent}});
-        taskStore.fireChange({
-            biz: biz!, bizId: id,
-        }, 'change');
-    }, 3000, {
-        trailing: true,
-    }),
+    updatePercent: groupThrottle(
+        async (id: string, percent: number) => {
+            // console.log('TaskService.updatePercent', {id, percent});
+            const { updates, biz } = await TaskService.update(id, {
+                result: { percent },
+            });
+            taskStore.fireChange(
+                {
+                    biz: biz!,
+                    bizId: id,
+                },
+                "change",
+            );
+        },
+        3000,
+        {
+            trailing: true,
+        },
+    ),
     cancelCheck: (biz: TaskBiz, bizId: string) => {
         if (taskStore.shouldCancel(biz, bizId)) {
-            throw t('task.cancelled');
+            throw t("task.cancelled");
         }
     },
-    updateDelayAndFireChange: groupThrottle(async (
-        id: string,
-        record: Partial<TaskRecord>,
-        fireChangeType: TaskChangeType = "running",
-        option?: {
-            mergeResult?: boolean;
-        }
-    ) => {
-        const {updates, biz} = await TaskService.update(id, record, option);
-        taskStore.fireChange({biz: biz!, bizId: id}, fireChangeType);
-    }, 1000, {
-        trailing: true,
-    }),
+    updateDelayAndFireChange: groupThrottle(
+        async (
+            id: string,
+            record: Partial<TaskRecord>,
+            fireChangeType: TaskChangeType = "running",
+            option?: {
+                mergeResult?: boolean;
+            },
+        ) => {
+            const { updates, biz } = await TaskService.update(
+                id,
+                record,
+                option,
+            );
+            taskStore.fireChange({ biz: biz!, bizId: id }, fireChangeType);
+        },
+        1000,
+        {
+            trailing: true,
+        },
+    ),
     async update(
         id: number | string,
         record: Partial<TaskRecord>,
         option?: {
             mergeResult?: boolean;
-        }
+        },
     ): Promise<{
-        updates: number,
-        biz: string | null,
+        updates: number;
+        biz: string | null;
     }> {
         option = Object.assign(
             {
                 mergeResult: true,
             },
-            option
+            option,
         );
         let recordOld: TaskRecord | null = null;
-        if ("result" in record || "jobResult" in record || "startTime" in record) {
+        if (
+            "result" in record ||
+            "jobResult" in record ||
+            "startTime" in record
+        ) {
             recordOld = await this.get(id);
             if (option.mergeResult) {
                 if ("result" in record) {
                     record.result = mergeData(recordOld?.result, record.result);
                 }
                 if ("jobResult" in record) {
-                    record.jobResult = mergeData(recordOld?.jobResult, record.jobResult);
+                    record.jobResult = mergeData(
+                        recordOld?.jobResult,
+                        record.jobResult,
+                    );
                 }
             }
         }
         record = this.encodeRecord(record as TaskRecord);
         const fields = Object.keys(record);
-        const values = fields.map(f => record[f]);
-        const set = fields.map(f => `${f} = ?`).join(",");
+        const values = fields.map((f) => record[f]);
+        const set = fields.map((f) => `${f} = ?`).join(",");
         const updates = await window.$mapi.db.execute(
             `UPDATE ${this.tableName()}
              SET ${set}
              WHERE id = ?`,
-            [...values, id]
+            [...values, id],
         );
         return {
             updates,
             biz: recordOld ? recordOld.biz : null,
-        }
+        };
     },
     async delete(record: TaskRecord) {
         const filesForClean: string[] = [];
@@ -310,7 +352,7 @@ export const TaskService = {
         }
         const cleaner = cleanersMap.get(record.biz);
         if (cleaner) {
-            const {files} = await cleaner(record);
+            const { files } = await cleaner(record);
             if (files && files.length > 0) {
                 filesForClean.push(...files);
             }
@@ -322,14 +364,14 @@ export const TaskService = {
             `DELETE
              FROM ${this.tableName()}
              WHERE id = ?`,
-            [record.id]
+            [record.id],
         );
     },
     async count(
         biz: TaskBiz | null,
         startTime: number = 0,
         endTime: number = 0,
-        type: TaskType = TaskType.User
+        type: TaskType = TaskType.User,
     ): Promise<number> {
         let sql = `SELECT COUNT(*) as cnt
                    FROM ${this.tableName()}`;

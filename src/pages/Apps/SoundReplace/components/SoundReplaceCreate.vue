@@ -12,11 +12,16 @@ const emit = defineEmits<{
     submitted: [];
 }>();
 const soundAsrForm = ref<InstanceType<typeof SoundAsrForm>>();
-const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(null);
+const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(
+    null,
+);
 const formData = ref({
     video: "",
 });
-const {clearDraft} = dataAutoSaveDraft("SoundReplaceCreate.formData", formData.value);
+const { clearDraft } = dataAutoSaveDraft(
+    "SoundReplaceCreate.formData",
+    formData.value,
+);
 
 const doSubmit = async () => {
     const soundAsrValue = await soundAsrForm.value?.getValue();
@@ -62,11 +67,11 @@ const doSubmit = async () => {
                 </a-tooltip>
             </div>
             <div class="flex items-center gap-2">
-                <FileSelector :extensions="['mp4']" v-model="formData.video"/>
+                <FileSelector :extensions="['mp4']" v-model="formData.video" />
             </div>
         </div>
-        <SoundAsrForm ref="soundAsrForm"/>
-        <SoundGenerateForm ref="soundGenerateForm"/>
+        <SoundAsrForm ref="soundAsrForm" />
+        <SoundGenerateForm ref="soundGenerateForm" />
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 <i class="iconfont icon-submit mr-2"></i>

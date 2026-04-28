@@ -1,8 +1,10 @@
-import {ffprobeGetMediaDuration, ffprobeVideoInfo} from "./ffprobe";
+import { ffprobeGetMediaDuration, ffprobeVideoInfo } from "./ffprobe";
 
 let hardwareEncodersCache: { [key: string]: boolean } | null = null;
 
-const detectHardwareEncoders = async (): Promise<{ [key: string]: boolean }> => {
+const detectHardwareEncoders = async (): Promise<{
+    [key: string]: boolean;
+}> => {
     if (hardwareEncodersCache) return hardwareEncodersCache;
 
     const platform = $mapi.app.platformName();
@@ -13,8 +15,8 @@ const detectHardwareEncoders = async (): Promise<{ [key: string]: boolean }> => 
             let buffer = "";
             $mapi.app.spawnBinary("ffmpeg", ["-encoders"], {
                 shell: false,
-                stdout: (data: string) => buffer += data,
-                stderr: (data: string) => buffer += data,
+                stdout: (data: string) => (buffer += data),
+                stderr: (data: string) => (buffer += data),
                 success: () => resolve(buffer),
                 error: (msg: string) => reject(msg),
             });
@@ -22,8 +24,10 @@ const detectHardwareEncoders = async (): Promise<{ [key: string]: boolean }> => 
         // Check for common hardware encoders based on platform
         if (platform === "osx") {
             // macOS VideoToolbox
-            if (output.includes("h264_videotoolbox")) encoders.h264_videotoolbox = true;
-            if (output.includes("hevc_videotoolbox")) encoders.hevc_videotoolbox = true;
+            if (output.includes("h264_videotoolbox"))
+                encoders.h264_videotoolbox = true;
+            if (output.includes("hevc_videotoolbox"))
+                encoders.hevc_videotoolbox = true;
         } else if (platform === "win") {
             // Windows
             if (output.includes("h264_nvenc")) encoders.h264_nvenc = true;
@@ -50,7 +54,10 @@ const detectHardwareEncoders = async (): Promise<{ [key: string]: boolean }> => 
     return encoders;
 };
 
-const optimizeArgs = (args: string[], encoders: { [key: string]: boolean }): string[] => {
+const optimizeArgs = (
+    args: string[],
+    encoders: { [key: string]: boolean },
+): string[] => {
     const optimizedArgs = [...args];
     // Replace software encoders with hardware ones if available
     for (let i = 0; i < optimizedArgs.length; i++) {
@@ -91,17 +98,19 @@ const extractInputFile = (args: string[]): string | null => {
 export const ffmpegOptimized = async (
     args: string[],
     option?: {
-        successFileCheck?: string,
+        successFileCheck?: string;
         onProgress?: (progress: number) => void;
-        codesOptimized?: boolean,
-    }
+        codesOptimized?: boolean;
+    },
 ): Promise<void> => {
-
-    option = Object.assign({
-        successFileCheck: '',
-        codesOptimized: false,
-        onProgress: undefined,
-    }, option)
+    option = Object.assign(
+        {
+            successFileCheck: "",
+            codesOptimized: false,
+            onProgress: undefined,
+        },
+        option,
+    );
 
     // add hide banner and loglevel error
     if (!args.includes("-hide_banner")) {
@@ -115,10 +124,10 @@ export const ffmpegOptimized = async (
     if (option!.codesOptimized) {
         const encoders = await detectHardwareEncoders();
         const optimizedArgs = optimizeArgs(args, encoders);
-        if (optimizedArgs.join(' ') !== args.join(' ')) {
-            $mapi.log.info('FfmpegCommandOptimized', {
-                original: 'ffmpeg ' + args.join(' '),
-                optimized: 'ffmpeg ' + optimizedArgs.join(' ')
+        if (optimizedArgs.join(" ") !== args.join(" ")) {
+            $mapi.log.info("FfmpegCommandOptimized", {
+                original: "ffmpeg " + args.join(" "),
+                optimized: "ffmpeg " + optimizedArgs.join(" "),
             });
         }
     }
@@ -148,8 +157,12 @@ export const ffmpegOptimized = async (
                         const hours = parseInt(timeMatch[1]);
                         const minutes = parseInt(timeMatch[2]);
                         const seconds = parseFloat(timeMatch[3]);
-                        const currentTime = hours * 3600 + minutes * 60 + seconds;
-                        const progress = Math.min(currentTime / totalDuration, 1);
+                        const currentTime =
+                            hours * 3600 + minutes * 60 + seconds;
+                        const progress = Math.min(
+                            currentTime / totalDuration,
+                            1,
+                        );
                         if (progress > lastProgress) {
                             option.onProgress(progress);
                             lastProgress = progress;
@@ -162,13 +175,18 @@ export const ffmpegOptimized = async (
                     option.onProgress(1);
                 }
                 if (option?.successFileCheck) {
-                    $mapi.file.exists(option.successFileCheck).then(exists => {
-                        if (exists) {
-                            resolve();
-                        } else {
-                            reject(`FFmpeg completed but output file not found: ${option?.successFileCheck}`);
-                        }
-                    }).catch(reject);
+                    $mapi.file
+                        .exists(option.successFileCheck)
+                        .then((exists) => {
+                            if (exists) {
+                                resolve();
+                            } else {
+                                reject(
+                                    `FFmpeg completed but output file not found: ${option?.successFileCheck}`,
+                                );
+                            }
+                        })
+                        .catch(reject);
                 } else {
                     resolve();
                 }
@@ -185,13 +203,13 @@ export const ffmpegSetMediaRatio = async (
     output: string,
     option?: {
         ratio: number;
-    }
+    },
 ) => {
     option = Object.assign(
         {
             ratio: 1.0,
         },
-        option || {}
+        option || {},
     );
     const ext = await $mapi.file.ext(input);
     if (!output) {
@@ -230,7 +248,15 @@ export const ffmpegSetMediaRatio = async (
             output,
         ];
     } else {
-        args = ["-i", input, "-filter:a", buildAtempoFilter(option.ratio), "-vn", "-y", output];
+        args = [
+            "-i",
+            input,
+            "-filter:a",
+            buildAtempoFilter(option.ratio),
+            "-vn",
+            "-y",
+            output,
+        ];
     }
 
     // console.log("FFmpeg setMediaRatio args:", args.join(" "));
@@ -270,7 +296,7 @@ const ffmpegConvertAudio = async (
         channels?: number;
         sampleRate?: number;
         format?: string;
-    }
+    },
 ) => {
     option = Object.assign(
         {
@@ -278,7 +304,7 @@ const ffmpegConvertAudio = async (
             sampleRate: 44100,
             format: "wav",
         },
-        option
+        option,
     );
     if (!output) {
         output = await $mapi.file.temp(option.format);
@@ -324,7 +350,7 @@ export type AudioRecord = {
 
 export const ffmpegMergeAudio = async (
     records: AudioRecord[],
-    recordMaxMs: number
+    recordMaxMs: number,
 ): Promise<{
     output: string;
     cleans: string[];
@@ -345,13 +371,21 @@ export const ffmpegMergeAudio = async (
     for (let i = 0; i < records.length; i++) {
         const currentRecord = records[i];
         const nextRecord = records[i + 1];
-        if (!currentRecord.audio || !(await $mapi.file.exists(currentRecord.audio))) {
+        if (
+            !currentRecord.audio ||
+            !(await $mapi.file.exists(currentRecord.audio))
+        ) {
             throw `音频文件不存在: ${currentRecord.audio}`;
         }
         // 计算当前片段的时长限制
         const startMs = currentRecord.start;
-        const maxDurationMs = nextRecord ? nextRecord.start - startMs : recordMaxMs - startMs;
-        const actualDurationMs = await ffprobeGetMediaDuration(currentRecord.audio, true);
+        const maxDurationMs = nextRecord
+            ? nextRecord.start - startMs
+            : recordMaxMs - startMs;
+        const actualDurationMs = await ffprobeGetMediaDuration(
+            currentRecord.audio,
+            true,
+        );
         mergeRecords.push({
             start: currentRecord.start,
             end: currentRecord.end,
@@ -389,16 +423,25 @@ export const ffmpegMergeAudio = async (
         const inputFilters: string[] = [];
         wavFiles.forEach((file, index) => {
             inputs.push("-i", file.path);
-            inputSources.push(`[${index}:a]adelay=${file.start}|${file.start}[a${index}]`);
+            inputSources.push(
+                `[${index}:a]adelay=${file.start}|${file.start}[a${index}]`,
+            );
             inputFilters.push(`[a${index}]`);
         });
         const filterComplex = [
             inputSources.join(";"),
             ";",
             inputFilters.join(""),
-            "amix=inputs=" + inputSources.length + ":duration=longest:normalize=0",
+            "amix=inputs=" +
+                inputSources.length +
+                ":duration=longest:normalize=0",
         ].join("");
-        await $mapi.app.spawnBinary("ffmpeg", [...inputs, "-filter_complex", filterComplex, output]);
+        await $mapi.app.spawnBinary("ffmpeg", [
+            ...inputs,
+            "-filter_complex",
+            filterComplex,
+            output,
+        ]);
     }
     // 检查合并后的音频是否存在
     if (!(await $mapi.file.exists(output))) {
@@ -418,12 +461,18 @@ export const ffmpegCombineVideoAudio = async (video: string, audio: string) => {
         video,
         "-i",
         audio,
-        "-c:v", "libx264",
-        "-preset", "ultrafast",
-        "-crf", "0",
-        "-c:a", "aac",
-        "-map", "0:v:0",
-        "-map", "1:a:0",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "ultrafast",
+        "-crf",
+        "0",
+        "-c:a",
+        "aac",
+        "-map",
+        "0:v:0",
+        "-map",
+        "1:a:0",
         "-y",
         output,
     ]);
@@ -455,9 +504,7 @@ export const ffmpegVideoToAudio = async (video: string) => {
     return file;
 };
 
-export const ffmpegConcatAudio = async (
-    audios: string[],
-): Promise<string> => {
+export const ffmpegConcatAudio = async (audios: string[]): Promise<string> => {
     if (audios.length === 0) {
         throw "没有提供任何音频文件";
     }
@@ -465,7 +512,9 @@ export const ffmpegConcatAudio = async (
         return audios[0];
     }
     const txtFile = await $mapi.file.temp("txt");
-    const lines = audios.map(audio => `file '${audio.replace(/'/g, "'\\''")}'`);
+    const lines = audios.map(
+        (audio) => `file '${audio.replace(/'/g, "'\\''")}'`,
+    );
     await $mapi.file.write(txtFile, lines.join("\n"));
     const output = await $mapi.file.temp("mp3");
     // mp3 128k 44100Hz 单声道
@@ -491,14 +540,17 @@ export const ffmpegConcatAudio = async (
         throw "音频合并失败";
     }
     return output;
-}
+};
 
-export const ffmpegVideoNormal = async (input: string, option: {
-    widthMax?: number;
-    heightMax?: number;
-    fps?: number;
-    durationMax?: number;
-}): Promise<string> => {
+export const ffmpegVideoNormal = async (
+    input: string,
+    option: {
+        widthMax?: number;
+        heightMax?: number;
+        fps?: number;
+        durationMax?: number;
+    },
+): Promise<string> => {
     option = Object.assign({
         widthMax: 1920,
         heightMax: 1920,
@@ -507,7 +559,7 @@ export const ffmpegVideoNormal = async (input: string, option: {
     });
     const ext = await $mapi.file.ext(input);
     const output = await $mapi.file.temp(ext);
-    const {width, height, duration, fps} = await ffprobeVideoInfo(input);
+    const { width, height, duration, fps } = await ffprobeVideoInfo(input);
     let scaleFilter = "";
     let targetWidth = width;
     let targetHeight = height;
@@ -527,8 +579,14 @@ export const ffmpegVideoNormal = async (input: string, option: {
         targetFps = option.fps;
         scaleFilter += (scaleFilter ? "," : "") + `fps=${targetFps}`;
     }
-    if (option.durationMax && option.durationMax > 0 && duration > option.durationMax) {
-        scaleFilter += (scaleFilter ? "," : "") + `trim=duration=${option.durationMax},setpts=PTS-STARTPTS`;
+    if (
+        option.durationMax &&
+        option.durationMax > 0 &&
+        duration > option.durationMax
+    ) {
+        scaleFilter +=
+            (scaleFilter ? "," : "") +
+            `trim=duration=${option.durationMax},setpts=PTS-STARTPTS`;
     }
     const args = [
         "-i",
@@ -548,25 +606,38 @@ export const ffmpegVideoNormal = async (input: string, option: {
         throw "视频处理失败，请检查视频文件是否存在或ffmpeg是否正常工作";
     }
     return output;
-}
+};
 
-export async function ffmpegCutVideo(input: string, startMs: number, endMs: number): Promise<string> {
-    const output = await $mapi.file.temp('mp4');
+export async function ffmpegCutVideo(
+    input: string,
+    startMs: number,
+    endMs: number,
+): Promise<string> {
+    const output = await $mapi.file.temp("mp4");
     const startSeconds = startMs / 1000;
     const durationSeconds = (endMs - startMs) / 1000;
     const args = [
-        '-i', input,
-        '-ss', startSeconds.toString(),
-        '-t', durationSeconds.toString(),
-        '-c:v', 'libx264',
-        '-preset', 'ultrafast',
-        '-crf', '0',
-        '-c:a', 'aac',
-        '-avoid_negative_ts', 'make_zero',
-        '-y', output
+        "-i",
+        input,
+        "-ss",
+        startSeconds.toString(),
+        "-t",
+        durationSeconds.toString(),
+        "-c:v",
+        "libx264",
+        "-preset",
+        "ultrafast",
+        "-crf",
+        "0",
+        "-c:a",
+        "aac",
+        "-avoid_negative_ts",
+        "make_zero",
+        "-y",
+        output,
     ];
     await ffmpegOptimized(args, {
-        successFileCheck: output
+        successFileCheck: output,
     });
     return output;
 }
@@ -574,28 +645,38 @@ export async function ffmpegCutVideo(input: string, startMs: number, endMs: numb
 // FFmpeg 工具函数：合并多个视频
 export async function ffmpegConcatVideos(videos: string[]): Promise<string> {
     if (videos.length === 0) {
-        throw new Error('No videos to concat');
+        throw new Error("No videos to concat");
     }
     if (videos.length === 1) {
         return videos[0];
     }
-    const output = await $mapi.file.temp('mp4');
-    const txtFile = await $mapi.file.temp('txt');
+    const output = await $mapi.file.temp("mp4");
+    const txtFile = await $mapi.file.temp("txt");
     // 创建 concat 文件列表
-    const lines = videos.map(video => `file '${video.replace(/'/g, "'\\''")}'`);
-    await $mapi.file.write(txtFile, lines.join('\n'));
+    const lines = videos.map(
+        (video) => `file '${video.replace(/'/g, "'\\''")}'`,
+    );
+    await $mapi.file.write(txtFile, lines.join("\n"));
     const args = [
-        '-f', 'concat',
-        '-safe', '0',
-        '-i', txtFile,
-        '-c:v', 'libx264',
-        '-preset', 'ultrafast',
-        '-crf', '0',
-        '-c:a', 'aac',
-        '-y', output
+        "-f",
+        "concat",
+        "-safe",
+        "0",
+        "-i",
+        txtFile,
+        "-c:v",
+        "libx264",
+        "-preset",
+        "ultrafast",
+        "-crf",
+        "0",
+        "-c:a",
+        "aac",
+        "-y",
+        output,
     ];
     await ffmpegOptimized(args, {
-        successFileCheck: output
+        successFileCheck: output,
     });
     return output;
 }

@@ -21,6 +21,12 @@ const props = defineProps<{
         <i class="iconfont icon-sound-prompt w-5"></i>
         {{ data.promptTitle }}
     </a-tag>
-    <ParamFormView v-if="data.type === 'SoundTts' && data.ttsParam" :param="data.ttsParam" />
-    <ParamFormView v-else-if="data.type === 'SoundClone' && data.cloneParam" :param="data.cloneParam" />
+    <ParamFormView
+        v-if="data.type === 'SoundTts' && data.ttsParam"
+        :param="data.ttsParam"
+    />
+    <ParamFormView
+        v-else-if="data.type === 'SoundClone' && data.cloneParam"
+        :param="data.cloneParam"
+    />
 </template>

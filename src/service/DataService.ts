@@ -3,7 +3,7 @@ export const DataService = {
         file: string,
         option?: {
             ext: string;
-        }
+        },
     ) {
         return await window.$mapi.file.hubSave(file, {
             ...option,

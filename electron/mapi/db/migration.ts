@@ -83,15 +83,23 @@ const versions = [
     {
         version: 2,
         up: async (db: DB) => {
-            await db.execute(`ALTER TABLE data_sound_tts ADD COLUMN result TEXT`);
-            await db.execute(`ALTER TABLE data_sound_clone ADD COLUMN result TEXT`);
-            await db.execute(`ALTER TABLE data_video_gen ADD COLUMN result TEXT`);
+            await db.execute(
+                `ALTER TABLE data_sound_tts ADD COLUMN result TEXT`,
+            );
+            await db.execute(
+                `ALTER TABLE data_sound_clone ADD COLUMN result TEXT`,
+            );
+            await db.execute(
+                `ALTER TABLE data_video_gen ADD COLUMN result TEXT`,
+            );
         },
     },
     {
         version: 3,
         up: async (db: DB) => {
-            await db.execute(`ALTER TABLE data_video_gen ADD COLUMN soundCustomFile TEXT`);
+            await db.execute(
+                `ALTER TABLE data_video_gen ADD COLUMN soundCustomFile TEXT`,
+            );
         },
     },
     {
@@ -154,7 +162,7 @@ const versions = [
                     `INSERT INTO data_task
                     (biz, status, statusMsg, startTime, endTime, serverName, serverTitle, serverVersion, param, jobResult, modelConfig,  result)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                    values
+                    values,
                 );
             }
             // SoundTts
@@ -182,7 +190,7 @@ const versions = [
                     `INSERT INTO data_task
                                  (biz, status, statusMsg, startTime, endTime, serverName, serverTitle, serverVersion, param, jobResult, modelConfig,  result)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                    values
+                    values,
                 );
             }
             // VideoGen
@@ -217,7 +225,7 @@ const versions = [
                     `INSERT INTO data_task
                                  (biz, status, statusMsg, startTime, endTime, serverName, serverTitle, serverVersion, param, jobResult, modelConfig,  result)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                    values
+                    values,
                 );
             }
         },
@@ -243,7 +251,11 @@ const versions = [
     {
         version: 7,
         up: async (db: DB) => {
-            const records = await StorageMain.get("soundClonePrompt", "records", []);
+            const records = await StorageMain.get(
+                "soundClonePrompt",
+                "records",
+                [],
+            );
             for (const r of records) {
                 const values = [
                     "SoundPrompt",
@@ -256,7 +268,7 @@ const versions = [
                 await db.insert(
                     `INSERT INTO data_storage (biz, title, content)
                                  VALUES (?, ?, ?)`,
-                    values
+                    values,
                 );
             }
         },
@@ -277,18 +289,32 @@ const versions = [
                 if (r.biz === "SoundTts" || r.biz === "SoundClone") {
                     title = Files.textToName(modelConfig.text);
                 } else if (r.biz === "VideoGen") {
-                    title = Files.textToName([modelConfig.videoTemplateName, modelConfig.soundTtsText].join("_"));
+                    title = Files.textToName(
+                        [
+                            modelConfig.videoTemplateName,
+                            modelConfig.soundTtsText,
+                        ].join("_"),
+                    );
                 } else if (r.biz === "VideoGenFlow") {
-                    title = Files.textToName([modelConfig.videoTemplateName, modelConfig.text].join("_"));
+                    title = Files.textToName(
+                        [modelConfig.videoTemplateName, modelConfig.text].join(
+                            "_",
+                        ),
+                    );
                 }
-                await db.execute(`UPDATE data_task SET title = ? WHERE id = ?`, [title, r.id]);
+                await db.execute(
+                    `UPDATE data_task SET title = ? WHERE id = ?`,
+                    [title, r.id],
+                );
             }
         },
     },
     {
         version: 9,
         up: async (db: DB) => {
-            const records = await db.select(`SELECT * FROM data_task where biz in ('SoundTts', 'SoundClone')`);
+            const records = await db.select(
+                `SELECT * FROM data_task where biz in ('SoundTts', 'SoundClone')`,
+            );
             for (const r of records) {
                 const modelConfigOld = JSON.parse(r.modelConfig);
                 const paramOld = JSON.parse(r.param);
@@ -317,7 +343,7 @@ const versions = [
                     `INSERT INTO data_task
                                  (biz, title, status, statusMsg, startTime, endTime, serverName, serverTitle, serverVersion, param, jobResult, modelConfig,  result)
                                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                    values
+                    values,
                 );
                 await db.execute(`DELETE FROM data_task WHERE id = ?`, [r.id]);
             }

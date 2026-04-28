@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import { onMounted, ref } from "vue";
 import InputInlineEditor from "../../components/common/InputInlineEditor.vue";
 import VideoPlayer from "../../components/common/VideoPlayer.vue";
-import {t} from "../../lang";
-import {Dialog} from "../../lib/dialog";
-import {VideoTemplateRecord, VideoTemplateService} from "../../service/VideoTemplateService";
+import { t } from "../../lang";
+import { Dialog } from "../../lib/dialog";
+import {
+    VideoTemplateRecord,
+    VideoTemplateService,
+} from "../../service/VideoTemplateService";
 import VideoInfo from "../Apps/common/VideoInfo.vue";
 import VideoTemplateCloudDialog from "./components/VideoTemplateCloudDialog.vue";
 import VideoTemplateEditDialog from "./components/VideoTemplateEditDialog.vue";
@@ -31,7 +34,7 @@ const doDelete = async (record: VideoTemplateRecord) => {
 };
 
 const onChangeTitle = async (record: VideoTemplateRecord, value: string) => {
-    await VideoTemplateService.update(record.id!, {name: value});
+    await VideoTemplateService.update(record.id!, { name: value });
     await doRefresh();
 };
 
@@ -66,18 +69,30 @@ const onUpdate = async () => {
             <m-empty v-if="!records.length && !loading" />
             <m-loading v-else-if="!records.length && loading" page />
             <div class="flex flex-wrap -mx-2">
-                <div v-for="r in records" :key="r.id" class="w-1/3 flex-shrink-0 p-2">
+                <div
+                    v-for="r in records"
+                    :key="r.id"
+                    class="w-1/3 flex-shrink-0 p-2"
+                >
                     <div class="rounded-xl shadow border p-4 hover:shadow-lg">
                         <div class="flex mb-3">
                             <div class="flex-grow w-0 mr-2">
                                 <div
                                     class="inline-flex max-w-full items-center bg-blue-100 rounded-full px-2 leading-8 h-8"
                                 >
-                                    <div class="truncate overflow-hidden flex-grow cursor-pointer">
+                                    <div
+                                        class="truncate overflow-hidden flex-grow cursor-pointer"
+                                    >
                                         {{ r.name }}
                                     </div>
-                                    <InputInlineEditor :value="r.name" @change="onChangeTitle(r, $event)">
-                                        <a class="ml-1 text-gray-400" href="javascript:;">
+                                    <InputInlineEditor
+                                        :value="r.name"
+                                        @change="onChangeTitle(r, $event)"
+                                    >
+                                        <a
+                                            class="ml-1 text-gray-400"
+                                            href="javascript:;"
+                                        >
                                             <icon-pen />
                                         </a>
                                     </InputInlineEditor>
@@ -97,7 +112,11 @@ const onUpdate = async () => {
                             </div>
                         </div>
                         <div class="flex gap-1">
-                            <VideoInfo :data="r.info" :label="false" :icon="false" />
+                            <VideoInfo
+                                :data="r.info"
+                                :label="false"
+                                :icon="false"
+                            />
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-import {t} from "../lang";
+import { t } from "../lang";
 
 export function mapError(msg: any) {
     if (typeof msg !== "string") {

@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import {VideoTemplateRecord, VideoTemplateService} from "../../../service/VideoTemplateService";
+import { onMounted, ref } from "vue";
+import {
+    VideoTemplateRecord,
+    VideoTemplateService,
+} from "../../../service/VideoTemplateService";
 
 const records = ref<VideoTemplateRecord[]>([]);
 onMounted(async () => {

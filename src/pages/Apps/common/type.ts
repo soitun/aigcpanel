@@ -1,8 +1,8 @@
 export type TaskRunResult = {
-    code: number,
-    msg: string,
+    code: number;
+    msg: string;
     data?: {
-        status: 'success' | 'pause',
-        [key: string]: any,
-    }
-}
+        status: "success" | "pause";
+        [key: string]: any;
+    };
+};

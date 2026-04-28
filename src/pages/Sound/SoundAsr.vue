@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { IconCopy, IconDown, IconDownload, IconEdit } from "@arco-design/web-vue/es/icon";
+import {
+    IconCopy,
+    IconDown,
+    IconDownload,
+    IconEdit,
+} from "@arco-design/web-vue/es/icon";
 import { computed, onMounted, ref } from "vue";
 import ServerNameVersion from "../../components/Server/ServerNameVersion.vue";
 import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam.vue";
@@ -29,17 +34,20 @@ interface AsrRecord {
     text: string;
 }
 
-const soundAsrRecordsEditDialog = ref<InstanceType<typeof SoundAsrRecordsEditDialog> | null>(null);
+const soundAsrRecordsEditDialog = ref<InstanceType<
+    typeof SoundAsrRecordsEditDialog
+> | null>(null);
 
-const {page, records, recordsForPage} = usePaginate<TaskRecord>();
+const { page, records, recordsForPage } = usePaginate<TaskRecord>();
 
 useTaskChangeRefresh("SoundAsr", () => {
     doRefresh();
 });
 
-const {mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords} = useCheckAll({
-    records: recordsForPage,
-});
+const { mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords } =
+    useCheckAll({
+        records: recordsForPage,
+    });
 
 onMounted(async () => {
     await doRefresh();
@@ -47,11 +55,15 @@ onMounted(async () => {
 
 const doRefresh = async () => {
     const rawRecords = await TaskService.list("SoundAsr");
-    const processedRecords = rawRecords.map(record => {
+    const processedRecords = rawRecords.map((record) => {
         record.runtime = {
             text: computed(() => {
-                if (record.result && record.result.records && Array.isArray(record.result.records)) {
-                    return record.result.records.map(r => r.text).join("");
+                if (
+                    record.result &&
+                    record.result.records &&
+                    Array.isArray(record.result.records)
+                ) {
+                    return record.result.records.map((r) => r.text).join("");
                 }
                 return "";
             }),
@@ -68,14 +80,17 @@ const onDownloadResultSubtitle = (record: TaskRecord) => {
                 (asrRecord, index) =>
                     `${index + 1}\n${formatSRTTime(asrRecord.start)} --> ${formatSRTTime(asrRecord.end)}\n${
                         asrRecord.text
-                    }\n`
+                    }\n`,
             )
             .join("\n");
-        DownloadUtil.downloadFile(srtContent, `${record.title || "asr-result"}.srt`);
+        DownloadUtil.downloadFile(
+            srtContent,
+            `${record.title || "asr-result"}.srt`,
+        );
     }
 };
 const onEditSave = async (taskId: number, records: AsrRecord[]) => {
-    await TaskService.update(taskId, {result: {records}});
+    await TaskService.update(taskId, { result: { records } });
     Dialog.tipSuccess(t("common.saveSuccess"));
     await doRefresh();
 };
@@ -85,14 +100,20 @@ const onEditSave = async (taskId: number, records: AsrRecord[]) => {
     <div class="p-5">
         <div class="mb-4 flex items-center">
             <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">{{ $t("voice.recognition") }}</div>
-                <div class="text-gray-400 ml-3">{{ $t("desc.recognitionEdit") }}</div>
+                <div class="text-3xl font-bold">
+                    {{ $t("voice.recognition") }}
+                </div>
+                <div class="text-gray-400 ml-3">
+                    {{ $t("desc.recognitionEdit") }}
+                </div>
             </div>
         </div>
         <div>
-            <SoundAsrCreate @submitted="doRefresh"/>
+            <SoundAsrCreate @submitted="doRefresh" />
             <div v-if="records.length > 0">
-                <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
+                <div
+                    class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center"
+                >
                     <div class="flex-grow flex items-center">
                         <div class="mr-3">
                             <a-checkbox
@@ -103,8 +124,11 @@ const onEditSave = async (taskId: number, records: AsrRecord[]) => {
                                 {{ $t("common.selectAll") }}
                             </a-checkbox>
                         </div>
-                        <TaskBatchDeleteAction :records="checkRecords" @update="doRefresh"/>
-                        <TaskBatchDownloadAction :records="checkRecords"/>
+                        <TaskBatchDeleteAction
+                            :records="checkRecords"
+                            @update="doRefresh"
+                        />
+                        <TaskBatchDownloadAction :records="checkRecords" />
                     </div>
                     <div>
                         <a-pagination
@@ -117,97 +141,145 @@ const onEditSave = async (taskId: number, records: AsrRecord[]) => {
                     </div>
                 </div>
                 <div v-for="r in recordsForPage" :key="r.id">
-                    <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg">
+                    <div
+                        class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg"
+                    >
                         <div class="flex items-center gap-1">
-                            <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
+                            <div
+                                class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2"
+                            >
                                 <div class="mr-2 h-8 pt-0.5">
-                                    <a-checkbox v-model="r['_check']"/>
+                                    <a-checkbox v-model="r['_check']" />
                                 </div>
                                 <div class="">
                                     <TaskTitleField
                                         :record="r"
-                                        @title-click="r['_check'] = !r['_check']"
-                                        @update="v => (r.title = v)"
+                                        @title-click="
+                                            r['_check'] = !r['_check']
+                                        "
+                                        @update="(v) => (r.title = v)"
                                     />
                                 </div>
                             </div>
                             <div class="flex-grow"></div>
-                            <TaskDuration :start="r.startTime" :end="r.endTime"/>
-                            <TaskBizStatus :status="r.status" :status-msg="r.statusMsg"/>
+                            <TaskDuration
+                                :start="r.startTime"
+                                :end="r.endTime"
+                            />
+                            <TaskBizStatus
+                                :status="r.status"
+                                :status-msg="r.statusMsg"
+                            />
                         </div>
                         <div class="mt-3 flex gap-1 flex-wrap">
-                            <ServerNameVersion :record="r"/>
-                            <ServerTaskResultParam :record="r as any"/>
+                            <ServerNameVersion :record="r" />
+                            <ServerTaskResultParam :record="r as any" />
                         </div>
 
                         <div v-if="r.result && r.runtime?.text" class="mt-3">
                             <div class="bg-gray-100 rounded-lg p-2">
-                                <TextTruncateView :text="r.runtime?.text"/>
+                                <TextTruncateView :text="r.runtime?.text" />
                             </div>
                         </div>
 
                         <div class="pt-4 flex items-center">
                             <div class="text-gray-400 flex-grow">
-                                <timeago :datetime="r['createdAt'] * 1000"/>
+                                <timeago :datetime="r['createdAt'] * 1000" />
                             </div>
                             <div class="">
-                                <a-tooltip v-if="r.result && r.runtime?.text" :content="$t('common.copyText')" mini>
-                                    <a-button class="mr-2" @click="doCopy(r.runtime?.text)" :title="$t('soundAsr.copyResult')">
+                                <a-tooltip
+                                    v-if="r.result && r.runtime?.text"
+                                    :content="$t('common.copyText')"
+                                    mini
+                                >
+                                    <a-button
+                                        class="mr-2"
+                                        @click="doCopy(r.runtime?.text)"
+                                        :title="$t('soundAsr.copyResult')"
+                                    >
                                         <template #icon>
-                                            <icon-copy/>
+                                            <icon-copy />
                                         </template>
                                     </a-button>
                                 </a-tooltip>
-                                <a-tooltip v-if="r.result && r.runtime?.text" :content="$t('common.download')" mini>
+                                <a-tooltip
+                                    v-if="r.result && r.runtime?.text"
+                                    :content="$t('common.download')"
+                                    mini
+                                >
                                     <a-dropdown-button
                                         @click="
-                                            DownloadUtil.downloadFile(r.runtime?.text, `${r.title || 'asr-result'}.txt`)
+                                            DownloadUtil.downloadFile(
+                                                r.runtime?.text,
+                                                `${r.title || 'asr-result'}.txt`,
+                                            )
                                         "
                                         class="mr-2"
                                     >
-                                        <icon-download/>
+                                        <icon-download />
                                         <template #icon>
-                                            <icon-down/>
+                                            <icon-down />
                                         </template>
                                         <template #content>
                                             <a-doption
                                                 @click="
                                                     DownloadUtil.downloadFile(
                                                         r.runtime?.text,
-                                                        `${r.title || 'asr-result'}.txt`
+                                                        `${r.title || 'asr-result'}.txt`,
                                                     )
                                                 "
                                             >
                                                 {{ $t("download.textFile") }}
                                             </a-doption>
-                                            <a-doption @click="onDownloadResultSubtitle(r)">
-                                                {{ $t("download.subtitleFile") }}
+                                            <a-doption
+                                                @click="
+                                                    onDownloadResultSubtitle(r)
+                                                "
+                                            >
+                                                {{
+                                                    $t("download.subtitleFile")
+                                                }}
                                             </a-doption>
                                         </template>
                                     </a-dropdown-button>
                                 </a-tooltip>
-                                <a-tooltip v-if="r.result && r.result.records" :content="$t('common.edit')" mini>
+                                <a-tooltip
+                                    v-if="r.result && r.result.records"
+                                    :content="$t('common.edit')"
+                                    mini
+                                >
                                     <a-button
                                         class="mr-2"
-                                        @click="soundAsrRecordsEditDialog?.edit(r.id as any, r.result.records)"
+                                        @click="
+                                            soundAsrRecordsEditDialog?.edit(
+                                                r.id as any,
+                                                r.result.records,
+                                            )
+                                        "
                                         :title="$t('task.editResult')"
                                     >
                                         <template #icon>
-                                            <icon-edit/>
+                                            <icon-edit />
                                         </template>
                                     </a-button>
                                 </a-tooltip>
-                                <TaskDeleteAction :record="r" @update="doRefresh"/>
-                                <TaskCancelAction :record="r"/>
+                                <TaskDeleteAction
+                                    :record="r"
+                                    @update="doRefresh"
+                                />
+                                <TaskCancelAction :record="r" />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <m-empty v-else :text="$t('empty.noRecognitionTask')"/>
+            <m-empty v-else :text="$t('empty.noRecognitionTask')" />
         </div>
 
         <!-- 编辑弹窗 -->
-        <SoundAsrRecordsEditDialog ref="soundAsrRecordsEditDialog" @save="onEditSave"/>
+        <SoundAsrRecordsEditDialog
+            ref="soundAsrRecordsEditDialog"
+            @save="onEditSave"
+        />
     </div>
 </template>

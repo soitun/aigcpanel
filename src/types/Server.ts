@@ -37,12 +37,12 @@ export type ServerRecord = {
         [key: string]: any;
     };
     cloudConfig?: any;
-    remoteConfig?: any;  // Remote model config: { url: string, name: string, version: string, ... }
+    remoteConfig?: any; // Remote model config: { url: string, name: string, version: string, ... }
     status?: any;
     runtime?: ServerRuntime | any;
     config?: {
         [key: string]: any;
-    }
+    };
 };
 
 export type ServerRuntime = {

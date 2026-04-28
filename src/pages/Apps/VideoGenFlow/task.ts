@@ -1,23 +1,27 @@
-import {DataService} from "../../../service/DataService";
-import {TaskService} from "../../../service/TaskService";
-import {useServerStore} from "../../../store/modules/server";
-import {TaskBiz} from "../../../store/modules/task";
-import {VideoGenFlowModelConfigType} from "./type";
-import {replaceSoundGenerateText} from "../../../lib/server";
+import { DataService } from "../../../service/DataService";
+import { TaskService } from "../../../service/TaskService";
+import { useServerStore } from "../../../store/modules/server";
+import { TaskBiz } from "../../../store/modules/task";
+import { VideoGenFlowModelConfigType } from "./type";
+import { replaceSoundGenerateText } from "../../../lib/server";
 
 const serverStore = useServerStore();
 
 const prepareData = async (bizId: string, bizParam: any) => {
-    const {record, server, serverInfo} = await serverStore.prepareForTask(bizId, bizParam);
+    const { record, server, serverInfo } = await serverStore.prepareForTask(
+        bizId,
+        bizParam,
+    );
     const modelConfig: VideoGenFlowModelConfigType = record.modelConfig;
     const soundGenerateServer = await serverStore.getByNameVersion(
         modelConfig.soundGenerate.serverName,
-        modelConfig.soundGenerate.serverVersion
+        modelConfig.soundGenerate.serverVersion,
     );
     if (!soundGenerateServer) {
         throw new Error("soundGenerateServer not found");
     }
-    const soundGenerateServerInfo = await serverStore.serverInfo(soundGenerateServer);
+    const soundGenerateServerInfo =
+        await serverStore.serverInfo(soundGenerateServer);
     return {
         record,
         server,
@@ -30,10 +34,13 @@ const prepareData = async (bizId: string, bizParam: any) => {
 export const VideoGenFlow: TaskBiz = {
     runFunc: async (bizId, bizParam) => {
         // console.log('VideoGenFlow.runFunc', {bizId, bizParam})
-        const {record, server, serverInfo, soundGenerateServer, soundGenerateServerInfo} = await prepareData(
-            bizId,
-            bizParam
-        );
+        const {
+            record,
+            server,
+            serverInfo,
+            soundGenerateServer,
+            soundGenerateServerInfo,
+        } = await prepareData(bizId, bizParam);
         const modelConfig: VideoGenFlowModelConfigType = record.modelConfig;
         // console.log('VideoGenFlow.runFunc.record', {record, server, soundTtsServer, soundCloneServer})
         // const videoServerInfo = await serverStore.serverInfo(server)
@@ -54,7 +61,7 @@ export const VideoGenFlow: TaskBiz = {
                 },
                 {
                     taskIdResultKey: "soundTtsTaskId",
-                }
+                },
             );
             // console.log('VideoGenFlow.runFunc.soundTts.res', res)
             if (res.code) {
@@ -91,7 +98,7 @@ export const VideoGenFlow: TaskBiz = {
                 },
                 {
                     taskIdResultKey: "soundCloneTaskId",
-                }
+                },
             );
             // console.log('VideoGenFlow.runFunc.soundClone.res', res)
             if (res.code) {
@@ -139,7 +146,7 @@ export const VideoGenFlow: TaskBiz = {
             },
             {
                 taskIdResultKey: "videoGenTaskId",
-            }
+            },
         );
         // console.log('VideoGen.runFunc.res', res)
         if (res.code) {
@@ -162,13 +169,15 @@ export const VideoGenFlow: TaskBiz = {
     },
     successFunc: async (bizId, bizParam) => {
         // console.log('VideoGenFlow.successFunc', {bizId, bizParam})
-        const {record} = await prepareData(bizId, bizParam);
+        const { record } = await prepareData(bizId, bizParam);
         // console.log('VideoGenFlow.successFunc.record', {record, server, soundTtsServer, soundCloneServer})
         await TaskService.update(bizId as any, {
             status: "success",
             endTime: Date.now(),
             result: {
-                url: await DataService.saveFile(record.jobResult.videoGen.data.data.url),
+                url: await DataService.saveFile(
+                    record.jobResult.videoGen.data.data.url,
+                ),
             },
         });
     },

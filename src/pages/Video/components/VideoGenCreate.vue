@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import {onMounted, ref, watch} from "vue";
+import { onMounted, ref, watch } from "vue";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
-import {t} from "../../../lang";
-import {Dialog} from "../../../lib/dialog";
-import {StorageUtil} from "../../../lib/storage";
-import {TimeUtil} from "../../../lib/util";
-import {PermissionService} from "../../../service/PermissionService";
-import {TaskRecord, TaskService} from "../../../service/TaskService";
-import {VideoTemplateRecord, VideoTemplateService} from "../../../service/VideoTemplateService";
+import { t } from "../../../lang";
+import { Dialog } from "../../../lib/dialog";
+import { StorageUtil } from "../../../lib/storage";
+import { TimeUtil } from "../../../lib/util";
+import { PermissionService } from "../../../service/PermissionService";
+import { TaskRecord, TaskService } from "../../../service/TaskService";
+import {
+    VideoTemplateRecord,
+    VideoTemplateService,
+} from "../../../service/VideoTemplateService";
 import SoundGenerateSelector from "../../Sound/components/SoundGenerateSelector.vue";
 import VideoGenForm from "./VideoGenForm.vue";
 
@@ -31,12 +34,12 @@ onMounted(() => {
 
 watch(
     () => formData.value,
-    async value => {
+    async (value) => {
         StorageUtil.set("VideoGenCreate.formData", value);
     },
     {
         deep: true,
-    }
+    },
 );
 
 const doSubmit = async () => {
@@ -68,7 +71,9 @@ const doSubmit = async () => {
     }
     const record: TaskRecord = {
         biz: "VideoGen",
-        title: await window.$mapi.file.textToName(videoGenValue.videoTemplateName + "_" + TimeUtil.datetimeString()),
+        title: await window.$mapi.file.textToName(
+            videoGenValue.videoTemplateName + "_" + TimeUtil.datetimeString(),
+        ),
         serverName: videoGenValue.serverName,
         serverTitle: videoGenValue.serverTitle,
         serverVersion: videoGenValue.serverVersion,
@@ -100,8 +105,8 @@ const refresh = async (type: "videoTemplate") => {
 const doSoundCustomSelect = async () => {
     const path = await window.$mapi.file.openFile({
         filters: [
-            {name: "*.wav", extensions: ["wav"]},
-            {name: "*.mp3", extensions: ["mp3"]},
+            { name: "*.wav", extensions: ["wav"] },
+            { name: "*.mp3", extensions: ["mp3"] },
         ],
     });
     if (!path) {
@@ -149,10 +154,16 @@ defineExpose({
                     </a-radio>
                 </a-radio-group>
             </div>
-            <div class="mr-3 w-96 flex-shrink-0" v-if="formData.soundType === 'soundGenerate'">
+            <div
+                class="mr-3 w-96 flex-shrink-0"
+                v-if="formData.soundType === 'soundGenerate'"
+            >
                 <SoundGenerateSelector v-model="formData.soundGenerateId" />
             </div>
-            <div class="mr-3 w-96 flex-shrink-0" v-if="formData.soundType === 'soundCustom'">
+            <div
+                class="mr-3 w-96 flex-shrink-0"
+                v-if="formData.soundType === 'soundCustom'"
+            >
                 <a-button @click="doSoundCustomSelect">
                     <div v-if="formData.soundCustomFile">
                         {{ fileName(formData.soundCustomFile) }}
@@ -165,7 +176,10 @@ defineExpose({
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 {{ $t("task.startVideoGen") }}
             </a-button>
-            <ServerContentInfoAction :config="modelConfig as any" func="videoGen" />
+            <ServerContentInfoAction
+                :config="modelConfig as any"
+                func="videoGen"
+            />
         </div>
     </div>
 </template>

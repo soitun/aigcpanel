@@ -4,15 +4,14 @@ import TextToImageForm from "../../common/TextToImageForm.vue";
 
 const textToImageForm = ref<InstanceType<typeof TextToImageForm> | null>(null);
 
-const props = defineProps<{
-}>();
+const props = defineProps<{}>();
 
 const visible = ref(false);
 const emit = defineEmits<{
     update: [
         data: {
-            textToImage: TextToImageParamType,
-        }
+            textToImage: TextToImageParamType;
+        },
     ];
 }>();
 const doSubmit = async () => {
@@ -36,7 +35,6 @@ defineExpose({
         });
     },
 });
-
 </script>
 
 <template>
@@ -45,14 +43,21 @@ defineExpose({
         title-align="start"
         :title="'文生图设置'"
         width="600px"
-        :destroyOnClose="true">
+        :destroyOnClose="true"
+    >
         <template #footer>
             <div class="flex justify-end space-x-2">
-                <a-button type="primary" @click="doSubmit">{{ "保存" }}</a-button>
+                <a-button type="primary" @click="doSubmit">{{
+                    "保存"
+                }}</a-button>
             </div>
         </template>
-        <div v-if="visible" class="space-y-4 overflow-y-auto" style="max-height: calc(100vh - 10rem)">
-            <TextToImageForm ref="textToImageForm"/>
+        <div
+            v-if="visible"
+            class="space-y-4 overflow-y-auto"
+            style="max-height: calc(100vh - 10rem)"
+        >
+            <TextToImageForm ref="textToImageForm" />
         </div>
     </a-modal>
 </template>

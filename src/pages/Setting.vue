@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import {onBeforeUnmount, onMounted, ref} from "vue";
-import {t} from "../lang";
-import {TabContentScroller} from "../lib/ui";
+import { onBeforeUnmount, onMounted, ref } from "vue";
+import { t } from "../lang";
+import { TabContentScroller } from "../lib/ui";
 import SettingBasic from "../components/Setting/SettingBasic.vue";
 import SettingEnv from "../components/Setting/SettingEnv.vue";
 import SettingAbout from "../components/Setting/SettingAbout.vue";
 import SettingHttpServer from "../components/Setting/SettingHttpServer.vue";
-import {LiveBlackWordContent} from "./Live/config/blackWord";
-import {LiveReplyGenerateContent} from "./Live/config/replyGenerate";
+import { LiveBlackWordContent } from "./Live/config/blackWord";
+import { LiveReplyGenerateContent } from "./Live/config/replyGenerate";
 import {
     SoundAsrResultOptimizedPrompt,
     SoundGenerateTextFormItems,
-    SoundGenerateTextPrompt
+    SoundGenerateTextPrompt,
 } from "./Sound/config/prompt";
-import {SoundGenerateReplaceContent} from "./Sound/config/replaceContent";
+import { SoundGenerateReplaceContent } from "./Sound/config/replaceContent";
 import DataConfigDialogButton from "../components/common/DataConfigDialogButton.vue";
 import ModelPromptDataConfigButton from "../module/Model/ModelPromptDataConfigButton.vue";
 
@@ -26,7 +26,7 @@ onMounted(() => {
         contentContainer.value as HTMLElement,
         {
             activeClass: "menu-active",
-        }
+        },
     );
 });
 onBeforeUnmount(() => {
@@ -53,33 +53,42 @@ onBeforeUnmount(() => {
             ref="tabContainer"
             class="p-6 w-56 flex-shrink-0 border-r border-solid border-gray-100 dark:border-gray-600"
         >
-            <div data-section="basic" class="p-2 rounded-lg mb-4 cursor-pointer menu-active">
+            <div
+                data-section="basic"
+                class="p-2 rounded-lg mb-4 cursor-pointer menu-active"
+            >
                 <div class="text-base">
-                    <icon-settings/>
+                    <icon-settings />
                     {{ t("setting.basic") }}
                 </div>
             </div>
             <div data-section="data" class="p-2 rounded-lg mb-4 cursor-pointer">
                 <div class="text-base">
-                    <icon-tool/>
+                    <icon-tool />
                     {{ t("setting.dataConfig") }}
                 </div>
             </div>
             <div data-section="env" class="p-2 rounded-lg mb-4 cursor-pointer">
                 <div class="text-base">
-                    <icon-code/>
+                    <icon-code />
                     {{ t("setting.env") }}
                 </div>
             </div>
-            <div data-section="httpserver" class="p-2 rounded-lg mb-4 cursor-pointer">
+            <div
+                data-section="httpserver"
+                class="p-2 rounded-lg mb-4 cursor-pointer"
+            >
                 <div class="text-base">
-                    <icon-wifi/>
+                    <icon-wifi />
                     HTTP 接口
                 </div>
             </div>
-            <div data-section="about" class="p-2 rounded-lg mb-4 cursor-pointer">
+            <div
+                data-section="about"
+                class="p-2 rounded-lg mb-4 cursor-pointer"
+            >
                 <div class="text-base">
-                    <icon-user/>
+                    <icon-user />
                     {{ t("about.software") }}
                 </div>
             </div>
@@ -91,14 +100,18 @@ onBeforeUnmount(() => {
                 style="height: calc(100vh - var(--window-header-height))"
             >
                 <div data-section="basic" class="scroll-mt-4">
-                    <div class="text-base font-bold mb-4">{{ t("setting.basic") }}</div>
+                    <div class="text-base font-bold mb-4">
+                        {{ t("setting.basic") }}
+                    </div>
                     <div>
-                        <SettingBasic/>
+                        <SettingBasic />
                     </div>
                 </div>
                 <div class="border-b border-solid border-gray-200 my-6"></div>
                 <div data-section="data" class="scroll-mt-4">
-                    <div class="text-base font-bold mb-4">{{ t("setting.dataConfig") }}</div>
+                    <div class="text-base font-bold mb-4">
+                        {{ t("setting.dataConfig") }}
+                    </div>
                     <div>
                         <div class="flex gap-1">
                             <DataConfigDialogButton
@@ -112,49 +125,65 @@ onBeforeUnmount(() => {
                                 name="LiveReplyGenerateContent"
                                 prompt-placeholder="支持使用变量：{reply}"
                                 :default-prompt="LiveReplyGenerateContent"
-                                :param="{reply:'示例回复内容',count: '数量'}"
+                                :param="{
+                                    reply: '示例回复内容',
+                                    count: '数量',
+                                }"
                             />
                             <ModelPromptDataConfigButton
                                 title="ASR结果优化提示词"
                                 name="SoundReplaceAsrResultOptimizedPrompt"
                                 prompt-placeholder="支持使用变量：{content}"
                                 :default-prompt="SoundAsrResultOptimizedPrompt"
-                                :param="{content:'识别结果内容'}"
+                                :param="{ content: '识别结果内容' }"
                             />
                             <DataConfigDialogButton
                                 title="声音合成优化"
                                 name="SoundGenerateReplaceContent"
                                 help="声音合成时会自动把文本中的“键”替换为“值”，可用于修正发音"
-                                :default-value="SoundGenerateReplaceContent"/>
+                                :default-value="SoundGenerateReplaceContent"
+                            />
                             <ModelPromptDataConfigButton
                                 title="声音合成内容生成"
                                 name="SoundGenerateTextPrompt"
-                                :param="SoundGenerateTextFormItems.map(i => ({name: i.name, label: i.label}))"
-                                :default-prompt="SoundGenerateTextPrompt"/>
+                                :param="
+                                    SoundGenerateTextFormItems.map((i) => ({
+                                        name: i.name,
+                                        label: i.label,
+                                    }))
+                                "
+                                :default-prompt="SoundGenerateTextPrompt"
+                            />
                         </div>
                     </div>
                 </div>
                 <div class="border-b border-solid border-gray-200 my-6"></div>
                 <div data-section="env" class="scroll-mt-4">
-                    <div class="text-base font-bold mb-4">{{ t("setting.env") }}</div>
+                    <div class="text-base font-bold mb-4">
+                        {{ t("setting.env") }}
+                    </div>
                     <div>
-                        <SettingEnv/>
+                        <SettingEnv />
                     </div>
                 </div>
-                <div class="border-b border-solid border-gray-200 my-6 dark:border-gray-700"></div>
+                <div
+                    class="border-b border-solid border-gray-200 my-6 dark:border-gray-700"
+                ></div>
                 <div data-section="httpserver" class="scroll-mt-4">
                     <div class="text-base font-bold mb-4">HTTP 接口</div>
                     <div>
-                        <SettingHttpServer/>
+                        <SettingHttpServer />
                     </div>
                 </div>
-                <div class="border-b border-solid border-gray-200 my-6 dark:border-gray-700"></div>
+                <div
+                    class="border-b border-solid border-gray-200 my-6 dark:border-gray-700"
+                ></div>
                 <div data-section="about" class="scroll-mt-4">
                     <div class="text-base font-bold mb-4">
                         {{ t("about.software") }}
                     </div>
                     <div class="">
-                        <SettingAbout/>
+                        <SettingAbout />
                     </div>
                 </div>
             </div>

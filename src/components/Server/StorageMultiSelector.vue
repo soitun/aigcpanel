@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {StorageRecord, StorageService} from "../../service/StorageService";
-import {nextTick, onMounted, ref} from "vue";
-import {Dialog} from "../../lib/dialog";
-import {t} from "../../lang";
+import { StorageRecord, StorageService } from "../../service/StorageService";
+import { nextTick, onMounted, ref } from "vue";
+import { Dialog } from "../../lib/dialog";
+import { t } from "../../lang";
 
 const props = defineProps({
     modelValue: {
@@ -45,11 +45,13 @@ const doLoad = async () => {
     }
     nextTick(() => {
         if (props.modelValue) {
-            recordsSelect.value = records.value.filter(r => props.modelValue.includes(r.id as number));
+            recordsSelect.value = records.value.filter((r) =>
+                props.modelValue.includes(r.id as number),
+            );
         }
         table.value?.select(
-            records.value.map(r => r.id),
-            false
+            records.value.map((r) => r.id),
+            false,
         );
     });
 };
@@ -57,15 +59,15 @@ const doShow = () => {
     visible.value = true;
     recordIdsSelect.value = [];
     table.value?.select(
-        records.value.map(r => r.id),
-        false
+        records.value.map((r) => r.id),
+        false,
     );
 };
 onMounted(() => {
     doLoad();
 });
 const doConfirm = () => {
-    const ids = recordsSelect.value.map(item => item.id) as number[];
+    const ids = recordsSelect.value.map((item) => item.id) as number[];
     const idsNew: number[] = [];
     const recordsNew: StorageRecord[] = [];
     for (const r of records.value) {
@@ -78,7 +80,7 @@ const doConfirm = () => {
         }
     }
     if (props.limit > 0 && ids.length + idsNew.length > props.limit) {
-        Dialog.tipError(t(`error.maxSelection`, {count: props.limit}));
+        Dialog.tipError(t(`error.maxSelection`, { count: props.limit }));
         return;
     }
     ids.push(...idsNew);
@@ -87,11 +89,11 @@ const doConfirm = () => {
     emit("update:modelValue", ids);
 };
 const doDelete = (id: number) => {
-    const index = recordsSelect.value.findIndex(r => r.id === id);
+    const index = recordsSelect.value.findIndex((r) => r.id === id);
     if (index !== -1) {
         recordsSelect.value.splice(index, 1);
     }
-    const ids = recordsSelect.value.map(item => item.id) as number[];
+    const ids = recordsSelect.value.map((item) => item.id) as number[];
     emit("update:modelValue", ids);
 };
 const onSelectChange = (keys: number[]) => {
@@ -101,7 +103,10 @@ const onSelectChange = (keys: number[]) => {
 
 <template>
     <div class="">
-        <div v-if="recordsSelect.length > 0" class="border pt-2 pl-2 pr-1 pb-1 rounded-lg mb-2">
+        <div
+            v-if="recordsSelect.length > 0"
+            class="border pt-2 pl-2 pr-1 pb-1 rounded-lg mb-2"
+        >
             <div
                 v-for="r in recordsSelect"
                 class="inline-flex items-center mr-1 mb-1 bg-gray-100 rounded-full p-1 pl-3"
@@ -110,7 +115,12 @@ const onSelectChange = (keys: number[]) => {
                     {{ r.title }}
                 </div>
                 <div>
-                    <a-button size="mini" shape="round" :disabled="props.disabled" @click="doDelete(r.id as number)">
+                    <a-button
+                        size="mini"
+                        shape="round"
+                        :disabled="props.disabled"
+                        @click="doDelete(r.id as number)"
+                    >
                         <template #icon>
                             <icon-close />
                         </template>
@@ -127,7 +137,12 @@ const onSelectChange = (keys: number[]) => {
             </a-button>
         </div>
     </div>
-    <a-modal v-model:visible="visible" :title="props.title" width="60vw" :destroy-on-close="true">
+    <a-modal
+        v-model:visible="visible"
+        :title="props.title"
+        width="60vw"
+        :destroy-on-close="true"
+    >
         <template #footer>
             <a-button @click="visible = false">取消</a-button>
             <a-button type="primary" @click="doConfirm">确定</a-button>
@@ -137,12 +152,16 @@ const onSelectChange = (keys: number[]) => {
                 ref="table"
                 @selection-change="onSelectChange"
                 :data="records"
-                :row-selection="{type: 'checkbox', showCheckedAll: true, onlyCurrent: false}"
+                :row-selection="{
+                    type: 'checkbox',
+                    showCheckedAll: true,
+                    onlyCurrent: false,
+                }"
                 row-key="id"
                 :bordered="false"
                 :pagination="false"
-                :virtual-list-props="{height: '50vh'}"
-                :columns="[{title: '名称', dataIndex: 'title'}]"
+                :virtual-list-props="{ height: '50vh' }"
+                :columns="[{ title: '名称', dataIndex: 'title' }]"
             >
             </a-table>
         </div>

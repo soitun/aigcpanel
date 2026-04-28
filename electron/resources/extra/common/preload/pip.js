@@ -6,6 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
             e.stopPropagation();
             return false;
         },
-        true
+        true,
     );
 });

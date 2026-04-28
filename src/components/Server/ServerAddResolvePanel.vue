@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {computed, ref} from "vue";
-import {useServerStore} from "../../store/modules/server";
-import {doCopy} from "../common/util";
-import {Dialog} from "../../lib/dialog";
+import { computed, ref } from "vue";
+import { useServerStore } from "../../store/modules/server";
+import { doCopy } from "../common/util";
+import { Dialog } from "../../lib/dialog";
 
 const serverStore = useServerStore();
 const props = defineProps<{
@@ -35,7 +35,9 @@ const doRun = async (type: "commands") => {
     running.value = true;
     const commandString = commands.value.join("; ");
     try {
-        await window.$mapi.app.shell(`osascript -e 'do shell script "${commandString}" with administrator privileges'`);
+        await window.$mapi.app.shell(
+            `osascript -e 'do shell script "${commandString}" with administrator privileges'`,
+        );
         passed.value.commands = true;
     } catch (e) {
         running.value = false;
@@ -80,7 +82,9 @@ defineExpose({
     <div v-if="shouldShow">
         <div class="border rounded-lg py-3 mt-3">
             <div class="flex mb-4">
-                <div class="w-20 flex-shrink-0 text-right pr-3">{{ $t("setting.fixCommand") }}</div>
+                <div class="w-20 flex-shrink-0 text-right pr-3">
+                    {{ $t("setting.fixCommand") }}
+                </div>
                 <div class="">
                     <div v-if="passed.commands">
                         <div class="mr-2 mb-1">
@@ -101,7 +105,11 @@ defineExpose({
                         >
                             <div class="flex-grow">{{ c }}</div>
                             <div class="w-10 text-right flex-shrink-0">
-                                <a href="javascript:;" @click="doCopy(c)" class="mr-1">
+                                <a
+                                    href="javascript:;"
+                                    @click="doCopy(c)"
+                                    class="mr-1"
+                                >
                                     <icon-copy />
                                 </a>
                             </div>
@@ -110,7 +118,10 @@ defineExpose({
                             <!--                            <a-button @click="doRun('commands')" :loading="running" class="mr-2">-->
                             <!--                                {{ $t('task.oneClickRun') }}-->
                             <!--                            </a-button>-->
-                            <a-button @click="doRunManual('commands')" class="mr-2">
+                            <a-button
+                                @click="doRunManual('commands')"
+                                class="mr-2"
+                            >
                                 {{ $t("status.manuallyCompleted") }}
                             </a-button>
                         </div>

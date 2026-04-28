@@ -1,8 +1,8 @@
-import {defineStore} from "pinia";
+import { defineStore } from "pinia";
 import store from "../index";
-import {AppConfig} from "../../config";
-import {computed} from "vue";
-import {cloneDeep} from "lodash-es";
+import { AppConfig } from "../../config";
+import { computed } from "vue";
+import { cloneDeep } from "lodash-es";
 
 export const settingStore = defineStore("setting", {
     state() {
@@ -128,7 +128,10 @@ const setting = settingStore(store);
 setting.init().then();
 
 window.__page.onBroadcast("ConfigChange", setting.onConfigChangeBroadcast);
-window.__page.onBroadcast("ConfigEnvChange", setting.onConfigEnvChangeBroadcast);
+window.__page.onBroadcast(
+    "ConfigEnvChange",
+    setting.onConfigEnvChangeBroadcast,
+);
 window.__page.onBroadcast("DarkModeChange", setting.onDarkModeChangeBroadcast);
 
 export const useSettingStore = () => {

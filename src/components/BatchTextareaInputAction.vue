@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {t} from "../lang";
-import {ref} from "vue";
-import {Dialog} from "../lib/dialog";
+import { t } from "../lang";
+import { ref } from "vue";
+import { Dialog } from "../lib/dialog";
 
 const props = defineProps({
     text: {
@@ -34,7 +34,7 @@ const doDelete = (index: number) => {
 };
 
 const doAdd = () => {
-    records.value.push({text: ""});
+    records.value.push({ text: "" });
 };
 
 const doShowInputText = () => {
@@ -43,11 +43,13 @@ const doShowInputText = () => {
 };
 
 const doInputTextSubmit = () => {
-    const lines = inputTextContent.value.split("\n").filter(line => line.trim());
+    const lines = inputTextContent.value
+        .split("\n")
+        .filter((line) => line.trim());
     if (!lines.length) {
         return;
     }
-    records.value = lines.map(text => ({text}));
+    records.value = lines.map((text) => ({ text }));
     inputTextVisible.value = false;
 };
 
@@ -67,7 +69,7 @@ const doSubmit = () => {
 };
 
 const emit = defineEmits({
-    submit: (records: {text: string}[]) => true,
+    submit: (records: { text: string }[]) => true,
 });
 </script>
 
@@ -75,7 +77,13 @@ const emit = defineEmits({
     <a-button class="mr-2" @click="doShow">
         {{ text }}
     </a-button>
-    <a-modal v-model:visible="visible" width="80vw" :esc-to-close="false" :mask-closable="false" title-align="start">
+    <a-modal
+        v-model:visible="visible"
+        width="80vw"
+        :esc-to-close="false"
+        :mask-closable="false"
+        title-align="start"
+    >
         <template #title>
             {{ text }}
         </template>
@@ -99,7 +107,7 @@ const emit = defineEmits({
                     {{ $t("common.batchPaste") }}
                 </a-button>
                 <div class="font-bold">
-                    {{ $t("common.totalCount", {count: records.length}) }}
+                    {{ $t("common.totalCount", { count: records.length }) }}
                 </div>
             </div>
             <div v-if="!records.length">
@@ -112,13 +120,18 @@ const emit = defineEmits({
                             v-model="records[textIndex].text"
                             style="min-height: 3rem"
                             :placeholder="$t('common.inputContent')"
-                            :auto-size="{minRows: 2}"
+                            :auto-size="{ minRows: 2 }"
                             show-word-limit
                             :max-length="1000"
                         ></a-textarea>
                     </div>
                     <div>
-                        <a-button type="primary" size="small" status="danger" @click="doDelete(textIndex)">
+                        <a-button
+                            type="primary"
+                            size="small"
+                            status="danger"
+                            @click="doDelete(textIndex)"
+                        >
                             <template #icon>
                                 <icon-delete />
                             </template>
@@ -148,7 +161,7 @@ const emit = defineEmits({
             <a-textarea
                 v-model="inputTextContent"
                 style="min-height: calc(100vh - 30rem)"
-                :auto-size="{minRows: 2}"
+                :auto-size="{ minRows: 2 }"
                 :placeholder="$t('common.batchPasteHint')"
             ></a-textarea>
         </div>

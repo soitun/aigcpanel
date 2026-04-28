@@ -1,4 +1,4 @@
-import {TaskJobResultStepStatus} from "../../../service/TaskService";
+import { TaskJobResultStepStatus } from "../../../service/TaskService";
 
 export type TextToImageModelConfigType = {
     prompt: string;

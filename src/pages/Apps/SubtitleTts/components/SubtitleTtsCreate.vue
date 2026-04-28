@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import { ref } from "vue";
 import FileSelector from "../../../../components/common/FileSelector.vue";
-import {dataAutoSaveDraft} from "../../../../components/common/util";
-import {Dialog} from "../../../../lib/dialog";
-import {TaskRecord, TaskService} from "../../../../service/TaskService";
+import { dataAutoSaveDraft } from "../../../../components/common/util";
+import { Dialog } from "../../../../lib/dialog";
+import { TaskRecord, TaskService } from "../../../../service/TaskService";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 
 const emit = defineEmits<{
@@ -13,7 +13,10 @@ const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm>>();
 const formData = ref({
     srt: "",
 });
-const {clearDraft} = dataAutoSaveDraft("SubtitleTtsCreate.formData", formData.value);
+const { clearDraft } = dataAutoSaveDraft(
+    "SubtitleTtsCreate.formData",
+    formData.value,
+);
 
 const doSubmit = async () => {
     const soundGenerateValue = await soundGenerateForm.value?.getValue();
@@ -54,10 +57,10 @@ const doSubmit = async () => {
                 </a-tooltip>
             </div>
             <div class="flex items-center gap-2">
-                <FileSelector :extensions="['srt']" v-model="formData.srt"/>
+                <FileSelector :extensions="['srt']" v-model="formData.srt" />
             </div>
         </div>
-        <SoundGenerateForm ref="soundGenerateForm"/>
+        <SoundGenerateForm ref="soundGenerateForm" />
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 <i class="iconfont icon-submit mr-2"></i>

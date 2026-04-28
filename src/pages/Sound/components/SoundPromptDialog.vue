@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import {StorageRecord, StorageService} from "../../../service/StorageService";
+import { onMounted, ref } from "vue";
+import { StorageRecord, StorageService } from "../../../service/StorageService";
 import SoundPromptEditDialog from "./SoundPromptEditDialog.vue";
 import InputInlineEditor from "../../../components/common/InputInlineEditor.vue";
 import AudioPlayer from "../../../components/common/AudioPlayer.vue";
-import {Dialog} from "../../../lib/dialog";
-import {t} from "../../../lang";
+import { Dialog } from "../../../lib/dialog";
+import { t } from "../../../lang";
 
 const visible = ref(false);
 
@@ -52,7 +52,12 @@ onMounted(async () => {
 </script>
 
 <template>
-    <a-modal v-model:visible="visible" width="900px" :footer="false" title-align="start">
+    <a-modal
+        v-model:visible="visible"
+        width="900px"
+        :footer="false"
+        title-align="start"
+    >
         <template #title>
             <div class="flex items-center">
                 <div class="font-bold mr-2">
@@ -78,11 +83,19 @@ onMounted(async () => {
                             <div
                                 class="inline-flex max-w-full items-center bg-blue-100 rounded-full px-2 leading-8 h-8"
                             >
-                                <div class="truncate overflow-hidden flex-grow cursor-pointer">
+                                <div
+                                    class="truncate overflow-hidden flex-grow cursor-pointer"
+                                >
                                     {{ r.title }}
                                 </div>
-                                <InputInlineEditor :value="r.title" @change="onChangeTitle(r, $event)">
-                                    <a class="ml-1 text-gray-400" href="javascript:;">
+                                <InputInlineEditor
+                                    :value="r.title"
+                                    @change="onChangeTitle(r, $event)"
+                                >
+                                    <a
+                                        class="ml-1 text-gray-400"
+                                        href="javascript:;"
+                                    >
                                         <icon-pen />
                                     </a>
                                 </InputInlineEditor>
@@ -102,7 +115,10 @@ onMounted(async () => {
                         </div>
                     </div>
                     <div class="mb-3">
-                        <AudioPlayer show-wave :url="'file://' + r.content.url" />
+                        <AudioPlayer
+                            show-wave
+                            :url="'file://' + r.content.url"
+                        />
                     </div>
                     <div>
                         {{ r.content.promptText }}

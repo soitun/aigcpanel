@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import { ref } from "vue";
 import SoundAsrForm from "../../../Sound/components/SoundAsrForm.vue";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 import SoundGenerateFormView from "../../../Sound/components/SoundGenerateFormView.vue";
@@ -16,7 +16,9 @@ const emit = defineEmits<{
 
 const visible = ref(false);
 const soundAsrForm = ref<InstanceType<typeof SoundAsrForm>>();
-const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(null);
+const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(
+    null,
+);
 const doSubmit = async () => {
     const soundAsrValue = await soundAsrForm.value?.getValue();
     if (!soundAsrValue) {
@@ -38,16 +40,22 @@ const doSubmit = async () => {
 
 <template>
     <div class="p-2 relative">
-        <SoundAsrFormView v-if="data.soundAsr" :data="data.soundAsr"/>
-        <SoundGenerateFormView v-if="data.soundGenerate" :data="data.soundGenerate"/>
+        <SoundAsrFormView v-if="data.soundAsr" :data="data.soundAsr" />
+        <SoundGenerateFormView
+            v-if="data.soundGenerate"
+            :data="data.soundGenerate"
+        />
         <div
             v-if="!data.soundAsr && !data.soundGenerate"
             @click="visible = true"
-            class="p-2 text-center text-xs text-gray-500 rounded-lg bg-gray-100 cursor-pointer">
+            class="p-2 text-center text-xs text-gray-500 rounded-lg bg-gray-100 cursor-pointer"
+        >
             {{ $t("common.clickToConfig") }}
         </div>
         <div v-else class="mt-2">
-            <a-button size="mini" @click="visible = true">{{ $t("common.modify") }}</a-button>
+            <a-button size="mini" @click="visible = true">{{
+                $t("common.modify")
+            }}</a-button>
         </div>
     </div>
     <a-modal
@@ -59,12 +67,18 @@ const doSubmit = async () => {
     >
         <template #footer>
             <div class="flex justify-end space-x-2">
-                <a-button type="primary" @click="doSubmit">{{ $t("common.save") }}</a-button>
+                <a-button type="primary" @click="doSubmit">{{
+                    $t("common.save")
+                }}</a-button>
             </div>
         </template>
-        <div v-if="visible" class="space-y-4 overflow-y-auto" style="max-height: calc(100vh - 10rem)">
-            <SoundAsrForm ref="soundAsrForm"/>
-            <SoundGenerateForm ref="soundGenerateForm"/>
+        <div
+            v-if="visible"
+            class="space-y-4 overflow-y-auto"
+            style="max-height: calc(100vh - 10rem)"
+        >
+            <SoundAsrForm ref="soundAsrForm" />
+            <SoundGenerateForm ref="soundGenerateForm" />
         </div>
     </a-modal>
 </template>

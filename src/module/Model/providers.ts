@@ -43,8 +43,8 @@ import XirangProviderLogo from "./assets/image/providers/xirang.png";
 import ZeroOneProviderLogo from "./assets/image/providers/zero-one.png";
 import ZhipuProviderLogo from "./assets/image/providers/zhipu.png";
 import BuildInProviderLogo from "./../../assets/image/logo.svg";
-import {Provider} from "./types";
-import {ModelProvider} from "./provider/provider";
+import { Provider } from "./types";
+import { ModelProvider } from "./provider/provider";
 
 const ProviderLogoMap = {
     buildIn: BuildInProviderLogo,
@@ -100,7 +100,11 @@ export function getProviderLogo(providerId: string) {
 }
 
 export function getProviderUrl(provider: Provider) {
-    return ModelProvider.apiUrl(provider.type, provider.apiUrl, provider.data.apiHost);
+    return ModelProvider.apiUrl(
+        provider.type,
+        provider.apiUrl,
+        provider.data.apiHost,
+    );
 }
 
 export const getProviderTitle = (providerId: string) => {
@@ -421,7 +425,8 @@ export const SystemProviders = {
             url: "https://deepseek.alayanew.com",
         },
         websites: {
-            official: "https://www.alayanew.com/backend/register?id=cherrystudio",
+            official:
+                "https://www.alayanew.com/backend/register?id=cherrystudio",
             apiKey: " https://www.alayanew.com/backend/register?id=cherrystudio",
             docs: "https://docs.alayanew.com/docs/modelService/interview?utm_source=cherrystudio",
             models: "https://www.alayanew.com/product/deepseek?id=cherrystudio",
@@ -583,7 +588,8 @@ export const SystemProviders = {
             url: "",
         },
         websites: {
-            official: "https://azure.microsoft.com/en-us/products/ai-services/openai-service",
+            official:
+                "https://azure.microsoft.com/en-us/products/ai-services/openai-service",
             apiKey: "https://portal.azure.com/#view/Microsoft_Azure_ProjectOxford/CognitiveServicesHub/~/OpenAI",
             docs: "https://learn.microsoft.com/en-us/azure/ai-services/openai/",
             models: "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models",

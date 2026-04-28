@@ -1,5 +1,5 @@
 import api from "./api";
-import {EnumServerType} from "../../../src/types/Server";
+import { EnumServerType } from "../../../src/types/Server";
 
 export type ServerApiType = typeof api;
 

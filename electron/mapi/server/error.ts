@@ -1,4 +1,4 @@
-export const mapError = e => {
+export const mapError = (e) => {
     let msg = e;
     if (e instanceof Error) {
         msg = [e.message, e.stack].join("\n");

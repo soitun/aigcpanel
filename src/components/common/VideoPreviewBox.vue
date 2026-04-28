@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from "vue";
+import { computed, ref } from "vue";
 
 const props = defineProps<{
     url: string;
@@ -22,8 +22,12 @@ const processedUrl = computed(() => {
     }
 });
 
-const currentWidth = computed(() => (isZoomed.value ? props.largeWidth || "100%" : props.width || "20rem"));
-const currentHeight = computed(() => (isZoomed.value ? props.largeHeight || "70vh" : props.height || "12rem"));
+const currentWidth = computed(() =>
+    isZoomed.value ? props.largeWidth || "100%" : props.width || "20rem",
+);
+const currentHeight = computed(() =>
+    isZoomed.value ? props.largeHeight || "70vh" : props.height || "12rem",
+);
 
 const toggleZoom = () => {
     isZoomed.value = !isZoomed.value;
@@ -32,14 +36,19 @@ const toggleZoom = () => {
 
 <template>
     <div class="inline-block relative bg-gray-200 p-2 rounded-lg">
-        <video :src="processedUrl" :style="{ width: currentWidth, height: currentHeight }"
-               controls preload="none"
-               class="object-contain border rounded bg-black"/>
-        <div @click="toggleZoom"
-             class="cursor-pointer w-6 h-6 text-center leading-6 absolute top-4 left-4 bg-black bg-opacity-50 text-white rounded hover:bg-opacity-75">
-            <icon-zoom-in v-if="!isZoomed"/>
-            <icon-zoom-out v-else/>
+        <video
+            :src="processedUrl"
+            :style="{ width: currentWidth, height: currentHeight }"
+            controls
+            preload="none"
+            class="object-contain border rounded bg-black"
+        />
+        <div
+            @click="toggleZoom"
+            class="cursor-pointer w-6 h-6 text-center leading-6 absolute top-4 left-4 bg-black bg-opacity-50 text-white rounded hover:bg-opacity-75"
+        >
+            <icon-zoom-in v-if="!isZoomed" />
+            <icon-zoom-out v-else />
         </div>
     </div>
 </template>
-

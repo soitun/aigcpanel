@@ -1,12 +1,15 @@
-import {TaskService} from "../service/TaskService";
-import {useServerStore} from "../store/modules/server";
-import {TaskBiz} from "../store/modules/task";
+import { TaskService } from "../service/TaskService";
+import { useServerStore } from "../store/modules/server";
+import { TaskBiz } from "../store/modules/task";
 
 const serverStore = useServerStore();
 
 export const SoundAsr: TaskBiz = {
     runFunc: async (bizId, bizParam) => {
-        const {record, server, serverInfo} = await serverStore.prepareForTask(bizId, bizParam);
+        const { record, server, serverInfo } = await serverStore.prepareForTask(
+            bizId,
+            bizParam,
+        );
         await TaskService.update(bizId, {
             status: "wait",
         });
@@ -33,7 +36,7 @@ export const SoundAsr: TaskBiz = {
         }
     },
     successFunc: async (bizId, bizParam) => {
-        const {record} = await serverStore.prepareForTask(bizId, bizParam);
+        const { record } = await serverStore.prepareForTask(bizId, bizParam);
         await TaskService.update(bizId, {
             status: "success",
             endTime: Date.now(),

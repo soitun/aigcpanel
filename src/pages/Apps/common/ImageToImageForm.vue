@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import {onMounted, ref, watch} from "vue";
+import { onMounted, ref, watch } from "vue";
 import ParamForm from "../../../components/common/ParamForm.vue";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
 import ServerSelector from "../../../components/Server/ServerSelector.vue";
-import {Dialog} from "../../../lib/dialog";
-import {StorageUtil} from "../../../lib/storage";
-import {useServerStore} from "../../../store/modules/server";
-import {EnumServerStatus} from "../../../types/Server";
+import { Dialog } from "../../../lib/dialog";
+import { StorageUtil } from "../../../lib/storage";
+import { useServerStore } from "../../../store/modules/server";
+import { EnumServerStatus } from "../../../types/Server";
 
 const serverStore = useServerStore();
 const formData = ref({
@@ -28,12 +28,12 @@ onMounted(async () => {
 
 watch(
     () => formData.value,
-    async value => {
+    async (value) => {
         StorageUtil.set("ImageToImageForm.formData", value);
     },
     {
         deep: true,
-    }
+    },
 );
 
 const getValue = async (): Promise<ImageToImageParamType | undefined> => {
@@ -95,10 +95,17 @@ defineExpose({
             </div>
             <div class="flex-grow flex flex-wrap gap-1">
                 <div>
-                    <ServerSelector v-model="formData.serverKey" @update="onServerUpdate" functionName="imageToImage" />
+                    <ServerSelector
+                        v-model="formData.serverKey"
+                        @update="onServerUpdate"
+                        functionName="imageToImage"
+                    />
                 </div>
                 <div class="">
-                    <ServerContentInfoAction :config="modelConfig" func="textToImage" />
+                    <ServerContentInfoAction
+                        :config="modelConfig"
+                        func="textToImage"
+                    />
                 </div>
             </div>
         </div>

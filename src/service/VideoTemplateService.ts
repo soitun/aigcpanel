@@ -29,7 +29,7 @@ export const VideoTemplateService = {
             `SELECT *
              FROM ${this.tableName()}
              WHERE id = ?`,
-            [id]
+            [id],
         );
         return this.decodeRecord(record);
     },
@@ -38,12 +38,13 @@ export const VideoTemplateService = {
             `SELECT *
              FROM ${this.tableName()}
              WHERE name = ?`,
-            [name]
+            [name],
         );
         return this.decodeRecord(record);
     },
     async list(): Promise<VideoTemplateRecord[]> {
-        const records: VideoTemplateRecord[] = await window.$mapi.db.select(`SELECT *
+        const records: VideoTemplateRecord[] = await window.$mapi.db
+            .select(`SELECT *
                                                                              FROM ${this.tableName()}
                                                                              ORDER BY id DESC`);
         return records.map(this.decodeRecord) as VideoTemplateRecord[];
@@ -56,7 +57,7 @@ export const VideoTemplateService = {
         return await window.$mapi.db.insert(
             `INSERT INTO ${this.tableName()} (${fields})
              VALUES (${valuePlaceholders})`,
-            values
+            values,
         );
     },
     async delete(record: VideoTemplateRecord) {
@@ -67,13 +68,13 @@ export const VideoTemplateService = {
             `DELETE
              FROM ${this.tableName()}
              WHERE id = ?`,
-            [record.id]
+            [record.id],
         );
     },
     async update(id: number, record: Partial<VideoTemplateRecord>) {
         record = this.encodeRecord(record as VideoTemplateRecord);
         const fields = Object.keys(record)
-            .map(key => `${key} = ?`)
+            .map((key) => `${key} = ?`)
             .join(", ");
         const values = Object.values(record);
         values.push(id);
@@ -81,7 +82,7 @@ export const VideoTemplateService = {
             `UPDATE ${this.tableName()}
              SET ${fields}
              WHERE id = ?`,
-            values
+            values,
         );
     },
 };

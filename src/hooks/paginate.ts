@@ -1,6 +1,9 @@
-import {computed, ref} from "vue";
+import { computed, ref } from "vue";
 
-export const usePaginate = <T = any>(data?: {pageSize?: number; filter?: (item: T) => boolean}) => {
+export const usePaginate = <T = any>(data?: {
+    pageSize?: number;
+    filter?: (item: T) => boolean;
+}) => {
     data = data || {};
     const records = ref<T[]>([]);
     const pageSize = data.pageSize && data.pageSize > 0 ? data.pageSize : 10;
@@ -9,7 +12,9 @@ export const usePaginate = <T = any>(data?: {pageSize?: number; filter?: (item: 
     const recordsForPage = computed(() => {
         let items = records.value;
         if (data.filter) {
-            items = items.filter(data.filter as (item: (typeof items)[number]) => boolean);
+            items = items.filter(
+                data.filter as (item: (typeof items)[number]) => boolean,
+            );
         }
         recordsFilterCount.value = items.length;
         if (items.length === 0) {

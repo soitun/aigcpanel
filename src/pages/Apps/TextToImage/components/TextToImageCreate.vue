@@ -12,7 +12,10 @@ const textToImageForm = ref<InstanceType<typeof TextToImageForm>>();
 const formData = ref({
     prompt: "",
 });
-const {clearDraft} = dataAutoSaveDraft("TextToImageCreate.formData", formData.value);
+const { clearDraft } = dataAutoSaveDraft(
+    "TextToImageCreate.formData",
+    formData.value,
+);
 
 const doSubmit = async () => {
     const textToImageValue = await textToImageForm.value?.getValue();
@@ -54,7 +57,7 @@ const doSubmit = async () => {
                 :auto-size="{ minRows: 2, maxRows: 10 }"
             />
         </div>
-        <TextToImageForm ref="textToImageForm"/>
+        <TextToImageForm ref="textToImageForm" />
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 <i class="iconfont icon-submit mr-2"></i>

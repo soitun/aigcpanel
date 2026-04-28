@@ -1,7 +1,11 @@
-import {defineStore} from "pinia";
-import {buildServerContent} from "../../lib/aigcpanel";
-import {wait} from "../../lib/util";
-import {EnumServerStatus, EnumServerType, ServerRecord} from "../../types/Server";
+import { defineStore } from "pinia";
+import { buildServerContent } from "../../lib/aigcpanel";
+import { wait } from "../../lib/util";
+import {
+    EnumServerStatus,
+    EnumServerType,
+    ServerRecord,
+} from "../../types/Server";
 import store from "../index";
 
 export type VideoTemplateCloudRecord = {
@@ -67,20 +71,31 @@ export const serverCloudStore = defineStore("serverCloud", {
             });
         },
         async getByKey(key: string): Promise<ServerRecord | undefined> {
-            return this.records.find(record => record.key === key) as any;
+            return this.records.find((record) => record.key === key) as any;
         },
-        async getByNameVersion(name: string, version: string): Promise<ServerRecord | undefined> {
-            return this.records.find(record => record.name === name && record.version === version) as any;
+        async getByNameVersion(
+            name: string,
+            version: string,
+        ): Promise<ServerRecord | undefined> {
+            return this.records.find(
+                (record) => record.name === name && record.version === version,
+            ) as any;
         },
         generateServerKey(serverCloud: ServerRecord) {
             return `${serverCloud.name}|${serverCloud.version}`;
         },
         async listVideoTemplates() {
-            const res = await $mapi.user.apiPost("aigcpanel/video_template/all", {});
+            const res = await $mapi.user.apiPost(
+                "aigcpanel/video_template/all",
+                {},
+            );
             this.videoTemplateRecords = res.data.records;
         },
         async getVideoTemplate(id: string): Promise<VideoTemplateCloudRecord> {
-            const res = await $mapi.user.apiPost("aigcpanel/video_template/get", {id});
+            const res = await $mapi.user.apiPost(
+                "aigcpanel/video_template/get",
+                { id },
+            );
             return res.data.record;
         },
     },

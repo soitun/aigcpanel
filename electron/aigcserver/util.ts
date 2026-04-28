@@ -1,4 +1,4 @@
-import {t} from "../config/lang";
+import { t } from "../config/lang";
 
 export const AigcServerUtil = {
     errorDetect: (data: string): string | null => {

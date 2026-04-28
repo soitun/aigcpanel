@@ -1,7 +1,9 @@
-import {AudioRecord} from "./ffmpeg";
+import { AudioRecord } from "./ffmpeg";
 
-export function subtitleGenerateSrtContent(records: { start: number, end: number, text: string }[]): string {
-    let subtitleText = '';
+export function subtitleGenerateSrtContent(
+    records: { start: number; end: number; text: string }[],
+): string {
+    let subtitleText = "";
     let index = 1;
     const formatMs = (ms: number) => {
         ms = Math.floor(ms);
@@ -9,8 +11,8 @@ export function subtitleGenerateSrtContent(records: { start: number, end: number
         const minute = Math.floor((ms % 3600000) / 60000);
         const second = Math.floor((ms % 60000) / 1000);
         const millisecond = ms % 1000;
-        return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')},${String(millisecond).padStart(3, '0')}`;
-    }
+        return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:${String(second).padStart(2, "0")},${String(millisecond).padStart(3, "0")}`;
+    };
     for (const record of records) {
         const start = formatMs(record.start);
         const end = formatMs(record.end);
@@ -23,18 +25,22 @@ export function subtitleGenerateSrtContent(records: { start: number, end: number
 export function subtitleGenerateRecords(
     records: AudioRecord[],
     option?: {
-        lineLimit: number,
-    }
+        lineLimit: number;
+    },
 ): AudioRecord[] {
-    option = Object.assign({
-        lineLimit: 30,
-    }, option);
+    option = Object.assign(
+        {
+            lineLimit: 30,
+        },
+        option,
+    );
 
     const calculateLength = (text: string): number => {
         let length = 0;
         let letterCount = 0;
         for (const char of text) {
-            if (/[\u4e00-\u9fff]/.test(char)) { // 中文字符
+            if (/[\u4e00-\u9fff]/.test(char)) {
+                // 中文字符
                 length += 1;
             } else if (/[a-zA-Z0-9]/.test(char)) {
                 letterCount += 1;
@@ -57,7 +63,7 @@ export function subtitleGenerateRecords(
 
     const splitWordByChar = (word: string, lineLimit: number): string[] => {
         const parts: string[] = [];
-        let current = '';
+        let current = "";
         let currentLength = 0;
         for (const char of word) {
             let charLen = 0;
@@ -69,7 +75,7 @@ export function subtitleGenerateRecords(
             if (currentLength + charLen > lineLimit) {
                 if (current) {
                     parts.push(current);
-                    current = '';
+                    current = "";
                     currentLength = 0;
                 }
                 current += char;
@@ -88,7 +94,7 @@ export function subtitleGenerateRecords(
     const splitPart = (part: string, lineLimit: number): string[] => {
         const words = part.split(/\s+/);
         const subParts: string[] = [];
-        let current = '';
+        let current = "";
         let currentLength = 0;
         for (const word of words) {
             if (!word) continue;
@@ -101,12 +107,12 @@ export function subtitleGenerateRecords(
                     if (currentLength + charLength > lineLimit) {
                         if (current) {
                             subParts.push(current);
-                            current = '';
+                            current = "";
                             currentLength = 0;
                         }
                     }
                     if (current) {
-                        current += ' ' + charPart;
+                        current += " " + charPart;
                     } else {
                         current = charPart;
                     }
@@ -117,12 +123,12 @@ export function subtitleGenerateRecords(
                 if (currentLength + wordLength > lineLimit) {
                     if (current) {
                         subParts.push(current);
-                        current = '';
+                        current = "";
                         currentLength = 0;
                     }
                 }
                 if (current) {
-                    current += ' ' + word;
+                    current += " " + word;
                 } else {
                     current = word;
                 }
@@ -138,7 +144,9 @@ export function subtitleGenerateRecords(
     const subtitles: AudioRecord[] = [];
     for (const record of records) {
         // 根据标点符号和空格分割成部分
-        const parts = record.text.split(/([。！？，,\s]+)/g).filter(p => p.length > 0);
+        const parts = record.text
+            .split(/([。！？，,\s]+)/g)
+            .filter((p) => p.length > 0);
         const readableParts: string[] = [];
         for (let i = 0; i < parts.length; i += 2) {
             readableParts.push(parts[i]);
@@ -147,7 +155,7 @@ export function subtitleGenerateRecords(
 
         // 拼接可读部分
         const subtitleTexts: string[] = [];
-        let currentText = '';
+        let currentText = "";
         let currentLength = 0;
         for (const part of readableParts) {
             const partLength = calculateLength(part);
@@ -160,7 +168,7 @@ export function subtitleGenerateRecords(
                     const subLength = calculateLength(subPart);
                     if (currentLength + subLength <= option.lineLimit) {
                         if (currentText) {
-                            currentText += ' ' + subPart;
+                            currentText += " " + subPart;
                         } else {
                             currentText = subPart;
                         }
@@ -177,7 +185,7 @@ export function subtitleGenerateRecords(
                 // 正常处理
                 if (currentLength + partLength <= option.lineLimit) {
                     if (currentText) {
-                        currentText += ' ' + part;
+                        currentText += " " + part;
                     } else {
                         currentText = part;
                     }
@@ -202,13 +210,16 @@ export function subtitleGenerateRecords(
         for (const subtitleText of subtitleTexts) {
             const charCount = calculateCharCount(subtitleText);
             const timeRatio = charCount / totalChars;
-            const start = record.start + (record.end - record.start) * cumulativeRatio;
-            const end = record.start + (record.end - record.start) * (cumulativeRatio + timeRatio);
+            const start =
+                record.start + (record.end - record.start) * cumulativeRatio;
+            const end =
+                record.start +
+                (record.end - record.start) * (cumulativeRatio + timeRatio);
             subtitles.push({
                 ...record,
                 start: start,
                 end: end,
-                text: subtitleText
+                text: subtitleText,
             });
             cumulativeRatio += timeRatio;
         }
@@ -221,25 +232,37 @@ export type SubtitleEntry = {
     end: number;
     text: string;
 };
-export const subtitleParseSrtFile = async (srtFilePath: string): Promise<SubtitleEntry[]> => {
-    const content = await $mapi.file.read(srtFilePath, {isDataPath: false});
+export const subtitleParseSrtFile = async (
+    srtFilePath: string,
+): Promise<SubtitleEntry[]> => {
+    const content = await $mapi.file.read(srtFilePath, { isDataPath: false });
     const entries: SubtitleEntry[] = [];
 
     // SRT格式解析
-    const blocks = content.trim().split('\n\n');
+    const blocks = content.trim().split("\n\n");
 
     for (const block of blocks) {
-        const lines = block.trim().split('\n');
+        const lines = block.trim().split("\n");
         if (lines.length < 3) continue;
 
-        const timeMatch = lines[1].match(/(\d{2}):(\d{2}):(\d{2}),(\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2}),(\d{3})/);
+        const timeMatch = lines[1].match(
+            /(\d{2}):(\d{2}):(\d{2}),(\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2}),(\d{3})/,
+        );
         if (!timeMatch) continue;
 
-        const startMs = parseInt(timeMatch[1]) * 3600000 + parseInt(timeMatch[2]) * 60000 + parseInt(timeMatch[3]) * 1000 + parseInt(timeMatch[4]);
-        const endMs = parseInt(timeMatch[5]) * 3600000 + parseInt(timeMatch[6]) * 60000 + parseInt(timeMatch[7]) * 1000 + parseInt(timeMatch[8]);
-        const text = lines.slice(2).join('\n');
+        const startMs =
+            parseInt(timeMatch[1]) * 3600000 +
+            parseInt(timeMatch[2]) * 60000 +
+            parseInt(timeMatch[3]) * 1000 +
+            parseInt(timeMatch[4]);
+        const endMs =
+            parseInt(timeMatch[5]) * 3600000 +
+            parseInt(timeMatch[6]) * 60000 +
+            parseInt(timeMatch[7]) * 1000 +
+            parseInt(timeMatch[8]);
+        const text = lines.slice(2).join("\n");
 
-        entries.push({start: startMs * 1000, end: endMs * 1000, text});
+        entries.push({ start: startMs * 1000, end: endMs * 1000, text });
     }
 
     return entries;

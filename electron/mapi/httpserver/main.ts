@@ -1,6 +1,6 @@
 import http from "node:http";
-import {ipcMain, net} from "electron";
-import {Log} from "../log/main";
+import { ipcMain, net } from "electron";
+import { Log } from "../log/main";
 import ConfigMain from "../config/main";
 import StorageMain from "../storage/main";
 import User from "../user/main";
@@ -21,14 +21,19 @@ const generateId = () => {
 };
 
 const sendJson = (res: http.ServerResponse, statusCode: number, data: any) => {
-    res.writeHead(statusCode, {"Content-Type": "application/json"});
+    res.writeHead(statusCode, { "Content-Type": "application/json" });
     res.end(JSON.stringify(data));
 };
 
 const getEnabledModels = async () => {
     const storageData = await StorageMain.read("models", null);
     const userData = await User.get();
-    const models: {id: string; providerId: string; modelId: string; modelName: string}[] = [];
+    const models: {
+        id: string;
+        providerId: string;
+        modelId: string;
+        modelName: string;
+    }[] = [];
 
     if (!storageData || !storageData.providerData) return models;
 
@@ -53,7 +58,9 @@ const getEnabledModels = async () => {
         const buildInData = storageData?.providerData?.["buildIn"];
         const enabled = buildInData ? buildInData.enabled !== false : true;
         if (enabled && lmApi.models) {
-            const existing = models.filter(m => m.providerId === "buildIn").map(m => m.modelId);
+            const existing = models
+                .filter((m) => m.providerId === "buildIn")
+                .map((m) => m.modelId);
             for (const m of lmApi.models) {
                 if (!existing.includes(m)) {
                     models.push({
@@ -74,7 +81,7 @@ const callModel = async (
     providerId: string,
     modelId: string,
     prompt: string,
-    systemPrompt?: string
+    systemPrompt?: string,
 ): Promise<string> => {
     const storageData = await StorageMain.read("models", null);
     const userData = await User.get();
@@ -97,7 +104,8 @@ const callModel = async (
     }
 
     let url = apiHost || apiUrl;
-    if (!url) throw new Error(`No API URL configured for provider: ${providerId}`);
+    if (!url)
+        throw new Error(`No API URL configured for provider: ${providerId}`);
 
     if (url.endsWith("/")) {
         url = `${url}chat/completions`;
@@ -107,9 +115,9 @@ const callModel = async (
 
     const messages: any[] = [];
     if (systemPrompt) {
-        messages.push({role: "system", content: systemPrompt});
+        messages.push({ role: "system", content: systemPrompt });
     }
-    messages.push({role: "user", content: prompt});
+    messages.push({ role: "user", content: prompt });
 
     const response = await net.fetch(url, {
         method: "POST",
@@ -117,7 +125,7 @@ const callModel = async (
             Authorization: `Bearer ${apiKey}`,
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({model: modelId, messages}),
+        body: JSON.stringify({ model: modelId, messages }),
     });
 
     if (!response.ok) {
@@ -133,7 +141,11 @@ const callModel = async (
     return content;
 };
 
-const handleRequest = async (req: http.IncomingMessage, res: http.ServerResponse, port: number) => {
+const handleRequest = async (
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+    port: number,
+) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -148,39 +160,45 @@ const handleRequest = async (req: http.IncomingMessage, res: http.ServerResponse
 
     if (req.method === "GET" && url.pathname === "/api/model/list") {
         const models = await getEnabledModels();
-        sendJson(res, 200, {code: 0, data: models});
+        sendJson(res, 200, { code: 0, data: models });
         return;
     }
 
     if (req.method === "POST" && url.pathname === "/api/model/call") {
         let body = "";
-        req.on("data", chunk => {
+        req.on("data", (chunk) => {
             body += chunk;
         });
         req.on("end", async () => {
             try {
-                const {model, prompt, systemPrompt} = JSON.parse(body);
+                const { model, prompt, systemPrompt } = JSON.parse(body);
                 const [providerId, modelId] = (model || "").split("|");
                 if (!providerId || !modelId) {
-                    sendJson(res, 400, {code: -1, msg: 'Invalid model format, expected "providerId|modelId"'});
+                    sendJson(res, 400, {
+                        code: -1,
+                        msg: 'Invalid model format, expected "providerId|modelId"',
+                    });
                     return;
                 }
                 if (!prompt) {
-                    sendJson(res, 400, {code: -1, msg: "Missing prompt"});
+                    sendJson(res, 400, { code: -1, msg: "Missing prompt" });
                     return;
                 }
                 const taskId = generateId();
-                tasks.set(taskId, {status: "pending"});
-                sendJson(res, 200, {code: 0, data: {taskId}});
+                tasks.set(taskId, { status: "pending" });
+                sendJson(res, 200, { code: 0, data: { taskId } });
                 callModel(providerId, modelId, prompt, systemPrompt)
-                    .then(result => {
-                        tasks.set(taskId, {status: "success", result});
+                    .then((result) => {
+                        tasks.set(taskId, { status: "success", result });
                     })
-                    .catch(err => {
-                        tasks.set(taskId, {status: "error", error: String(err)});
+                    .catch((err) => {
+                        tasks.set(taskId, {
+                            status: "error",
+                            error: String(err),
+                        });
                     });
             } catch (e) {
-                sendJson(res, 400, {code: -1, msg: `Invalid request: ${e}`});
+                sendJson(res, 400, { code: -1, msg: `Invalid request: ${e}` });
             }
         });
         return;
@@ -189,19 +207,19 @@ const handleRequest = async (req: http.IncomingMessage, res: http.ServerResponse
     if (req.method === "GET" && url.pathname === "/api/model/query") {
         const taskId = url.searchParams.get("taskId");
         if (!taskId) {
-            sendJson(res, 400, {code: -1, msg: "Missing taskId"});
+            sendJson(res, 400, { code: -1, msg: "Missing taskId" });
             return;
         }
         const task = tasks.get(taskId);
         if (!task) {
-            sendJson(res, 404, {code: -1, msg: "Task not found"});
+            sendJson(res, 404, { code: -1, msg: "Task not found" });
             return;
         }
-        sendJson(res, 200, {code: 0, data: task});
+        sendJson(res, 200, { code: 0, data: task });
         return;
     }
 
-    sendJson(res, 404, {code: -1, msg: "Not found"});
+    sendJson(res, 404, { code: -1, msg: "Not found" });
 };
 
 const start = async (port?: number): Promise<void> => {
@@ -213,10 +231,13 @@ const start = async (port?: number): Promise<void> => {
     }
     return new Promise((resolve, reject) => {
         const s = http.createServer((req, res) => {
-            handleRequest(req, res, port!).catch(err => {
+            handleRequest(req, res, port!).catch((err) => {
                 Log.error("httpserver.request.error", err);
                 try {
-                    sendJson(res, 500, {code: -1, msg: `Internal error: ${err}`});
+                    sendJson(res, 500, {
+                        code: -1,
+                        msg: `Internal error: ${err}`,
+                    });
                 } catch (_) {}
             });
         });
@@ -224,7 +245,7 @@ const start = async (port?: number): Promise<void> => {
             server = s;
             isRunning = true;
             runningPort = port!;
-            Log.info("httpserver.start", {port});
+            Log.info("httpserver.start", { port });
             resolve();
         });
         s.on("error", (err: any) => {
@@ -235,7 +256,7 @@ const start = async (port?: number): Promise<void> => {
 };
 
 const stop = async (): Promise<void> => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         if (!server) {
             isRunning = false;
             runningPort = 0;
@@ -263,15 +284,15 @@ ipcMain.handle("httpserver:status", async () => {
 ipcMain.handle("httpserver:start", async (_, port?: number) => {
     try {
         await start(port);
-        return {code: 0};
+        return { code: 0 };
     } catch (e) {
-        return {code: -1, msg: String(e)};
+        return { code: -1, msg: String(e) };
     }
 });
 
 ipcMain.handle("httpserver:stop", async () => {
     await stop();
-    return {code: 0};
+    return { code: 0 };
 });
 
 ipcMain.handle("httpserver:getPort", async () => {
@@ -280,7 +301,7 @@ ipcMain.handle("httpserver:getPort", async () => {
 
 ipcMain.handle("httpserver:setPort", async (_, port: number) => {
     await ConfigMain.set("httpServerPort", port);
-    return {code: 0};
+    return { code: 0 };
 });
 
 ipcMain.handle("httpserver:getEnabled", async () => {
@@ -289,7 +310,7 @@ ipcMain.handle("httpserver:getEnabled", async () => {
 
 ipcMain.handle("httpserver:setEnabled", async (_, enabled: boolean) => {
     await ConfigMain.set("httpServerEnabled", enabled);
-    return {code: 0};
+    return { code: 0 };
 });
 
 export const HttpServerMain = {

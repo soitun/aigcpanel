@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {Dialog} from "../../lib/dialog";
-import {t} from "../../lang";
-import {TaskRecord, TaskService} from "../../service/TaskService";
-import {computed} from "vue";
-import {sleep} from "../../lib/util";
+import { Dialog } from "../../lib/dialog";
+import { t } from "../../lang";
+import { TaskRecord, TaskService } from "../../service/TaskService";
+import { computed } from "vue";
+import { sleep } from "../../lib/util";
 
 const props = defineProps({
     records: {
@@ -13,7 +13,11 @@ const props = defineProps({
 });
 
 const canDelete = computed(() => {
-    return props.records.filter(record => record.status === "success" || record.status === "fail").length > 0;
+    return (
+        props.records.filter(
+            (record) => record.status === "success" || record.status === "fail",
+        ).length > 0
+    );
 });
 
 const emit = defineEmits({
@@ -21,7 +25,9 @@ const emit = defineEmits({
 });
 
 const doDelete = async () => {
-    await Dialog.confirm(t("common.deleteRecordsConfirm", {count: props.records.length}));
+    await Dialog.confirm(
+        t("common.deleteRecordsConfirm", { count: props.records.length }),
+    );
     Dialog.loadingOn(t("status.deleting"));
     await sleep(500);
     for (const r of props.records) {
@@ -39,7 +45,7 @@ const doDelete = async () => {
     <a-tooltip :content="$t('common.delete')" mini>
         <a-button class="mr-2" :disabled="!canDelete" @click="doDelete()">
             <template #icon>
-                <icon-delete/>
+                <icon-delete />
             </template>
         </a-button>
     </a-tooltip>

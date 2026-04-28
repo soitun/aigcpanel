@@ -1,5 +1,5 @@
-import {AudioRecord} from "../../../lib/ffmpeg";
-import {TaskJobResultStepStatus} from "../../../service/TaskService";
+import { AudioRecord } from "../../../lib/ffmpeg";
+import { TaskJobResultStepStatus } from "../../../service/TaskService";
 
 export type LongTextTtsModelConfigType = {
     text: string;
@@ -9,7 +9,7 @@ export type LongTextTtsModelConfigType = {
 type ArticleItemRecord = {
     text: string;
     audio: string;
-}
+};
 
 export type LongTextTtsJobResultType = {
     // 处理步骤
@@ -20,15 +20,15 @@ export type LongTextTtsJobResultType = {
     step: "SplitText" | "SoundGenerate" | "Combine" | "End";
 
     SplitText: {
-        status: TaskJobResultStepStatus,
+        status: TaskJobResultStepStatus;
         records: { text: string }[];
     };
     SoundGenerate: {
-        status: TaskJobResultStepStatus,
-        records: { text: string, audio: string, }[] | null;
+        status: TaskJobResultStepStatus;
+        records: { text: string; audio: string }[] | null;
     };
     Combine: {
-        status: TaskJobResultStepStatus,
+        status: TaskJobResultStepStatus;
         audio: string;
     };
 };

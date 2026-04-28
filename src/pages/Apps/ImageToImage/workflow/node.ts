@@ -1,7 +1,12 @@
-import {defineAsyncComponent} from "vue";
-import {NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult} from "../../../../module/Workflow/core/type";
-import {workflowRun} from "../../common/workflow";
-import {ImageToImageRun} from "../task";
+import { defineAsyncComponent } from "vue";
+import {
+    NodeFunctionCall,
+    NodeRunController,
+    NodeRunParam,
+    NodeRunResult,
+} from "../../../../module/Workflow/core/type";
+import { workflowRun } from "../../common/workflow";
+import { ImageToImageRun } from "../task";
 import ImageToImageIcon from "./../assets/icon.svg";
 
 export default <NodeFunctionCall>{
@@ -26,21 +31,29 @@ export default <NodeFunctionCall>{
             type: "file",
             name: "Image",
             fileExtensions: ["png", "jpg"],
-        }
+        },
     ],
-    async run(controller: NodeRunController, param: NodeRunParam): Promise<NodeRunResult> {
-        console.log('ImageToImage run', param);
+    async run(
+        controller: NodeRunController,
+        param: NodeRunParam,
+    ): Promise<NodeRunResult> {
+        console.log("ImageToImage run", param);
         return workflowRun(
-            controller, param,
+            controller,
+            param,
             async () => {
                 const taskRunData = {
-                    taskId: param.runData?.['taskId'] || '',
-                    image: param.runInputs['Image'],
-                    prompt: param.runInputs['Prompt'],
-                    title: param.node.properties?.title + '-' + param.node.id,
+                    taskId: param.runData?.["taskId"] || "",
+                    image: param.runInputs["Image"],
+                    prompt: param.runInputs["Prompt"],
+                    title: param.node.properties?.title + "-" + param.node.id,
                     imageToImage: param.node.properties?.data?.imageToImage,
                 };
-                if (!taskRunData.image || !taskRunData.prompt || !taskRunData.imageToImage) {
+                if (
+                    !taskRunData.image ||
+                    !taskRunData.prompt ||
+                    !taskRunData.imageToImage
+                ) {
                     const missing: string[] = [];
                     if (!taskRunData.image) missing.push("图像");
                     if (!taskRunData.prompt) missing.push("提示文本");
@@ -50,19 +63,19 @@ export default <NodeFunctionCall>{
                 return await ImageToImageRun(taskRunData);
             },
             async (result, data) => {
-                result.runOutputs['Image'] = data.image
-            }
+                result.runOutputs["Image"] = data.image;
+            },
         );
     },
     async check(node) {
         if (!node.properties?.data?.imageToImage) {
             throw "请配置图像生成服务";
         }
-        if (node.properties?.inputFields?.[0].value === '') {
+        if (node.properties?.inputFields?.[0].value === "") {
             throw "请输入图像参数";
         }
-        if (node.properties?.inputFields?.[1].value === '') {
+        if (node.properties?.inputFields?.[1].value === "") {
             throw "请输入提示参数";
         }
-    }
-}
+    },
+};

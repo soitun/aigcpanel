@@ -4,7 +4,7 @@ const props = defineProps<{
         key: number;
         label: string;
         description: string;
-    }[],
+    }[];
 }>();
 </script>
 
@@ -13,15 +13,31 @@ const props = defineProps<{
         <div class="w-full flex flex-col items-center">
             <div class="flex items-center overflow-x-auto">
                 <template v-for="(step, idx) in steps" :key="step.key">
-                    <div class="flex items-center" :class="idx > 0 ? 'ml-6' : ''">
+                    <div
+                        class="flex items-center"
+                        :class="idx > 0 ? 'ml-6' : ''"
+                    >
                         <div
                             class="rounded-full w-9 h-9 flex items-center justify-center text-base font-bold transition-all duration-200 shadow"
-                            :class="'bg-white border-2 ' + (idx === 0 ? 'border-blue-400' : 'border-gray-300')"
-                            style="box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);">
+                            :class="
+                                'bg-white border-2 ' +
+                                (idx === 0
+                                    ? 'border-blue-400'
+                                    : 'border-gray-300')
+                            "
+                            style="box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.04)"
+                        >
                             <span class="text-blue-500">{{ idx + 1 }}</span>
                         </div>
-                        <div class="ml-2 text-base font-medium whitespace-nowrap">{{ step.label }}</div>
-                        <div v-if="idx < steps.length - 1" class="w-8 h-1 mx-2 rounded bg-gray-200"></div>
+                        <div
+                            class="ml-2 text-base font-medium whitespace-nowrap"
+                        >
+                            {{ step.label }}
+                        </div>
+                        <div
+                            v-if="idx < steps.length - 1"
+                            class="w-8 h-1 mx-2 rounded bg-gray-200"
+                        ></div>
                     </div>
                 </template>
             </div>

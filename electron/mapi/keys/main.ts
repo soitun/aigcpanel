@@ -1,5 +1,5 @@
-import {app, BrowserWindow, globalShortcut} from "electron";
-import {AppsMain} from "../app/main";
+import { app, BrowserWindow, globalShortcut } from "electron";
+import { AppsMain } from "../app/main";
 
 const eventListeners = {};
 
@@ -7,12 +7,12 @@ const eventListeners = {};
 let continuousKeys = [];
 const addKeyInput = (key: string, expire = 1000) => {
     let now = Date.now();
-    continuousKeys.push({key, expire: now + expire});
-    continuousKeys = continuousKeys.filter(item => item.expire > now);
+    continuousKeys.push({ key, expire: now + expire });
+    continuousKeys = continuousKeys.filter((item) => item.expire > now);
     for (let i = continuousKeys.length - 1; i >= 0; i--) {
         const key = continuousKeys
             .filter((o, oIndex) => oIndex >= i)
-            .map(o => o.key)
+            .map((o) => o.key)
             .join("|");
         if (eventListeners[key]) {
             eventListeners[key]();
@@ -36,7 +36,9 @@ const createKeyInputListener = (key: string) => {
 };
 
 const keyMap = {
-    "CommandOrControl+Shift+H": createKeyInputListener("CommandOrControl+Shift+H"),
+    "CommandOrControl+Shift+H": createKeyInputListener(
+        "CommandOrControl+Shift+H",
+    ),
 };
 
 const ready = () => {
@@ -62,20 +64,27 @@ const register = () => {
         }
     });
 
-    addMultiKeyListener(["CommandOrControl+Shift+H", "CommandOrControl+Shift+H", "CommandOrControl+Shift+H"], () => {
-        let focusedWindow = BrowserWindow.getFocusedWindow();
-        if (focusedWindow) {
-            if (focusedWindow.webContents.isDevToolsOpened()) {
-                focusedWindow.webContents.closeDevTools();
-            } else {
-                focusedWindow.webContents.openDevTools({
-                    mode: "detach",
-                    activate: false,
-                    title: "FocusedWindow",
-                });
+    addMultiKeyListener(
+        [
+            "CommandOrControl+Shift+H",
+            "CommandOrControl+Shift+H",
+            "CommandOrControl+Shift+H",
+        ],
+        () => {
+            let focusedWindow = BrowserWindow.getFocusedWindow();
+            if (focusedWindow) {
+                if (focusedWindow.webContents.isDevToolsOpened()) {
+                    focusedWindow.webContents.closeDevTools();
+                } else {
+                    focusedWindow.webContents.openDevTools({
+                        mode: "detach",
+                        activate: false,
+                        title: "FocusedWindow",
+                    });
+                }
             }
-        }
-    });
+        },
+    );
 };
 
 export const KeysMain = {

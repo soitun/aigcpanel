@@ -1,19 +1,35 @@
-import {app, BrowserWindow, clipboard, ipcMain, nativeImage, nativeTheme, screen, shell} from "electron";
-import {AppConfig} from "../../../src/config";
-import {CommonConfig} from "../../config/common";
-import {WindowConfig} from "../../config/window";
-import {isDev, isMac, platformArch, platformName, platformUUID, platformVersion} from "../../lib/env";
-import {preloadDefault, rendererDistPath} from "../../lib/env-main";
-import {Page} from "../../page";
-import {ConfigMain} from "../config/main";
-import {AppRuntime} from "../env";
-import {Events} from "../event/main";
-import {Files} from "../file/main";
+import {
+    app,
+    BrowserWindow,
+    clipboard,
+    ipcMain,
+    nativeImage,
+    nativeTheme,
+    screen,
+    shell,
+} from "electron";
+import { AppConfig } from "../../../src/config";
+import { CommonConfig } from "../../config/common";
+import { WindowConfig } from "../../config/window";
+import {
+    isDev,
+    isMac,
+    platformArch,
+    platformName,
+    platformUUID,
+    platformVersion,
+} from "../../lib/env";
+import { preloadDefault, rendererDistPath } from "../../lib/env-main";
+import { Page } from "../../page";
+import { ConfigMain } from "../config/main";
+import { AppRuntime } from "../env";
+import { Events } from "../event/main";
+import { Files } from "../file/main";
 import Apps from "./index";
-import {AppPosition} from "./lib/position";
-import {makeLoading} from "./loading";
-import {SetupMain} from "./setup";
-import {makeToast} from "./toast";
+import { AppPosition } from "./lib/position";
+import { makeLoading } from "./loading";
+import { SetupMain } from "./setup";
+import { makeToast } from "./toast";
 
 const getWindowByName = (name?: string) => {
     if (!name || "main" === name) {
@@ -75,7 +91,7 @@ const windowSetSize = (
     option?: {
         includeMinimumSize: boolean;
         center: boolean;
-    }
+    },
 ) => {
     width = parseInt(String(width));
     height = parseInt(String(height));
@@ -89,7 +105,7 @@ const windowSetSize = (
             includeMinimumSize: true,
             center: true,
         },
-        option
+        option,
     );
     if (option.includeMinimumSize) {
         win.setMinimumSize(width, height);
@@ -110,7 +126,7 @@ ipcMain.handle("app:showItemInFolder", (event, url: string) => {
     return shell.showItemInFolder(url);
 });
 
-ipcMain.handle("app:getPreload", event => {
+ipcMain.handle("app:getPreload", (event) => {
     let preload = preloadDefault;
     if (!preload.startsWith("file://")) {
         preload = `file://${preload}`;
@@ -134,10 +150,10 @@ ipcMain.handle(
         option?: {
             includeMinimumSize: boolean;
             center: boolean;
-        }
+        },
     ) => {
         windowSetSize(name, width, height, option);
-    }
+    },
 );
 
 ipcMain.handle("window:close", (event, name: string) => {
@@ -150,7 +166,7 @@ const windowOpen = async (
         singleton?: boolean;
         parent?: BrowserWindow;
         [key: string]: any;
-    }
+    },
 ) => {
     name = name || "main";
     return Page.open(name, option);
@@ -177,21 +193,26 @@ ipcMain.handle(
             mouseY: number;
             width: number;
             height: number;
-        }
+        },
     ) => {
-        const {x, y} = screen.getCursorScreenPoint();
+        const { x, y } = screen.getCursorScreenPoint();
         const originWindow = getWindowByName(name);
         if (!originWindow) return;
-        originWindow.setBounds({x: x - data.mouseX, y: y - data.mouseY, width: data.width, height: data.height});
+        originWindow.setBounds({
+            x: x - data.mouseX,
+            y: y - data.mouseY,
+            width: data.width,
+            height: data.height,
+        });
         AppPosition.set(name, x - data.mouseX, y - data.mouseY);
-    }
+    },
 );
 
 const getClipboardText = () => {
     return clipboard.readText("clipboard");
 };
 
-ipcMain.handle("app:getClipboardText", event => {
+ipcMain.handle("app:getClipboardText", (event) => {
     return getClipboardText();
 });
 
@@ -208,7 +229,7 @@ const getClipboardImage = () => {
     return image.isEmpty() ? "" : image.toDataURL();
 };
 
-ipcMain.handle("app:getClipboardImage", event => {
+ipcMain.handle("app:getClipboardImage", (event) => {
     return getClipboardImage();
 });
 
@@ -251,9 +272,9 @@ const defaultDarkModeBackgroundColor = async () => {
 };
 
 nativeTheme.on("updated", () => {
-    Events.broadcast("DarkModeChange", {isDarkMode: isDarkMode()});
-    AppsMain.defaultDarkModeBackgroundColor().then(color => {
-        AppRuntime.mainWindow.setBackgroundColor(color)
+    Events.broadcast("DarkModeChange", { isDarkMode: isDarkMode() });
+    AppsMain.defaultDarkModeBackgroundColor().then((color) => {
+        AppRuntime.mainWindow.setBackgroundColor(color);
     });
 });
 
@@ -271,11 +292,16 @@ const getCurrentScreenDisplay = () => {
 };
 
 const calcPositionInCurrentDisplay = (
-    position: "center" | "left-top" | "right-top" | "left-bottom" | "right-bottom",
+    position:
+        | "center"
+        | "left-top"
+        | "right-top"
+        | "left-bottom"
+        | "right-bottom",
     width: number,
-    height: number
+    height: number,
 ) => {
-    const {bounds, workArea} = getCurrentScreenDisplay();
+    const { bounds, workArea } = getCurrentScreenDisplay();
     let x = 0;
     let y = 0;
     switch (position) {
@@ -311,7 +337,7 @@ const toast = (
     options?: {
         duration?: number;
         status?: "success" | "error" | "info";
-    }
+    },
 ) => {
     return makeToast(msg, options);
 };
@@ -326,7 +352,7 @@ const loading = (
         timeout?: number;
         percentAuto?: boolean;
         percentTotalSeconds?: number;
-    }
+    },
 ): {
     close: () => void;
     percent: (value: number) => void;
@@ -392,9 +418,12 @@ const setAutoLaunch = async (enable: boolean, options?: {}) => {
     });
 };
 
-ipcMain.handle("app:setAutoLaunch", async (event, enable: boolean, options?: {}) => {
-    return setAutoLaunch(enable, options);
-});
+ipcMain.handle(
+    "app:setAutoLaunch",
+    async (event, enable: boolean, options?: {}) => {
+        return setAutoLaunch(enable, options);
+    },
+);
 
 const getAutoLaunch = async (options?: {}) => {
     return app.getLoginItemSettings().openAtLogin;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {StorageRecord, StorageService} from "../../service/StorageService";
+import { StorageRecord, StorageService } from "../../service/StorageService";
 import InputInlineEditor from "../common/InputInlineEditor.vue";
 
 const props = defineProps({
@@ -24,7 +24,10 @@ const onEditTitle = async (value: string) => {
 
 <template>
     <div class="flex items-center">
-        <div class="truncate flex-grow max-w-96 cursor-pointer" @click="emit('titleClick')">
+        <div
+            class="truncate flex-grow max-w-96 cursor-pointer"
+            @click="emit('titleClick')"
+        >
             {{ record.title }}
         </div>
         <InputInlineEditor :value="record.title" @change="onEditTitle">

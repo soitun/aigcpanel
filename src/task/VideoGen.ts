@@ -1,14 +1,17 @@
-import {DataService} from "../service/DataService";
-import {TaskService} from "../service/TaskService";
-import {useServerStore} from "../store/modules/server";
-import {TaskBiz} from "../store/modules/task";
+import { DataService } from "../service/DataService";
+import { TaskService } from "../service/TaskService";
+import { useServerStore } from "../store/modules/server";
+import { TaskBiz } from "../store/modules/task";
 
 const serverStore = useServerStore();
 
 export const VideoGen: TaskBiz = {
     runFunc: async (bizId, bizParam) => {
         // console.log('VideoGen.runFunc', {bizId, bizParam})
-        const {record, server, serverInfo} = await serverStore.prepareForTask(bizId, bizParam);
+        const { record, server, serverInfo } = await serverStore.prepareForTask(
+            bizId,
+            bizParam,
+        );
         const modelConfig: VideoGenModelConfigType = record.modelConfig;
         // console.log('VideoGen.runFunc.serverInfo', serverInfo)
         await TaskService.update(bizId, {
@@ -16,7 +19,9 @@ export const VideoGen: TaskBiz = {
         });
         let audioFile: string | null = null;
         if (modelConfig.soundType === "soundGenerate") {
-            const soundRecord = await TaskService.get(modelConfig.soundGenerateId);
+            const soundRecord = await TaskService.get(
+                modelConfig.soundGenerateId,
+            );
             audioFile = soundRecord?.result.url as string;
         } else if (modelConfig.soundType === "soundCustom") {
             audioFile = modelConfig.soundCustomFile;
@@ -50,7 +55,7 @@ export const VideoGen: TaskBiz = {
     },
     successFunc: async (bizId, bizParam) => {
         // console.log('VideoGen.successFunc', {bizId, bizParam})
-        const {record} = await serverStore.prepareForTask(bizId, bizParam);
+        const { record } = await serverStore.prepareForTask(bizId, bizParam);
         // console.log('VideoGen.successFunc.record', {record, server})
         await TaskService.update(bizId, {
             status: "success",

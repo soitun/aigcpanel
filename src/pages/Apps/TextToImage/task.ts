@@ -1,11 +1,15 @@
-import {serverTextToImage} from "../../../lib/server";
-import {TaskRecord, TaskService, TaskType} from "../../../service/TaskService";
-import {useServerStore} from "../../../store/modules/server";
-import {TaskBiz, useTaskStore} from "../../../store/modules/task";
-import {TextToImageJobResultType, TextToImageModelConfigType} from "./type";
+import { serverTextToImage } from "../../../lib/server";
+import {
+    TaskRecord,
+    TaskService,
+    TaskType,
+} from "../../../service/TaskService";
+import { useServerStore } from "../../../store/modules/server";
+import { TaskBiz, useTaskStore } from "../../../store/modules/task";
+import { TextToImageJobResultType, TextToImageModelConfigType } from "./type";
 
-import {createTaskRunResult} from "../common/lib";
-import {TaskRunResult} from "../common/type";
+import { createTaskRunResult } from "../common/lib";
+import { TaskRunResult } from "../common/type";
 
 const serverStore = useServerStore();
 const taskStore = useTaskStore();
@@ -60,14 +64,14 @@ export const TextToImageCleaner = async (task: TaskRecord) => {
 
 export const TextToImage: TaskBiz = {
     runFunc: async (bizId, bizParam) => {
-        console.log("TextToImage.runFunc", {bizId, bizParam});
-        const {record} = await serverStore.prepareForTask(bizId, bizParam);
+        console.log("TextToImage.runFunc", { bizId, bizParam });
+        const { record } = await serverStore.prepareForTask(bizId, bizParam);
         const modelConfig: TextToImageModelConfigType = record.modelConfig;
         const jobResult: TextToImageJobResultType = record.jobResult;
 
         jobResult.step = jobResult.step || "Prepare";
-        jobResult.Prepare = jobResult.Prepare || {status: "queue"};
-        jobResult.Generate = jobResult.Generate || {status: "queue"};
+        jobResult.Prepare = jobResult.Prepare || { status: "queue" };
+        jobResult.Generate = jobResult.Generate || { status: "queue" };
 
         if (jobResult.step === "Prepare") {
             console.log("TextToImage.Prepare", jobResult);
@@ -76,11 +80,11 @@ export const TextToImage: TaskBiz = {
                 status: "running",
                 jobResult,
             });
-            taskStore.fireChange({biz: "TextToImage", bizId}, "running");
+            taskStore.fireChange({ biz: "TextToImage", bizId }, "running");
 
             jobResult.step = "Generate";
             jobResult.Prepare.status = "success";
-            await TaskService.update(bizId, {jobResult});
+            await TaskService.update(bizId, { jobResult });
         }
 
         if (jobResult.step === "Generate") {
@@ -90,13 +94,17 @@ export const TextToImage: TaskBiz = {
                 jobResult,
                 status: "running",
             });
-            taskStore.fireChange({biz: "TextToImage", bizId}, "running");
+            taskStore.fireChange({ biz: "TextToImage", bizId }, "running");
 
             const ret = await serverTextToImage(
-                "TextToImage", bizId, modelConfig.textToImage, record.result, modelConfig.prompt,
+                "TextToImage",
+                bizId,
+                modelConfig.textToImage,
+                record.result,
+                modelConfig.prompt,
                 {
                     cache: false,
-                }
+                },
             );
             if (ret.type === "retry") {
                 return ret.type;
@@ -104,7 +112,7 @@ export const TextToImage: TaskBiz = {
             jobResult.Generate.image = await $mapi.file.hubSave(ret.url);
             jobResult.step = "End";
             jobResult.Generate.status = "success";
-            await TaskService.update(bizId, {jobResult});
+            await TaskService.update(bizId, { jobResult });
         }
 
         if (jobResult.step === "End") {
@@ -115,7 +123,7 @@ export const TextToImage: TaskBiz = {
         throw `TextToImage.runFunc: unknown jobResult.step: ${jobResult.step}`;
     },
     successFunc: async (bizId, bizParam) => {
-        const {record} = await serverStore.prepareForTask(bizId, bizParam);
+        const { record } = await serverStore.prepareForTask(bizId, bizParam);
         const jobResult: TextToImageJobResultType = record.jobResult;
         if (jobResult.step === "End") {
             if (jobResult.Generate.image) {
@@ -127,10 +135,15 @@ export const TextToImage: TaskBiz = {
                     },
                 });
             } else {
-                $mapi.log.error("TextToImage.successFunc: no image in jobResult.Generate");
+                $mapi.log.error(
+                    "TextToImage.successFunc: no image in jobResult.Generate",
+                );
             }
         } else {
-            $mapi.log.error("TextToImage.successFunc: unknown jobResult.step", jobResult.step);
+            $mapi.log.error(
+                "TextToImage.successFunc: unknown jobResult.step",
+                jobResult.step,
+            );
         }
     },
     failFunc: async (bizId, msg, bizParam) => {
@@ -141,6 +154,6 @@ export const TextToImage: TaskBiz = {
         });
     },
     update: async (bizId, data, bizParam) => {
-        console.log("TextToImage.update", {bizId, data, bizParam});
+        console.log("TextToImage.update", { bizId, data, bizParam });
     },
 };

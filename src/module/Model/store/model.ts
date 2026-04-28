@@ -1,18 +1,22 @@
-import {defineStore} from "pinia";
+import { defineStore } from "pinia";
 import store from "../../../store/index";
 
-import {getProviderLogo, getProviderTitle, SystemProviders} from "../providers";
-import {SystemModels} from "../models";
-import {ChatParam, Model, Provider} from "../types";
-import {ObjectUtil, StringUtil} from "../../../lib/util";
-import {debounce} from "lodash-es";
-import {ModelChatResult, ModelProvider} from "../provider/provider";
-import {mapError} from "../../../lib/error";
-import {Dialog} from "../../../lib/dialog";
-import {t} from "../../../lang";
-import {useUserStore} from "../../../store/modules/user";
-import {watch} from "vue";
-import {AppConfig} from "../../../config";
+import {
+    getProviderLogo,
+    getProviderTitle,
+    SystemProviders,
+} from "../providers";
+import { SystemModels } from "../models";
+import { ChatParam, Model, Provider } from "../types";
+import { ObjectUtil, StringUtil } from "../../../lib/util";
+import { debounce } from "lodash-es";
+import { ModelChatResult, ModelProvider } from "../provider/provider";
+import { mapError } from "../../../lib/error";
+import { Dialog } from "../../../lib/dialog";
+import { t } from "../../../lang";
+import { useUserStore } from "../../../store/modules/user";
+import { watch } from "vue";
+import { AppConfig } from "../../../config";
 
 const userStore = useUserStore();
 
@@ -23,16 +27,16 @@ export type ModelItem = {
     providerTitle: string;
     modelId: string;
     modelName: string;
-}
+};
 
 watch(
     () => userStore.data,
-    newValue => {
+    (newValue) => {
         model.init().then();
     },
     {
         deep: true,
-    }
+    },
 );
 
 const mapModelError = (e: any, provider: Provider) => {
@@ -94,7 +98,7 @@ export const modelStore = defineStore("model", {
                     data: {
                         apiKey: "",
                         apiHost: "",
-                        models: (SystemModels[providerId] || []).map(m => {
+                        models: (SystemModels[providerId] || []).map((m) => {
                             return {
                                 id: m.id,
                                 provider: providerId,
@@ -112,7 +116,7 @@ export const modelStore = defineStore("model", {
             const storageData = await $mapi.storage.read("models");
             if (storageData) {
                 if (storageData.userProviders) {
-                    storageData.userProviders.forEach(provider => {
+                    storageData.userProviders.forEach((provider) => {
                         results.unshift({
                             id: provider.id,
                             type: provider.type,
@@ -135,19 +139,31 @@ export const modelStore = defineStore("model", {
                     });
                 }
                 if (storageData.providerData) {
-                    buildInProviderData = storageData.providerData["buildIn"] || null;
+                    buildInProviderData =
+                        storageData.providerData["buildIn"] || null;
                     for (const providerId in storageData.providerData) {
-                        const provider = results.find(p => p.id === providerId);
+                        const provider = results.find(
+                            (p) => p.id === providerId,
+                        );
                         if (provider) {
-                            provider.data.apiKey = storageData.providerData[providerId].apiKey || "";
-                            provider.data.apiHost = storageData.providerData[providerId].apiHost;
-                            (storageData.providerData[providerId].models || []).forEach(model => {
-                                const existingModel = provider.data.models.find(m => m.id === model.id);
+                            provider.data.apiKey =
+                                storageData.providerData[providerId].apiKey ||
+                                "";
+                            provider.data.apiHost =
+                                storageData.providerData[providerId].apiHost;
+                            (
+                                storageData.providerData[providerId].models ||
+                                []
+                            ).forEach((model) => {
+                                const existingModel = provider.data.models.find(
+                                    (m) => m.id === model.id,
+                                );
                                 if (existingModel) {
                                     existingModel.name = model.name;
                                     existingModel.group = model.group;
                                     existingModel.types = model.types;
-                                    existingModel.enabled = model.enabled || false;
+                                    existingModel.enabled =
+                                        model.enabled || false;
                                 } else {
                                     provider.data.models.push({
                                         id: model.id,
@@ -160,7 +176,9 @@ export const modelStore = defineStore("model", {
                                     });
                                 }
                             });
-                            provider.data.enabled = storageData.providerData[providerId].enabled || false;
+                            provider.data.enabled =
+                                storageData.providerData[providerId].enabled ||
+                                false;
                         }
                     }
                 }
@@ -170,9 +188,9 @@ export const modelStore = defineStore("model", {
         },
         async enabledModels(): Promise<ModelItem[]> {
             const results: ModelItem[] = [];
-            this.providers.forEach(provider => {
+            this.providers.forEach((provider) => {
                 if (provider.data.enabled) {
-                    provider.data.models.forEach(model => {
+                    provider.data.models.forEach((model) => {
                         if (model.enabled) {
                             results.push({
                                 id: provider.id + "|" + model.id,
@@ -189,9 +207,15 @@ export const modelStore = defineStore("model", {
             return results;
         },
         async refreshBuildIn(buildInProviderData?: any) {
-            if (userStore.data && userStore.data.lmApi && userStore.data.lmApi.models) {
+            if (
+                userStore.data &&
+                userStore.data.lmApi &&
+                userStore.data.lmApi.models
+            ) {
                 const lmApi = userStore.data.lmApi;
-                const buildInProvider = this.providers.find(p => p.id === "buildIn");
+                const buildInProvider = this.providers.find(
+                    (p) => p.id === "buildIn",
+                );
                 if (!buildInProvider) {
                     const models: Model[] = [];
                     for (const m of lmApi.models) {
@@ -207,10 +231,16 @@ export const modelStore = defineStore("model", {
                     }
                     // console.log("model.init.buildIn", JSON.stringify({lmApi}, null, 2));
                     let enabled = true;
-                    if (buildInProviderData && 'enabled' in buildInProviderData) {
+                    if (
+                        buildInProviderData &&
+                        "enabled" in buildInProviderData
+                    ) {
                         enabled = buildInProviderData.enabled;
                     }
-                    console.log('model.init.buildIn', {enabled, buildInProviderData});
+                    console.log("model.init.buildIn", {
+                        enabled,
+                        buildInProviderData,
+                    });
                     this.providers.unshift({
                         id: "buildIn",
                         type: "openai",
@@ -258,7 +288,7 @@ export const modelStore = defineStore("model", {
             await this.sync();
         },
         async edit(provider: Partial<Provider>) {
-            const p = this.providers.find(p => p.id === provider.id);
+            const p = this.providers.find((p) => p.id === provider.id);
             if (p) {
                 if ("title" in provider) {
                     p.title = provider.title || "";
@@ -282,19 +312,20 @@ export const modelStore = defineStore("model", {
         },
         async test(providerId: string, modelId: string) {
             await this.refreshBuildIn();
-            const provider = this.providers.find(p => p.id === providerId);
+            const provider = this.providers.find((p) => p.id === providerId);
             if (!provider) {
                 return;
             }
-            const m = provider.data.models.find(m => m.id === modelId);
+            const m = provider.data.models.find((m) => m.id === modelId);
             if (!m) {
                 return;
             }
             Dialog.loadingOn(t("common.testing"));
             try {
-                const ret = await ModelProvider.chat("你是什么模型，简短回答",
+                const ret = await ModelProvider.chat(
+                    "你是什么模型，简短回答",
                     {
-                        systemPrompt: null
+                        systemPrompt: null,
                     },
                     {
                         type: provider.type,
@@ -302,13 +333,16 @@ export const modelStore = defineStore("model", {
                         apiUrl: provider.apiUrl,
                         apiHost: provider.data.apiHost,
                         apiKey: provider.data.apiKey,
-                    });
+                    },
+                );
                 if (ret.code) {
                     throw ret.msg;
                 }
                 Dialog.tipSuccess(t("common.testSuccess"));
             } catch (e) {
-                Dialog.tipError(t("common.testFailed") + " " + mapModelError(e, provider));
+                Dialog.tipError(
+                    t("common.testFailed") + " " + mapModelError(e, provider),
+                );
             } finally {
                 Dialog.loadingOff();
             }
@@ -320,24 +354,27 @@ export const modelStore = defineStore("model", {
             chatParam: ChatParam,
             option?: {
                 loading: boolean;
-            }
+            },
         ): Promise<ModelChatResult> {
             await this.refreshBuildIn();
             if (!providerId || !modelId) {
                 Dialog.tipError(t("hint.selectModel"));
-                return {code: -1, msg: t("hint.selectModel")};
+                return { code: -1, msg: t("hint.selectModel") };
             }
-            option = Object.assign({
-                loading: false,
-            }, option);
-            const provider = this.providers.find(p => p.id === providerId);
+            option = Object.assign(
+                {
+                    loading: false,
+                },
+                option,
+            );
+            const provider = this.providers.find((p) => p.id === providerId);
             // console.log("provider.chat", JSON.stringify({provider}, null, 2));
             if (!provider) {
-                return {code: -1, msg: "provider not found"};
+                return { code: -1, msg: "provider not found" };
             }
-            const m = provider.data.models.find(m => m.id === modelId);
+            const m = provider.data.models.find((m) => m.id === modelId);
             if (!m) {
-                return {code: -1, msg: "model not found"};
+                return { code: -1, msg: "model not found" };
             }
             if (option.loading) {
                 Dialog.loadingOn();
@@ -351,15 +388,19 @@ export const modelStore = defineStore("model", {
                     apiKey: provider.data.apiKey,
                 });
             } catch (e) {
-                return {code: -1, msg: mapModelError(e, provider)};
+                return { code: -1, msg: mapModelError(e, provider) };
             } finally {
                 if (option.loading) {
                     Dialog.loadingOff();
                 }
             }
         },
-        async change(providerId: string, key: "" | "data.apiKey" | "data.apiHost" | "data.enabled", value: any) {
-            const provider = model.providers.find(p => p.id === providerId);
+        async change(
+            providerId: string,
+            key: "" | "data.apiKey" | "data.apiHost" | "data.enabled",
+            value: any,
+        ) {
+            const provider = model.providers.find((p) => p.id === providerId);
             if (!provider) {
                 return;
             }
@@ -375,7 +416,7 @@ export const modelStore = defineStore("model", {
             await this.sync();
         },
         async modelAdd(providerId: string, model: Partial<Model>) {
-            const provider = this.providers.find(p => p.id === providerId);
+            const provider = this.providers.find((p) => p.id === providerId);
             if (!provider) {
                 return;
             }
@@ -391,22 +432,22 @@ export const modelStore = defineStore("model", {
             await this.sync();
         },
         async modelDelete(providerId: string, modelId: string) {
-            const provider = this.providers.find(p => p.id === providerId);
+            const provider = this.providers.find((p) => p.id === providerId);
             if (!provider) {
                 return;
             }
-            const m = provider.data.models.find(m => m.id === modelId);
+            const m = provider.data.models.find((m) => m.id === modelId);
             if (m) {
                 provider.data.models.splice(provider.data.models.indexOf(m), 1);
             }
             await this.sync();
         },
         async modelEdit(providerId: string, model: Partial<Model>) {
-            const provider = this.providers.find(p => p.id === providerId);
+            const provider = this.providers.find((p) => p.id === providerId);
             if (!provider) {
                 return;
             }
-            const m = provider.data.models.find(m => m.id === model.id);
+            const m = provider.data.models.find((m) => m.id === model.id);
             if (m) {
                 if ("name" in model) {
                     m.name = model.name || "";
@@ -423,12 +464,17 @@ export const modelStore = defineStore("model", {
             }
             await this.sync();
         },
-        async changeModel(providerId: string, modelId: string, key: "enabled", value: any) {
-            const provider = this.providers.find(p => p.id === providerId);
+        async changeModel(
+            providerId: string,
+            modelId: string,
+            key: "enabled",
+            value: any,
+        ) {
+            const provider = this.providers.find((p) => p.id === providerId);
             if (!provider) {
                 return;
             }
-            const m = provider.data.models.find(m => m.id === modelId);
+            const m = provider.data.models.find((m) => m.id === modelId);
             if (m) {
                 m[key] = value;
             }
@@ -436,7 +482,7 @@ export const modelStore = defineStore("model", {
         },
         sync: debounce(async () => {
             const providerData = {};
-            model.providers.forEach(provider => {
+            model.providers.forEach((provider) => {
                 providerData[provider.id] = {
                     ...ObjectUtil.clone(provider.data),
                     apiUrl: provider.apiUrl || "",
@@ -445,8 +491,13 @@ export const modelStore = defineStore("model", {
                     providerData[provider.id].apiKey = "";
                 }
             });
-            const userProviders = model.providers.filter(provider => !provider.isSystem);
-            await $mapi.storage.write("models", ObjectUtil.clone({providerData, userProviders}));
+            const userProviders = model.providers.filter(
+                (provider) => !provider.isSystem,
+            );
+            await $mapi.storage.write(
+                "models",
+                ObjectUtil.clone({ providerData, userProviders }),
+            );
         }, 200),
     },
 });

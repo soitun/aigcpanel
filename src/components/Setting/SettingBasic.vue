@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {changeLocale, getLocale, listLocales, t} from "../../lang";
-import {useSettingStore} from "../../store/modules/setting";
-import {onMounted, ref} from "vue";
+import { changeLocale, getLocale, listLocales, t } from "../../lang";
+import { useSettingStore } from "../../store/modules/setting";
+import { onMounted, ref } from "vue";
 
 const locale = ref("");
 
@@ -20,8 +20,16 @@ const onLocaleChange = (value: string) => {
 <template>
     <a-form :model="{}" layout="vertical">
         <a-form-item field="name" :label="t('common.language')">
-            <a-select :model-value="locale as string" @change="onLocaleChange as any">
-                <a-option v-for="(l, lIndex) in locales" :key="l.name" :value="l.name">{{ l.label }}</a-option>
+            <a-select
+                :model-value="locale as string"
+                @change="onLocaleChange as any"
+            >
+                <a-option
+                    v-for="(l, lIndex) in locales"
+                    :key="l.name"
+                    :value="l.name"
+                    >{{ l.label }}</a-option
+                >
             </a-select>
         </a-form-item>
         <!--        <a-form-item field="name" :label="t('setting.themeStyle')">-->

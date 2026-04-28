@@ -2,24 +2,29 @@
 const props = defineProps<{
     param: {
         [key: string]: any;
-    },
+    };
 }>();
 const formatValue = (v: any) => {
-    if (true === v) return 'true';
-    if (false === v) return 'false';
-    if (null === v) return 'null';
-    if (undefined === v) return 'undefined';
-    if (Array.isArray(v)) return `[${v.map(i => formatValue(i)).join(',')}]`;
-    if ('object' === typeof v) return JSON.stringify(v);
+    if (true === v) return "true";
+    if (false === v) return "false";
+    if (null === v) return "null";
+    if (undefined === v) return "undefined";
+    if (Array.isArray(v)) return `[${v.map((i) => formatValue(i)).join(",")}]`;
+    if ("object" === typeof v) return JSON.stringify(v);
     return v;
 };
 </script>
 
 <template>
-    <div v-for="(v,k) in param">
+    <div v-for="(v, k) in param">
         <a-tag v-if="!(k as string).startsWith('_')" class="rounded-lg">
             <div class="w-5">
-                <svg class="w-4 h-4" viewBox="0 0 1024 1024" width="200" height="200">
+                <svg
+                    class="w-4 h-4"
+                    viewBox="0 0 1024 1024"
+                    width="200"
+                    height="200"
+                >
                     <path
                         d="M305.74999971 361.99999971h206.25000029v56.25H305.74999971zM624.5 418.24999971h93.75000029v-56.25h-93.75000029v-37.49999942h-56.25v131.24999971h56.25zM512 605.75000029h206.25000029v56.25H512zM399.5 699.49999971h56.25v-131.24999971h-56.25v37.50000029h-93.75000029v56.25h93.75000029z"
                         fill="currentColor"
@@ -30,8 +35,8 @@ const formatValue = (v: any) => {
                     ></path>
                 </svg>
             </div>
-            {{ param['_' + k] || k }}
-            {{ formatValue(param['__' + k] || v) }}
+            {{ param["_" + k] || k }}
+            {{ formatValue(param["__" + k] || v) }}
         </a-tag>
     </div>
 </template>

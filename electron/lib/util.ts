@@ -1,13 +1,13 @@
 import chardet from "chardet";
 import dayjs from "dayjs";
 import iconvLite from "iconv-lite";
-import {Base64} from "js-base64";
+import { Base64 } from "js-base64";
 import * as crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import Showdown from "showdown";
 // import {Iconv} from "iconv"
-import {isMac, isWin} from "./env";
+import { isMac, isWin } from "./env";
 import FileIndex from "../mapi/file";
 
 export const EncodeUtil = {
@@ -124,7 +124,8 @@ export const EncodeUtil = {
                 // XOR encrypt the chunk
                 const encryptedChunk = Buffer.alloc(chunk.length);
                 for (let i = 0; i < chunk.length; i++) {
-                    encryptedChunk[i] = chunk[i] ^ keyBytes[bytesProcessed % keyLength];
+                    encryptedChunk[i] =
+                        chunk[i] ^ keyBytes[bytesProcessed % keyLength];
                     bytesProcessed++;
                 }
 
@@ -137,12 +138,12 @@ export const EncodeUtil = {
                 resolve(outputPath);
             });
 
-            inputStream.on("error", error => {
+            inputStream.on("error", (error) => {
                 outputStream.destroy();
                 reject(error);
             });
 
-            outputStream.on("error", error => {
+            outputStream.on("error", (error) => {
                 inputStream.destroy();
                 reject(error);
             });
@@ -176,7 +177,11 @@ export const EncodeUtil = {
                     if (remainingMetaBytes === 0) {
                         // Read metadata length (first 4 bytes)
                         if (chunk.length < 4) {
-                            reject(new Error("Invalid xzip file: insufficient data for metadata length"));
+                            reject(
+                                new Error(
+                                    "Invalid xzip file: insufficient data for metadata length",
+                                ),
+                            );
                             return;
                         }
                         const metaLength = chunk.readUInt32LE(0);
@@ -185,9 +190,18 @@ export const EncodeUtil = {
                     }
 
                     // Read metadata
-                    const availableMetaBytes = Math.min(remainingMetaBytes, chunk.length - chunkOffset);
-                    const metaChunk = chunk.subarray(chunkOffset, chunkOffset + availableMetaBytes);
-                    metaBuffer = Buffer.concat([metaBuffer, metaChunk] as readonly Uint8Array[]);
+                    const availableMetaBytes = Math.min(
+                        remainingMetaBytes,
+                        chunk.length - chunkOffset,
+                    );
+                    const metaChunk = chunk.subarray(
+                        chunkOffset,
+                        chunkOffset + availableMetaBytes,
+                    );
+                    metaBuffer = Buffer.concat([
+                        metaBuffer,
+                        metaChunk,
+                    ] as readonly Uint8Array[]);
                     remainingMetaBytes -= availableMetaBytes;
                     chunkOffset += availableMetaBytes;
 
@@ -195,20 +209,30 @@ export const EncodeUtil = {
                         // Parse metadata
                         try {
                             const metaB64 = metaBuffer.toString("utf-8");
-                            const metaJson = Buffer.from(metaB64, "base64").toString("utf-8");
+                            const metaJson = Buffer.from(
+                                metaB64,
+                                "base64",
+                            ).toString("utf-8");
                             filemeta = JSON.parse(metaJson);
                             keyBytes = Buffer.from(filemeta.key, "utf-8");
 
                             // Create output file with correct extension
-                            const finalOutputPath = outputPath + (filemeta.format ? "." + filemeta.format : "");
-                            outputStream = fs.createWriteStream(finalOutputPath);
+                            const finalOutputPath =
+                                outputPath +
+                                (filemeta.format ? "." + filemeta.format : "");
+                            outputStream =
+                                fs.createWriteStream(finalOutputPath);
 
                             metadataRead = true;
 
                             // Set the final output path for resolution
                             outputPath = finalOutputPath;
                         } catch (error) {
-                            reject(new Error("Invalid xzip file: corrupted metadata"));
+                            reject(
+                                new Error(
+                                    "Invalid xzip file: corrupted metadata",
+                                ),
+                            );
                             return;
                         }
                     }
@@ -221,7 +245,9 @@ export const EncodeUtil = {
                     const keyLength = keyBytes.length;
 
                     for (let i = 0; i < encryptedChunk.length; i++) {
-                        decryptedChunk[i] = encryptedChunk[i] ^ keyBytes[bytesProcessed % keyLength];
+                        decryptedChunk[i] =
+                            encryptedChunk[i] ^
+                            keyBytes[bytesProcessed % keyLength];
                         bytesProcessed++;
                     }
 
@@ -238,7 +264,7 @@ export const EncodeUtil = {
                 }
             });
 
-            inputStream.on("error", error => {
+            inputStream.on("error", (error) => {
                 if (outputStream) {
                     outputStream.destroy();
                 }
@@ -246,7 +272,7 @@ export const EncodeUtil = {
             });
 
             if (outputStream) {
-                outputStream.on("error", error => {
+                outputStream.on("error", (error) => {
                     inputStream.destroy();
                     reject(error);
                 });
@@ -280,7 +306,8 @@ export const IconvUtil = {
 
 export const StrUtil = {
     randomString(len: number = 32) {
-        const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const chars =
+            "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         let result = "";
         for (let i = len; i > 0; --i) {
             result += chars[Math.floor(Math.random() * chars.length)];
@@ -288,11 +315,14 @@ export const StrUtil = {
         return result;
     },
     uuid() {
-        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-            const r = (Math.random() * 16) | 0;
-            const v = c === "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        });
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+            /[xy]/g,
+            function (c) {
+                const r = (Math.random() * 16) | 0;
+                const v = c === "x" ? r : (r & 0x3) | 0x8;
+                return v.toString(16);
+            },
+        );
     },
     hashCode(str: string, length: number = 8) {
         let hash = 0;
@@ -308,7 +338,11 @@ export const StrUtil = {
         }
         return result;
     },
-    hashCodeWithDuplicateCheck(str: string, check: string[], length: number = 8) {
+    hashCodeWithDuplicateCheck(
+        str: string,
+        check: string[],
+        length: number = 8,
+    ) {
         let code = this.hashCode(str, length);
         while (check.includes(code)) {
             code = this.uuid().substring(0, length);
@@ -316,7 +350,10 @@ export const StrUtil = {
         return code;
     },
     bigIntegerId() {
-        return [Date.now(), (Math.floor(Math.random() * 1000000) + "").padStart(6, "0")].join("");
+        return [
+            Date.now(),
+            (Math.floor(Math.random() * 1000000) + "").padStart(6, "0"),
+        ].join("");
     },
     ucFirst(str: string) {
         if (!str) return "";
@@ -350,7 +387,8 @@ export const TimeUtil = {
     },
     replacePattern(text: string) {
         // @ts-ignore
-        return text.replaceAll("{year}", dayjs().format("YYYY"))
+        return text
+            .replaceAll("{year}", dayjs().format("YYYY"))
             .replaceAll("{month}", dayjs().format("MM"))
             .replaceAll("{day}", dayjs().format("DD"))
             .replaceAll("{hour}", dayjs().format("HH"))
@@ -396,14 +434,14 @@ export const FileUtil = {
     streamToBase64(stream: NodeJS.ReadableStream): Promise<string> {
         return new Promise((resolve, reject) => {
             const chunks = [];
-            stream.on("data", chunk => {
+            stream.on("data", (chunk) => {
                 chunks.push(chunk);
             });
             stream.on("end", () => {
                 const buffer = Buffer.concat(chunks);
                 resolve(buffer.toString("base64"));
             });
-            stream.on("error", error => {
+            stream.on("error", (error) => {
                 reject(error);
             });
         });
@@ -438,13 +476,13 @@ export const FileUtil = {
         return new Promise((resolve, reject) => {
             const hash = crypto.createHash("md5");
             const stream = fs.createReadStream(filePath);
-            stream.on("data", data => {
+            stream.on("data", (data) => {
                 hash.update(data);
             });
             stream.on("end", () => {
                 resolve(hash.digest("hex"));
             });
-            stream.on("error", error => {
+            stream.on("error", (error) => {
                 reject(error);
             });
         });
@@ -460,7 +498,7 @@ export const JsonUtil = {
             Object.entries(obj).sort(([, a], [, b]) => {
                 // @ts-ignore
                 return ((a as any) - b) as any;
-            })
+            }),
         );
         return JSON.stringify(sortedData, null, 4);
     },
@@ -472,9 +510,9 @@ export const ImportUtil = {
         if (forceReload) {
             const md5 = await FileUtil.md5(cjsPath);
             tempPath = path.join(
-                await FileIndex.tempDir('commonJs'),
+                await FileIndex.tempDir("commonJs"),
                 `${md5}.cjs`,
-            )
+            );
             if (!fs.existsSync(tempPath)) {
                 fs.copyFileSync(cjsPath, tempPath);
             }
@@ -500,7 +538,11 @@ export const MemoryCacheUtil = {
             }
         }
     },
-    async remember(key: string, callback: () => Promise<any>, ttl: number = 60) {
+    async remember(
+        key: string,
+        callback: () => Promise<any>,
+        ttl: number = 60,
+    ) {
         if (this.pool[key] && this.pool[key].expire > TimeUtil.timestamp()) {
             return this.pool[key].value;
         }
@@ -551,7 +593,11 @@ export const MemoryMapCacheUtil = {
         }
     },
     get(group: string, key: string) {
-        if (this.pool[group] && this.pool[group][key] && this.pool[group][key].expire > TimeUtil.timestamp()) {
+        if (
+            this.pool[group] &&
+            this.pool[group][key] &&
+            this.pool[group][key].expire > TimeUtil.timestamp()
+        ) {
             return this.pool[group][key].value;
         }
         this._gc();
@@ -728,12 +774,29 @@ export const MarkdownUtil = {
     },
 };
 
-type HotkeyModifierType = "Control" | "Option" | "Command" | "Ctrl" | "Alt" | "Win" | "Meta" | "Shift";
+type HotkeyModifierType =
+    | "Control"
+    | "Option"
+    | "Command"
+    | "Ctrl"
+    | "Alt"
+    | "Win"
+    | "Meta"
+    | "Shift";
 type HotkeyType = { key: string; modifiers: HotkeyModifierType[] };
 
 export const HotKeyUtil = {
     orderModifiers(modifiers: HotkeyModifierType[]) {
-        const order = ["Control", "Ctrl", "Command", "Meta", "Win", "Option", "Alt", "Shift"];
+        const order = [
+            "Control",
+            "Ctrl",
+            "Command",
+            "Meta",
+            "Win",
+            "Option",
+            "Alt",
+            "Shift",
+        ];
         return modifiers.sort((a, b) => {
             return order.indexOf(a) - order.indexOf(b);
         });
@@ -741,23 +804,27 @@ export const HotKeyUtil = {
     unifyObject(hotkey: HotkeyType) {
         return {
             key: hotkey.key.toUpperCase(),
-            modifiers: this.orderModifiers(hotkey.modifiers.map(modifier => StrUtil.ucFirst(modifier))),
+            modifiers: this.orderModifiers(
+                hotkey.modifiers.map((modifier) => StrUtil.ucFirst(modifier)),
+            ),
         };
     },
     unifyString(hotkey: string): HotkeyType {
         const parts = hotkey.split("+");
         const key = parts.pop() || "";
         const modifiers: any[] = [];
-        parts.forEach(part => {
+        parts.forEach((part) => {
             modifiers.push(StrUtil.ucFirst(part.trim()));
         });
-        return this.unifyObject({key, modifiers});
+        return this.unifyObject({ key, modifiers });
     },
-    unify(hotkeys: string | string[] | HotkeyType | HotkeyType[]): HotkeyType[] {
+    unify(
+        hotkeys: string | string[] | HotkeyType | HotkeyType[],
+    ): HotkeyType[] {
         if (typeof hotkeys === "string") {
             return [this.unifyString(hotkeys)];
         } else if (Array.isArray(hotkeys)) {
-            return hotkeys.map(hotkey => {
+            return hotkeys.map((hotkey) => {
                 if (typeof hotkey === "string") {
                     return this.unifyString(hotkey);
                 } else {
@@ -847,7 +914,7 @@ export const HotKeyUtil = {
         if (event.shiftKey || event.shift) {
             modifiers.push("Shift");
         }
-        return this.unifyObject({key, modifiers});
+        return this.unifyObject({ key, modifiers });
     },
     match(hotkeysForMatch: HotkeyType[], hotkey: HotkeyType): boolean {
         if (!hotkeysForMatch || !hotkey) {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import {t} from "../../../lang";
-import {Dialog} from "../../../lib/dialog";
+import { onMounted, ref } from "vue";
+import { t } from "../../../lang";
+import { Dialog } from "../../../lib/dialog";
 
 const env = ref({
     hubRoot: null as string | null,
@@ -22,24 +22,35 @@ const doSelectHubRootPath = async (useDefault: boolean) => {
         dir = await window.$mapi.file.openDirectory();
     }
     if (dir) {
-        Dialog.confirm(t("setting.pathChangeConfirm", {path: dir})).then(() => {
-            window.$mapi.config.set("hubRoot", dir).then(() => {
-                window.$mapi.app.quit();
-            });
-        });
+        Dialog.confirm(t("setting.pathChangeConfirm", { path: dir })).then(
+            () => {
+                window.$mapi.config.set("hubRoot", dir).then(() => {
+                    window.$mapi.app.quit();
+                });
+            },
+        );
     }
 };
 
 const doOpen = () => {
-    window.$mapi.app.openPath(env.value.hubRoot || env.value.hubRootDefault || "");
+    window.$mapi.app.openPath(
+        env.value.hubRoot || env.value.hubRootDefault || "",
+    );
 };
 </script>
 
 <template>
     <a-form-item field="name" :label="t('setting.storagePath')">
-        <a-input readonly :placeholder="env.hubRootDefault as string" v-model="env.hubRoot as string">
+        <a-input
+            readonly
+            :placeholder="env.hubRootDefault as string"
+            v-model="env.hubRoot as string"
+        >
             <template #append>
-                <div @click="doSelectHubRootPath(false)" class="cursor-pointer pl-3">
+                <div
+                    @click="doSelectHubRootPath(false)"
+                    class="cursor-pointer pl-3"
+                >
                     {{ t("common.selectPath") }}
                 </div>
             </template>

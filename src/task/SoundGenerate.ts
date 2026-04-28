@@ -1,15 +1,18 @@
-import {DataService} from "../service/DataService";
-import {TaskService} from "../service/TaskService";
-import {useServerStore} from "../store/modules/server";
-import {TaskBiz} from "../store/modules/task";
-import {replaceSoundGenerateText} from "../lib/server";
+import { DataService } from "../service/DataService";
+import { TaskService } from "../service/TaskService";
+import { useServerStore } from "../store/modules/server";
+import { TaskBiz } from "../store/modules/task";
+import { replaceSoundGenerateText } from "../lib/server";
 
 const serverStore = useServerStore();
 
 export const SoundGenerate: TaskBiz = {
     runFunc: async (bizId, bizParam) => {
         // console.log('SoundClone.runFunc', {bizId, bizParam})
-        const {record, server, serverInfo} = await serverStore.prepareForTask(bizId, bizParam);
+        const { record, server, serverInfo } = await serverStore.prepareForTask(
+            bizId,
+            bizParam,
+        );
         // console.log('runFunc', serverInfo, record)
         await TaskService.update(bizId, {
             status: "wait",
@@ -50,7 +53,7 @@ export const SoundGenerate: TaskBiz = {
         }
     },
     successFunc: async (bizId, bizParam) => {
-        const {record} = await serverStore.prepareForTask(bizId, bizParam);
+        const { record } = await serverStore.prepareForTask(bizId, bizParam);
         await TaskService.update(bizId, {
             status: "success",
             endTime: Date.now(),

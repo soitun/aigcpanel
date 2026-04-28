@@ -1,16 +1,20 @@
 import dayjs from "dayjs";
-import {Base64} from "js-base64";
-import {t} from "../lang";
+import { Base64 } from "js-base64";
+import { t } from "../lang";
 
 export const sleep = (time = 1000) => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         setTimeout(() => resolve(true), time);
     });
 };
 
-export const wait = (callback: () => boolean | Promise<boolean>, interval = 10, timeout = 3600) => {
+export const wait = (
+    callback: () => boolean | Promise<boolean>,
+    interval = 10,
+    timeout = 3600,
+) => {
     const startTime = Date.now();
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         const timer = setInterval(async () => {
             if (Date.now() - startTime > timeout * 1000) {
                 clearInterval(timer);
@@ -54,13 +58,14 @@ export function preciseInterval(callback: () => void, interval: number) {
     return {
         cancel: () => {
             stop = true;
-        }
+        },
     };
 }
 
 export const StringUtil = {
     random(length: number = 16) {
-        const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        const chars =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         let result = "";
         for (let i = 0; i < length; i++) {
             result += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -68,11 +73,14 @@ export const StringUtil = {
         return result;
     },
     uuid: () => {
-        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-            const r = (Math.random() * 16) | 0;
-            const v = c === "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        });
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+            /[xy]/g,
+            function (c) {
+                const r = (Math.random() * 16) | 0;
+                const v = c === "x" ? r : (r & 0x3) | 0x8;
+                return v.toString(16);
+            },
+        );
     },
     replaceParam: (str: string, param: any) => {
         return str.replace(/{(.*?)}/g, (match: string, key: string) => {
@@ -236,7 +244,7 @@ export const ObjectUtil = {
 
 export const DownloadUtil = {
     downloadFile(content: string, filename?: string) {
-        const blob = new Blob([content], {type: "application/octet-stream"});
+        const blob = new Blob([content], { type: "application/octet-stream" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;

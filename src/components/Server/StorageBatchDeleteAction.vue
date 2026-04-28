@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {Dialog} from "../../lib/dialog";
-import {t} from "../../lang";
-import {computed} from "vue";
-import {sleep} from "../../lib/util";
-import {StorageRecord, StorageService} from "../../service/StorageService";
+import { Dialog } from "../../lib/dialog";
+import { t } from "../../lang";
+import { computed } from "vue";
+import { sleep } from "../../lib/util";
+import { StorageRecord, StorageService } from "../../service/StorageService";
 
 const props = defineProps<{
     records: StorageRecord[];
@@ -18,7 +18,9 @@ const emit = defineEmits({
 });
 
 const doDelete = async () => {
-    await Dialog.confirm(t("common.deleteRecordsConfirm", {count: props.records.length}));
+    await Dialog.confirm(
+        t("common.deleteRecordsConfirm", { count: props.records.length }),
+    );
     Dialog.loadingOn(t("status.deleting"));
     await sleep(500);
     for (const r of props.records) {

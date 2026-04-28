@@ -1,5 +1,10 @@
 import { defineAsyncComponent } from "vue";
-import { NodeFunctionCall, NodeRunController, NodeRunParam, NodeRunResult } from "../../../../module/Workflow/core/type";
+import {
+    NodeFunctionCall,
+    NodeRunController,
+    NodeRunParam,
+    NodeRunResult,
+} from "../../../../module/Workflow/core/type";
 import { workflowRun } from "../../common/workflow";
 import { TextToImageRun } from "../task";
 import TextToImageIcon from "./../assets/icon.svg";
@@ -21,17 +26,21 @@ export default <NodeFunctionCall>{
             type: "file",
             name: "Image",
             fileExtensions: ["png", "jpg"],
-        }
+        },
     ],
-    async run(controller: NodeRunController, param: NodeRunParam): Promise<NodeRunResult> {
-        console.log('TextToImage run', param);
+    async run(
+        controller: NodeRunController,
+        param: NodeRunParam,
+    ): Promise<NodeRunResult> {
+        console.log("TextToImage run", param);
         return workflowRun(
-            controller, param,
+            controller,
+            param,
             async () => {
                 const taskRunData = {
-                    taskId: param.runData?.['taskId'] || '',
-                    prompt: param.runInputs['Prompt'],
-                    title: param.node.properties?.title + '-' + param.node.id,
+                    taskId: param.runData?.["taskId"] || "",
+                    prompt: param.runInputs["Prompt"],
+                    title: param.node.properties?.title + "-" + param.node.id,
                     textToImage: param.node.properties?.data?.textToImage,
                 };
                 if (!taskRunData.prompt || !taskRunData.textToImage) {
@@ -43,16 +52,16 @@ export default <NodeFunctionCall>{
                 return await TextToImageRun(taskRunData);
             },
             async (result, data) => {
-                result.runOutputs['Image'] = data.image
-            }
+                result.runOutputs["Image"] = data.image;
+            },
         );
     },
     async check(node) {
         if (!node.properties?.data?.textToImage) {
             throw "请配置图像生成服务";
         }
-        if (node.properties?.inputFields?.[0].value === '') {
+        if (node.properties?.inputFields?.[0].value === "") {
             throw "请输入文本参数";
         }
-    }
-}
+    },
+};

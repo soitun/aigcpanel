@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {ref} from "vue";
-import {t} from "../../../lang";
-import {Dialog} from "../../../lib/dialog";
-import {PermissionService} from "../../../service/PermissionService";
-import {TaskRecord, TaskService} from "../../../service/TaskService";
+import { ref } from "vue";
+import { t } from "../../../lang";
+import { Dialog } from "../../../lib/dialog";
+import { PermissionService } from "../../../service/PermissionService";
+import { TaskRecord, TaskService } from "../../../service/TaskService";
 import SoundAsrForm from "./SoundAsrForm.vue";
 import FileSelector from "../../../components/common/FileSelector.vue";
 
@@ -20,7 +20,9 @@ const onSelectAudioFile = async () => {
     try {
         const filePath = await window.$mapi.file.openFile({
             title: t("media.selectAudio"),
-            filters: [{name: t("media.audioFile"), extensions: ["mp3", "wav"]}],
+            filters: [
+                { name: t("media.audioFile"), extensions: ["mp3", "wav"] },
+            ],
         });
 
         if (filePath) {
@@ -47,7 +49,10 @@ const doSubmit = async () => {
         }
 
         // Generate task title from audio filename
-        const taskTitle = window.$mapi.file.pathToName(formData.value.audio, false);
+        const taskTitle = window.$mapi.file.pathToName(
+            formData.value.audio,
+            false,
+        );
 
         const record: TaskRecord = {
             biz: "SoundAsr",
@@ -92,12 +97,20 @@ const isSubmitting = ref(false);
                 </a-tooltip>
             </div>
             <div>
-                <FileSelector :extensions="['mp3', 'wav']" v-model="formData.audio" />
+                <FileSelector
+                    :extensions="['mp3', 'wav']"
+                    v-model="formData.audio"
+                />
             </div>
         </div>
         <SoundAsrForm ref="soundAsrForm" />
         <div class="flex">
-            <a-button class="mr-2" type="primary" @click="doSubmit" :loading="isSubmitting">
+            <a-button
+                class="mr-2"
+                type="primary"
+                @click="doSubmit"
+                :loading="isSubmitting"
+            >
                 <i class="iconfont icon-submit mr-2"></i>
                 {{ t("task.startRecognition") }}
             </a-button>

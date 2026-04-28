@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import {ref} from "vue";
-import {serverSoundGenerate} from "../../../lib/server";
-import {Dialog} from "../../../lib/dialog";
-import {t} from "../../../lang";
-import {ObjectUtil} from "../../../lib/util";
+import { ref } from "vue";
+import { serverSoundGenerate } from "../../../lib/server";
+import { Dialog } from "../../../lib/dialog";
+import { t } from "../../../lang";
+import { ObjectUtil } from "../../../lib/util";
 import AudioPlayerButton from "../../../components/common/AudioPlayerButton.vue";
 import SoundGenerateFormViewBody from "./SoundGenerateFormViewBody.vue";
 
 const props = defineProps<{
-    soundGenerate: SoundGenerateParamType,
+    soundGenerate: SoundGenerateParamType;
 }>();
 const text = ref("");
 const loading = ref(false);
@@ -23,7 +23,7 @@ const request = async () => {
                     "0",
                     ObjectUtil.clone(props.soundGenerate),
                     {},
-                    text.value
+                    text.value,
                 );
                 if (ret.type === "success") {
                     resolve(ret.url);
@@ -36,7 +36,7 @@ const request = async () => {
         };
         process();
     });
-}
+};
 const doPreview = async () => {
     if (!text.value.trim()) {
         return;
@@ -47,19 +47,22 @@ const doPreview = async () => {
     const interval = setInterval(() => {
         requestSecond.value++;
     }, 1000);
-    request().then((url) => {
-        Dialog.tipSuccess(t('msg.requestSuccessPlaying'));
-        previewUrl.value = url as string;
-        const audio = new Audio(`file://${url}`);
-        audio.play();
-    }).catch((e) => {
-        console.error(e);
-        Dialog.tipError(t('error.requestFailed') + ':' + e + '')
-    }).finally(() => {
-        loading.value = false;
-        requestSecond.value = 0;
-        clearInterval(interval);
-    });
+    request()
+        .then((url) => {
+            Dialog.tipSuccess(t("msg.requestSuccessPlaying"));
+            previewUrl.value = url as string;
+            const audio = new Audio(`file://${url}`);
+            audio.play();
+        })
+        .catch((e) => {
+            console.error(e);
+            Dialog.tipError(t("error.requestFailed") + ":" + e + "");
+        })
+        .finally(() => {
+            loading.value = false;
+            requestSecond.value = 0;
+            clearInterval(interval);
+        });
 };
 </script>
 
@@ -76,7 +79,7 @@ const doPreview = async () => {
         <a-popover position="left">
             <a-button type="text" status="normal" class="text-gray-400">
                 <template #icon>
-                    <icon-settings/>
+                    <icon-settings />
                 </template>
             </a-button>
             <template #content>
@@ -84,23 +87,26 @@ const doPreview = async () => {
                     {{ $t("voice.currentConfig") }}
                 </div>
                 <div class="flex gap-2">
-                    <SoundGenerateFormViewBody :data="props.soundGenerate as any"/>
+                    <SoundGenerateFormViewBody
+                        :data="props.soundGenerate as any"
+                    />
                 </div>
             </template>
         </a-popover>
-        <a-button @click="doPreview"
-                  :loading="loading"
-                  :disabled="!text.trim()">
+        <a-button
+            @click="doPreview"
+            :loading="loading"
+            :disabled="!text.trim()"
+        >
             <template #icon>
-                <icon-send/>
+                <icon-send />
             </template>
             {{ $t("task.synthesize") }}
         </a-button>
         <a-button v-if="previewUrl">
             <template #icon>
-                <AudioPlayerButton :source="previewUrl"/>
+                <AudioPlayerButton :source="previewUrl" />
             </template>
         </a-button>
     </div>
 </template>
-

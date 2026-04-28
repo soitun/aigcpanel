@@ -12,26 +12,18 @@ import Steps from "../common/Steps.vue";
 import SoundReplaceCreate from "./components/SoundReplaceCreate.vue";
 import SoundReplaceItem from "./components/SoundReplaceItem.vue";
 
-const {page, records, recordsForPage} = usePaginate<TaskRecord>({
+const { page, records, recordsForPage } = usePaginate<TaskRecord>({
     pageSize: 10,
 });
 
-useTaskChangeRefresh("SoundReplace", (
-    bizId: string,
-    type: TaskChangeType
-) => {
+useTaskChangeRefresh("SoundReplace", (bizId: string, type: TaskChangeType) => {
     doRefresh();
 });
 
-const {
-    mergeCheck,
-    isIndeterminate,
-    isAllChecked,
-    onCheckAll,
-    checkRecords,
-} = useCheckAll({
-    records: recordsForPage,
-});
+const { mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords } =
+    useCheckAll({
+        records: recordsForPage,
+    });
 
 const stepsVisible = ref(false);
 
@@ -50,25 +42,45 @@ const doRefresh = async () => {
         <div class="app-header mb-4 flex items-center">
             <div class="flex-grow flex items-end">
                 <div class="text-3xl font-bold">{{ $t("voice.replace") }}</div>
-                <div class="text-gray-400 ml-3">{{ $t("desc.videoVoiceReplace") }}</div>
+                <div class="text-gray-400 ml-3">
+                    {{ $t("desc.videoVoiceReplace") }}
+                </div>
             </div>
-            <ToggleButton v-model="stepsVisible"/>
+            <ToggleButton v-model="stepsVisible" />
         </div>
-        <Steps v-if="stepsVisible" :steps="[
-            {key: 1, label: $t('soundReplace.extractAndRecognize'), description: $t('soundReplace.extractAndRecognizeDesc')},
-            {key: 2, label: $t('soundReplace.confirmText'), description: $t('soundReplace.confirmTextDesc')},
-            {key: 3, label: $t('soundReplace.synthesizeReplace'), description: $t('soundReplace.synthesizeReplaceDesc')},
-        ]"/>
+        <Steps
+            v-if="stepsVisible"
+            :steps="[
+                {
+                    key: 1,
+                    label: $t('soundReplace.extractAndRecognize'),
+                    description: $t('soundReplace.extractAndRecognizeDesc'),
+                },
+                {
+                    key: 2,
+                    label: $t('soundReplace.confirmText'),
+                    description: $t('soundReplace.confirmTextDesc'),
+                },
+                {
+                    key: 3,
+                    label: $t('soundReplace.synthesizeReplace'),
+                    description: $t('soundReplace.synthesizeReplaceDesc'),
+                },
+            ]"
+        />
         <div>
-            <SoundReplaceCreate @submitted="doRefresh"/>
+            <SoundReplaceCreate @submitted="doRefresh" />
             <div v-if="records.length > 0">
-                <div class="rounded-xl shadow border p-4 mt-4 mb-4 hover:shadow-lg flex items-center">
+                <div
+                    class="rounded-xl shadow border p-4 mt-4 mb-4 hover:shadow-lg flex items-center"
+                >
                     <div class="flex-grow flex items-center">
                         <div class="mr-3">
                             <a-checkbox
                                 :model-value="isAllChecked"
                                 :indeterminate="isIndeterminate"
-                                @change="onCheckAll">
+                                @change="onCheckAll"
+                            >
                                 {{ $t("common.selectAll") }}
                             </a-checkbox>
                         </div>
@@ -76,7 +88,7 @@ const doRefresh = async () => {
                             :records="checkRecords"
                             @update="doRefresh"
                         />
-                        <TaskBatchDownloadAction :records="checkRecords"/>
+                        <TaskBatchDownloadAction :records="checkRecords" />
                     </div>
                     <div>
                         <a-pagination
@@ -96,7 +108,7 @@ const doRefresh = async () => {
                     />
                 </div>
             </div>
-            <m-empty v-else/>
+            <m-empty v-else />
         </div>
     </div>
 </template>

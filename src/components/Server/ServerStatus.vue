@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {EnumServerStatus, ServerRuntime} from "../../types/Server";
-import {computed} from "vue";
-import {t} from "../../lang";
+import { EnumServerStatus, ServerRuntime } from "../../types/Server";
+import { computed } from "vue";
+import { t } from "../../lang";
 
 interface Props {
     status: EnumServerStatus | null;
@@ -47,7 +47,10 @@ const statusText = computed(() => {
 </script>
 
 <template>
-    <div class="text-white px-2 py-1 rounded-full text-sm inline-flex items-center" :class="statusColor">
+    <div
+        class="text-white px-2 py-1 rounded-full text-sm inline-flex items-center"
+        :class="statusColor"
+    >
         <div class="w-2 h-2 rounded-full bg-white mr-2"></div>
         <div>
             {{ statusText }}

@@ -5,12 +5,12 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import {onLocaleChange} from "./lang";
+import { onMounted, ref } from "vue";
+import { onLocaleChange } from "./lang";
 
 import zhCN from "@arco-design/web-vue/es/locale/lang/zh-cn";
 import enUS from "@arco-design/web-vue/es/locale/lang/en-us";
-import {doCheckForUpdate} from "./components/common/util";
+import { doCheckForUpdate } from "./components/common/util";
 
 const locales = {
     "zh-CN": zhCN,
@@ -18,13 +18,16 @@ const locales = {
 };
 
 const locale = ref(zhCN);
-onLocaleChange(newLocale => {
+onLocaleChange((newLocale) => {
     locale.value = locales[newLocale];
 });
 
 onMounted(() => {
     setTimeout(async () => {
-        const checkAtLaunch = await window.$mapi.config.get("updaterCheckAtLaunch", "yes");
+        const checkAtLaunch = await window.$mapi.config.get(
+            "updaterCheckAtLaunch",
+            "yes",
+        );
         if ("yes" !== checkAtLaunch) {
             return;
         }

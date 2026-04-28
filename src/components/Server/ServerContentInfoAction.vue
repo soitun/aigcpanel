@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {computed, ref, watch} from "vue";
+import { computed, ref, watch } from "vue";
 import ServerCloudDemoDialog from "./ServerCloudDemoDialog.vue";
-import {doCopy} from "../common/util";
+import { doCopy } from "../common/util";
 
 const demoDialog = ref<InstanceType<typeof ServerCloudDemoDialog> | null>(null);
 
@@ -38,10 +38,12 @@ const content = computed(() => {
 });
 watch(
     () => visible.value,
-    v => {
+    (v) => {
         if (v) {
-            const codeElements = document.querySelectorAll(".pb-content-info code");
-            codeElements.forEach(codeElement => {
+            const codeElements = document.querySelectorAll(
+                ".pb-content-info code",
+            );
+            codeElements.forEach((codeElement) => {
                 if (codeElement.getAttribute("data-click-bind")) {
                     return;
                 }
@@ -52,7 +54,7 @@ watch(
                 codeElement.setAttribute("data-click-bind", "true");
             });
         }
-    }
+    },
 );
 </script>
 
@@ -61,11 +63,19 @@ watch(
         <icon-info-circle class="mr-1" />
         {{ $t("model.description") }}
     </a-button>
-    <a-modal v-model:visible="visible" width="40rem" :footer="false" title-align="start">
+    <a-modal
+        v-model:visible="visible"
+        width="40rem"
+        :footer="false"
+        title-align="start"
+    >
         <template #title>
             {{ $t("model.description") }}
         </template>
-        <div class="overflow-y-auto overflow-x-hidden leading-6 pb-content-info" style="max-height: 60vh">
+        <div
+            class="overflow-y-auto overflow-x-hidden leading-6 pb-content-info"
+            style="max-height: 60vh"
+        >
             <div v-html="content"></div>
         </div>
     </a-modal>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {ref} from "vue";
-import {dataAutoSaveDraft} from "../../../../components/common/util";
-import {Dialog} from "../../../../lib/dialog";
-import {TaskRecord, TaskService} from "../../../../service/TaskService";
+import { ref } from "vue";
+import { dataAutoSaveDraft } from "../../../../components/common/util";
+import { Dialog } from "../../../../lib/dialog";
+import { TaskRecord, TaskService } from "../../../../service/TaskService";
 import ImageToImageForm from "../../common/ImageToImageForm.vue";
 import FileSelector from "../../../../components/common/FileSelector.vue";
 import ImagePreviewBox from "../../../../components/common/ImagePreviewBox.vue";
@@ -15,7 +15,10 @@ const formData = ref({
     image: "",
     prompt: "",
 });
-const {clearDraft} = dataAutoSaveDraft("ImageToImageCreate.formData", formData.value);
+const { clearDraft } = dataAutoSaveDraft(
+    "ImageToImageCreate.formData",
+    formData.value,
+);
 
 const doSubmit = async () => {
     const imageToImageValue = await imageToImageForm.value?.getValue();
@@ -58,19 +61,22 @@ const doSubmit = async () => {
         <div class="mb-4 flex items-start">
             <div class="pt-1 w-5">
                 <a-tooltip :content="'输入图像'" mini>
-                    <icon-video-camera/>
+                    <icon-video-camera />
                 </a-tooltip>
             </div>
             <div>
                 <div class="flex items-center gap-2">
-                    <FileSelector :extensions="['png', 'jpg', 'jpeg']" v-model="formData.image"/>
+                    <FileSelector
+                        :extensions="['png', 'jpg', 'jpeg']"
+                        v-model="formData.image"
+                    />
                 </div>
                 <div v-if="formData.image" class="mt-2">
-                    <ImagePreviewBox :url="formData.image"/>
+                    <ImagePreviewBox :url="formData.image" />
                 </div>
             </div>
         </div>
-        <ImageToImageForm ref="imageToImageForm"/>
+        <ImageToImageForm ref="imageToImageForm" />
         <div class="mb-4">
             <a-textarea
                 v-model="formData.prompt"

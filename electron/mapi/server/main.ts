@@ -1,26 +1,29 @@
 import ServerApi from "./api";
-import {ipcMain} from "electron";
-import {Log} from "../log/main";
-import {mapError} from "./error";
-import {AigcServer} from "../../aigcserver";
-import {SendType, ServerContext, ServerInfo} from "./type";
-import {Files} from "../file/main";
-import {getGpuInfo} from "../../lib/env-main";
-import {EnumServerType} from "../../../src/types/Server";
+import { ipcMain } from "electron";
+import { Log } from "../log/main";
+import { mapError } from "./error";
+import { AigcServer } from "../../aigcserver";
+import { SendType, ServerContext, ServerInfo } from "./type";
+import { Files } from "../file/main";
+import { getGpuInfo } from "../../lib/env-main";
+import { EnumServerType } from "../../../src/types/Server";
 
-ipcMain.handle("server:listGpus", async event => {
+ipcMain.handle("server:listGpus", async (event) => {
     return await getGpuInfo();
 });
 
 let runningServerCount = 0;
-ipcMain.handle("server:runningServerCount", async (event, count: number | null) => {
-    if (count === null) {
+ipcMain.handle(
+    "server:runningServerCount",
+    async (event, count: number | null) => {
+        if (count === null) {
+            return runningServerCount;
+        }
+        // console.log('runningServerCount', count)
+        runningServerCount = count;
         return runningServerCount;
-    }
-    // console.log('runningServerCount', count)
-    runningServerCount = count;
-    return runningServerCount;
-});
+    },
+);
 const getRunningServerCount = () => {
     return runningServerCount;
 };
@@ -29,20 +32,19 @@ const serverModule: {
     [key: string]: ServerContext;
 } = {};
 
-const init = () => {
-};
+const init = () => {};
 
 const getModule = async (
     serverInfo: ServerInfo,
     option?: {
         throwException: boolean;
-    }
+    },
 ): Promise<ServerContext> => {
     option = Object.assign(
         {
             throwException: true,
         },
-        option
+        option,
     );
     // console.log('getModule', serverInfo)
     if (!serverModule[serverInfo.localPath]) {
@@ -84,7 +86,9 @@ const getModule = async (
                         isDataPath: false,
                     }))
                 ) {
-                    const configContent = await Files.read(configPath, {isDataPath: false});
+                    const configContent = await Files.read(configPath, {
+                        isDataPath: false,
+                    });
                     try {
                         const config = JSON.parse(configContent);
                         if (config.entry === "__EasyServer__") {
@@ -105,10 +109,17 @@ const getModule = async (
                     await server.init();
                 }
                 server.send = (type: SendType, data: any) => {
-                    server.ServerApi.event.sendChannel(server.ServerInfo.eventChannelName, {type, data});
+                    server.ServerApi.event.sendChannel(
+                        server.ServerInfo.eventChannelName,
+                        { type, data },
+                    );
                 };
                 server.sendLog = (data: any) => {
-                    server.ServerApi.file.appendText(server.ServerInfo.logFile, data, {isDataPath: true});
+                    server.ServerApi.file.appendText(
+                        server.ServerInfo.logFile,
+                        data,
+                        { isDataPath: true },
+                    );
                 };
                 serverModule[serverInfo.localPath] = server;
             }
@@ -200,32 +211,41 @@ ipcMain.handle("server:config", async (event, serverInfo: ServerInfo) => {
     }
 });
 
-ipcMain.handle("server:callFunction", async (event, serverInfo: ServerInfo, method: string, data: any, option: any) => {
-    // console.log('getModule.before', serverInfo, method)
-    const module = await getModule(serverInfo);
-    // console.log('getModule.end', serverInfo, method, module)
-    const func = module[method];
-    if (!func) {
-        throw new Error(`MethodNotFound : ${method}`);
-    }
-    try {
-        return await func.bind(module)(data, option || {});
-    } catch (e) {
-        const error = mapError(e);
-        Log.error("mapi.server.callFunction.error", {
-            type: typeof e,
-            error,
-            serverInfo,
-            method,
-            data,
-            option,
-        });
-        return {
-            code: -1,
-            msg: error,
-        };
-    }
-});
+ipcMain.handle(
+    "server:callFunction",
+    async (
+        event,
+        serverInfo: ServerInfo,
+        method: string,
+        data: any,
+        option: any,
+    ) => {
+        // console.log('getModule.before', serverInfo, method)
+        const module = await getModule(serverInfo);
+        // console.log('getModule.end', serverInfo, method, module)
+        const func = module[method];
+        if (!func) {
+            throw new Error(`MethodNotFound : ${method}`);
+        }
+        try {
+            return await func.bind(module)(data, option || {});
+        } catch (e) {
+            const error = mapError(e);
+            Log.error("mapi.server.callFunction.error", {
+                type: typeof e,
+                error,
+                serverInfo,
+                method,
+                data,
+                option,
+            });
+            return {
+                code: -1,
+                msg: error,
+            };
+        }
+    },
+);
 
 export default {
     init,

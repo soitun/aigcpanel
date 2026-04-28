@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {nextTick, ref} from "vue";
-import {useSettingStore} from "../store/modules/setting";
+import { nextTick, ref } from "vue";
+import { useSettingStore } from "../store/modules/setting";
 
 const visible = ref(false);
 const remember = ref(false);
@@ -58,13 +58,17 @@ defineExpose({
         <template #footer>
             <a-button @click="doCancel">{{ $t("common.cancel") }}</a-button>
             <a-button @click="doExit">{{ $t("common.exit") }}</a-button>
-            <a-button type="primary" @click="doHide">{{ $t("common.hideWindow") }}</a-button>
+            <a-button type="primary" @click="doHide">{{
+                $t("common.hideWindow")
+            }}</a-button>
         </template>
         <div>
             <div class="text-center">{{ $t("common.exitConfirm") }}</div>
             <div class="text-center mt-4">
                 <a-checkbox v-model="remember">
-                    <span class="text-sm text-gray-500">{{ $t("common.rememberChoice") }}</span>
+                    <span class="text-sm text-gray-500">{{
+                        $t("common.rememberChoice")
+                    }}</span>
                 </a-checkbox>
             </div>
         </div>

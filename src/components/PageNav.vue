@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {computed} from "vue";
-import {useRouter} from "vue-router";
-import {AppConfig} from "../config";
-import {useUserStore} from "../store/modules/user";
-import {t} from "../lang";
-import {useSettingStore} from "../store/modules/setting";
+import { computed } from "vue";
+import { useRouter } from "vue-router";
+import { AppConfig } from "../config";
+import { useUserStore } from "../store/modules/user";
+import { t } from "../lang";
+import { useSettingStore } from "../store/modules/setting";
 
 const route = useRouter();
 const user = useUserStore();
@@ -43,9 +43,20 @@ const doUser = async () => {
 </script>
 
 <template>
-    <div class="flex flex-col h-full border-r border-gray-200 dark:border-gray-600">
-        <div class="py-4 px-3" :class="setting.basic.userEnable ? 'cursor-pointer' : ''" @click="doUser">
-            <a-tooltip v-if="setting.basic.userEnable" :content="userTip as string" position="right" mini>
+    <div
+        class="flex flex-col h-full border-r border-gray-200 dark:border-gray-600"
+    >
+        <div
+            class="py-4 px-3"
+            :class="setting.basic.userEnable ? 'cursor-pointer' : ''"
+            @click="doUser"
+        >
+            <a-tooltip
+                v-if="setting.basic.userEnable"
+                :content="userTip as string"
+                position="right"
+                mini
+            >
                 <img
                     v-if="!user.isInit || !user.user.id"
                     class="rounded-full border border-solid border-gray-200 w-10 h-10 shadow-lg"

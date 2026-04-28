@@ -1,5 +1,5 @@
-import {TaskJobResultStepStatus} from "../../../service/TaskService";
-import {AudioRecord} from "../../../lib/ffmpeg";
+import { TaskJobResultStepStatus } from "../../../service/TaskService";
+import { AudioRecord } from "../../../lib/ffmpeg";
 
 export type SoundReplaceModelConfigType = {
     video: string;
@@ -15,38 +15,47 @@ export type SoundReplaceJobResultType = {
     // 4 合成 SoundGenerate
     // 5 替换 Combine
     // 6 替换确认 CombineConfirm
-    step: "ToAudio" | "SoundAsr" | "Confirm" | "SoundGenerate" | "Combine" | "CombineConfirm" | "End";
+    step:
+        | "ToAudio"
+        | "SoundAsr"
+        | "Confirm"
+        | "SoundGenerate"
+        | "Combine"
+        | "CombineConfirm"
+        | "End";
 
     ToAudio: {
-        status: TaskJobResultStepStatus,
+        status: TaskJobResultStepStatus;
         file: string;
     };
     SoundAsr: {
-        status: TaskJobResultStepStatus,
+        status: TaskJobResultStepStatus;
         start: number;
         end: number;
         duration: number;
         records: { start: number; end: number; text: string }[];
     };
     Confirm: {
-        status: TaskJobResultStepStatus,
+        status: TaskJobResultStepStatus;
         records: { start: number; end: number; text: string }[];
     };
     SoundGenerate: {
-        status: TaskJobResultStepStatus,
+        status: TaskJobResultStepStatus;
         start: number;
         end: number;
-        records: (AudioRecord & {
-            actualStart: number;
-            actualEnd: number;
-        })[] | null;
+        records:
+            | (AudioRecord & {
+                  actualStart: number;
+                  actualEnd: number;
+              })[]
+            | null;
     };
     Combine: {
-        status: TaskJobResultStepStatus,
+        status: TaskJobResultStepStatus;
         audio: string;
         file: string;
     };
-    CombineConfirm:{
-        status: TaskJobResultStepStatus,
-    }
+    CombineConfirm: {
+        status: TaskJobResultStepStatus;
+    };
 };

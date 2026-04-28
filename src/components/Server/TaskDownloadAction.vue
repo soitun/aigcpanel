@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {Dialog} from "../../lib/dialog";
-import {t} from "../../lang";
-import {TaskRecord} from "../../service/TaskService";
-import {computed} from "vue";
-import {mapError} from "../../lib/error";
-import {FileUtil} from "../../lib/file";
+import { Dialog } from "../../lib/dialog";
+import { t } from "../../lang";
+import { TaskRecord } from "../../service/TaskService";
+import { computed } from "vue";
+import { mapError } from "../../lib/error";
+import { FileUtil } from "../../lib/file";
 
 const props = defineProps<{
     record: TaskRecord;
@@ -16,7 +16,10 @@ const canDownload = computed(() => {
     if (!props.record) {
         return false;
     }
-    return props.record.status === "success" && props.record.result[props.name || 'url'];
+    return (
+        props.record.status === "success" &&
+        props.record.result[props.name || "url"]
+    );
 });
 
 const doDownload = async () => {

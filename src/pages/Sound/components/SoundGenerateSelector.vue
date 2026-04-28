@@ -4,7 +4,9 @@ import AudioPlayerButton from "../../../components/common/AudioPlayerButton.vue"
 import { TaskRecord } from "../../../service/TaskService";
 import SoundGenerateDialog from "./SoundGenerateDialog.vue";
 
-const soundGenerateDialog = ref<InstanceType<typeof SoundGenerateDialog> | null>(null);
+const soundGenerateDialog = ref<InstanceType<
+    typeof SoundGenerateDialog
+> | null>(null);
 const props = defineProps({
     modelValue: {
         type: Number,
@@ -30,14 +32,14 @@ const onSelect = (record: TaskRecord | null) => {
 };
 watch(
     () => props.modelValue,
-    value => {
+    (value) => {
         if (value > 0 && soundId.value !== value) {
             soundGenerateDialog.value?.load(value).then(onSelect);
         }
     },
     {
         immediate: true,
-    }
+    },
 );
 </script>
 

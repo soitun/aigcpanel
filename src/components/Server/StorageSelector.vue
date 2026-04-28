@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {StorageRecord, StorageService} from "../../service/StorageService";
-import {nextTick, onMounted, ref} from "vue";
+import { StorageRecord, StorageService } from "../../service/StorageService";
+import { nextTick, onMounted, ref } from "vue";
 
 const props = defineProps({
     modelValue: {
@@ -39,7 +39,9 @@ const doLoad = async () => {
     }
     nextTick(() => {
         if (props.modelValue) {
-            recordSelect.value = records.value.find(r => r.id === props.modelValue);
+            recordSelect.value = records.value.find(
+                (r) => r.id === props.modelValue,
+            );
         }
         // table.value?.select(records.value.map(r => r.id), false)
     });
@@ -53,7 +55,9 @@ onMounted(() => {
 });
 const doConfirm = () => {
     visible.value = false;
-    recordSelect.value = records.value.find(r => r.id === recordIdSelect.value);
+    recordSelect.value = records.value.find(
+        (r) => r.id === recordIdSelect.value,
+    );
     emit("update:modelValue", recordIdSelect.value);
 };
 const doDelete = (id: number) => {
@@ -67,8 +71,13 @@ const onSelectChange = (keys: number[]) => {
 
 <template>
     <div class="w-full">
-        <div v-if="recordSelect" class="border pt-2 pl-2 pr-1 pb-1 rounded-lg mb-2">
-            <div class="inline-flex items-center mr-1 mb-1 bg-gray-100 rounded-full p-1 pl-3">
+        <div
+            v-if="recordSelect"
+            class="border pt-2 pl-2 pr-1 pb-1 rounded-lg mb-2"
+        >
+            <div
+                class="inline-flex items-center mr-1 mb-1 bg-gray-100 rounded-full p-1 pl-3"
+            >
                 <div>
                     {{ recordSelect.title }}
                 </div>
@@ -95,7 +104,12 @@ const onSelectChange = (keys: number[]) => {
             </a-button>
         </div>
     </div>
-    <a-modal v-model:visible="visible" :title="props.title" width="60vw" :destroy-on-close="true">
+    <a-modal
+        v-model:visible="visible"
+        :title="props.title"
+        width="60vw"
+        :destroy-on-close="true"
+    >
         <template #footer>
             <a-button @click="visible = false">取消</a-button>
             <a-button type="primary" @click="doConfirm">确定</a-button>
@@ -105,12 +119,12 @@ const onSelectChange = (keys: number[]) => {
                 ref="table"
                 @selection-change="onSelectChange"
                 :data="records"
-                :row-selection="{type: 'radio'}"
+                :row-selection="{ type: 'radio' }"
                 row-key="id"
                 :bordered="false"
                 :pagination="false"
-                :virtual-list-props="{height: '50vh'}"
-                :columns="[{title: '名称', dataIndex: 'title'}]"
+                :virtual-list-props="{ height: '50vh' }"
+                :columns="[{ title: '名称', dataIndex: 'title' }]"
             >
             </a-table>
         </div>

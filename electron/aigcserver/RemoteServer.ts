@@ -1,9 +1,14 @@
-import {SendType, ServerApiType, ServerFunctionDataType, ServerInfo} from "../mapi/server/type";
-import {AigcServerUtil} from "./util";
-import {Files} from "../mapi/file/main";
+import {
+    SendType,
+    ServerApiType,
+    ServerFunctionDataType,
+    ServerInfo,
+} from "../mapi/server/type";
+import { AigcServerUtil } from "./util";
+import { Files } from "../mapi/file/main";
 import axios from "axios";
-import {Base64} from "js-base64";
-import {Log} from "../mapi/log/main";
+import { Base64 } from "js-base64";
+import { Log } from "../mapi/log/main";
 
 type LauncherResultType = {
     result: {
@@ -35,7 +40,7 @@ const RemoteApi = {
 
     async query(url: string, token: string) {
         try {
-            const response = await axios.post(`${url}/query`, {token});
+            const response = await axios.post(`${url}/query`, { token });
             const data = response.data;
             if (data && data.data && data.data.logs) {
                 // Decode logs from Base64
@@ -59,38 +64,43 @@ const RemoteApi = {
         } catch (e: any) {
             Log.error("RemoteApi.cancel.error", e);
             // Ignore cancel errors usually
-            return {code: -1, msg: e.message};
+            return { code: -1, msg: e.message };
         }
     },
 
     async upload(url: string, filePath: string) {
         try {
             // Check if environment is Node.js (Electron main process)
-            if (typeof process !== 'undefined' && process.versions && process.versions.node) {
-                const fs = await import('fs');
-                const FormData = (await import('form-data')).default;
+            if (
+                typeof process !== "undefined" &&
+                process.versions &&
+                process.versions.node
+            ) {
+                const fs = await import("fs");
+                const FormData = (await import("form-data")).default;
 
                 const form = new FormData();
-                form.append('file', fs.createReadStream(filePath));
+                form.append("file", fs.createReadStream(filePath));
 
                 const response = await axios.post(`${url}/upload`, form, {
                     headers: {
-                        ...form.getHeaders()
-                    }
+                        ...form.getHeaders(),
+                    },
                 });
                 return response.data;
             } else {
-                throw new Error("Upload only supported in Electron main process");
+                throw new Error(
+                    "Upload only supported in Electron main process",
+                );
             }
         } catch (e: any) {
             Log.error("RemoteApi.upload.error", e);
             throw e;
         }
-    }
+    },
 };
 
 export const RemoteServer = function (config: any) {
-
     const me = this;
     let controllerWatching = {
         id: null as string | null,
@@ -99,12 +109,12 @@ export const RemoteServer = function (config: any) {
         resolve: null as ((value: any) => void) | null,
         reject: null as ((reason?: any) => void) | null,
         promiseResolved: false,
-        timer: null as any
+        timer: null as any,
     };
 
     // Initialize with remoteConfig
     this.serverConfig = {
-        remoteConfig: config.config.remoteConfig || {}
+        remoteConfig: config.config.remoteConfig || {},
     };
 
     this.isRunning = false;
@@ -124,21 +134,23 @@ export const RemoteServer = function (config: any) {
         const localPath = await this.ServerApi.file.temp(ext);
         await this.ServerApi.requestUrlFileToLocal(fullUrl, localPath);
         return localPath;
-    }
+    };
 
     this.send = function (type: SendType, data: any) {
-        this.ServerApi.event.sendChannel(this.ServerInfo.eventChannelName, {type, data});
+        this.ServerApi.event.sendChannel(this.ServerInfo.eventChannelName, {
+            type,
+            data,
+        });
     };
 
-    this.init = async function () {
-    };
+    this.init = async function () {};
 
     this.config = async function () {
         const ret = await RemoteApi.config(getBaseUrl());
         if (!ret.data) {
             throw new Error(ret.msg || "Remote config fetch failed");
         }
-        const config = ret.data
+        const config = ret.data;
         return {
             code: 0,
             msg: "ok",
@@ -212,13 +224,13 @@ export const RemoteServer = function (config: any) {
         payload: any,
         option: {
             timeout: number;
-        }
+        },
     ) {
         option = Object.assign(
             {
                 timeout: 24 * 3600,
             },
-            option
+            option,
         );
         const baseUrl = getBaseUrl();
 
@@ -241,14 +253,20 @@ export const RemoteServer = function (config: any) {
         const startTime = Date.now();
 
         const pollError = (msg: string) => {
-            if (controllerWatching.reject && !controllerWatching.promiseResolved) {
+            if (
+                controllerWatching.reject &&
+                !controllerWatching.promiseResolved
+            ) {
                 controllerWatching.promiseResolved = true;
                 controllerWatching.reject(msg);
             }
-        }
+        };
 
         const poll = async () => {
-            if (option.timeout > 0 && Date.now() - startTime > option.timeout * 1000) {
+            if (
+                option.timeout > 0 &&
+                Date.now() - startTime > option.timeout * 1000
+            ) {
                 await this.cancel();
                 pollError("Task timeout");
                 return;
@@ -262,33 +280,55 @@ export const RemoteServer = function (config: any) {
                     pollError(queryRes.msg || "Remote query failed");
                     return;
                 } else {
-                    const {logs, status} = queryRes.data;
+                    const { logs, status } = queryRes.data;
                     if (logs) {
-                        this.ServerApi.file.appendText(this.ServerInfo.logFile, logs, {isDataPath: true});
-                        const result = this.ServerApi.extractResultFromLogs(controllerWatching.id, logs);
+                        this.ServerApi.file.appendText(
+                            this.ServerInfo.logFile,
+                            logs,
+                            { isDataPath: true },
+                        );
+                        const result = this.ServerApi.extractResultFromLogs(
+                            controllerWatching.id,
+                            logs,
+                        );
                         if (result) {
                             if (controllerWatching.launcherResult) {
-                                controllerWatching.launcherResult.result = Object.assign(controllerWatching.launcherResult.result, result);
+                                controllerWatching.launcherResult.result =
+                                    Object.assign(
+                                        controllerWatching.launcherResult
+                                            .result,
+                                        result,
+                                    );
                             }
                             if (controllerWatching.id) {
-                                this.send("taskResult", {id: controllerWatching.id, result});
+                                this.send("taskResult", {
+                                    id: controllerWatching.id,
+                                    result,
+                                });
                             }
                         }
                         // Error detection
                         if (controllerWatching.launcherResult) {
                             controllerWatching.launcherResult.result.error =
-                                AigcServerUtil.errorDetect(logs) || controllerWatching.launcherResult.result.error;
+                                AigcServerUtil.errorDetect(logs) ||
+                                controllerWatching.launcherResult.result.error;
                         }
                     }
                     // Check status
                     if (status === "success") {
-                        if (controllerWatching.resolve && !controllerWatching.promiseResolved) {
+                        if (
+                            controllerWatching.resolve &&
+                            !controllerWatching.promiseResolved
+                        ) {
                             controllerWatching.promiseResolved = true;
                             controllerWatching.resolve(undefined);
                         }
                         return;
                     } else if (status === "error") {
-                        pollError(controllerWatching.launcherResult?.result?.error || "Remote task failed")
+                        pollError(
+                            controllerWatching.launcherResult?.result?.error ||
+                                "Remote task failed",
+                        );
                         return;
                     }
                 }
@@ -304,7 +344,7 @@ export const RemoteServer = function (config: any) {
 
     // Helper to upload file if it exists locally
     this._uploadIfNeeded = async function (path: string): Promise<string> {
-        if (path && typeof path === 'string') {
+        if (path && typeof path === "string") {
             if (path.startsWith("http://") || path.startsWith("https://")) {
                 return path;
             }
@@ -319,20 +359,22 @@ export const RemoteServer = function (config: any) {
         return path;
     };
 
-
     this._callFunc = async function (
         data: ServerFunctionDataType,
         configCalculator: (data: ServerFunctionDataType) => Promise<any>,
-        resultDataCalculator: (data: ServerFunctionDataType, launcherResult: LauncherResultType) => Promise<any>,
+        resultDataCalculator: (
+            data: ServerFunctionDataType,
+            launcherResult: LauncherResultType,
+        ) => Promise<any>,
         option: {
             timeout: number;
-        }
+        },
     ) {
         option = Object.assign(
             {
                 timeout: 24 * 3600,
             },
-            option
+            option,
         );
         const resultData = {
             // success, retry
@@ -353,10 +395,11 @@ export const RemoteServer = function (config: any) {
         resultData.start = Date.now();
 
         try {
-            this.send("taskRunning", {id: data.id});
+            this.send("taskRunning", { id: data.id });
             const configData = await configCalculator(data);
             configData.setting = this.ServerInfo.setting;
-            const configJsonPath = await this.ServerApi.launcherPrepareConfigJson(configData);
+            const configJsonPath =
+                await this.ServerApi.launcherPrepareConfigJson(configData);
             const remoteConfigPath = await this._uploadIfNeeded(configJsonPath);
             await Files.deletes(configJsonPath);
             const launcherResult: LauncherResultType = {
@@ -364,7 +407,7 @@ export const RemoteServer = function (config: any) {
                 endTime: null,
             };
             const payload = {
-                entryPlaceholders: {"CONFIG": remoteConfigPath}
+                entryPlaceholders: { CONFIG: remoteConfigPath },
             };
             await (async () => {
                 return new Promise((resolve, reject) => {
@@ -406,7 +449,10 @@ export const RemoteServer = function (config: any) {
                     },
                 };
             },
-            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
@@ -416,7 +462,7 @@ export const RemoteServer = function (config: any) {
                 return {
                     url: await downloadUrl(launcherResult.result.url),
                 };
-            }
+            },
         );
     };
 
@@ -439,7 +485,10 @@ export const RemoteServer = function (config: any) {
                     },
                 };
             },
-            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
@@ -449,7 +498,7 @@ export const RemoteServer = function (config: any) {
                 return {
                     url: await downloadUrl(launcherResult.result.url),
                 };
-            }
+            },
         );
     };
 
@@ -474,7 +523,10 @@ export const RemoteServer = function (config: any) {
                     },
                 };
             },
-            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
@@ -484,7 +536,7 @@ export const RemoteServer = function (config: any) {
                 return {
                     url: await downloadUrl(launcherResult.result.url),
                 };
-            }
+            },
         );
     };
 
@@ -500,13 +552,16 @@ export const RemoteServer = function (config: any) {
                     id: data.id,
                     mode: "local",
                     modelConfig: {
-                        type: 'asr',
+                        type: "asr",
                         audio: data.audio,
                         param: data.param,
                     },
                 };
             },
-            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
                 if (!("records" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
@@ -516,7 +571,7 @@ export const RemoteServer = function (config: any) {
                 return {
                     records: launcherResult.result.records,
                 };
-            }
+            },
         );
     };
 
@@ -534,7 +589,10 @@ export const RemoteServer = function (config: any) {
                     },
                 };
             },
-            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
@@ -544,7 +602,7 @@ export const RemoteServer = function (config: any) {
                 return {
                     url: await downloadUrl(launcherResult.result.url),
                 };
-            }
+            },
         );
     };
 
@@ -567,7 +625,10 @@ export const RemoteServer = function (config: any) {
                     },
                 };
             },
-            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
@@ -577,7 +638,7 @@ export const RemoteServer = function (config: any) {
                 return {
                     url: await downloadUrl(launcherResult.result.url),
                 };
-            }
+            },
         );
     };
 };

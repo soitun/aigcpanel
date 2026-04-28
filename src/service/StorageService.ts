@@ -1,4 +1,9 @@
-export type StorageBiz = "SoundPrompt" | "LiveAvatar" | "LiveKnowledge" | "LiveEvent" | "LiveTalk";
+export type StorageBiz =
+    | "SoundPrompt"
+    | "LiveAvatar"
+    | "LiveKnowledge"
+    | "LiveEvent"
+    | "LiveTalk";
 
 export type StorageRecord = {
     id?: number;
@@ -33,13 +38,16 @@ export const StorageService = {
         }
         return record;
     },
-    async getByTitle(biz: StorageBiz, title: string): Promise<StorageRecord | null> {
+    async getByTitle(
+        biz: StorageBiz,
+        title: string,
+    ): Promise<StorageRecord | null> {
         const record: any = await window.$mapi.db.first(
             `SELECT *
              FROM ${this.tableName()}
              WHERE biz = ?
                AND title = ?`,
-            [biz, title]
+            [biz, title],
         );
         return this.decodeRecord(record);
     },
@@ -48,7 +56,7 @@ export const StorageService = {
             `SELECT *
              FROM ${this.tableName()}
              WHERE id = ?`,
-            [id]
+            [id],
         );
         return this.decodeRecord(record);
     },
@@ -60,7 +68,7 @@ export const StorageService = {
             `SELECT *
              FROM ${this.tableName()}
              WHERE id IN (${ids.join(",")})`,
-            []
+            [],
         );
         return records.map(this.decodeRecord) as StorageRecord[];
     },
@@ -70,7 +78,7 @@ export const StorageService = {
              FROM ${this.tableName()}
              WHERE biz = ?
              ORDER BY id DESC`,
-            [biz]
+            [biz],
         );
         return records.map(this.decodeRecord) as StorageRecord[];
     },
@@ -78,27 +86,31 @@ export const StorageService = {
         const fields = ["biz", "title", "sort", "content"];
         record["biz"] = biz;
         record = this.encodeRecord(record as StorageRecord);
-        const values = fields.map(f => record[f]);
-        const valuesPlaceholder = fields.map(f => "?");
+        const values = fields.map((f) => record[f]);
+        const valuesPlaceholder = fields.map((f) => "?");
         const id = await window.$mapi.db.insert(
             `INSERT INTO ${this.tableName()} (${fields.join(",")})
              VALUES (${valuesPlaceholder.join(",")})`,
-            values
+            values,
         );
     },
     async update(id: number, record: Partial<StorageRecord>) {
         record = this.encodeRecord(record as StorageRecord);
         const fields = Object.keys(record);
-        const values = fields.map(f => record[f]);
-        const set = fields.map(f => `${f} = ?`).join(",");
+        const values = fields.map((f) => record[f]);
+        const set = fields.map((f) => `${f} = ?`).join(",");
         return await window.$mapi.db.execute(
             `UPDATE ${this.tableName()}
              SET ${set}
              WHERE id = ?`,
-            [...values, id]
+            [...values, id],
         );
     },
-    async addOrUpdate(biz: StorageBiz, id: number, record: Partial<StorageRecord>) {
+    async addOrUpdate(
+        biz: StorageBiz,
+        id: number,
+        record: Partial<StorageRecord>,
+    ) {
         if (!id) {
             await this.add(biz, record);
         } else {
@@ -119,7 +131,7 @@ export const StorageService = {
             `DELETE
              FROM ${this.tableName()}
              WHERE id = ?`,
-            [record.id]
+            [record.id],
         );
     },
     async clear(biz: StorageBiz) {
@@ -127,7 +139,7 @@ export const StorageService = {
             `DELETE
              FROM ${this.tableName()}
              WHERE biz = ?`,
-            [biz]
+            [biz],
         );
     },
     async count(biz: StorageBiz, startTime: number = 0, endTime: number = 0) {

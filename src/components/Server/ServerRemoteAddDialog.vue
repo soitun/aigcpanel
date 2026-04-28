@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import axios from "axios";
-import {ref, watch} from "vue";
-import {t} from "../../lang";
-import {Dialog} from "../../lib/dialog";
-import {useServerStore} from "../../store/modules/server";
-import {EnumServerType, ServerRecord} from "../../types/Server";
-import {StringUtil} from "../../lib/util";
+import { ref, watch } from "vue";
+import { t } from "../../lang";
+import { Dialog } from "../../lib/dialog";
+import { useServerStore } from "../../store/modules/server";
+import { EnumServerType, ServerRecord } from "../../types/Server";
+import { StringUtil } from "../../lib/util";
 
 const serverStore = useServerStore();
 const visible = ref(false);
@@ -64,22 +64,30 @@ const doCheck = async () => {
         const configData = data.data;
 
         // Validate required fields
-        if (!configData.name) throw new Error("Missing 'name' in remote config");
-        if (!configData.version) throw new Error("Missing 'version' in remote config");
-        if (!configData.title) throw new Error("Missing 'title' in remote config");
+        if (!configData.name)
+            throw new Error("Missing 'name' in remote config");
+        if (!configData.version)
+            throw new Error("Missing 'version' in remote config");
+        if (!configData.title)
+            throw new Error("Missing 'title' in remote config");
 
         // Check if exists
-        const exists = await serverStore.getByNameVersion(configData.name, configData.version);
+        const exists = await serverStore.getByNameVersion(
+            configData.name,
+            configData.version,
+        );
         if (exists) {
             Dialog.tipError(t("error.modelVersionExists"));
             return;
         }
 
         fetchedConfig.value = configData;
-        validatedUrl.value = requestUrl.substring(0, requestUrl.length - "/config".length);
+        validatedUrl.value = requestUrl.substring(
+            0,
+            requestUrl.length - "/config".length,
+        );
 
         logStatus.value = ""; // Clear status on success
-
     } catch (e: any) {
         console.error("ServerRemoteAddDialog.error", e);
         logStatus.value = e.message || t("error.networkError");
@@ -104,7 +112,9 @@ const doSubmit = async () => {
                 name: configData.name,
                 version: configData.version,
             } as any),
-            localPath: `${configData.name}_${configData.version}_` + StringUtil.random(16),
+            localPath:
+                `${configData.name}_${configData.version}_` +
+                StringUtil.random(16),
             name: configData.name,
             title: configData.title,
             version: configData.version,
@@ -112,11 +122,11 @@ const doSubmit = async () => {
             autoStart: true,
             functions: configData.functions || [],
             remoteConfig: {
-                url: url
+                url: url,
             },
             settings: configData.settings || [],
             setting: {},
-            config: configData
+            config: configData,
         } as ServerRecord);
 
         Dialog.tipSuccess(t("model.addSuccess"));
@@ -153,7 +163,9 @@ const emit = defineEmits({
         </template>
         <div class="p-4">
             <div class="mb-4">
-                <div class="mb-2 text-gray-700">{{ $t("model.remoteUrl") }}</div>
+                <div class="mb-2 text-gray-700">
+                    {{ $t("model.remoteUrl") }}
+                </div>
                 <a-input
                     v-model="remoteUrl"
                     :placeholder="$t('model.remoteUrlPlaceholder')"
@@ -163,12 +175,17 @@ const emit = defineEmits({
                 />
             </div>
 
-            <div v-if="fetchedConfig" class="mb-4 bg-gray-50 p-3 rounded border border-gray-200">
+            <div
+                v-if="fetchedConfig"
+                class="mb-4 bg-gray-50 p-3 rounded border border-gray-200"
+            >
                 <div class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
                     <div class="text-gray-500 text-right">名称</div>
                     <div class="font-medium text-gray-800">
                         {{ fetchedConfig.title }}
-                        <div class="inline-block rounded-3xl bg-gray-100 px-3">v{{ fetchedConfig.version }}</div>
+                        <div class="inline-block rounded-3xl bg-gray-100 px-3">
+                            v{{ fetchedConfig.version }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -181,10 +198,20 @@ const emit = defineEmits({
                 <a-button @click="visible = false" :disabled="loading">
                     {{ $t("common.cancel") }}
                 </a-button>
-                <a-button v-if="!fetchedConfig" type="primary" @click="doCheck" :loading="loading">
+                <a-button
+                    v-if="!fetchedConfig"
+                    type="primary"
+                    @click="doCheck"
+                    :loading="loading"
+                >
                     {{ "校验" }}
                 </a-button>
-                <a-button v-else type="primary" @click="doSubmit" :loading="loading">
+                <a-button
+                    v-else
+                    type="primary"
+                    @click="doSubmit"
+                    :loading="loading"
+                >
                     {{ $t("common.confirm") }}
                 </a-button>
             </div>

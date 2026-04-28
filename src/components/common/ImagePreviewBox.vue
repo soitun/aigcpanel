@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from "vue";
+import { computed, ref } from "vue";
 
 const props = defineProps<{
     url: string;
@@ -15,7 +15,7 @@ const processedUrl = computed(() => {
     if (!props.url) {
         return "";
     }
-    const url = props.url + '';
+    const url = props.url + "";
     if (url.startsWith("http://") || url.startsWith("https://")) {
         return url;
     } else {
@@ -23,8 +23,12 @@ const processedUrl = computed(() => {
     }
 });
 
-const currentWidth = computed(() => (isZoomed.value ? props.largeWidth || "100%" : props.width || "10rem"));
-const currentHeight = computed(() => (isZoomed.value ? props.largeHeight || "70vh" : props.height || "10rem"));
+const currentWidth = computed(() =>
+    isZoomed.value ? props.largeWidth || "100%" : props.width || "10rem",
+);
+const currentHeight = computed(() =>
+    isZoomed.value ? props.largeHeight || "70vh" : props.height || "10rem",
+);
 
 const toggleZoom = () => {
     isZoomed.value = !isZoomed.value;
@@ -33,16 +37,19 @@ const toggleZoom = () => {
 
 <template>
     <div class="inline-block relative bg-gray-200 p-2 rounded-lg">
-        <img :src="processedUrl"
-             :style="{ width: currentWidth, height: currentHeight }"
-             class="rounded object-contain border"/>
-        <div @click="toggleZoom"
-             class="cursor-pointer w-6 h-6 text-center leading-6 absolute top-4 left-4 bg-black bg-opacity-50 text-white rounded hover:bg-opacity-75">
-            <icon-zoom-in v-if="!isZoomed"/>
-            <icon-zoom-out v-else/>
+        <img
+            :src="processedUrl"
+            :style="{ width: currentWidth, height: currentHeight }"
+            class="rounded object-contain border"
+        />
+        <div
+            @click="toggleZoom"
+            class="cursor-pointer w-6 h-6 text-center leading-6 absolute top-4 left-4 bg-black bg-opacity-50 text-white rounded hover:bg-opacity-75"
+        >
+            <icon-zoom-in v-if="!isZoomed" />
+            <icon-zoom-out v-else />
         </div>
     </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

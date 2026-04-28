@@ -1,7 +1,7 @@
-import {useServerStore} from "../store/modules/server";
-import {EnumServerType} from "../types/Server";
-import {Dialog} from "../lib/dialog";
-import {t} from "../lang";
+import { useServerStore } from "../store/modules/server";
+import { EnumServerType } from "../types/Server";
+import { Dialog } from "../lib/dialog";
+import { t } from "../lang";
 
 const serverStore = useServerStore();
 export const PermissionService = {
@@ -10,9 +10,12 @@ export const PermissionService = {
         data: {
             serverName: string;
             serverVersion: string;
-        }
+        },
     ) {
-        const server = await serverStore.getByNameVersion(data.serverName, data.serverVersion);
+        const server = await serverStore.getByNameVersion(
+            data.serverName,
+            data.serverVersion,
+        );
         if (!server) {
             throw "ServerNotFound";
         }
@@ -32,7 +35,7 @@ export const PermissionService = {
                 },
                 {
                     throwException: false,
-                }
+                },
             );
             Dialog.loadingOff();
             if (res.code) {

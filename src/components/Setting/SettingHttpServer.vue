@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import { onMounted, ref } from "vue";
 
-const serverStatus = ref<{running: boolean; port: number}>({running: false, port: 60000});
+const serverStatus = ref<{ running: boolean; port: number }>({
+    running: false,
+    port: 60000,
+});
 const port = ref(60000);
 const enabled = ref(true);
 const loading = ref(false);
@@ -23,7 +26,7 @@ const doStart = async () => {
     await loadStatus();
     loading.value = false;
     if (ret.code !== 0) {
-        $mapi.app.toast(ret.msg || "启动失败", {status: "error"});
+        $mapi.app.toast(ret.msg || "启动失败", { status: "error" });
     }
 };
 
@@ -51,11 +54,10 @@ const onEnabledChange = async (value: boolean) => {
 <template>
     <a-form :model="{}" layout="vertical">
         <a-form-item label="自动启动">
-            <a-switch
-                :model-value="enabled"
-                @change="onEnabledChange"
-            />
-            <span class="text-sm text-gray-500 ml-2">应用启动时自动开启 HTTP 接口服务</span>
+            <a-switch :model-value="enabled" @change="onEnabledChange" />
+            <span class="text-sm text-gray-500 ml-2"
+                >应用启动时自动开启 HTTP 接口服务</span
+            >
         </a-form-item>
         <a-form-item label="监听端口">
             <div class="flex items-center gap-3">
@@ -67,25 +69,51 @@ const onEnabledChange = async (value: boolean) => {
                     @change="onPortChange"
                     @blur="onPortBlur"
                 />
-                <a-button v-if="!serverStatus.running" type="primary" :loading="loading" @click="doStart">
+                <a-button
+                    v-if="!serverStatus.running"
+                    type="primary"
+                    :loading="loading"
+                    @click="doStart"
+                >
                     启动服务
                 </a-button>
-                <a-button v-else status="danger" :loading="loading" @click="doStop">
+                <a-button
+                    v-else
+                    status="danger"
+                    :loading="loading"
+                    @click="doStop"
+                >
                     停止服务
                 </a-button>
                 <span class="flex items-center gap-1 text-sm">
                     <span
                         class="inline-block w-2 h-2 rounded-full"
-                        :class="serverStatus.running ? 'bg-green-500' : 'bg-gray-400'"
+                        :class="
+                            serverStatus.running
+                                ? 'bg-green-500'
+                                : 'bg-gray-400'
+                        "
                     ></span>
-                    <span :class="serverStatus.running ? 'text-green-600' : 'text-gray-500'">
-                        {{ serverStatus.running ? `运行中 (端口 ${serverStatus.port})` : "已停止" }}
+                    <span
+                        :class="
+                            serverStatus.running
+                                ? 'text-green-600'
+                                : 'text-gray-500'
+                        "
+                    >
+                        {{
+                            serverStatus.running
+                                ? `运行中 (端口 ${serverStatus.port})`
+                                : "已停止"
+                        }}
                     </span>
                 </span>
             </div>
         </a-form-item>
         <a-form-item v-if="serverStatus.running" label="接口地址">
-            <div class="text-sm font-mono bg-gray-50 dark:bg-gray-800 rounded p-3 space-y-1">
+            <div
+                class="text-sm font-mono bg-gray-50 dark:bg-gray-800 rounded p-3 space-y-1"
+            >
                 <div>
                     <span class="text-blue-500">GET</span>
                     <span class="ml-2 text-gray-700 dark:text-gray-300">
@@ -98,12 +126,16 @@ const onEnabledChange = async (value: boolean) => {
                     <span class="ml-2 text-gray-700 dark:text-gray-300">
                         http://localhost:{{ serverStatus.port }}/api/model/call
                     </span>
-                    <span class="ml-2 text-gray-400">调用模型，返回 taskId</span>
+                    <span class="ml-2 text-gray-400"
+                        >调用模型，返回 taskId</span
+                    >
                 </div>
                 <div>
                     <span class="text-blue-500">GET</span>
                     <span class="ml-2 text-gray-700 dark:text-gray-300">
-                        http://localhost:{{ serverStatus.port }}/api/model/query?taskId=xxx
+                        http://localhost:{{
+                            serverStatus.port
+                        }}/api/model/query?taskId=xxx
                     </span>
                     <span class="ml-2 text-gray-400">查询任务结果</span>
                 </div>

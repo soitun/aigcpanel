@@ -1,24 +1,27 @@
-
-export function parseSrt(content: string): { start: number; end: number; text: string }[] {
+export function parseSrt(
+    content: string,
+): { start: number; end: number; text: string }[] {
     const records: { start: number; end: number; text: string }[] = [];
     const blocks = content.split(/\n\s*\n/);
 
     for (const block of blocks) {
-        const lines = block.trim().split('\n');
+        const lines = block.trim().split("\n");
         if (lines.length < 3) continue;
 
         // 跳过序号行
         let timeLine = lines[1];
-        if (!timeLine.includes('-->')) {
+        if (!timeLine.includes("-->")) {
             timeLine = lines[0];
         }
 
-        const timeMatch = timeLine.match(/(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})/);
+        const timeMatch = timeLine.match(
+            /(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})/,
+        );
         if (!timeMatch) continue;
 
         const start = timeToMs(timeMatch[1]);
         const end = timeToMs(timeMatch[2]);
-        const text = lines.slice(2).join(' ').trim();
+        const text = lines.slice(2).join(" ").trim();
 
         if (text) {
             records.push({ start, end, text });
@@ -29,13 +32,18 @@ export function parseSrt(content: string): { start: number; end: number; text: s
 }
 
 function timeToMs(time: string): number {
-    const [hms, ms] = time.split(',');
-    const [hours, minutes, seconds] = hms.split(':').map(Number);
+    const [hms, ms] = time.split(",");
+    const [hours, minutes, seconds] = hms.split(":").map(Number);
     return hours * 3600000 + minutes * 60000 + seconds * 1000 + Number(ms);
 }
 
-export function adjustAudioSpeed(records: { start: number; end: number; text: string }[]): { record: { start: number; end: number; text: string }; speed?: number }[] {
-    const adjusted: { record: { start: number; end: number; text: string }; speed?: number }[] = [];
+export function adjustAudioSpeed(
+    records: { start: number; end: number; text: string }[],
+): { record: { start: number; end: number; text: string }; speed?: number }[] {
+    const adjusted: {
+        record: { start: number; end: number; text: string };
+        speed?: number;
+    }[] = [];
     for (let i = 0; i < records.length; i++) {
         const record = records[i];
         const nextRecord = records[i + 1];

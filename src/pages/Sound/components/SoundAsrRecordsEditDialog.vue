@@ -4,7 +4,9 @@ import DataConfigDialogButton from "../../../components/common/DataConfigDialogB
 import { t } from "../../../lang";
 import { Dialog } from "../../../lib/dialog";
 import { TimeUtil } from "../../../lib/util";
-import ModelGenerateButton, { ModelGenerateButtonOptionType } from "../../../module/Model/ModelGenerateButton.vue";
+import ModelGenerateButton, {
+    ModelGenerateButtonOptionType,
+} from "../../../module/Model/ModelGenerateButton.vue";
 import { SoundAsrResultOptimizedPrompt } from "../config/prompt";
 import { SoundGenerateReplaceContent } from "../config/replaceContent";
 import SoundAsrRecordsSubtitlePreviewDialog from "./SoundAsrRecordsSubtitlePreviewDialog.vue";
@@ -29,7 +31,7 @@ const props = defineProps({
     soundGenerate: {
         type: Object,
         default: () => null,
-    }
+    },
 });
 
 const emit = defineEmits<{
@@ -54,12 +56,17 @@ const lastSelectedIndex = ref<number>(-1);
 const wordsPerMinute = ref(250);
 
 // 预览对话框引用
-const previewDialog = ref<InstanceType<typeof SoundAsrRecordsSubtitlePreviewDialog> | null>(null);
+const previewDialog = ref<InstanceType<
+    typeof SoundAsrRecordsSubtitlePreviewDialog
+> | null>(null);
 
 // 计算属性：检查是否有连续的空白片段
 const hasConsecutiveBlanks = computed(() => {
     for (let i = 0; i < editingRecords.value.length - 1; i++) {
-        if (editingRecords.value[i].text.trim() === '' && editingRecords.value[i + 1].text.trim() === '') {
+        if (
+            editingRecords.value[i].text.trim() === "" &&
+            editingRecords.value[i + 1].text.trim() === ""
+        ) {
             return true;
         }
     }
@@ -68,7 +75,10 @@ const hasConsecutiveBlanks = computed(() => {
 
 // 计算属性：总字数统计
 const totalWords = computed(() => {
-    return editingRecords.value.reduce((sum, record) => sum + calculateCustomLength(record.text), 0);
+    return editingRecords.value.reduce(
+        (sum, record) => sum + calculateCustomLength(record.text),
+        0,
+    );
 });
 
 // 计算自定义长度：英文单词算两个长度，汉字算1个，字符不算
@@ -86,15 +96,16 @@ const calculateCustomLength = (text: string): number => {
 
 // 计算maxLength，根据记录时长和每分钟字数
 const getMaxLength = (record: EditingAsrRecord) => {
-    const durationSeconds = (record.endSeconds || 0) - (record.startSeconds || 0);
-    return Math.floor(durationSeconds * wordsPerMinute.value / 60);
+    const durationSeconds =
+        (record.endSeconds || 0) - (record.startSeconds || 0);
+    return Math.floor((durationSeconds * wordsPerMinute.value) / 60);
 };
 
 const edit = (
     taskId: number,
     records: AsrRecord[],
     audioOrVideo: string,
-    duration: number
+    duration: number,
 ) => {
     currentRecords.value = records;
     currentTaskId.value = taskId || 0;
@@ -114,10 +125,12 @@ const initEditingRecords = () => {
         return;
     }
 
-    const sortedRecords = [...currentRecords.value].sort((a, b) => a.start - b.start);
+    const sortedRecords = [...currentRecords.value].sort(
+        (a, b) => a.start - b.start,
+    );
     const filledRecords: EditingAsrRecord[] = [];
     let currentTime = 0;
-    sortedRecords.forEach(record => {
+    sortedRecords.forEach((record) => {
         if (record.start > currentTime) {
             filledRecords.push({
                 start: currentTime,
@@ -159,8 +172,8 @@ const doSave = () => {
     }
     // 过滤空白条目
     const finalRecords = editingRecords.value
-        .filter(record => record.text.trim() !== "")
-        .map(record => ({
+        .filter((record) => record.text.trim() !== "")
+        .map((record) => ({
             start: secondsToMs(record.startSeconds || 0),
             end: secondsToMs(record.endSeconds || 0),
             text: record.text,
@@ -189,15 +202,20 @@ const onFindReplace = () => {
     }
 
     let replaceCount = 0;
-    editingRecords.value.forEach(record => {
+    editingRecords.value.forEach((record) => {
         if (record.text.includes(findText.value)) {
-            record.text = record.text.replace(new RegExp(findText.value, "g"), replaceText.value);
+            record.text = record.text.replace(
+                new RegExp(findText.value, "g"),
+                replaceText.value,
+            );
             replaceCount++;
         }
     });
 
     if (replaceCount > 0) {
-        Dialog.tipSuccess(t("soundAsrEdit.replacedRecords", {count: replaceCount}));
+        Dialog.tipSuccess(
+            t("soundAsrEdit.replacedRecords", { count: replaceCount }),
+        );
     } else {
         Dialog.tipError(t("soundAsrEdit.noMatchFound"));
     }
@@ -214,8 +232,10 @@ const onRecordClick = (record: EditingAsrRecord) => {
 // 音频时间更新，高亮当前记录
 const onTimeUpdate = () => {
     const currentTime = mediaRef.value?.currentTime || 0;
-    const newIndex = editingRecords.value.findIndex((record) =>
-        (record.startSeconds || 0) <= currentTime && currentTime < (record.endSeconds || 0)
+    const newIndex = editingRecords.value.findIndex(
+        (record) =>
+            (record.startSeconds || 0) <= currentTime &&
+            currentTime < (record.endSeconds || 0),
     );
     sliderValue.value = currentTime;
     if (newIndex !== currentIndex.value) {
@@ -225,9 +245,11 @@ const onTimeUpdate = () => {
         sliderMax.value = currentRecord.endSeconds || 0;
         if (newIndex !== -1) {
             nextTick(() => {
-                const el = document.querySelector(`[data-record-index='${newIndex}']`) as HTMLElement;
+                const el = document.querySelector(
+                    `[data-record-index='${newIndex}']`,
+                ) as HTMLElement;
                 if (el) {
-                    el.scrollIntoView({behavior: "smooth", block: "center"});
+                    el.scrollIntoView({ behavior: "smooth", block: "center" });
                 }
             });
         }
@@ -254,7 +276,11 @@ const doMerge = () => {
         Dialog.tipError(t("soundAsrEdit.mergeOnlyContinuous"));
         return;
     }
-    const text = editingRecords.value.slice(first, last + 1).map(r => r.text).filter(t => t).join('；');
+    const text = editingRecords.value
+        .slice(first, last + 1)
+        .map((r) => r.text)
+        .filter((t) => t)
+        .join("；");
     const merged = {
         start: editingRecords.value[first].start,
         end: editingRecords.value[last].end,
@@ -275,12 +301,12 @@ const doMergeBlanks = () => {
     let currentBlank: EditingAsrRecord | null = null;
 
     for (const record of editingRecords.value) {
-        if (record.text.trim() === '') {
+        if (record.text.trim() === "") {
             if (currentBlank) {
                 currentBlank.end = record.end;
                 currentBlank.endSeconds = record.endSeconds;
             } else {
-                currentBlank = {...record};
+                currentBlank = { ...record };
             }
         } else {
             if (currentBlank) {
@@ -308,13 +334,19 @@ const doOptimizeTimeline = () => {
         const record = editingRecords.value[i];
         const maxLength = getMaxLength(record);
         if (calculateCustomLength(record.text) > maxLength) {
-            if (i + 1 < editingRecords.value.length && editingRecords.value[i + 1].text.trim() === '') {
+            if (
+                i + 1 < editingRecords.value.length &&
+                editingRecords.value[i + 1].text.trim() === ""
+            ) {
                 // 计算需要额外时间
-                const extraWords = calculateCustomLength(record.text) - maxLength;
-                const extraTime = extraWords * 60 / wordsPerMinute.value; // 秒
+                const extraWords =
+                    calculateCustomLength(record.text) - maxLength;
+                const extraTime = (extraWords * 60) / wordsPerMinute.value; // 秒
 
                 // 下一句的时长
-                const nextDuration = (editingRecords.value[i + 1].endSeconds || 0) - (editingRecords.value[i + 1].startSeconds || 0);
+                const nextDuration =
+                    (editingRecords.value[i + 1].endSeconds || 0) -
+                    (editingRecords.value[i + 1].startSeconds || 0);
 
                 // 实际挪的时间
                 const moveTime = Math.min(extraTime, nextDuration);
@@ -322,7 +354,8 @@ const doOptimizeTimeline = () => {
                 if (moveTime > 0) {
                     if (moveTime >= nextDuration) {
                         // 下一句时间会被完全占用，删除下一句
-                        record.endSeconds = editingRecords.value[i + 1].endSeconds;
+                        record.endSeconds =
+                            editingRecords.value[i + 1].endSeconds;
                         record.end = secondsToMs(record.endSeconds || 0);
                         editingRecords.value.splice(i + 1, 1);
                         i--; // 调整索引，因为删除了一个元素
@@ -332,8 +365,12 @@ const doOptimizeTimeline = () => {
                         record.end = secondsToMs(record.endSeconds);
 
                         // 缩短下一句
-                        editingRecords.value[i + 1].startSeconds = (editingRecords.value[i + 1].startSeconds || 0) + moveTime;
-                        editingRecords.value[i + 1].start = secondsToMs(editingRecords.value[i + 1].startSeconds || 0);
+                        editingRecords.value[i + 1].startSeconds =
+                            (editingRecords.value[i + 1].startSeconds || 0) +
+                            moveTime;
+                        editingRecords.value[i + 1].start = secondsToMs(
+                            editingRecords.value[i + 1].startSeconds || 0,
+                        );
                     }
                     successCount++;
                 } else {
@@ -345,7 +382,9 @@ const doOptimizeTimeline = () => {
         }
     }
 
-    Dialog.tipSuccess(t("soundAsrEdit.optimizeComplete", {successCount, failCount}));
+    Dialog.tipSuccess(
+        t("soundAsrEdit.optimizeComplete", { successCount, failCount }),
+    );
 };
 
 // 合并到前一条
@@ -355,7 +394,8 @@ const doMergeToPrevious = (index: number) => {
     const previous = editingRecords.value[index - 1];
     // 合并文本，如果当前有文本，用分号连接
     if (current.text.trim()) {
-        previous.text += (previous.text.trim() ? '；' : '') + current.text.trim();
+        previous.text +=
+            (previous.text.trim() ? "；" : "") + current.text.trim();
     }
     // 更新结束时间
     previous.end = current.end;
@@ -363,13 +403,18 @@ const doMergeToPrevious = (index: number) => {
     // 删除当前记录
     editingRecords.value.splice(index, 1);
     // 更新选择状态
-    selectedIndexes.value = selectedIndexes.value.filter(i => i !== index).map(i => i > index ? i - 1 : i);
+    selectedIndexes.value = selectedIndexes.value
+        .filter((i) => i !== index)
+        .map((i) => (i > index ? i - 1 : i));
     if (currentIndex.value === index) {
         currentIndex.value = index - 1;
     } else if (currentIndex.value > index) {
         currentIndex.value--;
     }
-    lastSelectedIndex.value = lastSelectedIndex.value > index ? lastSelectedIndex.value - 1 : lastSelectedIndex.value;
+    lastSelectedIndex.value =
+        lastSelectedIndex.value > index
+            ? lastSelectedIndex.value - 1
+            : lastSelectedIndex.value;
 };
 
 // 分割当前记录
@@ -378,7 +423,12 @@ const doSplit = () => {
         return;
     }
     const record = editingRecords.value[currentIndex.value];
-    if (!(sliderValue.value > record.startSeconds! && sliderValue.value < record.endSeconds!)) {
+    if (
+        !(
+            sliderValue.value > record.startSeconds! &&
+            sliderValue.value < record.endSeconds!
+        )
+    ) {
         Dialog.tipError(t("soundAsrEdit.invalidTimeRange"));
         return;
     }
@@ -410,7 +460,9 @@ const onRecordSelect = (index: number, event: MouseEvent) => {
     } else {
         if (event.ctrlKey || event.metaKey) {
             if (selectedIndexes.value.includes(index)) {
-                selectedIndexes.value = selectedIndexes.value.filter(i => i !== index);
+                selectedIndexes.value = selectedIndexes.value.filter(
+                    (i) => i !== index,
+                );
             } else {
                 selectedIndexes.value.push(index);
             }
@@ -428,7 +480,9 @@ const onCheckboxChange = (index: number, checked: boolean) => {
             selectedIndexes.value.push(index);
         }
     } else {
-        selectedIndexes.value = selectedIndexes.value.filter(i => i !== index);
+        selectedIndexes.value = selectedIndexes.value.filter(
+            (i) => i !== index,
+        );
     }
     lastSelectedIndex.value = index;
 };
@@ -436,17 +490,17 @@ const onCheckboxChange = (index: number, checked: boolean) => {
 const aiIndex = ref(0);
 
 const aiOption: ModelGenerateButtonOptionType = {
-    mode: 'repeat',
+    mode: "repeat",
     promptDefault: SoundAsrResultOptimizedPrompt,
     onStart: async () => {
-        console.log('AI优化开始');
+        console.log("AI优化开始");
         aiIndex.value = 0;
     },
     onEnd: async () => {
-        console.log('AI优化结束');
+        console.log("AI优化结束");
     },
     onGetParam: async () => {
-        console.log('AI优化获取参数, index=', aiIndex.value);
+        console.log("AI优化获取参数, index=", aiIndex.value);
         // get next none empty record
         while (aiIndex.value < editingRecords.value.length) {
             const record = editingRecords.value[aiIndex.value];
@@ -461,13 +515,13 @@ const aiOption: ModelGenerateButtonOptionType = {
     },
     onResult: async (result: string, param: Record<string, any>) => {
         const index = aiIndex.value - 1;
-        console.log('AI优化结果:', {index, result, param});
+        console.log("AI优化结果:", { index, result, param });
         onRecordClick(editingRecords.value[index]);
         setTimeout(() => {
             editingRecords.value[index].text = result.trim();
         }, 1000);
     },
-}
+};
 
 defineExpose({
     edit,
@@ -488,7 +542,7 @@ defineExpose({
                         :min="1"
                         :max="1000"
                         size="small"
-                        style="width:80px"
+                        style="width: 80px"
                     />
                 </div>
                 <DataConfigDialogButton
@@ -496,21 +550,34 @@ defineExpose({
                     title="声音合成优化"
                     name="SoundGenerateReplaceContent"
                     help="声音合成时会自动把文本中的“键”替换为“值”，可用于修正发音"
-                    :default-value="SoundGenerateReplaceContent">
+                    :default-value="SoundGenerateReplaceContent"
+                >
                     <div class="mb-2">
-                        <SoundGeneratePreviewBox :sound-generate="soundGenerate as any"/>
+                        <SoundGeneratePreviewBox
+                            :sound-generate="soundGenerate as any"
+                        />
                     </div>
                 </DataConfigDialogButton>
-                <div class="text-sm text-gray-500">{{ $t("common.totalWords", {count: totalWords}) }}</div>
+                <div class="text-sm text-gray-500">
+                    {{ $t("common.totalWords", { count: totalWords }) }}
+                </div>
             </div>
         </template>
         <template #footer>
             <a-button @click="doCancel">{{ $t("common.cancel") }}</a-button>
-            <a-button type="primary" @click="doSave">{{ props.saveTitle }}</a-button>
+            <a-button type="primary" @click="doSave">{{
+                props.saveTitle
+            }}</a-button>
         </template>
-        <div v-if="visible" class="flex flex-col gap-1 h-full -mx-4 -my-5" style="height:calc(100vh - 12rem);">
-
-            <div class="bg-gray-100 p-2 border-b rounded-lg" v-if="currentMedia">
+        <div
+            v-if="visible"
+            class="flex flex-col gap-1 h-full -mx-4 -my-5"
+            style="height: calc(100vh - 12rem)"
+        >
+            <div
+                class="bg-gray-100 p-2 border-b rounded-lg"
+                v-if="currentMedia"
+            >
                 <video
                     ref="mediaRef"
                     v-if="currentMedia.endsWith('mp4')"
@@ -529,47 +596,78 @@ defineExpose({
                 ></audio>
             </div>
 
-            <div class="bg-white rounded-lg p-2 flex items-center justify-between gap-2">
+            <div
+                class="bg-white rounded-lg p-2 flex items-center justify-between gap-2"
+            >
                 <div class="flex items-center gap-1">
                     <a-input
                         v-model="findText"
                         :placeholder="$t('common.find')"
                         size="small"
-                        style="width:100px"
+                        style="width: 100px"
                         allow-clear
                     />
                     <a-input
                         v-model="replaceText"
                         :placeholder="$t('common.replace')"
                         size="small"
-                        style="width:100px"
+                        style="width: 100px"
                         allow-clear
                     />
-                    <a-button size="small" class="px-2" @click="onFindReplace" :disabled="!findText.trim()">
+                    <a-button
+                        size="small"
+                        class="px-2"
+                        @click="onFindReplace"
+                        :disabled="!findText.trim()"
+                    >
                         <template #icon>
-                            <icon-check/>
+                            <icon-check />
                         </template>
                     </a-button>
-                    <a-button size="small" class="px-2" type="primary" @click="doMergeBlanks"
-                              :disabled="!hasConsecutiveBlanks">
+                    <a-button
+                        size="small"
+                        class="px-2"
+                        type="primary"
+                        @click="doMergeBlanks"
+                        :disabled="!hasConsecutiveBlanks"
+                    >
                         {{ $t("common.mergeWhitespace") }}
                     </a-button>
-                    <a-button size="small" class="px-2" type="primary" @click="doSplit" :disabled="currentIndex === -1">
+                    <a-button
+                        size="small"
+                        class="px-2"
+                        type="primary"
+                        @click="doSplit"
+                        :disabled="currentIndex === -1"
+                    >
                         {{ $t("common.split") }}
                     </a-button>
-                    <a-button size="small" class="px-2" type="primary" @click="doMerge"
-                              :disabled="selectedIndexes.length < 2">
+                    <a-button
+                        size="small"
+                        class="px-2"
+                        type="primary"
+                        @click="doMerge"
+                        :disabled="selectedIndexes.length < 2"
+                    >
                         {{ $t("common.merge") }}
                         <span v-if="selectedIndexes.length">
                             ({{ selectedIndexes.length }})
                         </span>
                     </a-button>
-                    <a-button size="small" class="px-2" type="primary"
-                              @click="previewDialog?.show(editingRecords);">
+                    <a-button
+                        size="small"
+                        class="px-2"
+                        type="primary"
+                        @click="previewDialog?.show(editingRecords)"
+                    >
                         {{ $t("media.subtitle") }}
                     </a-button>
-                    <a-button size="small" class="px-2" type="primary"
-                              @click="doOptimizeTimeline">
+                    <a-button
+                        size="small"
+                        class="px-2"
+                        type="primary"
+                        @click="doOptimizeTimeline"
+                    >
                         {{ $t("task.optimizeTimeline") }}
                     </a-button>
                     <ModelGenerateButton
@@ -582,7 +680,10 @@ defineExpose({
 
             <div class="flex-grow overflow-y-auto border rounded-lg p-2">
                 <!-- 没有数据提示 -->
-                <div v-if="editingRecords.length === 0" class="text-center text-gray-500 py-4">
+                <div
+                    v-if="editingRecords.length === 0"
+                    class="text-center text-gray-500 py-4"
+                >
                     {{ $t("empty.noEditableData") }}
                 </div>
                 <!-- 表格编辑 -->
@@ -593,37 +694,77 @@ defineExpose({
                         :data-record-index="index + ''"
                         :class="[
                             'border rounded p-2 hover:shadow cursor-pointer',
-                            selectedIndexes.includes(index) ? 'border-red-400 bg-red-50' : '',
-                            index === currentIndex ? 'bg-blue-50 border-blue-400' : ''
+                            selectedIndexes.includes(index)
+                                ? 'border-red-400 bg-red-50'
+                                : '',
+                            index === currentIndex
+                                ? 'bg-blue-50 border-blue-400'
+                                : '',
                         ]"
                         @click="onRecordClick(record)"
                     >
                         <div class="flex items-start">
                             <div class="flex-grow">
                                 <div class="flex items-center mb-1">
-                                    <a-tag class="rounded-lg mr-3"
-                                           :color="calculateCustomLength(record.text) > getMaxLength(record)?'red':undefined">
+                                    <a-tag
+                                        class="rounded-lg mr-3"
+                                        :color="
+                                            calculateCustomLength(record.text) >
+                                            getMaxLength(record)
+                                                ? 'red'
+                                                : undefined
+                                        "
+                                    >
                                         {{ index + 1 }}
                                     </a-tag>
-                                    <div class="flex-grow text-xs text-gray-600 font-mono select-none">
-                                        {{ TimeUtil.msToTime(record.start) }} - {{ TimeUtil.msToTime(record.end) }}
+                                    <div
+                                        class="flex-grow text-xs text-gray-600 font-mono select-none"
+                                    >
+                                        {{ TimeUtil.msToTime(record.start) }} -
+                                        {{ TimeUtil.msToTime(record.end) }}
                                     </div>
-                                    <div class="flex items-center gap-3" @click.stop>
-                                        <div class="text-xs font-mono bg-gray-100 rounded-lg px-2 leading-6"
-                                             :class="{'bg-red-100 text-red-600': calculateCustomLength(record.text) > getMaxLength(record)}">
-                                            {{ calculateCustomLength(record.text) }}
+                                    <div
+                                        class="flex items-center gap-3"
+                                        @click.stop
+                                    >
+                                        <div
+                                            class="text-xs font-mono bg-gray-100 rounded-lg px-2 leading-6"
+                                            :class="{
+                                                'bg-red-100 text-red-600':
+                                                    calculateCustomLength(
+                                                        record.text,
+                                                    ) > getMaxLength(record),
+                                            }"
+                                        >
+                                            {{
+                                                calculateCustomLength(
+                                                    record.text,
+                                                )
+                                            }}
                                             /
                                             {{ getMaxLength(record) }}
                                         </div>
-                                        <a-button v-if="index>0" size="mini" @click="doMergeToPrevious(index)">
+                                        <a-button
+                                            v-if="index > 0"
+                                            size="mini"
+                                            @click="doMergeToPrevious(index)"
+                                        >
                                             <template #icon>
-                                                <icon-arrow-up/>
+                                                <icon-arrow-up />
                                             </template>
                                             合并到前一条
                                         </a-button>
                                         <a-checkbox
-                                            :model-value="selectedIndexes.includes(index)"
-                                            @change="(checked) => onCheckboxChange(index, checked)"
+                                            :model-value="
+                                                selectedIndexes.includes(index)
+                                            "
+                                            @change="
+                                                (checked) =>
+                                                    onCheckboxChange(
+                                                        index,
+                                                        checked,
+                                                    )
+                                            "
                                             class="ml-2 self-start"
                                         />
                                     </div>
@@ -631,9 +772,9 @@ defineExpose({
                                 <div class="text-sm" @click.stop>
                                     <a-textarea
                                         v-model="record.text"
-                                        :auto-size="{minRows: 1, maxRows: 3}"
+                                        :auto-size="{ minRows: 1, maxRows: 3 }"
                                         size="mini"
-                                        :textarea-attrs="{tabindex:index}"
+                                        :textarea-attrs="{ tabindex: index }"
                                         show-word-limit
                                         placeholder="输入文本"
                                     />
@@ -654,5 +795,5 @@ defineExpose({
             </div>
         </div>
     </a-modal>
-    <SoundAsrRecordsSubtitlePreviewDialog ref="previewDialog"/>
+    <SoundAsrRecordsSubtitlePreviewDialog ref="previewDialog" />
 </template>

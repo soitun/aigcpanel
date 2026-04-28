@@ -1,5 +1,5 @@
-import {ipcRenderer} from "electron";
-import {ServerInfo} from "./type";
+import { ipcRenderer } from "electron";
+import { ServerInfo } from "./type";
 
 const listGpus = async () => {
     return ipcRenderer.invoke("server:listGpus");
@@ -31,19 +31,41 @@ const cancel = async (serverInfo: ServerInfo) => {
 
 const deletes = async (serverInfo: ServerInfo) => {
     return ipcRenderer.invoke("server:deletes", serverInfo);
-}
+};
 
 const config = async (serverInfo: ServerInfo) => {
     return ipcRenderer.invoke("server:config", serverInfo);
 };
 
-const callFunction = async (serverInfo: ServerInfo, method: string, data: any, option: any) => {
-    return ipcRenderer.invoke("server:callFunction", serverInfo, method, data, option);
+const callFunction = async (
+    serverInfo: ServerInfo,
+    method: string,
+    data: any,
+    option: any,
+) => {
+    return ipcRenderer.invoke(
+        "server:callFunction",
+        serverInfo,
+        method,
+        data,
+        option,
+    );
 };
 
-const callFunctionWithException = async (serverInfo: ServerInfo, method: string, data: any, option: any) => {
+const callFunctionWithException = async (
+    serverInfo: ServerInfo,
+    method: string,
+    data: any,
+    option: any,
+) => {
     try {
-        return ipcRenderer.invoke("server:callFunction", serverInfo, method, data, option);
+        return ipcRenderer.invoke(
+            "server:callFunction",
+            serverInfo,
+            method,
+            data,
+            option,
+        );
     } catch (e) {
         return {
             code: -1,

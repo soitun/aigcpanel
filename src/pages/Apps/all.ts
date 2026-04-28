@@ -1,4 +1,4 @@
-import {t} from "../../lang";
+import { t } from "../../lang";
 
 import LongTextTts from "./LongTextTts/LongTextTts.vue";
 import SubtitleTts from "./SubtitleTts/SubtitleTts.vue";
@@ -67,19 +67,19 @@ export const ToolApps = [
         description: t("desc.img2img"),
         icon: ImageToImageIcon,
         component: ImageToImage,
-    }
+    },
 ];
 
 export const AllApps = [
-    ...(SoundApps.map(app => ({
+    ...(SoundApps.map((app) => ({
         ...app,
         url: `/sound?tab=${app.name}`,
     })) as any),
-    ...(VideoApps.map(app => ({
+    ...(VideoApps.map((app) => ({
         ...app,
         url: `/video?tab=${app.name}`,
     })) as any),
-    ...(ToolApps.map(app => ({
+    ...(ToolApps.map((app) => ({
         ...app,
         url: `/tool?tab=${app.name}`,
     })) as any),

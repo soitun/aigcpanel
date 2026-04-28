@@ -1,17 +1,17 @@
-import {t} from "../lang";
+import { t } from "../lang";
 
 export const allFunctions = [
-    {value: "soundTts", label: t("voice.synthesis")},
-    {value: "soundClone", label: t("voice.clone")},
-    {value: "videoGen", label: t("avatar.digitalHuman")},
-    {value: "asr", label: t("voice.recognition")},
-    {value: "textToImage", label: t("model.txt2img")},
-    {value: "imageToImage", label: t("model.img2img")},
-    {value: "live", label: t("avatar.smartLive")},
-]
+    { value: "soundTts", label: t("voice.synthesis") },
+    { value: "soundClone", label: t("voice.clone") },
+    { value: "videoGen", label: t("avatar.digitalHuman") },
+    { value: "asr", label: t("voice.recognition") },
+    { value: "textToImage", label: t("model.txt2img") },
+    { value: "imageToImage", label: t("model.img2img") },
+    { value: "live", label: t("avatar.smartLive") },
+];
 
 export function functionToLabels(functions: string[]) {
-    return functions.map(f => functionToLabel(f));
+    return functions.map((f) => functionToLabel(f));
 }
 
 export function functionToLabel(f: string) {
@@ -31,7 +31,9 @@ export function buildServerContent(config: any) {
     if (config.functions) {
         for (const func in config.functions) {
             if (config.functions[func].content) {
-                contentLines.push('<p class="font-bold">' + functionToLabel(func) + "</p>");
+                contentLines.push(
+                    '<p class="font-bold">' + functionToLabel(func) + "</p>",
+                );
                 contentLines.push(config.functions[func].content as string);
             }
         }

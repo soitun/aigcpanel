@@ -12,26 +12,18 @@ import Steps from "../common/Steps.vue";
 import TextToImageCreate from "./components/TextToImageCreate.vue";
 import TextToImageItem from "./components/TextToImageItem.vue";
 
-const {page, records, recordsForPage} = usePaginate<TaskRecord>({
+const { page, records, recordsForPage } = usePaginate<TaskRecord>({
     pageSize: 10,
 });
 
-useTaskChangeRefresh("TextToImage", (
-    bizId: string,
-    type: TaskChangeType
-) => {
+useTaskChangeRefresh("TextToImage", (bizId: string, type: TaskChangeType) => {
     doRefresh();
 });
 
-const {
-    mergeCheck,
-    isIndeterminate,
-    isAllChecked,
-    onCheckAll,
-    checkRecords,
-} = useCheckAll({
-    records: recordsForPage,
-});
+const { mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords } =
+    useCheckAll({
+        records: recordsForPage,
+    });
 
 const stepsVisible = ref(false);
 
@@ -52,22 +44,36 @@ const doRefresh = async () => {
                 <div class="text-3xl font-bold">{{ "文生图" }}</div>
                 <div class="text-gray-400 ml-3">{{ "将文本转换为图像" }}</div>
             </div>
-            <ToggleButton v-model="stepsVisible"/>
+            <ToggleButton v-model="stepsVisible" />
         </div>
-        <Steps v-if="stepsVisible" :steps="[
-            {key: 1, label: '输入提示词', description: '输入描述图像的文本'},
-            {key: 2, label: '合并图像', description: '将所有图像片段合并成一个长图像'},
-        ]"/>
+        <Steps
+            v-if="stepsVisible"
+            :steps="[
+                {
+                    key: 1,
+                    label: '输入提示词',
+                    description: '输入描述图像的文本',
+                },
+                {
+                    key: 2,
+                    label: '合并图像',
+                    description: '将所有图像片段合并成一个长图像',
+                },
+            ]"
+        />
         <div>
-            <TextToImageCreate @submitted="doRefresh"/>
+            <TextToImageCreate @submitted="doRefresh" />
             <div v-if="records.length > 0">
-                <div class="rounded-xl shadow border p-4 mt-4 mb-4 hover:shadow-lg flex items-center">
+                <div
+                    class="rounded-xl shadow border p-4 mt-4 mb-4 hover:shadow-lg flex items-center"
+                >
                     <div class="flex-grow flex items-center">
                         <div class="mr-3">
                             <a-checkbox
                                 :model-value="isAllChecked"
                                 :indeterminate="isIndeterminate"
-                                @change="onCheckAll">
+                                @change="onCheckAll"
+                            >
                                 {{ "全选" }}
                             </a-checkbox>
                         </div>
@@ -75,7 +81,7 @@ const doRefresh = async () => {
                             :records="checkRecords"
                             @update="doRefresh"
                         />
-                        <TaskBatchDownloadAction :records="checkRecords"/>
+                        <TaskBatchDownloadAction :records="checkRecords" />
                     </div>
                     <div>
                         <a-pagination
@@ -95,7 +101,7 @@ const doRefresh = async () => {
                     />
                 </div>
             </div>
-            <m-empty v-else/>
+            <m-empty v-else />
         </div>
     </div>
 </template>

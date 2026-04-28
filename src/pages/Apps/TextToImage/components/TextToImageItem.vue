@@ -17,40 +17,44 @@ const props = defineProps<{
     dialog: boolean;
     onRefresh: () => void;
 }>();
-
 </script>
 
 <template>
     <div class="rounded-xl shadow border p-4 mb-4 hover:shadow-lg">
         <div class="flex items-center gap-1">
-            <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
+            <div
+                class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2"
+            >
                 <div v-if="!dialog" class="mr-2 h-8 pt-0.5">
-                    <a-checkbox v-model="record['_check']"/>
+                    <a-checkbox v-model="record['_check']" />
                 </div>
                 <div class="">
                     <TaskTitleField
                         :record="record"
                         :disabled="dialog"
                         @title-click="record['_check'] = !record['_check']"
-                        @update="v => (record.title = v)"
+                        @update="(v) => (record.title = v)"
                     />
                 </div>
             </div>
             <div class="flex-grow"></div>
-            <TaskDuration :start="record.startTime" :end="record.endTime"/>
-            <TaskBizStatus :status="record.status" :status-msg="record.statusMsg"/>
+            <TaskDuration :start="record.startTime" :end="record.endTime" />
+            <TaskBizStatus
+                :status="record.status"
+                :status-msg="record.statusMsg"
+            />
         </div>
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
-                    <icon-file/>
+                    <icon-file />
                     {{ "处理图像" }}
                 </div>
             </div>
             <div class="flex-grow pt-1">
                 <TaskJobResultStepView :record="record" step="Prepare">
                     <div class="bg-gray-100 rounded-lg p-2">
-                        <TextTruncateView :text="record.modelConfig?.prompt!"/>
+                        <TextTruncateView :text="record.modelConfig?.prompt!" />
                     </div>
                 </TaskJobResultStepView>
             </div>
@@ -58,36 +62,38 @@ const props = defineProps<{
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
-                    <icon-file-image/>
+                    <icon-file-image />
                     {{ "图像生成" }}
                 </div>
             </div>
             <div class="flex-grow">
                 <TaskJobResultStepView :record="record" step="Generate">
                     <div>
-                        <ImagePreviewBox :url="record.jobResult?.Generate?.image!"/>
+                        <ImagePreviewBox
+                            :url="record.jobResult?.Generate?.image!"
+                        />
                     </div>
                 </TaskJobResultStepView>
                 <div class="mt-1 flex gap-1">
-                    <TextToImageFormViewBody :data="record.modelConfig?.textToImage"/>
+                    <TextToImageFormViewBody
+                        :data="record.modelConfig?.textToImage"
+                    />
                 </div>
             </div>
         </div>
         <div class="pt-4 flex items-center">
-            <div class="text-gray-400 text-xs mr-2">
-                #{{ record.id }}
-            </div>
+            <div class="text-gray-400 text-xs mr-2">#{{ record.id }}</div>
             <div class="text-gray-400 flex-grow">
-                <timeago :datetime="record['createdAt'] * 1000"/>
+                <timeago :datetime="record['createdAt'] * 1000" />
             </div>
             <div class="">
-                <TaskDownloadAction :record="record"/>
+                <TaskDownloadAction :record="record" />
                 <TaskDeleteAction
                     v-if="!dialog"
                     :record="record"
                     @update="onRefresh"
                 />
-                <TaskContinueAction :record="record" @update="onRefresh"/>
+                <TaskContinueAction :record="record" @update="onRefresh" />
             </div>
         </div>
     </div>

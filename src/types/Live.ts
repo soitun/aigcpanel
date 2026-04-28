@@ -1,6 +1,11 @@
-import {EventTypes} from "../pages/Live/util";
+import { EventTypes } from "../pages/Live/util";
 
-export type LiveStatusType = "stopped" | "starting" | "running" | "stopping" | "error";
+export type LiveStatusType =
+    | "stopped"
+    | "starting"
+    | "running"
+    | "stopping"
+    | "error";
 
 export type LiveKnowledgeSystemType = (typeof EventTypes)[number]["value"];
 

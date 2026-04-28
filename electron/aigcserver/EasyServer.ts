@@ -1,7 +1,12 @@
-import {Files} from "../mapi/file/main";
-import {Log} from "../mapi/log/main";
-import {SendType, ServerApiType, ServerFunctionDataType, ServerInfo} from "../mapi/server/type";
-import {AigcServerUtil} from "./util";
+import { Files } from "../mapi/file/main";
+import { Log } from "../mapi/log/main";
+import {
+    SendType,
+    ServerApiType,
+    ServerFunctionDataType,
+    ServerInfo,
+} from "../mapi/server/type";
+import { AigcServerUtil } from "./util";
 
 type LauncherResultType = {
     result: {
@@ -41,10 +46,12 @@ export const EasyServer = function (config: any) {
         startTime: 0,
     };
     this.send = function (type: SendType, data: any) {
-        this.ServerApi.event.sendChannel(this.ServerInfo.eventChannelName, {type, data});
+        this.ServerApi.event.sendChannel(this.ServerInfo.eventChannelName, {
+            type,
+            data,
+        });
     };
-    this.init = async function () {
-    };
+    this.init = async function () {};
     this.config = async function () {
         return {
             code: 0,
@@ -79,17 +86,25 @@ export const EasyServer = function (config: any) {
         configJsonPath: string | null,
         option: {
             timeout: number;
-        }
+        },
     ) {
         if (!controller) {
             let command = [];
             command.push(this.serverConfig.easyServer.entry);
             if (this.serverConfig.easyServer.entryArgs) {
-                command = command.concat(this.serverConfig.easyServer.entryArgs);
+                command = command.concat(
+                    this.serverConfig.easyServer.entryArgs,
+                );
             }
             for (let i = 0; i < command.length; i++) {
-                command[i] = command[i].replace("${CONFIG}", `"${configJsonPath}"`);
-                command[i] = command[i].replace("${ROOT}", this.ServerInfo.localPath);
+                command[i] = command[i].replace(
+                    "${CONFIG}",
+                    `"${configJsonPath}"`,
+                );
+                command[i] = command[i].replace(
+                    "${ROOT}",
+                    this.ServerInfo.localPath,
+                );
             }
             const envMap = {};
             // console.log('EasyServer', this.serverConfig.easyServer)
@@ -106,7 +121,8 @@ export const EasyServer = function (config: any) {
             ]);
             envMap["PYTHONIOENCODING"] = "utf-8";
             envMap["AIGCPANEL_SERVER_PLACEHOLDER_CONFIG"] = configJsonPath;
-            envMap["AIGCPANEL_SERVER_PLACEHOLDER_ROOT"] = this.ServerInfo.localPath;
+            envMap["AIGCPANEL_SERVER_PLACEHOLDER_ROOT"] =
+                this.ServerInfo.localPath;
             if (this.serverConfig.easyServer.envs) {
                 for (const e of this.serverConfig.easyServer.envs) {
                     let pcs = e.split("=");
@@ -115,13 +131,22 @@ export const EasyServer = function (config: any) {
                 }
             }
             for (const k in envMap) {
-                envMap[k] = envMap[k].replace("${CONFIG}", `"${configJsonPath}"`);
-                envMap[k] = envMap[k].replace("${ROOT}", this.ServerInfo.localPath);
+                envMap[k] = envMap[k].replace(
+                    "${CONFIG}",
+                    `"${configJsonPath}"`,
+                );
+                envMap[k] = envMap[k].replace(
+                    "${ROOT}",
+                    this.ServerInfo.localPath,
+                );
             }
             const hasMoreQueue = async () => {
-                const queueRoot = this.ServerInfo.localPath + `/aigcpanel-queue/`;
+                const queueRoot =
+                    this.ServerInfo.localPath + `/aigcpanel-queue/`;
                 const files = await Files.list(queueRoot);
-                const validQueueFiles = files.filter(f => f.name.match(/\.queue\.json$/));
+                const validQueueFiles = files.filter((f) =>
+                    f.name.match(/\.queue\.json$/),
+                );
                 if (validQueueFiles.length > 0) {
                     const configJson = await Files.temp("json");
                     await Files.copy(validQueueFiles[0].pathname, configJson);
@@ -139,7 +164,11 @@ export const EasyServer = function (config: any) {
                             Log.error("easyServer.timeout.stop.error", e);
                         }
                     }
-                    this.ServerApi.file.appendText(this.ServerInfo.logFile, "timeout", {isDataPath: true});
+                    this.ServerApi.file.appendText(
+                        this.ServerInfo.logFile,
+                        "timeout",
+                        { isDataPath: true },
+                    );
                     if (controllerWatching.reject) {
                         controllerWatching.reject(undefined);
                     }
@@ -149,87 +178,127 @@ export const EasyServer = function (config: any) {
             controller = await this.ServerApi.app.spawnShell(command, {
                 env: envMap,
                 cwd: this.ServerInfo.localPath,
-                stdout: _data => {
+                stdout: (_data) => {
                     // console.log('easyServer.stdout', _data)
                     buffer += _data;
                     // check if has \n and process the buffer
                     let lines = buffer.split("\n");
                     buffer = lines.pop() || "";
-                    this.ServerApi.file.appendText(this.ServerInfo.logFile, _data, {isDataPath: true});
-                    const result = this.ServerApi.extractResultFromLogs(controllerWatching.id, lines.join("\n") + "\n");
+                    this.ServerApi.file.appendText(
+                        this.ServerInfo.logFile,
+                        _data,
+                        { isDataPath: true },
+                    );
+                    const result = this.ServerApi.extractResultFromLogs(
+                        controllerWatching.id,
+                        lines.join("\n") + "\n",
+                    );
                     if (result) {
                         if (controllerWatching.launcherResult) {
-                            controllerWatching.launcherResult.result = Object.assign(controllerWatching.launcherResult.result, result);
+                            controllerWatching.launcherResult.result =
+                                Object.assign(
+                                    controllerWatching.launcherResult.result,
+                                    result,
+                                );
                         }
                         if (controllerWatching.id) {
-                            this.send("taskResult", {id: controllerWatching.id, result});
+                            this.send("taskResult", {
+                                id: controllerWatching.id,
+                                result,
+                            });
                         }
                     }
                     if (controllerWatching.launcherResult) {
                         controllerWatching.launcherResult.result.error =
-                            AigcServerUtil.errorDetect(_data) || controllerWatching.launcherResult.result.error;
-                        if (controllerWatching.launcherResult.result && controllerWatching.launcherResult.result['End']) {
-                            if (controllerWatching.resolve && !controllerWatching.promiseResolved) {
+                            AigcServerUtil.errorDetect(_data) ||
+                            controllerWatching.launcherResult.result.error;
+                        if (
+                            controllerWatching.launcherResult.result &&
+                            controllerWatching.launcherResult.result["End"]
+                        ) {
+                            if (
+                                controllerWatching.resolve &&
+                                !controllerWatching.promiseResolved
+                            ) {
                                 controllerWatching.promiseResolved = true;
                                 controllerWatching.resolve(undefined);
                             }
                         }
                     }
                 },
-                stderr: _data => {
+                stderr: (_data) => {
                     // console.log('easyServer.stderr', _data)
-                    this.ServerApi.file.appendText(this.ServerInfo.logFile, _data, {isDataPath: true});
+                    this.ServerApi.file.appendText(
+                        this.ServerInfo.logFile,
+                        _data,
+                        { isDataPath: true },
+                    );
                     if (controllerWatching.launcherResult) {
                         controllerWatching.launcherResult.result.error =
-                            AigcServerUtil.errorDetect(_data) || controllerWatching.launcherResult.result.error;
+                            AigcServerUtil.errorDetect(_data) ||
+                            controllerWatching.launcherResult.result.error;
                     }
                 },
-                success: _data => {
+                success: (_data) => {
                     // console.log('easyServer.success', _data)
                     clearTimeout(timer);
                     controller = null;
-                    hasMoreQueue()
-                    if (controllerWatching.resolve && !controllerWatching.promiseResolved) {
+                    hasMoreQueue();
+                    if (
+                        controllerWatching.resolve &&
+                        !controllerWatching.promiseResolved
+                    ) {
                         controllerWatching.promiseResolved = true;
                         controllerWatching.resolve(undefined);
                     }
                 },
                 error: (_data, code) => {
                     // console.log('easyServer.error', {_data, controllerWatching})
-                    this.ServerApi.file.appendText(this.ServerInfo.logFile, `exit code ${code}`, {isDataPath: true});
+                    this.ServerApi.file.appendText(
+                        this.ServerInfo.logFile,
+                        `exit code ${code}`,
+                        { isDataPath: true },
+                    );
                     clearTimeout(timer);
                     controller = null;
-                    hasMoreQueue()
-                    if (controllerWatching.reject && !controllerWatching.promiseResolved) {
+                    hasMoreQueue();
+                    if (
+                        controllerWatching.reject &&
+                        !controllerWatching.promiseResolved
+                    ) {
                         controllerWatching.promiseResolved = true;
                         controllerWatching.reject(undefined);
                     }
                 },
-            })
+            });
         } else if (configJsonPath) {
             const queueName = `${Date.now()}.queue.json`;
-            const queuePath = this.ServerInfo.localPath + `/aigcpanel-queue/${queueName}`;
+            const queuePath =
+                this.ServerInfo.localPath + `/aigcpanel-queue/${queueName}`;
             await Files.copy(configJsonPath, queuePath);
             this.ServerApi.file.appendText(
                 this.ServerInfo.logFile,
                 `Another task is running, queued at ${queueName}`,
-                {isDataPath: true}
+                { isDataPath: true },
             );
         }
     };
     this._callFunc = async function (
         data: ServerFunctionDataType,
         configCalculator: (data: ServerFunctionDataType) => Promise<any>,
-        resultDataCalculator: (data: ServerFunctionDataType, launcherResult: LauncherResultType) => Promise<any>,
+        resultDataCalculator: (
+            data: ServerFunctionDataType,
+            launcherResult: LauncherResultType,
+        ) => Promise<any>,
         option: {
             timeout: number;
-        }
+        },
     ) {
         option = Object.assign(
             {
                 timeout: 24 * 3600,
             },
-            option
+            option,
         );
         const resultData = {
             // success, retry
@@ -250,10 +319,11 @@ export const EasyServer = function (config: any) {
         resultData.start = Date.now();
         let configJsonPath = null;
         try {
-            this.send("taskRunning", {id: data.id});
+            this.send("taskRunning", { id: data.id });
             const configData = await configCalculator(data);
             configData.setting = this.ServerInfo.setting;
-            configJsonPath = await this.ServerApi.launcherPrepareConfigJson(configData);
+            configJsonPath =
+                await this.ServerApi.launcherPrepareConfigJson(configData);
             // console.log('EasyServer.envMap', envMap)
             const launcherResult: LauncherResultType = {
                 result: {},
@@ -300,7 +370,10 @@ export const EasyServer = function (config: any) {
                     },
                 };
             },
-            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
@@ -310,7 +383,7 @@ export const EasyServer = function (config: any) {
                 return {
                     url: launcherResult.result.url,
                 };
-            }
+            },
         );
     };
     this.soundClone = async function (data: ServerFunctionDataType) {
@@ -330,7 +403,10 @@ export const EasyServer = function (config: any) {
                     },
                 };
             },
-            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
@@ -340,7 +416,7 @@ export const EasyServer = function (config: any) {
                 return {
                     url: launcherResult.result.url,
                 };
-            }
+            },
         );
     };
     this.videoGen = async function (data: ServerFunctionDataType) {
@@ -359,7 +435,10 @@ export const EasyServer = function (config: any) {
                     },
                 };
             },
-            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
@@ -369,7 +448,7 @@ export const EasyServer = function (config: any) {
                 return {
                     url: launcherResult.result.url,
                 };
-            }
+            },
         );
     };
     this.asr = async function (data: ServerFunctionDataType) {
@@ -381,13 +460,16 @@ export const EasyServer = function (config: any) {
                     id: data.id,
                     mode: "local",
                     modelConfig: {
-                        type: 'asr',
+                        type: "asr",
                         audio: data.audio,
                         param: data.param,
                     },
                 };
             },
-            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
                 if (!("records" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
@@ -397,7 +479,7 @@ export const EasyServer = function (config: any) {
                 return {
                     records: launcherResult.result.records,
                 };
-            }
+            },
         );
     };
     this.textToImage = async function (data: ServerFunctionDataType) {
@@ -415,7 +497,10 @@ export const EasyServer = function (config: any) {
                     },
                 };
             },
-            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
@@ -425,7 +510,7 @@ export const EasyServer = function (config: any) {
                 return {
                     url: launcherResult.result.url,
                 };
-            }
+            },
         );
     };
     this.imageToImage = async function (data: ServerFunctionDataType) {
@@ -444,7 +529,10 @@ export const EasyServer = function (config: any) {
                     },
                 };
             },
-            async (data: ServerFunctionDataType, launcherResult: LauncherResultType) => {
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
@@ -454,7 +542,7 @@ export const EasyServer = function (config: any) {
                 return {
                     url: launcherResult.result.url,
                 };
-            }
+            },
         );
     };
 };

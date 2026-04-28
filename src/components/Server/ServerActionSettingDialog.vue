@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {EnumServerStatus, ServerRecord} from "../../types/Server";
-import {computed, ref, toRaw} from "vue";
-import {useServerStore} from "../../store/modules/server";
-import {Dialog} from "../../lib/dialog";
-import {cloneDeep} from "lodash-es";
-import {t} from "../../lang";
+import { EnumServerStatus, ServerRecord } from "../../types/Server";
+import { computed, ref, toRaw } from "vue";
+import { useServerStore } from "../../store/modules/server";
+import { Dialog } from "../../lib/dialog";
+import { cloneDeep } from "lodash-es";
+import { t } from "../../lang";
 
 const serverStore = useServerStore();
 const props = defineProps<{
@@ -20,7 +20,10 @@ const readonly = computed(() => {
         }
         return false;
     }
-    return props.record.status !== EnumServerStatus.STOPPED && props.record.status !== EnumServerStatus.ERROR;
+    return (
+        props.record.status !== EnumServerStatus.STOPPED &&
+        props.record.status !== EnumServerStatus.ERROR
+    );
 });
 const gpus = ref<
     {
@@ -32,7 +35,7 @@ const gpus = ref<
 
 const getGpus = async () => {
     let gpus: any = [];
-    gpus.push({id: "", name: "默认", size: 0});
+    gpus.push({ id: "", name: "默认", size: 0 });
     gpus = gpus.concat(await window.$mapi.server.listGpus());
     return gpus;
 };
@@ -43,13 +46,17 @@ const show = async () => {
     settings.value = cloneDeep(props.record.settings);
     const settingValue = {};
     settings.value.forEach((s: any) => {
-        settingValue[s.name] = props.record.setting?.[s.name] || s.defaultValue || "";
+        settingValue[s.name] =
+            props.record.setting?.[s.name] || s.defaultValue || "";
     });
     setting.value = settingValue;
 };
 
 const doSubmit = async () => {
-    await serverStore.updateSetting(props.record.key, cloneDeep(toRaw(setting.value)));
+    await serverStore.updateSetting(
+        props.record.key,
+        cloneDeep(toRaw(setting.value)),
+    );
     Dialog.tipSuccess(t("common.settingSuccess"));
     visible.value = false;
 };
@@ -65,23 +72,51 @@ defineExpose({
             {{ $t("common.setting") }}
         </template>
         <template #footer>
-            <a-button type="primary" :disabled="readonly" @click="doSubmit">{{ $t("common.confirm") }}</a-button>
+            <a-button type="primary" :disabled="readonly" @click="doSubmit">{{
+                $t("common.confirm")
+            }}</a-button>
         </template>
         <div>
             <a-form :model="{}">
                 <div v-for="fs in settings">
-                    <a-form-item v-if="fs.type === 'text'" :field="fs.name" :label="fs.title">
-                        <a-input :placeholder="fs.placeholder" :readonly="readonly" v-model="setting[fs.name]"/>
+                    <a-form-item
+                        v-if="fs.type === 'text'"
+                        :field="fs.name"
+                        :label="fs.title"
+                    >
+                        <a-input
+                            :placeholder="fs.placeholder"
+                            :readonly="readonly"
+                            v-model="setting[fs.name]"
+                        />
                     </a-form-item>
-                    <a-form-item v-else-if="fs.type === 'radio'" :field="fs.name" :label="fs.title">
-                        <a-radio-group v-model="setting[fs.name]" :disabled="readonly">
-                            <a-radio v-for="option in fs.options" :key="option.value" :value="option.value"
-                            >{{ option.label }}
+                    <a-form-item
+                        v-else-if="fs.type === 'radio'"
+                        :field="fs.name"
+                        :label="fs.title"
+                    >
+                        <a-radio-group
+                            v-model="setting[fs.name]"
+                            :disabled="readonly"
+                        >
+                            <a-radio
+                                v-for="option in fs.options"
+                                :key="option.value"
+                                :value="option.value"
+                                >{{ option.label }}
                             </a-radio>
                         </a-radio-group>
                     </a-form-item>
-                    <a-form-item v-else-if="fs.type === 'gpuSelector'" :field="fs.name" :label="fs.title">
-                        <a-input v-model="setting[fs.name]" :disabled="readonly" :placeholder="fs.placeholder">
+                    <a-form-item
+                        v-else-if="fs.type === 'gpuSelector'"
+                        :field="fs.name"
+                        :label="fs.title"
+                    >
+                        <a-input
+                            v-model="setting[fs.name]"
+                            :disabled="readonly"
+                            :placeholder="fs.placeholder"
+                        >
                         </a-input>
                         <!--                        <a-select v-model="setting[fs.name]"-->
                         <!--                                  :disabled="readonly">-->

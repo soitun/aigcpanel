@@ -19,40 +19,44 @@ const props = defineProps<{
     dialog: boolean;
     onRefresh: () => void;
 }>();
-
 </script>
 
 <template>
     <div class="rounded-xl shadow border p-4 mb-4 hover:shadow-lg">
         <div class="flex items-center gap-1">
-            <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
+            <div
+                class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2"
+            >
                 <div v-if="!dialog" class="mr-2 h-8 pt-0.5">
-                    <a-checkbox v-model="record['_check']"/>
+                    <a-checkbox v-model="record['_check']" />
                 </div>
                 <div class="">
                     <TaskTitleField
                         :record="record"
                         :disabled="dialog"
                         @title-click="record['_check'] = !record['_check']"
-                        @update="v => (record.title = v)"
+                        @update="(v) => (record.title = v)"
                     />
                 </div>
             </div>
             <div class="flex-grow"></div>
-            <TaskDuration :start="record.startTime" :end="record.endTime"/>
-            <TaskBizStatus :status="record.status" :status-msg="record.statusMsg"/>
+            <TaskDuration :start="record.startTime" :end="record.endTime" />
+            <TaskBizStatus
+                :status="record.status"
+                :status-msg="record.statusMsg"
+            />
         </div>
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
-                    <icon-file/>
+                    <icon-file />
                     {{ "分割文本" }}
                 </div>
             </div>
             <div class="flex-grow pt-1">
                 <TaskJobResultStepView :record="record" step="SplitText">
                     <div class="bg-gray-100 rounded-lg p-2">
-                        <TextTruncateView :text="record.modelConfig.text"/>
+                        <TextTruncateView :text="record.modelConfig.text" />
                     </div>
                 </TaskJobResultStepView>
             </div>
@@ -60,7 +64,7 @@ const props = defineProps<{
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
-                    <icon-file-audio/>
+                    <icon-file-audio />
                     {{ "音频合成" }}
                 </div>
             </div>
@@ -68,16 +72,29 @@ const props = defineProps<{
                 <TaskJobResultStepView :record="record" step="SoundGenerate">
                     <template #successRunning>
                         <div class="bg-gray-100 rounded-lg p-2">
-                            <ItemsLimitedView toggle-biz="LongTextTts"
-                                              :toggle-id="record.id!"
-                                              :records="record.jobResult?.SoundGenerate?.records||[]">
-                                <template #default="{item}">
+                            <ItemsLimitedView
+                                toggle-biz="LongTextTts"
+                                :toggle-id="record.id!"
+                                :records="
+                                    record.jobResult?.SoundGenerate?.records ||
+                                    []
+                                "
+                            >
+                                <template #default="{ item }">
                                     <div class="flex items-start mb-1">
                                         <div class="w-6 flex-shrink-0">
-                                            <AudioPlayerButton v-if="item.audio" :source="item.audio"/>
-                                            <icon-info-circle v-else class="text-gray-400 text-xs"/>
+                                            <AudioPlayerButton
+                                                v-if="item.audio"
+                                                :source="item.audio"
+                                            />
+                                            <icon-info-circle
+                                                v-else
+                                                class="text-gray-400 text-xs"
+                                            />
                                         </div>
-                                        <div class="text-xs">{{ item.text }}</div>
+                                        <div class="text-xs">
+                                            {{ item.text }}
+                                        </div>
                                     </div>
                                 </template>
                             </ItemsLimitedView>
@@ -85,40 +102,40 @@ const props = defineProps<{
                     </template>
                 </TaskJobResultStepView>
                 <div class="mt-1 flex gap-1">
-                    <SoundGenerateFormViewBody :data="record.modelConfig?.soundGenerate!"/>
+                    <SoundGenerateFormViewBody
+                        :data="record.modelConfig?.soundGenerate!"
+                    />
                 </div>
             </div>
         </div>
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
-                    <icon-file-audio/>
+                    <icon-file-audio />
                     {{ "合并音频" }}
                 </div>
             </div>
             <div class="flex-grow">
                 <TaskJobResultStepView :record="record" step="Combine">
                     <div>
-                        <AudioPlayer :url="record.result?.url"/>
+                        <AudioPlayer :url="record.result?.url" />
                     </div>
                 </TaskJobResultStepView>
             </div>
         </div>
         <div class="pt-4 flex items-center">
-            <div class="text-gray-400 text-xs mr-2">
-                #{{ record.id }}
-            </div>
+            <div class="text-gray-400 text-xs mr-2">#{{ record.id }}</div>
             <div class="text-gray-400 flex-grow">
-                <timeago :datetime="record['createdAt'] * 1000"/>
+                <timeago :datetime="record['createdAt'] * 1000" />
             </div>
             <div class="">
-                <TaskDownloadAction :record="record"/>
+                <TaskDownloadAction :record="record" />
                 <TaskDeleteAction
                     v-if="!dialog"
                     :record="record"
                     @update="onRefresh"
                 />
-                <TaskContinueAction :record="record" @update="onRefresh"/>
+                <TaskContinueAction :record="record" @update="onRefresh" />
             </div>
         </div>
     </div>

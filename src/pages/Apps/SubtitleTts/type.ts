@@ -1,5 +1,5 @@
-import {AudioRecord} from "../../../lib/ffmpeg";
-import {TaskJobResultStepStatus} from "../../../service/TaskService";
+import { AudioRecord } from "../../../lib/ffmpeg";
+import { TaskJobResultStepStatus } from "../../../service/TaskService";
 
 export type SubtitleTtsModelConfigType = {
     srt: string;
@@ -15,15 +15,15 @@ export type SubtitleTtsJobResultType = {
     step: "ParseSrt" | "SoundGenerate" | "Combine" | "End";
 
     ParseSrt: {
-        status: TaskJobResultStepStatus,
+        status: TaskJobResultStepStatus;
         records: { start: number; end: number; text: string }[];
     };
     SoundGenerate: {
-        status: TaskJobResultStepStatus,
+        status: TaskJobResultStepStatus;
         records: AudioRecord[] | null;
     };
     Combine: {
-        status: TaskJobResultStepStatus,
+        status: TaskJobResultStepStatus;
         records: AudioRecord[] | null;
         audio: string;
     };

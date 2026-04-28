@@ -16,11 +16,15 @@ const doRetry = async () => {
     Dialog.loadingOn(t("status.retrying"));
     try {
         await sleep(500);
-        await TaskService.update(record.id as any, {
-            status: 'queue',
-            jobResult: {},
-            result: {},
-        }, { mergeResult: false });
+        await TaskService.update(
+            record.id as any,
+            {
+                status: "queue",
+                jobResult: {},
+                result: {},
+            },
+            { mergeResult: false },
+        );
         await taskStore.dispatch(record.biz, record.id as any);
         Dialog.loadingOff();
         Dialog.tipSuccess(t("common.retrySuccess"));

@@ -7,7 +7,9 @@ import { TaskRecord, TaskService } from "../../../../service/TaskService";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 import VideoGenForm from "../../../Video/components/VideoGenForm.vue";
 
-const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(null);
+const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(
+    null,
+);
 const videoGenForm = ref<InstanceType<typeof VideoGenForm> | null>(null);
 
 const formData = ref({
@@ -21,12 +23,12 @@ onMounted(async () => {
 
 watch(
     () => formData.value,
-    async value => {
+    async (value) => {
         StorageUtil.set("VideoGenFlowCreate.formData", value);
     },
     {
         deep: true,
-    }
+    },
 );
 
 const doSubmit = async () => {
@@ -75,7 +77,7 @@ const emit = defineEmits({
         <div class="mb-4">
             <a-textarea
                 v-model="formData.text"
-                :auto-size="{minRows: 2}"
+                :auto-size="{ minRows: 2 }"
                 :placeholder="'输入语音内容开始生成视频'"
             ></a-textarea>
         </div>

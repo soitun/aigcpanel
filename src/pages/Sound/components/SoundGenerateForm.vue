@@ -43,12 +43,12 @@ onMounted(async () => {
 });
 watch(
     () => formData.value,
-    async value => {
+    async (value) => {
         StorageUtil.set("SoundGenerateForm.formData", value);
     },
     {
         deep: true,
-    }
+    },
 );
 
 const getValue = async (): Promise<SoundGenerateParamType | undefined> => {
@@ -97,7 +97,9 @@ const getValue = async (): Promise<SoundGenerateParamType | undefined> => {
         data.serverName = server.name;
         data.serverTitle = server.title;
         data.serverVersion = server.version;
-        data.cloneParam = cloneParamForm.value ? cloneParamForm.value.getValue() : {};
+        data.cloneParam = cloneParamForm.value
+            ? cloneParamForm.value.getValue()
+            : {};
         if (!data.cloneParam) {
             Dialog.tipError(t("error.voiceParamInvalid"));
             return;
@@ -177,7 +179,10 @@ defineExpose({
                 </a-radio-group>
             </div>
         </div>
-        <div v-if="formData.type === 'SoundTts'" class="flex items-start min-h-8">
+        <div
+            v-if="formData.type === 'SoundTts'"
+            class="flex items-start min-h-8"
+        >
             <div class="mr-1 pt-2">
                 <a-tooltip :content="$t('voice.synthesisModel')" mini>
                     <i class="iconfont icon-server"></i>
@@ -192,11 +197,17 @@ defineExpose({
                     />
                 </div>
                 <div>
-                    <ServerContentInfoAction :config="ttsModelConfig as any" func="soundTts" />
+                    <ServerContentInfoAction
+                        :config="ttsModelConfig as any"
+                        func="soundTts"
+                    />
                 </div>
             </div>
         </div>
-        <div v-if="formData.type === 'SoundClone'" class="flex items-start min-h-8 gap-1">
+        <div
+            v-if="formData.type === 'SoundClone'"
+            class="flex items-start min-h-8 gap-1"
+        >
             <div class="mr-1 pt-2">
                 <a-tooltip :content="$t('voice.cloneModel')" mini>
                     <i class="iconfont icon-server"></i>
@@ -211,11 +222,17 @@ defineExpose({
                     />
                 </div>
                 <div class="">
-                    <ServerContentInfoAction :config="cloneModelConfig as any" func="soundClone" />
+                    <ServerContentInfoAction
+                        :config="cloneModelConfig as any"
+                        func="soundClone"
+                    />
                 </div>
             </div>
         </div>
-        <div v-if="formData.type === 'SoundClone'" class="flex items-center min-h-8 mt-2 gap-2">
+        <div
+            v-if="formData.type === 'SoundClone'"
+            class="flex items-center min-h-8 mt-2 gap-2"
+        >
             <div class="">
                 <a-tooltip :content="$t('voice.timbre')" mini>
                     <i class="iconfont icon-sound-prompt"></i>
@@ -227,13 +244,19 @@ defineExpose({
         </div>
         <div
             class="flex flex-wrap items-center mt-2"
-            v-if="formData.type === 'SoundTts' && ttsParam && ttsParam.length > 0"
+            v-if="
+                formData.type === 'SoundTts' && ttsParam && ttsParam.length > 0
+            "
         >
             <ParamForm ref="ttsParamForm" :param="ttsParam" />
         </div>
         <div
             class="flex flex-wrap items-center mt-2"
-            v-else-if="formData.type === 'SoundClone' && cloneParam && cloneParam.length > 0"
+            v-else-if="
+                formData.type === 'SoundClone' &&
+                cloneParam &&
+                cloneParam.length > 0
+            "
         >
             <ParamForm ref="cloneParamForm" :param="cloneParam" />
         </div>

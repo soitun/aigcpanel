@@ -1,9 +1,19 @@
-import {BrowserView, BrowserWindow} from "electron";
-import {AppsMain} from "../mapi/app/main";
+import { BrowserView, BrowserWindow } from "electron";
+import { AppsMain } from "../mapi/app/main";
 
-type HookType = never | "Show" | "Hide" | "EnterFullScreen" | "LeaveFullScreen" | "ShowQuitConfirmDialog";
+type HookType =
+    | never
+    | "Show"
+    | "Hide"
+    | "EnterFullScreen"
+    | "LeaveFullScreen"
+    | "ShowQuitConfirmDialog";
 
-export const executeHooks = async (win: BrowserWindow, hook: HookType, data?: any) => {
+export const executeHooks = async (
+    win: BrowserWindow,
+    hook: HookType,
+    data?: any,
+) => {
     const evalJs = `
     if(window.__page && window.__page.hooks && typeof window.__page.hooks.on${hook} === 'function' ) {
         try {
@@ -19,13 +29,13 @@ export const executeDarkMode = async (
     view: BrowserWindow | BrowserView,
     data: {
         isSystem: boolean;
-    }
+    },
 ) => {
     data = Object.assign(
         {
             isSystem: false,
         },
-        data
+        data,
     );
     if (await AppsMain.shouldDarkMode()) {
         // body and html
@@ -34,7 +44,9 @@ export const executeDarkMode = async (
         document.documentElement.setAttribute('data-theme', 'dark');
         `);
         if (data.isSystem) {
-            view.webContents.executeJavaScript(`document.body.setAttribute('arco-theme', 'dark');`);
+            view.webContents.executeJavaScript(
+                `document.body.setAttribute('arco-theme', 'dark');`,
+            );
         }
     }
 };

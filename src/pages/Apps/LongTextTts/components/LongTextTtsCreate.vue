@@ -12,7 +12,10 @@ const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm>>();
 const formData = ref({
     text: "",
 });
-const {clearDraft} = dataAutoSaveDraft("LongTextTtsCreate.formData", formData.value);
+const { clearDraft } = dataAutoSaveDraft(
+    "LongTextTtsCreate.formData",
+    formData.value,
+);
 
 const doSubmit = async () => {
     const soundGenerateValue = await soundGenerateForm.value?.getValue();
@@ -54,7 +57,7 @@ const doSubmit = async () => {
                 :auto-size="{ minRows: 6, maxRows: 20 }"
             />
         </div>
-        <SoundGenerateForm ref="soundGenerateForm"/>
+        <SoundGenerateForm ref="soundGenerateForm" />
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 <i class="iconfont icon-submit mr-2"></i>

@@ -1,15 +1,18 @@
 <script setup lang="ts" generic="T">
-import {ToggleUtil} from "../../lib/toggle";
-import {computed} from "vue";
+import { ToggleUtil } from "../../lib/toggle";
+import { computed } from "vue";
 
-const props = withDefaults(defineProps<{
-    records: T[];
-    limit?: number;
-    toggleBiz: string;
-    toggleId: string | number;
-}>(), {
-    limit: 5,
-});
+const props = withDefaults(
+    defineProps<{
+        records: T[];
+        limit?: number;
+        toggleBiz: string;
+        toggleId: string | number;
+    }>(),
+    {
+        limit: 5,
+    },
+);
 
 defineSlots<{
     default(props: { item: T; index: number }): any;
@@ -17,10 +20,12 @@ defineSlots<{
 
 const visibleRecords = computed(() => {
     return props.records.filter((o, i) => {
-        return i < props.limit! || ToggleUtil.get(props.toggleBiz, props.toggleId, false).value;
+        return (
+            i < props.limit! ||
+            ToggleUtil.get(props.toggleBiz, props.toggleId, false).value
+        );
     });
 });
-
 </script>
 
 <template>
@@ -37,7 +42,7 @@ const visibleRecords = computed(() => {
             @click="ToggleUtil.toggle(toggleBiz, toggleId)"
         >
             <template #icon>
-                <icon-down/>
+                <icon-down />
             </template>
             {{ $t("common.expand") }}
         </a-button>
@@ -45,9 +50,10 @@ const visibleRecords = computed(() => {
             v-else
             size="mini"
             class="px-1"
-            @click="ToggleUtil.toggle(toggleBiz, toggleId)">
+            @click="ToggleUtil.toggle(toggleBiz, toggleId)"
+        >
             <template #icon>
-                <icon-up/>
+                <icon-up />
             </template>
             {{ $t("common.collapse") }}
         </a-button>

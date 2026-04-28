@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {TaskJobResultStepStatus, TaskRecord} from "../../service/TaskService";
-import {computed} from "vue";
+import { TaskJobResultStepStatus, TaskRecord } from "../../service/TaskService";
+import { computed } from "vue";
 
 const props = defineProps<{
     record: TaskRecord;
@@ -25,7 +25,11 @@ const stepData = computed(() => {
         <slot name="successPending"></slot>
     </div>
     <div
-        v-else-if="stepData && stepData.status === 'running' && record.status === 'running'"
+        v-else-if="
+            stepData &&
+            stepData.status === 'running' &&
+            record.status === 'running'
+        "
         class="w-full bg-gray-100 rounded-lg"
     >
         <div class="text-gray-400 text-xs p-2">
@@ -36,7 +40,11 @@ const stepData = computed(() => {
         <slot name="successRunning"></slot>
     </div>
     <div
-        v-else-if="stepData && stepData.status === 'running' && record.status === 'fail'"
+        v-else-if="
+            stepData &&
+            stepData.status === 'running' &&
+            record.status === 'fail'
+        "
         class="w-full bg-gray-100 rounded-lg"
     >
         <div class="text-red-400 text-xs p-2">
@@ -44,7 +52,10 @@ const stepData = computed(() => {
             {{ $t("error.processError") }}
         </div>
     </div>
-    <div v-else-if="stepData && stepData.status === 'fail'" class="w-full bg-gray-100 rounded-lg">
+    <div
+        v-else-if="stepData && stepData.status === 'fail'"
+        class="w-full bg-gray-100 rounded-lg"
+    >
         <div class="text-red-400 text-xs p-2">
             <icon-info-circle />
             {{ $t("error.processError") }}

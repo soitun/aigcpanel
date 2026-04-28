@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import { ref } from "vue";
 import AudioPlayer from "../../../components/common/AudioPlayer.vue";
-import {AudioUtil} from "../../../lib/audio";
+import { AudioUtil } from "../../../lib/audio";
 import WebFileSelectButton from "../../../components/common/WebFileSelectButton.vue";
-import {Dialog} from "../../../lib/dialog";
-import {t} from "../../../lang";
-import {StorageService} from "../../../service/StorageService";
-import {DataService} from "../../../service/DataService";
+import { Dialog } from "../../../lib/dialog";
+import { t } from "../../../lang";
+import { StorageService } from "../../../service/StorageService";
+import { DataService } from "../../../service/DataService";
 
 const visible = ref(false);
 const audioPlayer = ref<InstanceType<typeof AudioPlayer>>();
@@ -24,7 +24,7 @@ const add = () => {
     visible.value = true;
 };
 
-const onSelectFile = async file => {
+const onSelectFile = async (file) => {
     await audioPlayer.value?.setRecordFromFile(file);
 };
 
@@ -42,7 +42,10 @@ const doSave = async () => {
         Dialog.tipError(t("hint.inputRefText"));
         return;
     }
-    const exists = await StorageService.getByTitle("SoundPrompt", formData.value.name);
+    const exists = await StorageService.getByTitle(
+        "SoundPrompt",
+        formData.value.name,
+    );
     if (exists) {
         Dialog.tipError(t("error.nameDuplicate"));
         return;
@@ -91,7 +94,10 @@ const emit = defineEmits({
                         <a-form-item :label="$t('common.name')" required>
                             <a-input v-model="formData.name" />
                         </a-form-item>
-                        <a-form-item :label="$t('voice.referenceAudio')" required>
+                        <a-form-item
+                            :label="$t('voice.referenceAudio')"
+                            required
+                        >
                             <div class="w-full">
                                 <div class="mb-3">
                                     <a-alert>
@@ -99,15 +105,25 @@ const emit = defineEmits({
                                     </a-alert>
                                 </div>
                                 <div class="mb-3">
-                                    <AudioPlayer ref="audioPlayer" show-wave trim-enable record-enable />
+                                    <AudioPlayer
+                                        ref="audioPlayer"
+                                        show-wave
+                                        trim-enable
+                                        record-enable
+                                    />
                                 </div>
-                                <div class="mb-3 text-gray-400 flex items-center">
+                                <div
+                                    class="mb-3 text-gray-400 flex items-center"
+                                >
                                     <div class="flex-grow text-sm">
                                         <icon-info-circle />
                                         {{ $t("hint.audioFormat") }}
                                     </div>
                                     <div>
-                                        <WebFileSelectButton @select-file="onSelectFile" accept="audio/wav,audio/mp3">
+                                        <WebFileSelectButton
+                                            @select-file="onSelectFile"
+                                            accept="audio/wav,audio/mp3"
+                                        >
                                             <a-button>
                                                 <template #icon>
                                                     <icon-upload />
@@ -119,7 +135,10 @@ const emit = defineEmits({
                                 </div>
                             </div>
                         </a-form-item>
-                        <a-form-item :label="$t('voice.referenceText')" required>
+                        <a-form-item
+                            :label="$t('voice.referenceText')"
+                            required
+                        >
                             <div class="w-full">
                                 <div class="mb-3">
                                     <a-input v-model="formData.promptText" />
@@ -133,8 +152,12 @@ const emit = defineEmits({
                     </a-form>
                 </div>
                 <div class="flex-grow">
-                    <div class="text-lg font-bold">{{ $t("voice.timbreDesc") }}</div>
-                    <div class="bg-gray-100 mt-2 p-3 rounded-lg leading-6 text-xs">
+                    <div class="text-lg font-bold">
+                        {{ $t("voice.timbreDesc") }}
+                    </div>
+                    <div
+                        class="bg-gray-100 mt-2 p-3 rounded-lg leading-6 text-xs"
+                    >
                         <div>{{ $t("guide.audioReq1") }}</div>
                         <div>{{ $t("guide.audioReq2") }}</div>
                         <div>{{ $t("guide.audioReq3") }}</div>

@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import {EnumServerStatus, EnumServerType, ServerRecord} from "../../types/Server";
-import {Dialog} from "../../lib/dialog";
-import {t} from "../../lang";
-import {sleep} from "../../lib/util";
-import {useServerStore} from "../../store/modules/server";
-import {computed} from "vue";
+import {
+    EnumServerStatus,
+    EnumServerType,
+    ServerRecord,
+} from "../../types/Server";
+import { Dialog } from "../../lib/dialog";
+import { t } from "../../lang";
+import { sleep } from "../../lib/util";
+import { useServerStore } from "../../store/modules/server";
+import { computed } from "vue";
 
 const serverStore = useServerStore();
 
@@ -17,7 +21,12 @@ const emit = defineEmits({
 
 const doDelete = async () => {
     const record = props.record;
-    await Dialog.confirm(t("model.deleteConfirm", {title: record.title, version: record.version}));
+    await Dialog.confirm(
+        t("model.deleteConfirm", {
+            title: record.title,
+            version: record.version,
+        }),
+    );
     Dialog.loadingOn(t("status.deleting"));
     await sleep(500);
     await serverStore.delete(record);

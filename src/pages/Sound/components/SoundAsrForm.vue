@@ -29,12 +29,12 @@ onMounted(async () => {
 
 watch(
     () => formData.value,
-    async value => {
+    async (value) => {
         StorageUtil.set("SoundAsrForm.formData", value);
     },
     {
         deep: true,
-    }
+    },
 );
 
 const getValue = async (): Promise<SoundAsrParamType | undefined> => {
@@ -96,10 +96,17 @@ defineExpose({
             </div>
             <div class="flex-grow flex flex-wrap gap-1">
                 <div>
-                    <ServerSelector v-model="formData.serverKey" @update="onServerUpdate" functionName="asr" />
+                    <ServerSelector
+                        v-model="formData.serverKey"
+                        @update="onServerUpdate"
+                        functionName="asr"
+                    />
                 </div>
                 <div class="">
-                    <ServerContentInfoAction :config="modelConfig as any" func="asr" />
+                    <ServerContentInfoAction
+                        :config="modelConfig as any"
+                        func="asr"
+                    />
                 </div>
             </div>
         </div>
