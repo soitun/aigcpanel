@@ -29,7 +29,7 @@ const deviceName = computed(() => {
             <div
                 class="bg-green-100 text-green-600 rounded-lg px-1 leading-6 h-6 inline-flex items-center"
             >
-                <i class="iconfont icon-cuda"></i>
+                <i-mdi-expansion-card class="w-4 h-4" />
                 <div v-if="deviceName">
                     {{ deviceName }}
                 </div>
@@ -39,7 +39,7 @@ const deviceName = computed(() => {
             <div
                 class="bg-yellow-100 text-yellow-600 rounded-lg px-1 leading-6 h-6 inline-flex items-center"
             >
-                <i class="iconfont icon-cpu"></i>
+                <i-mdi-cpu-64-bit class="w-4 h-4" />
                 <div v-if="deviceName">
                     {{ deviceName }}
                 </div>

@@ -272,59 +272,75 @@ const createApp = (port: number) => {
                 sendJson(res, 400, { code: -1, msg: "Missing taskId" });
                 return;
             }
-            const record = await DBMain.first(
-                "SELECT * FROM data_task WHERE id = ?",
-                [taskId],
-            );
-            if (!record) {
-                sendJson(res, 200, {
-                    code: 0,
-                    data: { status: "error", error: "Task not found" },
-                });
-                return;
-            }
-            if (record.status === "success") {
-                let result: any = null;
-                try {
-                    const parsed = JSON.parse(record.result);
-                    if (parsed && Object.keys(parsed).length > 0) {
-                        result = parsed;
-                    }
-                } catch (_) {}
-                if (result) {
-                    sendJson(res, 200, {
-                        code: 0,
-                        data: {
-                            status: "success",
-                            result: {
+            const LONG_POLL_MS = 60_000;
+            const POLL_INTERVAL_MS = 500;
+            const deadline = Date.now() + LONG_POLL_MS;
+            const queryOnce = async () => {
+                const record = await DBMain.first(
+                    "SELECT * FROM data_task WHERE id = ?",
+                    [taskId],
+                );
+                if (!record) {
+                    return {
+                        done: true,
+                        payload: {
+                            code: 0,
+                            data: { status: "error", error: "Task not found" },
+                        },
+                    };
+                }
+                if (record.status === "success") {
+                    let result: any = null;
+                    try {
+                        const parsed = JSON.parse(record.result);
+                        if (parsed && Object.keys(parsed).length > 0)
+                            result = parsed;
+                    } catch (_) {}
+                    if (result) {
+                        return {
+                            done: true,
+                            payload: {
                                 code: 0,
-                                msg: "ok",
                                 data: {
-                                    type: "success",
-                                    start: record.startTime || 0,
-                                    end: record.endTime || 0,
-                                    data: result,
+                                    status: "success",
+                                    result: {
+                                        code: 0,
+                                        msg: "ok",
+                                        data: {
+                                            type: "success",
+                                            start: record.startTime || 0,
+                                            end: record.endTime || 0,
+                                            data: result,
+                                        },
+                                    },
                                 },
                             },
+                        };
+                    }
+                } else if (record.status === "fail") {
+                    return {
+                        done: true,
+                        payload: {
+                            code: 0,
+                            data: {
+                                status: "error",
+                                error: record.statusMsg || "Task failed",
+                            },
                         },
-                    });
-                } else {
-                    sendJson(res, 200, {
-                        code: 0,
-                        data: { status: "pending" },
-                    });
+                    };
                 }
-            } else if (record.status === "fail") {
-                sendJson(res, 200, {
-                    code: 0,
-                    data: {
-                        status: "error",
-                        error: record.statusMsg || "Task failed",
-                    },
-                });
-            } else {
-                sendJson(res, 200, { code: 0, data: { status: "pending" } });
+                return { done: false, payload: null };
+            };
+            while (true) {
+                const { done, payload } = await queryOnce();
+                if (done) {
+                    sendJson(res, 200, payload!);
+                    return;
+                }
+                if (Date.now() >= deadline) break;
+                await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
             }
+            sendJson(res, 200, { code: 0, data: { status: "pending" } });
         } catch (e) {
             sendJson(res, 500, { code: -1, msg: `Internal error: ${e}` });
         }

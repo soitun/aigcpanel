@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+- Add：Video preview auto-conversion for non-H264/MOV formats using ffmpeg | 视频预览自动转码，非 H264/MOV 格式自动转换为可预览格式
+- Add：File existence validation before task submission in ImageToImage, SoundReplace, SubtitleTts, SoundAsr, and SoundGenerate | 提交任务前增加文件存在性校验，适用于图生图、声音替换、字幕合成、语音识别等功能
+- Add：`ffmpegVideoPreview` and `ffprobeVideoCodec` utilities for video codec detection and conversion | 新增视频编码检测与预览转换工具函数
+- Optimize：Migrate iconfont icons to MDI icons via unplugin-icons across all components | 全局图标迁移，使用 unplugin-icons MDI 图标替换 iconfont 图标
+- Optimize：Add null guards for SoundGenerateFormViewBody, TextToImageFormViewBody, and SoundReplaceItem components | 表单视图组件增加空值保护，修复潜在渲染错误
+- Optimize：Make ModelAgentButton props (systemPrompt, title, placeholder, formItems) optional | ModelAgentButton 组件属性改为可选，提升组件灵活性
+- Add：`window.__debug` helper for in-app navigation and DOM inspection during development | 新增 window.__debug 调试工具，支持路由导航和 DOM 查询
 - 新增：HTTP Server 增加接口文档页面 (`/doc`)，支持在设置界面一键打开 | Add HTTP Server API documentation page (`/doc`) with one-click access from settings
 - 优化：HTTP Server 重构为 Express.js 框架，API 由大模型代理改为 AIGC 服务任务调度 | Refactor HTTP Server to Express.js; API redesigned from LLM proxy to AIGC server task dispatcher
 - 优化：设置界面移除内联接口地址展示，改为独立接口文档页面 | Replace inline API address display in settings with dedicated documentation page

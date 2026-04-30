@@ -16,67 +16,30 @@ const versions = [
         up: async (db: DB) => {
             await db.execute(`CREATE TABLE IF NOT EXISTS data_sound_tts (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-                    serverName TEXT,
-                    serverTitle TEXT,
-                    serverVersion TEXT,
-                    text TEXT,
-                    param TEXT,
-
-                    status TEXT,
-                    statusMsg TEXT,
-                    jobResult TEXT,
-                    startTime INTEGER,
-                    endTime INTEGER,
-                    resultWav TEXT
+                    serverName TEXT, serverTitle TEXT, serverVersion TEXT,
+                    text TEXT, param TEXT,
+                    status TEXT, statusMsg TEXT, jobResult TEXT,
+                    startTime INTEGER, endTime INTEGER, resultWav TEXT
             )`);
             await db.execute(`CREATE TABLE IF NOT EXISTS data_sound_clone (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-                    serverName TEXT,
-                    serverTitle TEXT,
-                    serverVersion TEXT,
-                    promptName TEXT,
-                    promptWav TEXT,
-                    promptText TEXT,
-                    text TEXT,
-                    param TEXT,
-
-                    status TEXT,
-                    statusMsg TEXT,
-                    jobResult TEXT,
-                    startTime INTEGER,
-                    endTime INTEGER,
-                    resultWav TEXT
+                    serverName TEXT, serverTitle TEXT, serverVersion TEXT,
+                    promptName TEXT, promptWav TEXT, promptText TEXT,
+                    text TEXT, param TEXT,
+                    status TEXT, statusMsg TEXT, jobResult TEXT,
+                    startTime INTEGER, endTime INTEGER, resultWav TEXT
             )`);
-            await db.execute(`CREATE TABLE IF NOT EXISTS data_video_template (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-                    name TEXT,
-                    video TEXT
-            )`);
+            await db.execute(
+                `CREATE TABLE IF NOT EXISTS data_video_template (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, video TEXT)`,
+            );
             await db.execute(`CREATE TABLE IF NOT EXISTS data_video_gen (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-                    serverName TEXT,
-                    serverTitle TEXT,
-                    serverVersion TEXT,
-                    videoTemplateId INTEGER,
-                    videoTemplateName TEXT,
-                    soundType TEXT,
-                    soundTtsId INTEGER,
-                    soundTtsText TEXT,
-                    soundCloneId INTEGER,
-                    soundCloneText TEXT,
-
-                    param TEXT,
-
-                    status TEXT,
-                    statusMsg TEXT,
-                    jobResult TEXT,
-                    startTime INTEGER,
-                    endTime INTEGER,
-                    resultMp4 TEXT
+                    serverName TEXT, serverTitle TEXT, serverVersion TEXT,
+                    videoTemplateId INTEGER, videoTemplateName TEXT,
+                    soundType TEXT, soundTtsId INTEGER, soundTtsText TEXT,
+                    soundCloneId INTEGER, soundCloneText TEXT, param TEXT,
+                    status TEXT, statusMsg TEXT, jobResult TEXT,
+                    startTime INTEGER, endTime INTEGER, resultMp4 TEXT
             )`);
         },
     },
@@ -107,26 +70,12 @@ const versions = [
         up: async (db: DB) => {
             await db.execute(`CREATE TABLE IF NOT EXISTS data_task (
                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-
                    createdAt INTEGER DEFAULT (strftime('%s', 'now')),
                    updatedAt INTEGER DEFAULT (strftime('%s', 'now')),
-
                    biz TEXT,
-
-                   status TEXT,
-                   statusMsg TEXT,
-                   startTime INTEGER,
-                   endTime INTEGER,
-
-                   serverName TEXT,
-                   serverTitle TEXT,
-                   serverVersion TEXT,
-
-                   param TEXT,
-                   jobResult TEXT,
-                   modelConfig TEXT,
-                   result TEXT
-
+                   status TEXT, statusMsg TEXT, startTime INTEGER, endTime INTEGER,
+                   serverName TEXT, serverTitle TEXT, serverVersion TEXT,
+                   param TEXT, jobResult TEXT, modelConfig TEXT, result TEXT
             )`);
         },
     },
@@ -154,9 +103,7 @@ const versions = [
                         promptText: r.promptText,
                         text: r.text,
                     }),
-                    JSON.stringify({
-                        url: r.resultWav,
-                    }),
+                    JSON.stringify({ url: r.resultWav }),
                 ];
                 await db.insert(
                     `INSERT INTO data_task
@@ -179,12 +126,8 @@ const versions = [
                     r.serverVersion,
                     r.param,
                     r.jobResult,
-                    JSON.stringify({
-                        text: r.text,
-                    }),
-                    JSON.stringify({
-                        url: r.resultWav,
-                    }),
+                    JSON.stringify({ text: r.text }),
+                    JSON.stringify({ url: r.resultWav }),
                 ];
                 await db.insert(
                     `INSERT INTO data_task
@@ -217,9 +160,7 @@ const versions = [
                         soundCloneText: r.soundCloneText,
                         soundCustomFile: r.soundCustomFile,
                     }),
-                    JSON.stringify({
-                        url: r.resultMp4,
-                    }),
+                    JSON.stringify({ url: r.resultMp4 }),
                 ];
                 await db.insert(
                     `INSERT INTO data_task
@@ -235,16 +176,9 @@ const versions = [
         up: async (db: DB) => {
             await db.execute(`CREATE TABLE IF NOT EXISTS data_storage (
                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-
                    createdAt INTEGER DEFAULT (strftime('%s', 'now')),
                    updatedAt INTEGER DEFAULT (strftime('%s', 'now')),
-
-                   biz TEXT,
-
-                   title TEXT,
-                   sort INTEGER,
-                   content TEXT
-
+                   biz TEXT, title TEXT, sort INTEGER, content TEXT
             )`);
         },
     },
@@ -352,15 +286,17 @@ const versions = [
     {
         version: 10,
         up: async (db: DB) => {
-            await db.execute(`ALTER TABLE data_task
-                ADD COLUMN type INTEGER DEFAULT 1`);
+            await db.execute(
+                `ALTER TABLE data_task ADD COLUMN type INTEGER DEFAULT 1`,
+            );
         },
     },
     {
         version: 11,
         up: async (db: DB) => {
-            await db.execute(`ALTER TABLE data_video_template
-                ADD COLUMN info TEXT`);
+            await db.execute(
+                `ALTER TABLE data_video_template ADD COLUMN info TEXT`,
+            );
         },
     },
 ];

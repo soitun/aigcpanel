@@ -33,7 +33,7 @@ const dynamicComponent = computed(() => {
                 @click="tab = 'videoGen'"
             >
                 <div class="text-base truncate flex items-center">
-                    <i class="iconfont icon-video w-6 inline-block"></i>
+                    <i-mdi-video-outline class="w-6 h-6 inline-block" />
                     {{ t("avatar.synthesis") }}
                 </div>
             </div>
@@ -43,9 +43,7 @@ const dynamicComponent = computed(() => {
                 @click="tab = 'videoTemplate'"
             >
                 <div class="text-base truncate flex items-center">
-                    <i
-                        class="iconfont icon-video-template w-6 inline-block"
-                    ></i>
+                    <i-mdi-video-box class="w-6 h-6 inline-block" />
                     {{ t("avatar.avatar") }}
                 </div>
             </div>

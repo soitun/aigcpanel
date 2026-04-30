@@ -144,9 +144,9 @@ const doRefresh = async () => {
                                 >
                                     <div class="mb-2">
                                         <a-tag class="rounded-lg">
-                                            <i
-                                                class="iconfont icon-sound w-5"
-                                            ></i>
+                                            <i-mdi-volume-high
+                                                class="w-5 h-5"
+                                            />
                                             {{ $t("voice.synthesis") }}
                                         </a-tag>
                                     </div>

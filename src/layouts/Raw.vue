@@ -24,7 +24,7 @@ onMounted(() => {
                     class="inline-block w-6 h-6 leading-6 cursor-pointer hover:text-red-500"
                     @click="doQuit"
                 >
-                    <i class="iconfont text-sm icon-close"></i>
+                    <i-mdi-close class="text-sm" />
                 </div>
             </div>
         </div>

@@ -36,6 +36,10 @@ const doSubmit = async () => {
         Dialog.tipError(t("hint.selectVideoFile"));
         return;
     }
+    if (!(await $mapi.file.exists(formData.value.video))) {
+        Dialog.tipError("所选视频文件不存在，请重新选择");
+        return;
+    }
     const taskTitle = $mapi.file.pathToName(formData.value.video, false);
     const record: TaskRecord = {
         biz: "SoundReplace",
@@ -63,7 +67,7 @@ const doSubmit = async () => {
         <div class="mb-4 flex items-start">
             <div class="pt-1 w-5">
                 <a-tooltip :content="$t('media.video')" mini>
-                    <i class="iconfont icon-video"></i>
+                    <i-mdi-video-outline class="w-4 h-4" />
                 </a-tooltip>
             </div>
             <div class="flex items-center gap-2">
@@ -74,7 +78,7 @@ const doSubmit = async () => {
         <SoundGenerateForm ref="soundGenerateForm" />
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
-                <i class="iconfont icon-submit mr-2"></i>
+                <i-mdi-send class="mr-2" />
                 {{ $t("soundReplace.submitTask") }}
             </a-button>
         </div>

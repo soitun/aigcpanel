@@ -157,7 +157,7 @@ const doSaveConfirmRecordItem = async (index: number, text: string) => {
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
-                    <i class="iconfont icon-sound-prompt"></i>
+                    <i-mdi-comment-text-outline class="w-4 h-4 inline-block" />
                     {{ $t("soundReplace.extractAudio") }}
                 </div>
             </div>
@@ -173,7 +173,7 @@ const doSaveConfirmRecordItem = async (index: number, text: string) => {
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
-                    <i class="iconfont icon-asr"></i>
+                    <i-mdi-microphone-outline class="w-4 h-4 inline-block" />
                     {{ $t("voice.recognition") }}
                 </div>
             </div>
@@ -188,6 +188,7 @@ const doSaveConfirmRecordItem = async (index: number, text: string) => {
                 </TaskJobResultStepView>
                 <div class="mt-1">
                     <ServerNameVersion
+                        v-if="record.modelConfig?.soundAsr?.serverTitle"
                         :record="record.modelConfig?.soundAsr!"
                     />
                 </div>
@@ -238,7 +239,7 @@ const doSaveConfirmRecordItem = async (index: number, text: string) => {
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
-                    <i class="iconfont icon-sound"></i>
+                    <i-mdi-volume-high class="w-4 h-4 inline-block" />
                     {{ $t("voice.synthesis") }}
                 </div>
             </div>
@@ -337,7 +338,7 @@ const doSaveConfirmRecordItem = async (index: number, text: string) => {
         <div class="mt-3 flex">
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
-                    <i class="iconfont icon-video"></i>
+                    <i-mdi-video-outline class="w-4 h-4 inline-block" />
                     {{ $t("soundReplace.videoSynthesis") }}
                 </div>
             </div>

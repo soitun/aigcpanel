@@ -88,7 +88,7 @@ const doUser = async () => {
                 @click="$router.push('/')"
                 href="javascript:;"
             >
-                <div>
+                <div class="flex justify-center">
                     <icon-home class="text-xl" />
                 </div>
                 <div class="text-sm">{{ $t("nav.home") }}</div>
@@ -99,8 +99,8 @@ const doUser = async () => {
                 @click="$router.push('/sound')"
                 href="javascript:;"
             >
-                <div>
-                    <i class="iconfont icon-sound text-xl"></i>
+                <div class="flex justify-center">
+                    <i-mdi-volume-high class="text-xl" />
                 </div>
                 <div class="text-sm">{{ $t("voice.voice") }}</div>
             </a>
@@ -110,8 +110,8 @@ const doUser = async () => {
                 @click="$router.push('/video')"
                 href="javascript:;"
             >
-                <div>
-                    <i class="iconfont icon-video text-xl"></i>
+                <div class="flex justify-center">
+                    <i-mdi-video-outline class="text-xl" />
                 </div>
                 <div class="text-sm">{{ $t("media.video") }}</div>
             </a>
@@ -121,7 +121,7 @@ const doUser = async () => {
                 @click="$router.push('/live')"
                 href="javascript:;"
             >
-                <div>
+                <div class="flex justify-center">
                     <icon-live-broadcast class="text-xl" />
                 </div>
                 <div class="text-sm">{{ $t("live.live") }}</div>
@@ -132,7 +132,7 @@ const doUser = async () => {
                 @click="$router.push('/tool')"
                 href="javascript:;"
             >
-                <div>
+                <div class="flex justify-center">
                     <icon-tool class="text-xl" />
                 </div>
                 <div class="text-sm">{{ $t("nav.toolbox") }}</div>
@@ -143,8 +143,8 @@ const doUser = async () => {
                 @click="$router.push('/server')"
                 href="javascript:;"
             >
-                <div>
-                    <i class="iconfont icon-server text-xl"></i>
+                <div class="flex justify-center">
+                    <i-mdi-server-outline class="text-xl" />
                 </div>
                 <div class="text-sm">{{ $t("model.model") }}</div>
             </a>
@@ -154,7 +154,7 @@ const doUser = async () => {
                 @click="$router.push('/setting')"
                 href="javascript:;"
             >
-                <div>
+                <div class="flex justify-center">
                     <icon-settings class="text-xl" />
                 </div>
                 <div class="text-sm">{{ $t("common.setting") }}</div>

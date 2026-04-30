@@ -91,7 +91,7 @@ defineExpose({
         <div class="flex items-start min-h-8 max-w-lg w-full gap-1">
             <div class="pt-2">
                 <a-tooltip :content="$t('voice.recognitionModel')" mini>
-                    <i class="iconfont icon-server"></i>
+                    <i-mdi-server-outline class="w-4 h-4" />
                 </a-tooltip>
             </div>
             <div class="flex-grow flex flex-wrap gap-1">

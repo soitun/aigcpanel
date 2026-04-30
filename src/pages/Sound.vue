@@ -34,9 +34,7 @@ const dynamicComponent = computed(() => {
                 @click="tab = 'soundGenerate'"
             >
                 <div class="text-base truncate flex items-center">
-                    <i
-                        class="iconfont icon-sound-generate w-6 inline-block"
-                    ></i>
+                    <i-mdi-text-to-speech class="w-6 h-6 inline-block" />
                     {{ t("voice.synthesis") }}
                 </div>
             </div>
@@ -46,7 +44,7 @@ const dynamicComponent = computed(() => {
                 @click="tab = 'soundAsr'"
             >
                 <div class="text-base truncate flex items-center">
-                    <i class="iconfont icon-asr w-6 inline-block"></i>
+                    <i-mdi-microphone-outline class="w-6 h-6 inline-block" />
                     {{ t("voice.recognition") }}
                 </div>
             </div>
@@ -65,7 +63,7 @@ const dynamicComponent = computed(() => {
         <div class="flex-grow h-full overflow-y-auto">
             <SoundGenerate v-if="tab === 'soundGenerate'" />
             <SoundAsr v-else-if="tab === 'soundAsr'" />
-            <component v-else :is="dynamicComponent" />
+            <component v-else-if="dynamicComponent" :is="dynamicComponent" />
         </div>
     </div>
 </template>

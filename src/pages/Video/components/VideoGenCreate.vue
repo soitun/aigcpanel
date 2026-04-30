@@ -138,14 +138,16 @@ defineExpose({
         <div class="flex items-center h-12">
             <div class="mr-1">
                 <a-tooltip :content="$t('voice.voice')" mini>
-                    <i class="iconfont icon-sound"></i>
+                    <i-mdi-volume-high class="w-4 h-4" />
                     {{ $t("voice.voice") }}
                 </a-tooltip>
             </div>
             <div class="mr-1">
                 <a-radio-group v-model="formData.soundType">
                     <a-radio value="soundGenerate">
-                        <i class="iconfont icon-sound-generate"></i>
+                        <i-mdi-text-to-speech
+                            class="w-4 h-4 inline-block align-middle"
+                        />
                         {{ $t("voice.synthesis") }}
                     </a-radio>
                     <a-radio value="soundCustom">

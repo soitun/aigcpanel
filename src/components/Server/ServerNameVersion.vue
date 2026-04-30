@@ -14,7 +14,7 @@ const props = defineProps({
 
 <template>
     <a-tag class="rounded-lg">
-        <i class="iconfont icon-server w-5"></i>
+        <i-mdi-server-outline class="w-5 h-5" />
         {{ record.serverTitle }}
         v{{ record.serverVersion }}
     </a-tag>

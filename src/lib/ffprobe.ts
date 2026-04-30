@@ -18,6 +18,21 @@ export const ffprobeGetMediaDuration = async (
     return ms ? Math.ceil(duration * 1000) : duration;
 };
 
+export const ffprobeVideoCodec = async (video: string): Promise<string> => {
+    const info = await $mapi.app.spawnBinary("ffprobe", [
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "stream=codec_name",
+        "-of",
+        "default=noprint_wrappers=1:nokey=1",
+        video,
+    ]);
+    return info.trim().toLowerCase();
+};
+
 export const ffprobeVideoInfo = async (
     video: string,
 ): Promise<{

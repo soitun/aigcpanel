@@ -96,7 +96,7 @@ defineExpose({
         <div class="flex items-center h-12 mb-2">
             <div class="mr-1">
                 <a-tooltip :content="$t('avatar.model')" mini>
-                    <i class="iconfont icon-server"></i>
+                    <i-mdi-server-outline class="w-4 h-4" />
                 </a-tooltip>
             </div>
             <div class="mr-2 w-96 flex-shrink-0">
@@ -116,7 +116,7 @@ defineExpose({
         <div class="flex items-center h-12 mb-2">
             <div class="mr-1">
                 <a-tooltip :content="$t('avatar.video')" mini>
-                    <i class="iconfont icon-video-template"></i>
+                    <i-mdi-video-box class="w-4 h-4" />
                 </a-tooltip>
             </div>
             <div class="mr-3 w-56 flex-shrink-0">

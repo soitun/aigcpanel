@@ -42,4 +42,32 @@ TaskManager.init();
 
 app.mount("#app").$nextTick(() => {
     postMessage({ payload: "removeLoading" }, "*");
+
+    window.__debug = {
+        navigate: (route: string) => {
+            const appEl = document.querySelector("#app");
+            const vueApp = appEl && (appEl as any).__vue_app__;
+            if (vueApp) vueApp.config.globalProperties.$router.push(route);
+        },
+        getHash: () => window.location.hash,
+        click: (selector: string) => {
+            const el = document.querySelector(selector) as HTMLElement | null;
+            if (!el) throw new Error(`__debug.click: 未找到元素 "${selector}"`);
+            el.click();
+        },
+        clickNth: (selector: string, index: number) => {
+            const el = document.querySelectorAll(selector)[index] as
+                | HTMLElement
+                | undefined;
+            if (!el)
+                throw new Error(
+                    `__debug.clickNth: 未找到第 ${index} 个 "${selector}"`,
+                );
+            el.click();
+        },
+        exists: (selector: string) => !!document.querySelector(selector),
+        count: (selector: string) => document.querySelectorAll(selector).length,
+        getText: (selector: string) =>
+            document.querySelector(selector)?.textContent ?? null,
+    };
 });

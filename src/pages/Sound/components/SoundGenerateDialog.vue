@@ -147,20 +147,26 @@ defineExpose({
                                 v-if="r.modelConfig.type === 'SoundTts'"
                                 class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6"
                             >
-                                <i class="iconfont icon-sound-generate"></i>
+                                <i-mdi-text-to-speech
+                                    class="w-4 h-4 inline-block align-middle"
+                                />
                                 {{ $t("voice.synthesis") }}
                             </div>
                             <div
                                 v-else-if="r.modelConfig.type === 'SoundClone'"
                                 class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6"
                             >
-                                <i class="iconfont icon-sound-clone"></i>
+                                <i-mdi-account-voice
+                                    class="w-4 h-4 inline-block align-middle"
+                                />
                                 {{ $t("voice.clone") }}
                             </div>
                             <div
                                 class="inline-block mr-2 bg-gray-100 rounded-lg px-1 leading-6 h-6"
                             >
-                                <i class="iconfont icon-server mr-1"></i>
+                                <i-mdi-server-outline
+                                    class="w-4 h-4 inline-block align-middle mr-1"
+                                />
                                 {{ r.serverTitle }}
                                 v{{ r.serverVersion }}
                             </div>
@@ -171,7 +177,9 @@ defineExpose({
                                 "
                                 class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
                             >
-                                <i class="iconfont icon-speaker mr-1"></i>
+                                <i-mdi-speaker
+                                    class="w-4 h-4 inline-block align-middle mr-1"
+                                />
                                 {{ r.modelConfig?.ttsParam?.speakerTitle }}
                             </div>
                             <div
@@ -181,7 +189,9 @@ defineExpose({
                                 "
                                 class="inline-block mr-2 bg-blue-100 rounded-lg px-2 leading-6 h-6"
                             >
-                                <i class="iconfont icon-speed mr-1"></i>
+                                <i-mdi-speedometer
+                                    class="w-4 h-4 inline-block align-middle mr-1"
+                                />
                                 <span class=""
                                     >x{{ r.param?.ttsParam?.speed }}</span
                                 >
@@ -190,7 +200,9 @@ defineExpose({
                                 v-if="r.modelConfig.type === 'SoundClone'"
                                 class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
                             >
-                                <i class="iconfont icon-sound-prompt mr-1"></i>
+                                <i-mdi-comment-text-outline
+                                    class="w-4 h-4 inline-block align-middle mr-1"
+                                />
                                 {{ r.modelConfig.promptTitle }}
                             </div>
                             <div
@@ -200,7 +212,9 @@ defineExpose({
                                 "
                                 class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
                             >
-                                <i class="iconfont icon-speed mr-1"></i>
+                                <i-mdi-speedometer
+                                    class="w-4 h-4 inline-block align-middle mr-1"
+                                />
                                 <span class=""
                                     >x{{
                                         r.modelConfig?.cloneParam?.speed
@@ -214,7 +228,9 @@ defineExpose({
                                 "
                                 class="inline-block mr-2 bg-gray-100 rounded-lg px-2 leading-6 h-6"
                             >
-                                <i class="iconfont icon-global mr-1"></i>
+                                <i-mdi-web
+                                    class="w-4 h-4 inline-block align-middle mr-1"
+                                />
                                 <span class="">{{
                                     $t("voice.crossLanguage")
                                 }}</span>

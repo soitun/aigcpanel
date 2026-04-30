@@ -60,7 +60,7 @@ const doSubmit = async () => {
         <TextToImageForm ref="textToImageForm" />
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
-                <i class="iconfont icon-submit mr-2"></i>
+                <i-mdi-send class="mr-2" />
                 {{ "提交任务" }}
             </a-button>
         </div>

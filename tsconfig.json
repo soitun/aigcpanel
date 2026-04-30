@@ -15,7 +15,7 @@
         "noImplicitAny": false,
         "allowJs": true
     },
-    "include": ["src"],
+    "include": ["src", "node_modules/unplugin-icons/types/vue.d.ts"],
     "references": [
         {
             "path": "./tsconfig.node.json"

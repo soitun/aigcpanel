@@ -3,7 +3,7 @@ import SettingEnvHubRoot from "./components/SettingEnvHubRoot.vue";
 </script>
 
 <template>
-    <a-form :model="null as any" layout="vertical">
+    <a-form :model="{}" layout="vertical">
         <SettingEnvHubRoot />
     </a-form>
 </template>

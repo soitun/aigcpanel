@@ -10,7 +10,7 @@ const props = defineProps<{
 <template>
     <ServerNameVersion v-if="data.serverTitle" :record="data" />
     <a-tag v-if="data.videoTemplateName" class="rounded-lg">
-        <i class="iconfont icon-video-template w-5"></i>
+        <i-mdi-video-box class="w-5 h-5" />
         {{ data.videoTemplateName }}
     </a-tag>
     <ParamFormView v-if="data.param" :param="data.param" />

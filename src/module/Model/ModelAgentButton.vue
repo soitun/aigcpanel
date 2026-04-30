@@ -15,15 +15,16 @@ const props = withDefaults(
     defineProps<{
         biz: string;
         promptDefault: string;
-        systemPrompt: string;
-        title: string;
-        placeholder: string;
-        formItems: ModelAgentButtonFormItems;
+        systemPrompt?: string;
+        title?: string;
+        placeholder?: string;
+        formItems?: ModelAgentButtonFormItems;
     }>(),
     {
+        systemPrompt: "",
         title: t("common.aiGenerated"),
         placeholder: t("hint.inputRequirement"),
-        formItems: [] as ModelAgentButtonFormItems,
+        formItems: () => [] as ModelAgentButtonFormItems,
     },
 );
 

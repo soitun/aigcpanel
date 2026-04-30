@@ -121,6 +121,12 @@ const getValue = async (): Promise<SoundGenerateParamType | undefined> => {
         data.promptTitle = prompt.title;
         data.promptUrl = prompt.content.url;
         data.promptText = prompt.content.promptText;
+        if (data.promptUrl && !data.promptUrl.startsWith("http")) {
+            if (!(await window.$mapi.file.exists(data.promptUrl))) {
+                Dialog.tipError("音色参考音频文件不存在，请重新设置音色");
+                return;
+            }
+        }
     }
     return data;
 };
@@ -163,17 +169,21 @@ defineExpose({
         <div class="flex items-start min-h-8">
             <div class="mr-1">
                 <a-tooltip :content="$t('task.synthesisType')" mini>
-                    <i class="iconfont icon-sound"></i>
+                    <i-mdi-volume-high class="w-4 h-4" />
                 </a-tooltip>
             </div>
             <div class="mr-1">
                 <a-radio-group v-model="formData.type">
                     <a-radio value="SoundTts">
-                        <i class="iconfont icon-sound-generate"></i>
+                        <i-mdi-text-to-speech
+                            class="w-4 h-4 inline-block align-middle"
+                        />
                         {{ $t("voice.synthesis") }}
                     </a-radio>
                     <a-radio value="SoundClone">
-                        <i class="iconfont icon-sound-clone"></i>
+                        <i-mdi-account-voice
+                            class="w-4 h-4 inline-block align-middle"
+                        />
                         {{ $t("voice.clone") }}
                     </a-radio>
                 </a-radio-group>
@@ -185,7 +195,7 @@ defineExpose({
         >
             <div class="mr-1 pt-2">
                 <a-tooltip :content="$t('voice.synthesisModel')" mini>
-                    <i class="iconfont icon-server"></i>
+                    <i-mdi-server-outline class="w-4 h-4" />
                 </a-tooltip>
             </div>
             <div class="flex flex-wrap gap-1">
@@ -210,7 +220,7 @@ defineExpose({
         >
             <div class="mr-1 pt-2">
                 <a-tooltip :content="$t('voice.cloneModel')" mini>
-                    <i class="iconfont icon-server"></i>
+                    <i-mdi-server-outline class="w-4 h-4" />
                 </a-tooltip>
             </div>
             <div class="flex flex-wrap gap-1">
@@ -235,7 +245,7 @@ defineExpose({
         >
             <div class="">
                 <a-tooltip :content="$t('voice.timbre')" mini>
-                    <i class="iconfont icon-sound-prompt"></i>
+                    <i-mdi-comment-text-outline class="w-4 h-4" />
                 </a-tooltip>
             </div>
             <div class="mr-2 flex items-center">

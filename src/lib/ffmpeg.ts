@@ -608,6 +608,32 @@ export const ffmpegVideoNormal = async (
     return output;
 };
 
+export const ffmpegVideoPreview = async (input: string): Promise<string> => {
+    const output = await $mapi.file.temp("mp4");
+    const args = [
+        "-hide_banner",
+        "-i",
+        input,
+        "-c:v",
+        "libx264",
+        "-preset",
+        "ultrafast",
+        "-crf",
+        "23",
+        "-c:a",
+        "aac",
+        "-movflags",
+        "+faststart",
+        "-y",
+        output,
+    ];
+    await $mapi.app.spawnBinary("ffmpeg", args);
+    if (!(await $mapi.file.exists(output))) {
+        throw "视频预览格式转换失败";
+    }
+    return output;
+};
+
 export async function ffmpegCutVideo(
     input: string,
     startMs: number,

@@ -7,8 +7,8 @@ import {
     VideoTemplateRecord,
     VideoTemplateService,
 } from "../../../service/VideoTemplateService";
-import { ffmpegVideoNormal } from "../../../lib/ffmpeg";
-import { ffprobeVideoInfo } from "../../../lib/ffprobe";
+import { ffmpegVideoNormal, ffmpegVideoPreview } from "../../../lib/ffmpeg";
+import { ffprobeVideoCodec, ffprobeVideoInfo } from "../../../lib/ffprobe";
 
 const visible = ref(false);
 const videoPlayer = ref<InstanceType<typeof VideoPlayer> | null>(null);
@@ -17,10 +17,13 @@ const formData = ref({
     name: "",
     video: "",
 });
+const previewVideoPath = ref("");
+const isConvertingPreview = ref(false);
 
 const add = () => {
     formData.value.name = "";
     formData.value.video = "";
+    previewVideoPath.value = "";
     visible.value = true;
 };
 
@@ -28,9 +31,32 @@ const doSelectFile = async () => {
     const path = await window.$mapi.file.openFile({
         accept: "video/*",
     });
-    if (path) {
-        formData.value.video = path;
-        // videoPlayer.value?.loadVideo(path)
+    if (!path) return;
+    formData.value.video = path;
+    previewVideoPath.value = "";
+    // 检测视频编码，非 H264 或 mov 格式需要转换
+    const ext = path.split(".").pop()?.toLowerCase() || "";
+    let needsConvert = ext === "mov";
+    if (!needsConvert) {
+        try {
+            const codec = await ffprobeVideoCodec(path);
+            needsConvert = codec !== "h264";
+        } catch (e) {
+            needsConvert = true;
+        }
+    }
+    if (needsConvert) {
+        isConvertingPreview.value = true;
+        try {
+            previewVideoPath.value = await ffmpegVideoPreview(path);
+        } catch (e) {
+            console.error(e);
+            Dialog.tipError(t("error.videoPreviewConvertFailed") + ":" + e);
+        } finally {
+            isConvertingPreview.value = false;
+        }
+    } else {
+        previewVideoPath.value = path;
     }
 };
 
@@ -99,10 +125,24 @@ const emit = defineEmits({
                         <a-form-item :label="$t('media.video')" required>
                             <div class="w-full">
                                 <div class="mb-3" v-if="formData.video">
-                                    <div class="h-52 rounded-lg p-2 bg-black">
+                                    <div
+                                        class="h-52 rounded-lg p-2 bg-black relative"
+                                    >
+                                        <div
+                                            v-if="isConvertingPreview"
+                                            class="absolute inset-0 flex flex-col items-center justify-center text-white text-sm gap-2"
+                                        >
+                                            <icon-loading
+                                                class="text-2xl animate-spin"
+                                            />
+                                            <span>{{
+                                                $t("msg.videoPreviewConverting")
+                                            }}</span>
+                                        </div>
                                         <VideoPlayer
+                                            v-else-if="previewVideoPath"
                                             ref="videoPlayer"
-                                            :url="`file://${formData.video}`"
+                                            :url="`file://${previewVideoPath}`"
                                         />
                                     </div>
                                 </div>

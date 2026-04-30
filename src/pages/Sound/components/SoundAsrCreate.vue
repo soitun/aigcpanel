@@ -47,6 +47,10 @@ const doSubmit = async () => {
             Dialog.tipError(t("hint.selectAudioFile"));
             return;
         }
+        if (!(await window.$mapi.file.exists(formData.value.audio))) {
+            Dialog.tipError("所选音频文件不存在，请重新选择");
+            return;
+        }
 
         // Generate task title from audio filename
         const taskTitle = window.$mapi.file.pathToName(
@@ -93,7 +97,7 @@ const isSubmitting = ref(false);
         <div class="mb-4 flex items-start">
             <div class="mr-1 pt-1">
                 <a-tooltip :content="$t('voice.file')" mini>
-                    <i class="iconfont icon-sound"></i>
+                    <i-mdi-volume-high class="w-4 h-4" />
                 </a-tooltip>
             </div>
             <div>
@@ -111,7 +115,7 @@ const isSubmitting = ref(false);
                 @click="doSubmit"
                 :loading="isSubmitting"
             >
-                <i class="iconfont icon-submit mr-2"></i>
+                <i-mdi-send class="mr-2" />
                 {{ t("task.startRecognition") }}
             </a-button>
         </div>

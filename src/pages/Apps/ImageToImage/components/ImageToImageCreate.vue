@@ -29,6 +29,10 @@ const doSubmit = async () => {
         Dialog.tipError("请选择图像");
         return;
     }
+    if (!(await $mapi.file.exists(formData.value.image))) {
+        Dialog.tipError("所选图像文件不存在，请重新选择");
+        return;
+    }
     if (!formData.value.prompt.trim()) {
         Dialog.tipError("请输入提示");
         return;
@@ -86,7 +90,7 @@ const doSubmit = async () => {
         </div>
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
-                <i class="iconfont icon-submit mr-2"></i>
+                <i-mdi-send class="mr-2" />
                 {{ "提交任务" }}
             </a-button>
         </div>

@@ -8,6 +8,8 @@ const props = defineProps<{
 </script>
 
 <template>
-    <ServerNameVersion v-if="data.serverTitle" :record="data" />
-    <ParamFormView :param="data.param" />
+    <template v-if="data">
+        <ServerNameVersion v-if="data.serverTitle" :record="data" />
+        <ParamFormView :param="data.param" />
+    </template>
 </template>

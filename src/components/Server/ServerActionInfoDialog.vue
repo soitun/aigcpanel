@@ -70,7 +70,9 @@ defineExpose({
                     <div>
                         <div>
                             <div v-if="record.type === EnumServerType.LOCAL">
-                                <i class="iconfont icon-desktop mr-1"></i>
+                                <i-mdi-desktop-mac
+                                    class="w-4 h-4 inline-block align-middle mr-1"
+                                />
                                 {{ $t("model.localModel") }}
                             </div>
                             <div
@@ -78,13 +80,17 @@ defineExpose({
                                     record.type === EnumServerType.LOCAL_DIR
                                 "
                             >
-                                <i class="iconfont icon-folder mr-1"></i>
+                                <i-mdi-folder-outline
+                                    class="w-4 h-4 inline-block align-middle mr-1"
+                                />
                                 {{ $t("setting.localModelDir") }}
                             </div>
                             <div
                                 v-else-if="record.type === EnumServerType.CLOUD"
                             >
-                                <i class="iconfont icon-network mr-1"></i>
+                                <i-mdi-network-outline
+                                    class="w-4 h-4 inline-block align-middle mr-1"
+                                />
                                 {{ $t("model.cloudModel") }}
                             </div>
                             <div

@@ -65,7 +65,7 @@ watch(
     >
         <div v-if="!logs.length" class="text-center text-white py-10">
             <div>
-                <i class="iconfont icon-empty-box text-4xl"></i>
+                <i-mdi-inbox-outline class="text-4xl" />
             </div>
             <div class="text-xs mt-3">
                 {{ $t("empty.noLog") }}

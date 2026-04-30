@@ -15,11 +15,6 @@ const routes = [
             { path: "setting", component: () => import("./pages/Setting.vue") },
         ],
     },
-    {
-        path: "/",
-        component: () => import("./layouts/Raw.vue"),
-        children: [],
-    },
 ];
 
 const router = createRouter({

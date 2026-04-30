@@ -131,6 +131,9 @@ onMounted(() => {
     wave.value.on("timeupdate", () => {
         timeCurrent.value = wave.value?.getCurrentTime() as number;
     });
+    wave.value.on("error", () => {
+        // ignore audio load errors (e.g. invalid url, file not found)
+    });
     if (props.recordEnable) {
         if (!props.url) {
             recordVisible.value = true;
@@ -162,12 +165,13 @@ watch(
     (url) => {
         if (url) {
             // auto add file:// when url is local file
-            if (
-                url.startsWith("file:") ||
-                url.startsWith("http:") ||
-                url.startsWith("https:")
+            if (url.startsWith("file://file://")) {
+                url = url.replace("file://file://", "file:///");
+            } else if (
+                !url.startsWith("file:") &&
+                !url.startsWith("http:") &&
+                !url.startsWith("https:")
             ) {
-            } else {
                 url = `file://${url}`;
             }
             waveUrl.value = url;
@@ -205,7 +209,7 @@ watch(
 watchEffect(() => {
     if (wave.value && waveUrl.value) {
         waveIsLoaded.value = false;
-        wave.value.load(waveUrl.value);
+        wave.value.load(waveUrl.value).catch(() => {});
     }
 });
 
@@ -215,7 +219,7 @@ const doPlay = () => {
     }
     if (!waveIsLoaded.value) {
         waveLoadAutoPlay.value = true;
-        wave.value?.load(waveUrl.value);
+        wave.value?.load(waveUrl.value).catch(() => {});
         return;
     }
     wave.value?.play();
@@ -409,9 +413,9 @@ defineExpose({
                         @click="doRecordClean"
                         class="cursor-pointer w-8 h-8 inline-flex"
                     >
-                        <i
-                            class="iconfont icon-refresh-circle m-auto text-gray-700 hover:text-primary text-2xl"
-                        ></i>
+                        <i-mdi-refresh
+                            class="m-auto text-gray-700 hover:text-primary text-2xl"
+                        />
                     </div>
                 </a-tooltip>
                 <a-tooltip
@@ -423,9 +427,9 @@ defineExpose({
                         @click="doTrim"
                         class="cursor-pointer w-8 h-8 inline-flex"
                     >
-                        <i
-                            class="iconfont icon-cut m-auto text-gray-700 hover:text-primary text-2xl"
-                        ></i>
+                        <i-mdi-content-cut
+                            class="m-auto text-gray-700 hover:text-primary text-2xl"
+                        />
                     </div>
                 </a-tooltip>
                 <a-tooltip
@@ -465,9 +469,9 @@ defineExpose({
                         @click="doRecord"
                         class="cursor-pointer w-8 h-8 inline-flex"
                     >
-                        <i
-                            class="iconfont icon-mic m-auto text-gray-700 hover:text-primary text-2xl"
-                        ></i>
+                        <i-mdi-microphone
+                            class="m-auto text-gray-700 hover:text-primary text-2xl"
+                        />
                     </div>
                 </a-tooltip>
             </div>
