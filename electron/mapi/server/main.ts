@@ -253,4 +253,17 @@ export default {
 
 export const ServerMain = {
     getRunningServerCount,
+    callFunction: async (
+        serverInfo: ServerInfo,
+        method: string,
+        data: any,
+        option?: any,
+    ) => {
+        const module = await getModule(serverInfo);
+        const func = module[method];
+        if (!func) {
+            throw new Error(`MethodNotFound: ${method}`);
+        }
+        return await func.bind(module)(data, option || {});
+    },
 };

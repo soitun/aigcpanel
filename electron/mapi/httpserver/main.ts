@@ -1,225 +1,340 @@
+import express from "express";
+import type { Request, Response } from "express";
 import http from "node:http";
-import { ipcMain, net } from "electron";
+import { ipcMain } from "electron";
 import { Log } from "../log/main";
 import ConfigMain from "../config/main";
 import StorageMain from "../storage/main";
-import User from "../user/main";
+import { Events } from "../event/main";
+import { DBMain } from "../db/main";
+import docHtml from "./doc.html?raw";
 
-type TaskRecord = {
-    status: "pending" | "success" | "error";
-    result?: string;
-    error?: string;
-};
-
-const tasks = new Map<string, TaskRecord>();
 let server: http.Server | null = null;
 let isRunning = false;
 let runningPort = 0;
 
-const generateId = () => {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2);
+const functionArgsMap: Record<string, string[]> = {
+    soundTts: ["text"],
+    soundClone: ["text", "promptAudio", "promptText"],
+    videoGen: ["video", "audio"],
+    asr: ["audio"],
+    textToImage: ["prompt"],
+    imageToImage: ["image", "prompt"],
+    live: [],
 };
 
-const sendJson = (res: http.ServerResponse, statusCode: number, data: any) => {
-    res.writeHead(statusCode, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(data));
+const functionBizMap: Record<string, string> = {
+    soundTts: "SoundGenerate",
+    soundClone: "SoundGenerate",
+    videoGen: "VideoGen",
+    asr: "SoundAsr",
+    textToImage: "TextToImage",
+    imageToImage: "ImageToImage",
 };
 
-const getEnabledModels = async () => {
-    const storageData = await StorageMain.read("models", null);
-    const userData = await User.get();
-    const models: {
-        id: string;
-        providerId: string;
-        modelId: string;
-        modelName: string;
-    }[] = [];
+const getInstalledServers = async () => {
+    const storageData = await StorageMain.read("server", null);
+    const records = storageData?.records || [];
+    return records
+        .filter((r: any) => r.name && r.version)
+        .map((r: any) => ({
+            id: `${r.name}|${r.version}`,
+            name: r.name,
+            version: r.version,
+            title: r.title || r.name,
+            functions: (r.functions || []).map((funcName: string) => ({
+                name: funcName,
+                args: functionArgsMap[funcName] || [],
+                param: r.config?.functions?.[funcName]?.param || [],
+            })),
+        }));
+};
 
-    if (!storageData || !storageData.providerData) return models;
+const getServerRecord = async (serverName: string, serverVersion: string) => {
+    const storageData = await StorageMain.read("server", null);
+    const records = storageData?.records || [];
+    return records.find(
+        (r: any) => r.name === serverName && r.version === serverVersion,
+    );
+};
 
-    for (const providerId in storageData.providerData) {
-        const providerData = storageData.providerData[providerId];
-        if (!providerData.enabled) continue;
+const buildModelConfig = (
+    funcName: string,
+    serverName: string,
+    serverTitle: string,
+    serverVersion: string,
+    param: any,
+) => {
+    switch (funcName) {
+        case "soundTts":
+            return {
+                type: "SoundTts",
+                ttsServerKey: `${serverName}|${serverVersion}`,
+                ttsParam: param?.param || {},
+                text: param?.text || "",
+            };
+        case "soundClone":
+            return {
+                type: "SoundClone",
+                cloneServerKey: `${serverName}|${serverVersion}`,
+                cloneParam: param?.param || {},
+                text: param?.text || "",
+                promptUrl: param?.promptAudio || "",
+                promptText: param?.promptText || "",
+            };
+        case "videoGen":
+            return {
+                soundType: "soundCustom",
+                soundCustomFile: param?.audio || "",
+                videoTemplateUrl: param?.video || "",
+            };
+        case "asr":
+            return {
+                audio: param?.audio || "",
+            };
+        case "textToImage":
+            return {
+                prompt: param?.prompt || "",
+                textToImage: {
+                    serverName,
+                    serverTitle,
+                    serverVersion,
+                    type: "TextToImage",
+                    serverKey: `${serverName}|${serverVersion}`,
+                    param: param?.param || {},
+                },
+            };
+        case "imageToImage":
+            return {
+                image: param?.image || "",
+                prompt: param?.prompt || "",
+                imageToImage: {
+                    serverName,
+                    serverTitle,
+                    serverVersion,
+                    type: "ImageToImage",
+                    serverKey: `${serverName}|${serverVersion}`,
+                    param: param?.param || {},
+                },
+            };
+        default:
+            return param || {};
+    }
+};
 
-        for (const model of providerData.models || []) {
-            if (!model.enabled) continue;
-            models.push({
-                id: `${providerId}|${model.id}`,
-                providerId,
-                modelId: model.id,
-                modelName: model.name,
-            });
+const buildTaskParam = (funcName: string, param: any) => {
+    if (funcName === "videoGen" || funcName === "asr") {
+        return param?.param || {};
+    }
+    return {};
+};
+
+const buildTaskTitle = (funcName: string, param: any): string => {
+    switch (funcName) {
+        case "soundTts":
+            return param?.text ? String(param.text).slice(0, 20) : "TTS任务";
+        case "soundClone":
+            return param?.text
+                ? String(param.text).slice(0, 20)
+                : "音色克隆任务";
+        case "videoGen":
+            return "AI数字人视频";
+        case "asr":
+            return "ASR识别任务";
+        case "textToImage":
+            return param?.prompt
+                ? String(param.prompt).slice(0, 20)
+                : "文生图任务";
+        case "imageToImage":
+            return param?.prompt
+                ? String(param.prompt).slice(0, 20)
+                : "图生图任务";
+        default:
+            return "任务";
+    }
+};
+
+const sendJson = (res: Response, statusCode: number, data: any) => {
+    res.status(statusCode).json(data);
+};
+
+const createApp = (port: number) => {
+    const app = express();
+    app.use(express.json());
+    app.use((_req, res, next) => {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        if (_req.method === "OPTIONS") {
+            res.status(200).end();
+            return;
         }
-    }
-
-    // buildIn provider from user lmApi
-    if (userData?.data && (userData.data as any).lmApi) {
-        const lmApi = (userData.data as any).lmApi;
-        const buildInData = storageData?.providerData?.["buildIn"];
-        const enabled = buildInData ? buildInData.enabled !== false : true;
-        if (enabled && lmApi.models) {
-            const existing = models
-                .filter((m) => m.providerId === "buildIn")
-                .map((m) => m.modelId);
-            for (const m of lmApi.models) {
-                if (!existing.includes(m)) {
-                    models.push({
-                        id: `buildIn|${m}`,
-                        providerId: "buildIn",
-                        modelId: m,
-                        modelName: m,
-                    });
-                }
-            }
-        }
-    }
-
-    return models;
-};
-
-const callModel = async (
-    providerId: string,
-    modelId: string,
-    prompt: string,
-    systemPrompt?: string,
-): Promise<string> => {
-    const storageData = await StorageMain.read("models", null);
-    const userData = await User.get();
-
-    let apiKey = "";
-    let apiUrl = "";
-    let apiHost = "";
-
-    if (providerId === "buildIn") {
-        const lmApi = (userData?.data as any)?.lmApi;
-        if (!lmApi) throw new Error("buildIn provider not configured");
-        apiKey = lmApi.apiKey || "";
-        apiUrl = lmApi.apiUrl || "";
-    } else {
-        const providerData = storageData?.providerData?.[providerId];
-        if (!providerData) throw new Error(`Provider not found: ${providerId}`);
-        apiKey = providerData.apiKey || "";
-        apiUrl = providerData.apiUrl || "";
-        apiHost = providerData.apiHost || "";
-    }
-
-    let url = apiHost || apiUrl;
-    if (!url)
-        throw new Error(`No API URL configured for provider: ${providerId}`);
-
-    if (url.endsWith("/")) {
-        url = `${url}chat/completions`;
-    } else if (!url.endsWith("/chat/completions")) {
-        url = `${url}/v1/chat/completions`;
-    }
-
-    const messages: any[] = [];
-    if (systemPrompt) {
-        messages.push({ role: "system", content: systemPrompt });
-    }
-    messages.push({ role: "user", content: prompt });
-
-    const response = await net.fetch(url, {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ model: modelId, messages }),
+        next();
     });
 
-    if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`API call failed: ${response.status}\n${error}`);
-    }
+    app.get("/doc", (_req, res) => {
+        const html = docHtml.replace(/\{\{PORT\}\}/g, String(port));
+        res.status(200)
+            .set("Content-Type", "text/html; charset=utf-8")
+            .send(html);
+    });
 
-    const data = (await response.json()) as any;
-    const content = data?.choices?.[0]?.message?.content;
-    if (content === undefined) {
-        throw new Error(`Invalid response format: ${JSON.stringify(data)}`);
-    }
-    return content;
-};
+    app.post("/api/model/list", async (_req, res) => {
+        try {
+            const servers = await getInstalledServers();
+            sendJson(res, 200, { code: 0, data: servers });
+        } catch (e) {
+            sendJson(res, 500, { code: -1, msg: String(e) });
+        }
+    });
 
-const handleRequest = async (
-    req: http.IncomingMessage,
-    res: http.ServerResponse,
-    port: number,
-) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-    if (req.method === "OPTIONS") {
-        res.writeHead(200);
-        res.end();
-        return;
-    }
-
-    const url = new URL(req.url!, `http://localhost:${port}`);
-
-    if (req.method === "GET" && url.pathname === "/api/model/list") {
-        const models = await getEnabledModels();
-        sendJson(res, 200, { code: 0, data: models });
-        return;
-    }
-
-    if (req.method === "POST" && url.pathname === "/api/model/call") {
-        let body = "";
-        req.on("data", (chunk) => {
-            body += chunk;
-        });
-        req.on("end", async () => {
-            try {
-                const { model, prompt, systemPrompt } = JSON.parse(body);
-                const [providerId, modelId] = (model || "").split("|");
-                if (!providerId || !modelId) {
-                    sendJson(res, 400, {
-                        code: -1,
-                        msg: 'Invalid model format, expected "providerId|modelId"',
-                    });
-                    return;
-                }
-                if (!prompt) {
-                    sendJson(res, 400, { code: -1, msg: "Missing prompt" });
-                    return;
-                }
-                const taskId = generateId();
-                tasks.set(taskId, { status: "pending" });
-                sendJson(res, 200, { code: 0, data: { taskId } });
-                callModel(providerId, modelId, prompt, systemPrompt)
-                    .then((result) => {
-                        tasks.set(taskId, { status: "success", result });
-                    })
-                    .catch((err) => {
-                        tasks.set(taskId, {
-                            status: "error",
-                            error: String(err),
-                        });
-                    });
-            } catch (e) {
-                sendJson(res, 400, { code: -1, msg: `Invalid request: ${e}` });
+    app.post("/api/model/call", async (req, res) => {
+        try {
+            const { model, function: funcName, param } = req.body || {};
+            const parts = (model || "").split("|");
+            const serverName = parts[0];
+            const serverVersion = parts.slice(1).join("|");
+            if (!serverName || !serverVersion) {
+                sendJson(res, 400, {
+                    code: -1,
+                    msg: 'Invalid model format, expected "name|version"',
+                });
+                return;
             }
-        });
-        return;
-    }
-
-    if (req.method === "GET" && url.pathname === "/api/model/query") {
-        const taskId = url.searchParams.get("taskId");
-        if (!taskId) {
-            sendJson(res, 400, { code: -1, msg: "Missing taskId" });
-            return;
+            if (!funcName) {
+                sendJson(res, 400, { code: -1, msg: "Missing function" });
+                return;
+            }
+            const biz = functionBizMap[funcName];
+            if (!biz) {
+                sendJson(res, 400, {
+                    code: -1,
+                    msg: `Unknown function: ${funcName}`,
+                });
+                return;
+            }
+            const serverRecord = await getServerRecord(
+                serverName,
+                serverVersion,
+            );
+            if (!serverRecord) {
+                sendJson(res, 400, {
+                    code: -1,
+                    msg: `Server not found: ${serverName}|${serverVersion}`,
+                });
+                return;
+            }
+            const serverTitle = serverRecord.title || serverName;
+            const modelConfig = buildModelConfig(
+                funcName,
+                serverName,
+                serverTitle,
+                serverVersion,
+                param,
+            );
+            const taskParam = buildTaskParam(funcName, param);
+            const title = buildTaskTitle(funcName, param);
+            const taskDbId = await DBMain.insert(
+                `INSERT INTO data_task (biz, title, status, startTime, serverName, serverTitle, serverVersion, param, jobResult, modelConfig, result, type)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    biz,
+                    title,
+                    "queue",
+                    Date.now(),
+                    serverName,
+                    serverTitle,
+                    serverVersion,
+                    JSON.stringify(taskParam),
+                    JSON.stringify({}),
+                    JSON.stringify(modelConfig),
+                    JSON.stringify({}),
+                    1,
+                ],
+            );
+            const taskId = String(taskDbId);
+            sendJson(res, 200, { code: 0, data: { taskId } });
+            Events.callPage("main", "httpserver:submitTask", {
+                biz,
+                taskId,
+            }).catch((err) => {
+                Log.error("httpserver.submitTask.error", err);
+            });
+        } catch (e) {
+            sendJson(res, 500, { code: -1, msg: `Internal error: ${e}` });
         }
-        const task = tasks.get(taskId);
-        if (!task) {
-            sendJson(res, 404, { code: -1, msg: "Task not found" });
-            return;
-        }
-        sendJson(res, 200, { code: 0, data: task });
-        return;
-    }
+    });
 
-    sendJson(res, 404, { code: -1, msg: "Not found" });
+    app.post("/api/model/query", async (req, res) => {
+        try {
+            const { taskId } = req.body || {};
+            if (!taskId) {
+                sendJson(res, 400, { code: -1, msg: "Missing taskId" });
+                return;
+            }
+            const record = await DBMain.first(
+                "SELECT * FROM data_task WHERE id = ?",
+                [taskId],
+            );
+            if (!record) {
+                sendJson(res, 200, {
+                    code: 0,
+                    data: { status: "error", error: "Task not found" },
+                });
+                return;
+            }
+            if (record.status === "success") {
+                let result: any = null;
+                try {
+                    const parsed = JSON.parse(record.result);
+                    if (parsed && Object.keys(parsed).length > 0) {
+                        result = parsed;
+                    }
+                } catch (_) {}
+                if (result) {
+                    sendJson(res, 200, {
+                        code: 0,
+                        data: {
+                            status: "success",
+                            result: {
+                                code: 0,
+                                msg: "ok",
+                                data: {
+                                    type: "success",
+                                    start: record.startTime || 0,
+                                    end: record.endTime || 0,
+                                    data: result,
+                                },
+                            },
+                        },
+                    });
+                } else {
+                    sendJson(res, 200, {
+                        code: 0,
+                        data: { status: "pending" },
+                    });
+                }
+            } else if (record.status === "fail") {
+                sendJson(res, 200, {
+                    code: 0,
+                    data: {
+                        status: "error",
+                        error: record.statusMsg || "Task failed",
+                    },
+                });
+            } else {
+                sendJson(res, 200, { code: 0, data: { status: "pending" } });
+            }
+        } catch (e) {
+            sendJson(res, 500, { code: -1, msg: `Internal error: ${e}` });
+        }
+    });
+
+    app.use((_req, res) => {
+        sendJson(res, 404, { code: -1, msg: "Not found" });
+    });
+
+    return app;
 };
 
 const start = async (port?: number): Promise<void> => {
@@ -227,20 +342,11 @@ const start = async (port?: number): Promise<void> => {
         await stop();
     }
     if (!port) {
-        port = await ConfigMain.get("httpServerPort", 60000);
+        port = await ConfigMain.get("httpServerPort", 59999);
     }
     return new Promise((resolve, reject) => {
-        const s = http.createServer((req, res) => {
-            handleRequest(req, res, port!).catch((err) => {
-                Log.error("httpserver.request.error", err);
-                try {
-                    sendJson(res, 500, {
-                        code: -1,
-                        msg: `Internal error: ${err}`,
-                    });
-                } catch (_) {}
-            });
-        });
+        const app = createApp(port!);
+        const s = http.createServer(app);
         s.listen(port, "127.0.0.1", () => {
             server = s;
             isRunning = true;
@@ -296,7 +402,7 @@ ipcMain.handle("httpserver:stop", async () => {
 });
 
 ipcMain.handle("httpserver:getPort", async () => {
-    return await ConfigMain.get("httpServerPort", 60000);
+    return await ConfigMain.get("httpServerPort", 59999);
 });
 
 ipcMain.handle("httpserver:setPort", async (_, port: number) => {

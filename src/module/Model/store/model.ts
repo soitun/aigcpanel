@@ -46,7 +46,7 @@ const mapModelError = (e: any, provider: Provider) => {
             $mapi.user
                 .open({
                     readyParam: {
-                        page: "ChargeLmApi",
+                        page: "ChargeLLMPX",
                     },
                 })
                 .then();
@@ -209,27 +209,28 @@ export const modelStore = defineStore("model", {
         async refreshBuildIn(buildInProviderData?: any) {
             if (
                 userStore.data &&
-                userStore.data.lmApi &&
-                userStore.data.lmApi.models
+                userStore.data.llmpx &&
+                userStore.data.llmpx.models
             ) {
-                const lmApi = userStore.data.lmApi;
+                const llmpx = userStore.data.llmpx;
                 const buildInProvider = this.providers.find(
                     (p) => p.id === "buildIn",
                 );
                 if (!buildInProvider) {
                     const models: Model[] = [];
-                    for (const m of lmApi.models) {
+                    for (const m of llmpx.models) {
+                        const modelName = (m as any).name || m;
                         models.push({
-                            id: m,
+                            id: modelName,
                             provider: "buildIn",
-                            name: m,
+                            name: modelName,
                             group: "Default",
                             types: ["text"],
                             enabled: true,
                             editable: false,
                         });
                     }
-                    // console.log("model.init.buildIn", JSON.stringify({lmApi}, null, 2));
+                    // console.log("model.init.buildIn", JSON.stringify({llmpx}, null, 2));
                     let enabled = true;
                     if (
                         buildInProviderData &&
@@ -247,21 +248,21 @@ export const modelStore = defineStore("model", {
                         title: getProviderTitle("buildIn"),
                         logo: getProviderLogo("buildIn"),
                         isSystem: true,
-                        apiUrl: lmApi.apiUrl,
+                        apiUrl: llmpx.apiUrl,
                         websites: {
                             official: AppConfig.website,
                             docs: AppConfig.website,
                             models: AppConfig.website,
                         },
                         data: {
-                            apiKey: lmApi.apiKey,
+                            apiKey: llmpx.apiKey,
                             apiHost: "",
                             models: models,
                             enabled: enabled,
                         },
                     });
                 } else {
-                    buildInProvider.data.apiKey = lmApi.apiKey;
+                    buildInProvider.data.apiKey = llmpx.apiKey;
                 }
             }
         },

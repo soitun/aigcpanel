@@ -1,3 +1,9 @@
+## [Unreleased]
+
+- 新增：HTTP Server 增加接口文档页面 (`/doc`)，支持在设置界面一键打开 | Add HTTP Server API documentation page (`/doc`) with one-click access from settings
+- 优化：HTTP Server 重构为 Express.js 框架，API 由大模型代理改为 AIGC 服务任务调度 | Refactor HTTP Server to Express.js; API redesigned from LLM proxy to AIGC server task dispatcher
+- 优化：设置界面移除内联接口地址展示，改为独立接口文档页面 | Replace inline API address display in settings with dedicated documentation page
+
 ## v1.5.0
 
 - 优化：提示词设置界面功能优化

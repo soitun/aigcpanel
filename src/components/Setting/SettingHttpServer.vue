@@ -3,9 +3,9 @@ import { onMounted, ref } from "vue";
 
 const serverStatus = ref<{ running: boolean; port: number }>({
     running: false,
-    port: 60000,
+    port: 59999,
 });
-const port = ref(60000);
+const port = ref(59999);
 const enabled = ref(true);
 const loading = ref(false);
 
@@ -49,6 +49,12 @@ const onEnabledChange = async (value: boolean) => {
     enabled.value = value;
     await $mapi.httpserver.setEnabled(value);
 };
+
+const doOpenDoc = async () => {
+    await $mapi.app.openExternal(
+        `http://localhost:${serverStatus.value.port}/doc`,
+    );
+};
 </script>
 
 <template>
@@ -85,6 +91,13 @@ const onEnabledChange = async (value: boolean) => {
                 >
                     停止服务
                 </a-button>
+                <a-button
+                    v-if="serverStatus.running"
+                    type="outline"
+                    @click="doOpenDoc"
+                >
+                    接口文档
+                </a-button>
                 <span class="flex items-center gap-1 text-sm">
                     <span
                         class="inline-block w-2 h-2 rounded-full"
@@ -108,37 +121,6 @@ const onEnabledChange = async (value: boolean) => {
                         }}
                     </span>
                 </span>
-            </div>
-        </a-form-item>
-        <a-form-item v-if="serverStatus.running" label="接口地址">
-            <div
-                class="text-sm font-mono bg-gray-50 dark:bg-gray-800 rounded p-3 space-y-1"
-            >
-                <div>
-                    <span class="text-blue-500">GET</span>
-                    <span class="ml-2 text-gray-700 dark:text-gray-300">
-                        http://localhost:{{ serverStatus.port }}/api/model/list
-                    </span>
-                    <span class="ml-2 text-gray-400">获取可用模型列表</span>
-                </div>
-                <div>
-                    <span class="text-green-500">POST</span>
-                    <span class="ml-2 text-gray-700 dark:text-gray-300">
-                        http://localhost:{{ serverStatus.port }}/api/model/call
-                    </span>
-                    <span class="ml-2 text-gray-400"
-                        >调用模型，返回 taskId</span
-                    >
-                </div>
-                <div>
-                    <span class="text-blue-500">GET</span>
-                    <span class="ml-2 text-gray-700 dark:text-gray-300">
-                        http://localhost:{{
-                            serverStatus.port
-                        }}/api/model/query?taskId=xxx
-                    </span>
-                    <span class="ml-2 text-gray-400">查询任务结果</span>
-                </div>
             </div>
         </a-form-item>
     </a-form>

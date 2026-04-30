@@ -60,6 +60,22 @@ export const TaskManager = {
         for (const k in tasks) {
             taskStore.register(k, tasks[k]);
         }
+        window.__page.registerCallPage(
+            "httpserver:submitTask",
+            async (
+                resolve: (data: any) => void,
+                reject: (error: string) => void,
+                data: any,
+            ) => {
+                try {
+                    const { biz, taskId } = data;
+                    await taskStore.dispatch(biz, taskId, {});
+                    resolve({ taskId });
+                } catch (e: any) {
+                    reject(String(e));
+                }
+            },
+        );
         nextTick(async () => {
             await serverStore.waitReady();
             for (const k in tasks) {
