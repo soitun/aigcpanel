@@ -64,7 +64,9 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-        <div class="flex-grow h-full overflow-y-auto">
+        <div
+            class="flex-grow h-full overflow-y-auto flex items-center justify-center"
+        >
             <ProUpgrade />
         </div>
     </div>

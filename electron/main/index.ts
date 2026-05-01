@@ -25,6 +25,7 @@ import { AppsMain } from "../mapi/app/main";
 import { ServerMain } from "../mapi/server/main";
 import { HttpServerMain } from "../mapi/httpserver/main";
 import ConfigMain from "../mapi/config/main";
+import { reportError } from "../mapi/log/beacon";
 
 const isDummyNew = isDummy;
 
@@ -38,6 +39,10 @@ process.on("uncaughtException", (reason) => {
         error = [error.message, error.stack].join("\n");
     }
     Log.error("UncaughtException", error);
+    reportError(
+        reason instanceof Error ? reason.message : String(reason),
+        reason instanceof Error ? reason.stack : undefined,
+    );
 });
 
 process.on("unhandledRejection", (reason) => {
@@ -47,7 +52,17 @@ process.on("unhandledRejection", (reason) => {
         error = [error.message, error.stack].join("\n");
     }
     Log.error("UnhandledRejection", error);
+    reportError(
+        reason instanceof Error ? (reason as Error).message : String(reason),
+        reason instanceof Error ? (reason as Error).stack : undefined,
+    );
 });
+
+// Ensure consistent app name (macOS uses Info.plist CFBundleName from the dev binary,
+// which would be "Electron" instead of "aigcpanel" without this explicit override)
+if (app.getName() !== "aigcpanel") {
+    app.setName("aigcpanel");
+}
 
 app.disableHardwareAcceleration();
 
@@ -204,12 +219,8 @@ app.whenReady()
         MAPI.ready();
         ConfigMenu.ready();
         ConfigTray.ready();
-        ConfigMain.get("httpServerEnabled", true).then((enabled: boolean) => {
-            if (enabled) {
-                HttpServerMain.start().catch((err: any) => {
-                    Log.error("HttpServer auto-start failed", err);
-                });
-            }
+        HttpServerMain.start().catch((err: any) => {
+            Log.error("HttpServer auto-start failed", err);
         });
         app.on("browser-window-created", (_, window) => {
             optimizer.watchWindowShortcuts(window);

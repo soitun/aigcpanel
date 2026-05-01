@@ -1,14 +1,21 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import Router from "../router";
 import { ToolApps } from "./Apps/all";
 
 const tab = ref("");
 
-onMounted(() => {
+const syncTab = () => {
     tab.value =
         (Router.currentRoute.value.query.tab as string) || "TextToImage";
+};
+
+onMounted(() => {
+    syncTab();
 });
+
+// Keep tab in sync when navigating with ?tab= query param
+watch(() => Router.currentRoute.value.query.tab, syncTab);
 
 const dynamicComponent = computed(() => {
     for (const app of ToolApps) {
@@ -23,7 +30,7 @@ const dynamicComponent = computed(() => {
 <template>
     <div class="pb-device-container bg-white h-full relative select-none flex">
         <div
-            class="p-4 w-max-52 flex-shrink-0 border-r border-solid border-gray-100 overflow-x-hidden overflow-y-auto"
+            class="p-6 w-52 flex-shrink-0 border-r border-solid border-gray-100 overflow-x-hidden overflow-y-auto"
         >
             <div
                 v-for="s in ToolApps"

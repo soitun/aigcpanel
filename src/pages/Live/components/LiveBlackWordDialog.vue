@@ -85,9 +85,7 @@ defineExpose({
                             <icon-exclamation-circle />
                         </template>
                         检测到
-                        {{
-                            violationRecords.length
-                        }}
+                        {{ violationRecords.length }}
                         条知识库内容包含违规词汇，建议及时修改避免直播风险
                     </a-alert>
                 </div>

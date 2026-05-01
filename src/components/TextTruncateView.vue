@@ -39,7 +39,7 @@ const handleCopy = async () => {
 </script>
 
 <template>
-    <div :class="{ 'cursor-pointer': copyable !== false }">
+    <div class="text-xs">
         {{ displayText }}
         <a-tooltip
             :content="isTruncate ? $t('common.more') : $t('common.collapse')"

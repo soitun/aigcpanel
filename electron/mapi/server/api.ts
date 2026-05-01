@@ -8,6 +8,7 @@ import fs from "node:fs";
 import User, { UserApi } from "../user/main";
 import { EncodeUtil, MemoryMapCacheUtil } from "../../lib/util";
 import { ServerContext, ServerFunctionDataType } from "./type";
+import { UploadUtil } from "../../lib/upload";
 import { Log } from "../log/main";
 
 type RequestOptionType = {

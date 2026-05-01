@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { Dialog } from "../../lib/dialog";
+import { AppConfig } from "../../config";
 import { t } from "../../lang";
 import { functionToLabels } from "../../lib/aigcpanel";
-import { EnumServerType, ServerRecord } from "../../types/Server";
-import { useServerStore } from "../../store/modules/server";
+import { Dialog } from "../../lib/dialog";
 import { VersionUtil } from "../../lib/util";
-import { AppConfig } from "../../config";
-import ServerAddResolvePanel from "./ServerAddResolvePanel.vue";
+import { useServerStore } from "../../store/modules/server";
+import { EnumServerType, ServerRecord } from "../../types/Server";
+
 import { isDev } from "../../lib/env";
+import ServerAddResolvePanel from "./ServerAddResolvePanel.vue";
 
 const resolvePanel = ref<InstanceType<typeof ServerAddResolvePanel> | null>(
     null,
@@ -198,7 +199,11 @@ const doSelectLocalDir = async () => {
 };
 
 const doSelectCloud = async () => {
-    Dialog.tipError(t("请升级Pro版使用"));
+    let isPro = false;
+
+    if (!isPro) {
+        Dialog.tipError(t("请升级Pro版使用"));
+    }
 };
 defineExpose({
     show,

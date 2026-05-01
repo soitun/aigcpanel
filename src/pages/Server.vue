@@ -12,9 +12,10 @@ import { AppConfig } from "../config";
 import { t } from "../lang";
 import { functionToLabels } from "../lib/aigcpanel";
 import ModelSettingDialog from "../module/Model/ModelSettingDialog.vue";
-import ServerRemoteAddDialog from "../components/Server/ServerRemoteAddDialog.vue";
 import { useServerStore } from "../store/modules/server";
 import { EnumServerType } from "../types/Server";
+
+import ServerRemoteAddDialog from "../components/Server/ServerRemoteAddDialog.vue";
 
 const addDialog = ref<InstanceType<typeof ServerAddDialog> | null>(null);
 const remoteAddDialog = ref<InstanceType<typeof ServerRemoteAddDialog> | null>(
@@ -62,6 +63,7 @@ const typeName = (type: string) => {
                     </template>
                     {{ $t("setting.llm") }}
                 </a-button>
+
                 <a-button
                     v-if="serverStore.records.length > 0"
                     class="ml-1"
@@ -164,10 +166,7 @@ const typeName = (type: string) => {
                                                 "
                                                 class="text-lg"
                                             ></icon-cloud>
-                                            <i
-                                                v-else
-                                                class="iconfont icon-folder"
-                                            ></i>
+                                            <i-mdi-folder-outline v-else />
                                         </div>
                                     </a-tooltip>
                                 </div>

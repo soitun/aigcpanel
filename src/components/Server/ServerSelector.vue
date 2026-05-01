@@ -2,6 +2,7 @@
 import { useServerStore } from "../../store/modules/server";
 import { EnumServerStatus, ServerRecord } from "../../types/Server";
 import { computed, ref, watch } from "vue";
+
 import { Dialog } from "../../lib/dialog";
 import { mapError } from "../../lib/error";
 
@@ -16,6 +17,7 @@ const recordsFilter = computed(() => {
         s.functions.includes(props.functionName),
     );
 });
+
 const valueAutoStart = computed(() => {
     const server = serverStore.records.find(
         (s) => s.key === select.value?.modelValue,
@@ -34,6 +36,13 @@ const valueStatus = computed(() => {
             ?.status || EnumServerStatus.STOPPED
     );
 });
+let showCloudOptgroup = false;
+
+const hasRecords = computed(() => {
+    let count = recordsFilter.value.length;
+
+    return count > 0;
+});
 const emit = defineEmits({
     update: (config: any) => true,
 });
@@ -44,6 +53,7 @@ watch(
             return;
         }
         let config: any = null;
+
         if (!config) {
             const server = await serverStore.getByKey(value);
             if (server) {
@@ -118,22 +128,58 @@ watch(
                 </div>
             </a-option>
         </a-optgroup>
-        <a-optgroup :label="$t('升级Pro版，畅享云模型')"></a-optgroup>
+        <a-optgroup v-if="showCloudOptgroup" :label="$t('model.cloudModel')">
+            <a-option
+                v-for="server in cloudRecordsFilter"
+                :key="server.key"
+                :value="server.key"
+            >
+                <div
+                    class="flex items-center py-2 flex-nowrap truncate no-wrap"
+                >
+                    <div
+                        class="w-2 h-2 bg-green-500 rounded-full mr-1 flex-shrink-0"
+                    ></div>
+                    <div class="text-xs flex-grow">
+                        {{ server.title }}
+                        v{{ server.version }}
+                    </div>
+                </div>
+            </a-option>
+        </a-optgroup>
+        <a-optgroup
+            v-if="!showCloudOptgroup"
+            :label="$t('升级Pro版，畅享云模型')"
+        ></a-optgroup>
         <template #label="{ data }">
             <div class="text-sm flex items-center flex-nowrap truncate no-wrap">
                 <div
-                    v-if="valueStatus === EnumServerStatus.RUNNING"
-                    class="w-2 h-2 bg-green-700 rounded-full mr-1 flex-shrink-0"
+                    v-if="
+                        valueAutoStart &&
+                        valueAutoStartStatus === EnumServerStatus.RUNNING
+                    "
+                    class="w-2 h-2 bg-green-500 rounded-full mr-1 flex-shrink-0"
+                ></div>
+                <div
+                    v-else-if="
+                        valueAutoStart &&
+                        valueAutoStartStatus !== EnumServerStatus.RUNNING
+                    "
+                    class="w-2 h-2 bg-blue-500 rounded-full mr-1 flex-shrink-0"
+                ></div>
+                <div
+                    v-else-if="valueStatus === EnumServerStatus.RUNNING"
+                    class="w-2 h-2 bg-green-500 rounded-full mr-1 flex-shrink-0"
                 ></div>
                 <div
                     v-else
                     class="w-2 h-2 bg-red-700 rounded-full mr-1 flex-shrink-0"
                 ></div>
-                <div v-if="recordsFilter.length > 0">
+                <div v-if="hasRecords">
                     {{ data?.label }}
                 </div>
                 <div v-else>
-                    {{ $t("没有可用模型") }}
+                    {{ $t("empty.noModel") }}
                 </div>
             </div>
         </template>

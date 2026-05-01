@@ -36,6 +36,8 @@ const doQuit = async () => {
     await appQuitConfirm.value?.show();
 };
 
+let appEditionBadge = "社区版";
+
 onMounted(() => {
     // document.body.setAttribute('arco-theme', 'dark')
 });
@@ -57,8 +59,9 @@ onMounted(() => {
                 <div class="p-2 flex-grow">
                     {{ AppConfig.title }}
                     <span
-                        class="bg-gray-200 text-gray-500 rounded-lg px-1 inline-block"
-                        >{{ $t("社区版") }}</span
+                        v-if="appEditionBadge"
+                        class="bg-gray-200 text-gray-500 rounded-lg px-1 inline-block text-xs ml-1"
+                        >{{ appEditionBadge }}</span
                     >
                 </div>
             </div>
@@ -67,19 +70,19 @@ onMounted(() => {
                     class="inline-block w-6 h-6 leading-6 cursor-pointer hover:text-primary mr-1"
                     @click="$mapi.app.windowMin()"
                 >
-                    <i class="iconfont text-sm icon-min"></i>
+                    <i-mdi-minus class="text-sm" />
                 </div>
                 <div
                     class="inline-block w-6 h-6 leading-6 cursor-pointer hover:text-primary mr-1"
                     @click="$mapi.app.windowMax()"
                 >
-                    <i class="iconfont text-sm icon-max"></i>
+                    <i-mdi-window-maximize class="text-sm" />
                 </div>
                 <div
                     class="inline-block w-6 h-6 leading-6 cursor-pointer hover:text-red-500"
                     @click="doQuit"
                 >
-                    <i class="iconfont text-sm icon-close"></i>
+                    <i-mdi-close class="text-sm" />
                 </div>
             </div>
         </div>

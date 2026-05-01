@@ -2,11 +2,9 @@ import { ComputedRef } from "@vue/reactivity";
 import { cloneDeep } from "lodash-es";
 import { defineStore } from "pinia";
 import { computed, ref, toRaw } from "vue";
-import { TimeUtil, wait } from "../../lib/util";
-import { useTaskStore } from "./task";
-// import {useServerCloudStore} from "./serverCloud";
-import { Dialog } from "../../lib/dialog";
 import { t } from "../../lang";
+import { Dialog } from "../../lib/dialog";
+import { TimeUtil, wait } from "../../lib/util";
 import { StorageService } from "../../service/StorageService";
 import { TaskService } from "../../service/TaskService";
 import {
@@ -16,9 +14,10 @@ import {
     ServerRuntime,
 } from "../../types/Server";
 import store from "../index";
+
+import { useTaskStore } from "./task";
 import { ServerInfo } from "../../../electron/mapi/server/type";
 
-// const serverCloudStore = useServerCloudStore()
 const taskStore = useTaskStore();
 const serverRuntime = ref<Map<string, ServerRuntime>>(new Map());
 const createServerStatus = (
@@ -186,7 +185,6 @@ export const serverStore = defineStore("server", {
     actions: {
         async waitReady() {
             await wait(() => this.isReady);
-            // await serverCloudStore.waitReady()
         },
         async init() {
             await $mapi.storage.get("server", "records", []).then((records) => {
@@ -449,18 +447,12 @@ export const serverStore = defineStore("server", {
             await $mapi.storage.set("server", "records", savedRecords);
         },
         async getByKey(key: string): Promise<ServerRecord | undefined> {
-            // if (key.startsWith('Cloud')) {
-            //     return serverCloudStore.getByKey(key)
-            // }
             return this.records.find((record) => record.key === key);
         },
         async getByNameVersion(
             name: string,
             version: string,
         ): Promise<ServerRecord | undefined> {
-            // if (name.startsWith('Cloud')) {
-            //     return serverCloudStore.getByNameVersion(name, version)
-            // }
             return this.records.find(
                 (record) => record.name === name && record.version === version,
             );
