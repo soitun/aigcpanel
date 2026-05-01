@@ -1,4 +1,9 @@
-import {SendType, ServerApiType, ServerContext, ServerInfo} from "../mapi/server/type";
+import {
+    SendType,
+    ServerApiType,
+    ServerContext,
+    ServerInfo,
+} from "../mapi/server/type";
 
 const serverRuntime = {
     port: 0,
@@ -14,7 +19,10 @@ export const ServerLive: ServerContext = {
         return `http://localhost:${serverRuntime.port}/`;
     },
     send(type: SendType, data: any) {
-        this.ServerApi.event.sendChannel(this.ServerInfo.eventChannelName, {type, data});
+        this.ServerApi.event.sendChannel(this.ServerInfo.eventChannelName, {
+            type,
+            data,
+        });
     },
 
     async _client() {
@@ -25,22 +33,33 @@ export const ServerLive: ServerContext = {
         // console.log('this.ServerApi.app.availablePort(50617)', await this.ServerApi.app.availablePort(50617))
         this.send("starting", this.ServerInfo);
         let command = [];
-        serverRuntime.port = await this.ServerApi.availablePort(serverRuntime.port, this.ServerInfo.setting);
+        serverRuntime.port = await this.ServerApi.availablePort(
+            serverRuntime.port,
+            this.ServerInfo.setting,
+        );
         const env = await this.ServerApi.env();
         command.push(`"${this.ServerInfo.localPath}/launcher"`);
         command.push(`--env=DEBUG=true`);
-        env["PATH"] = this.ServerApi.getPathEnv(`${this.ServerInfo.localPath}/binary`);
+        env["PATH"] = this.ServerApi.getPathEnv(
+            `${this.ServerInfo.localPath}/binary`,
+        );
         env["AIGCPANEL_SERVER_PORT"] = `${serverRuntime.port}`;
-        env["AIGCPANEL_SERVER_PLACEHOLDER_CONFIG"] = await this.ServerApi.launcherPrepareConfigJson({
-            id: "live",
-            modelConfig: {},
-            setting: this.ServerInfo.setting,
-        });
+        env["AIGCPANEL_SERVER_PLACEHOLDER_CONFIG"] =
+            await this.ServerApi.launcherPrepareConfigJson({
+                id: "live",
+                modelConfig: {},
+                setting: this.ServerInfo.setting,
+            });
         // console.log('command', JSON.stringify(command))
         shellController = await this.ServerApi.app.spawnShell(command, {
-            stdout: data => {
-                this.ServerApi.file.appendText(this.ServerInfo.logFile, data, {isDataPath: true});
-                const result = this.ServerApi.extractResultFromLogs("live", data);
+            stdout: (data) => {
+                this.ServerApi.file.appendText(this.ServerInfo.logFile, data, {
+                    isDataPath: true,
+                });
+                const result = this.ServerApi.extractResultFromLogs(
+                    "live",
+                    data,
+                );
                 if (result) {
                     if (result["Action"]) {
                         const action = result["Action"].split(":");
@@ -51,16 +70,20 @@ export const ServerLive: ServerContext = {
                     }
                 }
             },
-            stderr: data => {
-                this.ServerApi.file.appendText(this.ServerInfo.logFile, data, {isDataPath: true});
+            stderr: (data) => {
+                this.ServerApi.file.appendText(this.ServerInfo.logFile, data, {
+                    isDataPath: true,
+                });
             },
-            success: data => {
+            success: (data) => {
                 // console.log('serverLive.success', {data})
                 this.send("success", this.ServerInfo);
             },
             error: (data, code) => {
                 // console.log('serverLive.error', {code, data})
-                this.ServerApi.file.appendText(this.ServerInfo.logFile, data, {isDataPath: true});
+                this.ServerApi.file.appendText(this.ServerInfo.logFile, data, {
+                    isDataPath: true,
+                });
                 this.send("error", this.ServerInfo);
             },
             env,
@@ -110,11 +133,11 @@ export const ServerLive: ServerContext = {
             url: string;
             param: any;
         },
-        option: any
+        option: any,
     ) {
         // serverRuntime.port = 60617
         // console.log('apiRequest', {url: this.url(), data, option})
-        const {url, param} = data;
+        const { url, param } = data;
         return this.ServerApi.request(`${this.url()}${url}`, param, {
             method: "POST",
         });

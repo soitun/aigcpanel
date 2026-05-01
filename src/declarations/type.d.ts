@@ -10,7 +10,11 @@ type DefsPage = {
     offBroadcast: (type: string, cb: (data: any) => void) => void;
     registerCallPage: (
         name: string,
-        cb: (resolve: (data: any) => void, reject: (error: string) => void, data: any) => void
+        cb: (
+            resolve: (data: any) => void,
+            reject: (error: string) => void,
+            data: any,
+        ) => void,
     ) => void;
     createChannel: (cb: (data: any) => void) => string;
     destroyChannel: (channel: string) => void;
@@ -36,7 +40,7 @@ type DefsMapi = {
             option?: {
                 includeMinimumSize: boolean;
                 center: boolean;
-            }
+            },
         ) => Promise<void>;
         windowOpen: (name: string, option?: any) => Promise<void>;
         windowHide: (name?: string) => Promise<void>;
@@ -48,7 +52,7 @@ type DefsMapi = {
                 mouseY: number;
                 width: number;
                 height: number;
-            }
+            },
         ) => Promise<void>;
         openExternal: (url: string) => Promise<void>;
         openPath: (url: string) => Promise<void>;
@@ -62,7 +66,7 @@ type DefsMapi = {
                 cwd?: string;
                 outputEncoding?: string;
                 shell?: boolean;
-            }
+            },
         ) => Promise<void>;
         spawnShell: (
             command: string | string[],
@@ -75,7 +79,7 @@ type DefsMapi = {
                 outputEncoding?: string;
                 env?: Record<string, any>;
                 shell?: boolean;
-            } | null
+            } | null,
         ) => Promise<{
             stop: () => void;
             send: (data: any) => void;
@@ -93,9 +97,13 @@ type DefsMapi = {
                 outputEncoding?: string;
                 env?: Record<string, any>;
                 shell?: boolean;
-            } | null
+            } | null,
         ) => Promise<string>;
-        availablePort: (start: number, lockKey?: string, lockTime?: number) => Promise<number>;
+        availablePort: (
+            start: number,
+            lockKey?: string,
+            lockTime?: number,
+        ) => Promise<number>;
         fixExecutable: (executable: string) => Promise<void>;
         getClipboardText: () => Promise<string>;
         setClipboardText: (text: string) => Promise<void>;
@@ -107,7 +115,7 @@ type DefsMapi = {
             option?: {
                 duration?: number;
                 status?: "success" | "error";
-            }
+            },
         ) => Promise<void>;
         setupList: () => Promise<
             {
@@ -142,7 +150,11 @@ type DefsMapi = {
         root: () => string;
         info: (msg: string, data: any = null) => Promise<void>;
         error: (msg: string, data: any = null) => Promise<void>;
-        collect: (option?: { startTime?: string; endTime?: string; limit?: number }) => Promise<string>;
+        collect: (option?: {
+            startTime?: string;
+            endTime?: string;
+            limit?: number;
+        }) => Promise<string>;
     };
     storage: {
         all: () => Promise<any>;
@@ -161,38 +173,87 @@ type DefsMapi = {
     };
     file: {
         fullPath: (path: string) => Promise<string>;
-        exists: (path: string, option?: { isDataPath?: boolean }) => Promise<boolean>;
-        isDirectory: (path: string, option?: { isDataPath?: boolean }) => Promise<boolean>;
-        mkdir: (path: string, option?: { isDataPath?: boolean }) => Promise<void>;
-        list: (path: string, option?: { isDataPath?: boolean }) => Promise<{
-            name: string,
-            pathname: string,
-            isDirectory: boolean,
-            size: number,
-            lastModified: number,
-        }[]>;
-        listAll: (path: string, option?: { isDataPath?: boolean }) => Promise<any[]>;
-        write: (path: string, data: any, option?: { isDataPath?: boolean }) => Promise<void>;
-        writeBuffer: (path: string, data: any, option?: { isDataPath?: boolean }) => Promise<void>;
-        writeStream: (path: string, stream: any, option?: { isDataPath?: boolean }) => Promise<void>;
+        exists: (
+            path: string,
+            option?: { isDataPath?: boolean },
+        ) => Promise<boolean>;
+        isDirectory: (
+            path: string,
+            option?: { isDataPath?: boolean },
+        ) => Promise<boolean>;
+        mkdir: (
+            path: string,
+            option?: { isDataPath?: boolean },
+        ) => Promise<void>;
+        list: (
+            path: string,
+            option?: { isDataPath?: boolean },
+        ) => Promise<
+            {
+                name: string;
+                pathname: string;
+                isDirectory: boolean;
+                size: number;
+                lastModified: number;
+            }[]
+        >;
+        listAll: (
+            path: string,
+            option?: { isDataPath?: boolean },
+        ) => Promise<any[]>;
+        write: (
+            path: string,
+            data: any,
+            option?: { isDataPath?: boolean },
+        ) => Promise<void>;
+        writeBuffer: (
+            path: string,
+            data: any,
+            option?: { isDataPath?: boolean },
+        ) => Promise<void>;
+        writeStream: (
+            path: string,
+            stream: any,
+            option?: { isDataPath?: boolean },
+        ) => Promise<void>;
         read: (path: string, option?: { isDataPath?: boolean }) => Promise<any>;
-        readBuffer: (path: string, option?: { isDataPath?: boolean }) => Promise<any>;
-        readStream: (path: string, option?: { isDataPath?: boolean }) => Promise<ReadableStream | null>;
-        deletes: (path: string, option?: { isDataPath?: boolean }) => Promise<void>;
-        clean: (paths: string[], option?: { isDataPath?: boolean }) => Promise<void>;
+        readBuffer: (
+            path: string,
+            option?: { isDataPath?: boolean },
+        ) => Promise<any>;
+        readStream: (
+            path: string,
+            option?: { isDataPath?: boolean },
+        ) => Promise<ReadableStream | null>;
+        deletes: (
+            path: string,
+            option?: { isDataPath?: boolean },
+        ) => Promise<void>;
+        clean: (
+            paths: string[],
+            option?: { isDataPath?: boolean },
+        ) => Promise<void>;
         rename: (
             pathOld: string,
             pathNew: string,
             option?: {
                 isDataPath?: boolean;
                 overwrite?: boolean;
-            }
+            },
         ) => Promise<void>;
-        copy: (pathOld: string, pathNew: string, option?: {
-            isDataPath?: boolean,
-            overwrite?: boolean;
-        }) => Promise<void>;
-        temp: (ext: string = "tmp", prefix: string = "file", suffix: string = "") => Promise<string>;
+        copy: (
+            pathOld: string,
+            pathNew: string,
+            option?: {
+                isDataPath?: boolean;
+                overwrite?: boolean;
+            },
+        ) => Promise<void>;
+        temp: (
+            ext: string = "tmp",
+            prefix: string = "file",
+            suffix: string = "",
+        ) => Promise<string>;
         tempDir: (prefix: string = "dir") => Promise<string>;
         watchText: (
             path: string,
@@ -200,11 +261,15 @@ type DefsMapi = {
             option?: {
                 isDataPath?: boolean;
                 limit?: number;
-            }
+            },
         ) => Promise<{
             stop: Function;
         }>;
-        appendText: (path: string, data: any, option?: { isDataPath?: boolean }) => Promise<void>;
+        appendText: (
+            path: string,
+            data: any,
+            option?: { isDataPath?: boolean },
+        ) => Promise<void>;
         download: (
             url: string,
             path?: string | null,
@@ -212,25 +277,38 @@ type DefsMapi = {
                 isDataPath?: boolean;
                 userAgent?: string;
                 progress?: (percent: number, total: number) => void;
-            }
+            },
         ) => Promise<string>;
-        openFile: (options: {
-            filters?: {
-                name: string;
-                extensions: string[];
-            }[],
-            properties?: ("multiSelections")[]
-        } = {}) => Promise<string | null>;
+        openFile: (
+            options: {
+                filters?: {
+                    name: string;
+                    extensions: string[];
+                }[];
+                properties?: "multiSelections"[];
+            } = {},
+        ) => Promise<string | null>;
         openDirectory: (options: {} = {}) => Promise<string | null>;
         openSave: (options: {} = {}) => Promise<string | null>;
         ext: (path: string) => Promise<string>;
-        stat: (path: string, option?: { isDataPath?: boolean }) => Promise<{
+        stat: (
+            path: string,
+            option?: { isDataPath?: boolean },
+        ) => Promise<{
             size: number;
             isDirectory: boolean;
             lastModified: number;
         }>;
-        textToName: (text: string, ext: string = "", maxLimit: number = 100) => string;
-        pathToName: (path: string, includeExt: boolean = true, maxLimit: number = 100) => string;
+        textToName: (
+            text: string,
+            ext: string = "",
+            maxLimit: number = 100,
+        ) => string;
+        pathToName: (
+            path: string,
+            includeExt: boolean = true,
+            maxLimit: number = 100,
+        ) => string;
         hubRootDefault: () => Promise<string>;
         hubRoot: () => Promise<string>;
         hubSave: (
@@ -245,7 +323,7 @@ type DefsMapi = {
                 savePathParam?: {
                     [key: string]: any;
                 };
-            }
+            },
         ) => Promise<string>;
         hubSaveContent: (
             content: string,
@@ -257,7 +335,7 @@ type DefsMapi = {
                 savePathParam?: {
                     [key: string]: any;
                 };
-            }
+            },
         ) => Promise<string>;
         hubDelete: (
             file: string,
@@ -265,7 +343,7 @@ type DefsMapi = {
                 isDataPath?: boolean;
                 ignoreWhenNotInHub?: boolean;
                 tryLaterWhenFailed?: boolean;
-            }
+            },
         ) => Promise<void>;
         hubFullPath: (file: string) => Promise<string>;
         hubFile: (
@@ -277,7 +355,7 @@ type DefsMapi = {
                 savePathParam?: {
                     [key: string]: any;
                 };
-            }
+            },
         ) => Promise<string>;
         isHubFile: (file: string) => Promise<boolean>;
         cacheForget: (key: any) => Promise<void>;
@@ -302,7 +380,7 @@ type DefsMapi = {
             option?: {
                 waitReadyTimeout?: number;
                 timeout?: number;
-            }
+            },
         ) => Promise<ApiResult<any>>;
         // channel main <-> render
         channelSend: (channel: string, data: any) => Promise<void>;
@@ -333,13 +411,21 @@ type DefsMapi = {
             data: Record<string, any>,
             option?: {
                 throwException?: boolean;
-            }
+            },
         ) => Promise<any>;
     };
     misc: {
         getZipFileContent: (path: string, pathInZip: string) => Promise<string>;
-        unzip: (zipPath: string, dest: string, option?: { process: Function }) => Promise<void>;
-        zip: (zipPath: string, sourceDir: string, option?: { end?: (archive: any) => void; }) => Promise<void>;
+        unzip: (
+            zipPath: string,
+            dest: string,
+            option?: { process: Function },
+        ) => Promise<void>;
+        zip: (
+            zipPath: string,
+            sourceDir: string,
+            option?: { end?: (archive: any) => void },
+        ) => Promise<void>;
         request: (option: {
             url: string;
             method?: "GET" | "POST";
@@ -349,13 +435,13 @@ type DefsMapi = {
         }) => Promise<any>;
     };
     httpserver: {
-        status: () => Promise<{running: boolean; port: number}>;
-        start: (port?: number) => Promise<{code: number; msg?: string}>;
-        stop: () => Promise<{code: number}>;
+        status: () => Promise<{ running: boolean; port: number }>;
+        start: (port?: number) => Promise<{ code: number; msg?: string }>;
+        stop: () => Promise<{ code: number }>;
         getPort: () => Promise<number>;
-        setPort: (port: number) => Promise<{code: number}>;
+        setPort: (port: number) => Promise<{ code: number }>;
         getEnabled: () => Promise<boolean>;
-        setEnabled: (enabled: boolean) => Promise<{code: number}>;
+        setEnabled: (enabled: boolean) => Promise<{ code: number }>;
     };
     server: {
         listGpus: () => Promise<
@@ -377,13 +463,13 @@ type DefsMapi = {
             serverInfo: ServerInfo,
             method: string,
             data: ServerCallFunctionData,
-            option?: ServerCallFunctionOption
+            option?: ServerCallFunctionOption,
         ) => Promise<ServerCallFunctionResult>;
         callFunctionWithException: (
             serverInfo: ServerInfo,
             method: string,
             data: ServerCallFunctionData,
-            option?: ServerCallFunctionOption
+            option?: ServerCallFunctionOption,
         ) => Promise<ServerCallFunctionResult>;
     };
 };
@@ -399,5 +485,3 @@ declare global {
 }
 
 export {};
-
-

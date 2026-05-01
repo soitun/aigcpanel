@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import FileSelector from "../../../../components/common/FileSelector.vue";
 import { dataAutoSaveDraft } from "../../../../components/common/util";
 import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
 import { TaskRecord, TaskService } from "../../../../service/TaskService";
+import { useTaskStore } from "../../../../store/modules/task";
 import SoundAsrForm from "../../../Sound/components/SoundAsrForm.vue";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
 
 const emit = defineEmits<{
     submitted: [];
 }>();
+const taskStore = useTaskStore();
 const soundAsrForm = ref<InstanceType<typeof SoundAsrForm>>();
 const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(
     null,
@@ -22,6 +24,10 @@ const { clearDraft } = dataAutoSaveDraft(
     "SoundReplaceCreate.formData",
     formData.value,
 );
+
+onMounted(() => {});
+
+onUnmounted(() => {});
 
 const doSubmit = async () => {
     const soundAsrValue = await soundAsrForm.value?.getValue();
@@ -54,11 +60,12 @@ const doSubmit = async () => {
         },
         param: {},
     };
-    await TaskService.submit(record);
+    const id = await TaskService.submit(record);
     formData.value.video = "";
     emit("submitted");
     Dialog.tipSuccess(t("soundReplace.taskSubmitted"));
     clearDraft();
+    return id;
 };
 </script>
 

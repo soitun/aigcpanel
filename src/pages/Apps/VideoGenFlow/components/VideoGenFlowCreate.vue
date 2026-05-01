@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import { Dialog } from "../../../../lib/dialog";
 import { StorageUtil } from "../../../../lib/storage";
 import { PermissionService } from "../../../../service/PermissionService";
@@ -20,6 +20,8 @@ onMounted(async () => {
     const old = StorageUtil.getObject("VideoGenFlowCreate.formData");
     formData.value.text = old.text || "";
 });
+
+onUnmounted(() => {});
 
 watch(
     () => formData.value,
@@ -63,6 +65,7 @@ const doSubmit = async () => {
     Dialog.tipSuccess("任务已经提交成功，等待视频生成完成");
     formData.value.text = "";
     emit("submitted");
+    return id;
 };
 
 const emit = defineEmits({

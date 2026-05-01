@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import {computed, ref} from "vue";
-import {Dialog} from "../../lib/dialog";
-import {t} from "../../lang";
-import {functionToLabels} from "../../lib/aigcpanel";
-import {EnumServerType, ServerRecord} from "../../types/Server";
-import {useServerStore} from "../../store/modules/server";
-import {VersionUtil} from "../../lib/util";
-import {AppConfig} from "../../config";
+import { computed, ref } from "vue";
+import { Dialog } from "../../lib/dialog";
+import { t } from "../../lang";
+import { functionToLabels } from "../../lib/aigcpanel";
+import { EnumServerType, ServerRecord } from "../../types/Server";
+import { useServerStore } from "../../store/modules/server";
+import { VersionUtil } from "../../lib/util";
+import { AppConfig } from "../../config";
 import ServerAddResolvePanel from "./ServerAddResolvePanel.vue";
-import {isDev} from "../../lib/env";
+import { isDev } from "../../lib/env";
 
-const resolvePanel = ref<InstanceType<typeof ServerAddResolvePanel> | null>(null);
+const resolvePanel = ref<InstanceType<typeof ServerAddResolvePanel> | null>(
+    null,
+);
 
 const serverStore = useServerStore();
 const visible = ref(false);
@@ -47,7 +49,9 @@ const platformInfo = computed(() => {
         osx: "macOS",
         linux: "Linux",
     };
-    const platformName = platformNameMap[modelInfo.value.platformName] || modelInfo.value.platformName;
+    const platformName =
+        platformNameMap[modelInfo.value.platformName] ||
+        modelInfo.value.platformName;
     return `${platformName} ${modelInfo.value.platformArch}`;
 });
 const functionLabels = computed(() => {
@@ -97,12 +101,17 @@ const doSubmit = async () => {
     if (!modelInfo.value.path) {
         return;
     }
-    const target = await $mapi.file.fullPath(`model/${modelInfo.value.name}-${modelInfo.value.version}`);
+    const target = await $mapi.file.fullPath(
+        `model/${modelInfo.value.name}-${modelInfo.value.version}`,
+    );
     if (await $mapi.file.exists(target)) {
         Dialog.tipError(t("error.modelVersionExists"));
         return;
     }
-    const exists = await serverStore.getByNameVersion(modelInfo.value.name, modelInfo.value.version);
+    const exists = await serverStore.getByNameVersion(
+        modelInfo.value.name,
+        modelInfo.value.version,
+    );
     if (exists) {
         Dialog.tipError(t("error.modelVersionExists"));
         return;
@@ -134,7 +143,7 @@ const doSubmit = async () => {
 
 const doSelectLocalDir = async () => {
     const configPath = await $mapi.file.openFile({
-        filters: [{name: "config.json", extensions: ["json"]}],
+        filters: [{ name: "config.json", extensions: ["json"] }],
     });
     if (!configPath) {
         return;
@@ -218,12 +227,19 @@ const emit = defineEmits({
                 <div v-if="!modelInfo.name">
                     <div class="px-3">
                         <div>
-                            <img class="w-48 h-48 object-contain m-auto" src="./../../assets/image/server-folder.svg"/>
+                            <img
+                                class="w-48 h-48 object-contain m-auto"
+                                src="./../../assets/image/server-folder.svg"
+                            />
                         </div>
                         <div class="flex gap-4">
-                            <a-button @click="doSelectLocalDir" class="block w-full" :loading="loading">
+                            <a-button
+                                @click="doSelectLocalDir"
+                                class="block w-full"
+                                :loading="loading"
+                            >
                                 <template #icon>
-                                    <icon-folder/>
+                                    <icon-folder />
                                 </template>
                                 {{ t("model.selectLocal") }}
                                 config.json
@@ -233,12 +249,14 @@ const emit = defineEmits({
                                 target="_blank"
                                 class="arco-btn arco-btn-secondary arco-btn-shape-square arco-btn-size-medium arco-btn-status-normal block w-full text-center py-1"
                             >
-                                <icon-cloud/>
+                                <icon-cloud />
                                 {{ t("model.download") }}
                             </a>
                         </div>
                         <div class="mt-2">
-                            <div class="text-sm bg-gray-100 p-5 rounded-lg text-gray-500 leading-6">
+                            <div
+                                class="text-sm bg-gray-100 p-5 rounded-lg text-gray-500 leading-6"
+                            >
                                 <div>
                                     {{ $t("model.runInLocalDesc") }}
                                 </div>
@@ -255,67 +273,108 @@ const emit = defineEmits({
                 <div v-else>
                     <div class="border rounded-lg py-4 leading-10">
                         <div class="flex">
-                            <div class="pr-3 text-right w-20">{{ t("common.name") }}</div>
+                            <div class="pr-3 text-right w-20">
+                                {{ t("common.name") }}
+                            </div>
                             <div class="flex flex-wrap items-center">
-                                <div class="mr-2 mb-1">{{ modelInfo.title }}</div>
-                                <div class="mr-2 text-sm bg-gray-100 px-2 leading-6 inline-block rounded-lg mb-1">
+                                <div class="mr-2 mb-1">
+                                    {{ modelInfo.title }}
+                                </div>
+                                <div
+                                    class="mr-2 text-sm bg-gray-100 px-2 leading-6 inline-block rounded-lg mb-1"
+                                >
                                     v{{ modelInfo.version }}
                                 </div>
-                                <div class="mr-2 text-xs bg-gray-100 px-2 leading-6 inline-block rounded-lg mb-1">
+                                <div
+                                    class="mr-2 text-xs bg-gray-100 px-2 leading-6 inline-block rounded-lg mb-1"
+                                >
                                     {{ modelInfo.name }}
                                 </div>
                             </div>
                         </div>
                         <div class="flex">
-                            <div class="pr-3 text-right w-20 flex-shrink-0">{{ t("common.description") }}</div>
+                            <div class="pr-3 text-right w-20 flex-shrink-0">
+                                {{ t("common.description") }}
+                            </div>
                             <div>{{ modelInfo.description }}</div>
                         </div>
                         <div class="flex">
-                            <div class="pr-3 text-right w-20 flex-shrink-0">{{ $t("common.adapt") }}</div>
+                            <div class="pr-3 text-right w-20 flex-shrink-0">
+                                {{ $t("common.adapt") }}
+                            </div>
                             <div>{{ platformInfo }}</div>
                         </div>
                         <div class="flex">
-                            <div class="pr-3 text-right w-20 flex-shrink-0">{{ $t("common.feature") }}</div>
+                            <div class="pr-3 text-right w-20 flex-shrink-0">
+                                {{ $t("common.feature") }}
+                            </div>
                             <div>
-                                <a-tag v-for="label in functionLabels" class="mr-1">
+                                <a-tag
+                                    v-for="label in functionLabels"
+                                    class="mr-1"
+                                >
                                     {{ label }}
                                 </a-tag>
                             </div>
                         </div>
                         <div class="flex">
-                            <div class="pr-3 text-right w-20 flex-shrink-0">{{ t("model.hardwareReq") }}</div>
+                            <div class="pr-3 text-right w-20 flex-shrink-0">
+                                {{ t("model.hardwareReq") }}
+                            </div>
                             <div>{{ modelInfo.deviceDescription }}</div>
                         </div>
                         <div class="flex">
-                            <div class="pr-3 text-right w-20 flex-shrink-0">{{ t("model.versionReq") }}</div>
-                            <div>{{ modelInfo.serverRequire === "*" ? t("common.none") : modelInfo.serverRequire }}</div>
+                            <div class="pr-3 text-right w-20 flex-shrink-0">
+                                {{ t("model.versionReq") }}
+                            </div>
+                            <div>
+                                {{
+                                    modelInfo.serverRequire === "*"
+                                        ? t("common.none")
+                                        : modelInfo.serverRequire
+                                }}
+                            </div>
                         </div>
                     </div>
                     <div>
-                        <ServerAddResolvePanel ref="resolvePanel" :root="modelInfo.path"/>
+                        <ServerAddResolvePanel
+                            ref="resolvePanel"
+                            :root="modelInfo.path"
+                        />
                     </div>
                     <div class="pt-4 flex items-center">
                         <div>
                             <a-button
                                 class="mr-2"
                                 type="primary"
-                                :disabled="(!modelInfo.isSupport||!resolvePanel?.isSuccess().value) as boolean"
+                                :disabled="
+                                    (!modelInfo.isSupport ||
+                                        !resolvePanel?.isSuccess()
+                                            .value) as boolean
+                                "
                                 :loading="isImporting"
                                 @click="doSubmit"
                             >
                                 <template #icon>
-                                    <icon-check/>
+                                    <icon-check />
                                 </template>
                                 {{ $t("common.submitConfirm") }}
                             </a-button>
-                            <a-button class="mr-2" v-if="!isImporting" @click="emptyModelInfo" :loading="loading">
+                            <a-button
+                                class="mr-2"
+                                v-if="!isImporting"
+                                @click="emptyModelInfo"
+                                :loading="loading"
+                            >
                                 <template #icon>
-                                    <icon-redo/>
+                                    <icon-redo />
                                 </template>
                                 {{ $t("common.reselect") }}
                             </a-button>
                         </div>
-                        <div class="flex-grow pl-3 text-sm truncate text-red-600">
+                        <div
+                            class="flex-grow pl-3 text-sm truncate text-red-600"
+                        >
                             {{ logStatus }}
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { t } from "../lang";
 import Router from "../router";
 import SoundAsr from "./Sound/SoundAsr.vue";
@@ -8,10 +8,17 @@ import { SoundApps } from "./Apps/all";
 
 const tab = ref("");
 
-onMounted(() => {
+const syncTab = () => {
     tab.value =
         (Router.currentRoute.value.query.tab as string) || "soundGenerate";
+};
+
+onMounted(() => {
+    syncTab();
 });
+
+// Keep tab in sync when navigating with ?tab= query param
+watch(() => Router.currentRoute.value.query.tab, syncTab);
 
 const dynamicComponent = computed(() => {
     for (const app of SoundApps) {

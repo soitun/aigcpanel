@@ -18,6 +18,10 @@ import { Dialog } from "./lib/dialog";
 import { CommonComponents } from "./components/common";
 import { TaskManager } from "./task";
 import { useSettingStore } from "./store/modules/setting";
+import { useServerStore } from "./store/modules/server";
+
+import { TaskService } from "./service/TaskService";
+import { reportErrorRender } from "../electron/mapi/log/beacon-render";
 
 const settingStore = useSettingStore();
 
@@ -43,31 +47,21 @@ TaskManager.init();
 app.mount("#app").$nextTick(() => {
     postMessage({ payload: "removeLoading" }, "*");
 
-    window.__debug = {
-        navigate: (route: string) => {
-            const appEl = document.querySelector("#app");
-            const vueApp = appEl && (appEl as any).__vue_app__;
-            if (vueApp) vueApp.config.globalProperties.$router.push(route);
-        },
-        getHash: () => window.location.hash,
-        click: (selector: string) => {
-            const el = document.querySelector(selector) as HTMLElement | null;
-            if (!el) throw new Error(`__debug.click: 未找到元素 "${selector}"`);
-            el.click();
-        },
-        clickNth: (selector: string, index: number) => {
-            const el = document.querySelectorAll(selector)[index] as
-                | HTMLElement
-                | undefined;
-            if (!el)
-                throw new Error(
-                    `__debug.clickNth: 未找到第 ${index} 个 "${selector}"`,
-                );
-            el.click();
-        },
-        exists: (selector: string) => !!document.querySelector(selector),
-        count: (selector: string) => document.querySelectorAll(selector).length,
-        getText: (selector: string) =>
-            document.querySelector(selector)?.textContent ?? null,
-    };
+    window.addEventListener("error", (ev) => {
+        reportErrorRender(
+            ev.message,
+            ev.error?.stack,
+            ev.filename,
+            ev.lineno,
+            ev.colno,
+        );
+    });
+
+    window.addEventListener("unhandledrejection", (ev) => {
+        const err = ev.reason;
+        const msg = err instanceof Error ? err.message : String(err);
+        const stack = err instanceof Error ? err.stack : undefined;
+
+        reportErrorRender(msg, stack);
+    });
 });

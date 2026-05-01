@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { StorageUtil } from "../../../lib/storage";
 import SoundGenerateForm from "./SoundGenerateForm.vue";
 import BatchTextareaInputAction from "../../../components/BatchTextareaInputAction.vue";
@@ -22,6 +22,8 @@ onMounted(async () => {
     const old = StorageUtil.getObject("SoundGenerateCreate.formData");
     formData.value.text = old.text || "";
 });
+
+onUnmounted(() => {});
 
 const doSubmit = async () => {
     const value = await soundGenerateForm.value?.getValue();
@@ -58,6 +60,7 @@ const doSubmit = async () => {
     formData.value.text = "";
     Dialog.tipSuccess(t("task.cloneSubmitted"));
     emit("submitted");
+    return id;
 };
 
 const doSubmitBatch = async (records: { text: string }[]) => {

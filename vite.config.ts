@@ -12,6 +12,10 @@ import {AppConfig} from "./src/config";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import {createRequire} from "node:module";
+
+const _require = createRequire(import.meta.url);
+const mdiIcons = _require("@iconify-json/mdi/icons.json");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -47,6 +51,9 @@ export default defineConfig(({command}) => {
             }),
             Icons({
                 compiler: "vue3",
+                customCollections: {
+                    mdi: () => mdiIcons as any,
+                },
             }),
             Components({
                 resolvers: [

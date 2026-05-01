@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { t } from "../../../lang";
 import { Dialog } from "../../../lib/dialog";
 import { PermissionService } from "../../../service/PermissionService";
@@ -15,6 +15,10 @@ const soundAsrForm = ref<InstanceType<typeof SoundAsrForm>>();
 const formData = ref({
     audio: "",
 });
+
+onMounted(() => {});
+
+onUnmounted(() => {});
 
 const onSelectAudioFile = async () => {
     try {
@@ -77,13 +81,14 @@ const doSubmit = async () => {
             return;
         }
 
-        await TaskService.submit(record);
+        const id = await TaskService.submit(record);
 
         // Reset form
         formData.value.audio = "";
 
         emit("submitted");
         Dialog.tipSuccess(t("task.recognitionSubmitted"));
+        return id;
     } finally {
         isSubmitting.value = false;
     }

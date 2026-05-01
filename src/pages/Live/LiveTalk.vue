@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import LiveServerAvailableNotice from "./components/LiveServerAvailableNotice.vue";
-import {computed, onMounted, ref} from "vue";
-import {StorageRecord, StorageService} from "../../service/StorageService";
-import {Dialog} from "../../lib/dialog";
-import {t} from "../../lang";
-import {useCheckAll} from "../../components/common/check-all";
+import { computed, onMounted, ref } from "vue";
+import { StorageRecord, StorageService } from "../../service/StorageService";
+import { Dialog } from "../../lib/dialog";
+import { t } from "../../lang";
+import { useCheckAll } from "../../components/common/check-all";
 import StorageBatchDeleteAction from "../../components/Server/StorageBatchDeleteAction.vue";
-import {EventTypes, eventTypeToLabel} from "./util";
-import {LiveKnowledgeContentType} from "../../types/Live";
+import { EventTypes, eventTypeToLabel } from "./util";
+import { LiveKnowledgeContentType } from "../../types/Live";
 
 const loading = ref(false);
 const records = ref<StorageRecord[]>([]);
@@ -15,7 +15,7 @@ const page = ref(1);
 const pageSize = ref(100);
 const recordsForPage = computed(() => {
     return records.value
-        .filter(r => {
+        .filter((r) => {
             if (filter.value.type) {
                 if (r.title !== filter.value.type) {
                     return false;
@@ -25,9 +25,10 @@ const recordsForPage = computed(() => {
         })
         .slice((page.value - 1) * pageSize.value, page.value * pageSize.value);
 });
-const {mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords} = useCheckAll({
-    records: recordsForPage,
-});
+const { mergeCheck, isIndeterminate, isAllChecked, onCheckAll, checkRecords } =
+    useCheckAll({
+        records: recordsForPage,
+    });
 
 const filter = ref({
     type: "" as LiveKnowledgeContentType["type"],
@@ -61,13 +62,21 @@ onMounted(() => {
         <div class="mb-4 flex items-center">
             <div class="text-3xl font-bold flex-grow">播报历史</div>
             <div class="flex items-center">
-                <a-button class="ml-1" @click="doRefresh()" v-if="!loading && records.length > 0">
+                <a-button
+                    class="ml-1"
+                    @click="doRefresh()"
+                    v-if="!loading && records.length > 0"
+                >
                     <template #icon>
                         <icon-refresh />
                     </template>
                     刷新
                 </a-button>
-                <a-button class="ml-1" @click="doClear()" v-if="!loading && records.length > 0">
+                <a-button
+                    class="ml-1"
+                    @click="doClear()"
+                    v-if="!loading && records.length > 0"
+                >
                     <template #icon>
                         <icon-delete />
                     </template>
@@ -84,7 +93,9 @@ onMounted(() => {
                 <m-empty />
             </div>
             <div v-else-if="records.length > 0" class="mb-3">
-                <div class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center">
+                <div
+                    class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center"
+                >
                     <div class="flex-grow flex items-center">
                         <div class="mr-3">
                             <a-checkbox
@@ -95,7 +106,10 @@ onMounted(() => {
                                 {{ $t("common.selectAll") }}
                             </a-checkbox>
                         </div>
-                        <StorageBatchDeleteAction :records="checkRecords" @update="doRefresh" />
+                        <StorageBatchDeleteAction
+                            :records="checkRecords"
+                            @update="doRefresh"
+                        />
                     </div>
                     <div>
                         <a-pagination
@@ -108,13 +122,18 @@ onMounted(() => {
                     </div>
                 </div>
             </div>
-            <div v-if="records.length > 0 && recordsForPage.length === 0" class="py-20">
+            <div
+                v-if="records.length > 0 && recordsForPage.length === 0"
+                class="py-20"
+            >
                 <m-empty />
             </div>
             <div v-for="r in recordsForPage" :key="r.id" class="mb-3">
                 <div class="rounded-xl shadow border p-4 hover:shadow-lg">
                     <div class="flex items-center">
-                        <div class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2">
+                        <div
+                            class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2"
+                        >
                             <div class="mr-2 h-8 pt-0.5">
                                 <a-checkbox v-model="r['_check']" />
                             </div>
@@ -127,7 +146,11 @@ onMounted(() => {
                         </div>
                         <div class="flex-grow"></div>
                         <div class="flex items-center">
-                            <a-button @click="doDelete(r)" class="ml-1" size="mini">
+                            <a-button
+                                @click="doDelete(r)"
+                                class="ml-1"
+                                size="mini"
+                            >
                                 <template #icon>
                                     <icon-delete />
                                 </template>

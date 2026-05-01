@@ -82,8 +82,23 @@ const getValue = async (): Promise<VideoGenParamType | undefined> => {
     return data;
 };
 
+const setValue = (
+    data: Partial<{ serverKey: string; videoTemplateId: number; param: any }>,
+) => {
+    if (data.serverKey !== undefined) {
+        formData.value.serverKey = data.serverKey;
+    }
+    if (data.videoTemplateId !== undefined) {
+        formData.value.videoTemplateId = data.videoTemplateId;
+    }
+    if (data.param !== undefined) {
+        paramForm.value?.setValue(data.param);
+    }
+};
+
 defineExpose({
     getValue,
+    setValue,
 });
 </script>
 

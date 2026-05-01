@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {ref} from "vue";
-import {detectBlackWords, highlightBlackWords} from "../config/blackWord";
-import {StorageRecord} from "../../../service/StorageService";
+import { ref } from "vue";
+import { detectBlackWords, highlightBlackWords } from "../config/blackWord";
+import { StorageRecord } from "../../../service/StorageService";
 
 type RecordWithViolations = StorageRecord & {
     violations: { word: string; index: number }[];
@@ -20,7 +20,7 @@ const calc = async () => {
         const allText = [
             record.title || "",
             record.content.reply || "",
-            ...(record.content.replies || []).map(r => r.value || ""),
+            ...(record.content.replies || []).map((r) => r.value || ""),
             ...(record.content.tags || []),
         ].join(" ");
         const violations = await detectBlackWords(allText);
@@ -29,12 +29,16 @@ const calc = async () => {
                 ...record,
                 violations,
                 highlightedTitle: await highlightBlackWords(record.title || ""),
-                highlightedReply: await highlightBlackWords(record.content.reply || ""),
+                highlightedReply: await highlightBlackWords(
+                    record.content.reply || "",
+                ),
                 highlightedReplies: await Promise.all(
-                    (record.content.replies || []).map(async r => ({
+                    (record.content.replies || []).map(async (r) => ({
                         ...r,
-                        highlightedValue: await highlightBlackWords(r.value || ""),
-                    }))
+                        highlightedValue: await highlightBlackWords(
+                            r.value || "",
+                        ),
+                    })),
                 ),
             });
         }
@@ -53,17 +57,24 @@ defineExpose({
 </script>
 
 <template>
-    <a-modal v-model:visible="visible" width="90vw" :footer="false" title-align="start">
+    <a-modal
+        v-model:visible="visible"
+        width="90vw"
+        :footer="false"
+        title-align="start"
+    >
         <template #title>
             <div class="flex items-center">
-                <icon-exclamation-circle class="text-red-500 mr-2"/>
+                <icon-exclamation-circle class="text-red-500 mr-2" />
                 {{ $t("model.censorResult") }}
-                <div class="ml-4 text-sm text-gray-500">共检测到 {{ violationRecords.length }} 条违规内容</div>
+                <div class="ml-4 text-sm text-gray-500">
+                    共检测到 {{ violationRecords.length }} 条违规内容
+                </div>
             </div>
         </template>
         <div class="-mx-4 -my-5 overflow-y" style="height: calc(100vh - 10rem)">
             <div v-if="violationRecords.length === 0" class="text-center py-48">
-                <icon-check-circle class="text-green-500 text-6xl mb-4"/>
+                <icon-check-circle class="text-green-500 text-6xl mb-4" />
                 <div class="text-xl font-bold text-green-600 mb-2">恭喜</div>
                 <div class="text-gray-500">未检测到任何违规词汇</div>
             </div>
@@ -71,9 +82,13 @@ defineExpose({
                 <div class="mb-2">
                     <a-alert type="warning" show-icon>
                         <template #icon>
-                            <icon-exclamation-circle/>
+                            <icon-exclamation-circle />
                         </template>
-                        检测到 {{ violationRecords.length }} 条知识库内容包含违规词汇，建议及时修改避免直播风险
+                        检测到
+                        {{
+                            violationRecords.length
+                        }}
+                        条知识库内容包含违规词汇，建议及时修改避免直播风险
                     </a-alert>
                 </div>
                 <div>
@@ -84,21 +99,41 @@ defineExpose({
                     >
                         <div class="flex items-center mb-1">
                             <div class="flex-grow">
-                                <div class="font-bold text-red-800" v-html="record.highlightedTitle"></div>
+                                <div
+                                    class="font-bold text-red-800"
+                                    v-html="record.highlightedTitle"
+                                ></div>
                             </div>
-                            <div class="text-sm text-red-600">违规词数: {{ record.violations.length }}</div>
+                            <div class="text-sm text-red-600">
+                                违规词数: {{ record.violations.length }}
+                            </div>
                         </div>
 
                         <div v-if="record.content.reply" class="mb-1">
-                            <div class="text-sm text-gray-600 mb-1">标准话术:</div>
-                            <div class="text-sm" v-html="record.highlightedReply"></div>
+                            <div class="text-sm text-gray-600 mb-1">
+                                标准话术:
+                            </div>
+                            <div
+                                class="text-sm"
+                                v-html="record.highlightedReply"
+                            ></div>
                         </div>
 
-                        <div v-if="record.content.replies && record.content.replies.length > 0" class="mb-1">
-                            <div class="text-sm text-gray-600 mb-1">随机话术:</div>
+                        <div
+                            v-if="
+                                record.content.replies &&
+                                record.content.replies.length > 0
+                            "
+                            class="mb-1"
+                        >
+                            <div class="text-sm text-gray-600 mb-1">
+                                随机话术:
+                            </div>
                             <div class="space-y-1">
                                 <div
-                                    v-for="(reply, index) in record.highlightedReplies"
+                                    v-for="(
+                                        reply, index
+                                    ) in record.highlightedReplies"
                                     :key="index"
                                     class="text-sm"
                                     v-html="reply.highlightedValue"

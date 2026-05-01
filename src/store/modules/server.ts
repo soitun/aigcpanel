@@ -1,30 +1,42 @@
-import {ComputedRef} from "@vue/reactivity";
-import {cloneDeep} from "lodash-es";
-import {defineStore} from "pinia";
-import {computed, ref, toRaw} from "vue";
-import {TimeUtil, wait} from "../../lib/util";
-import {useTaskStore} from "./task";
+import { ComputedRef } from "@vue/reactivity";
+import { cloneDeep } from "lodash-es";
+import { defineStore } from "pinia";
+import { computed, ref, toRaw } from "vue";
+import { TimeUtil, wait } from "../../lib/util";
+import { useTaskStore } from "./task";
 // import {useServerCloudStore} from "./serverCloud";
-import {Dialog} from "../../lib/dialog";
-import {t} from "../../lang";
-import {StorageService} from "../../service/StorageService";
-import {TaskService} from "../../service/TaskService";
-import {EnumServerStatus, EnumServerType, ServerRecord, ServerRuntime} from "../../types/Server";
+import { Dialog } from "../../lib/dialog";
+import { t } from "../../lang";
+import { StorageService } from "../../service/StorageService";
+import { TaskService } from "../../service/TaskService";
+import {
+    EnumServerStatus,
+    EnumServerType,
+    ServerRecord,
+    ServerRuntime,
+} from "../../types/Server";
 import store from "../index";
-import {ServerInfo} from "../../../electron/mapi/server/type";
+import { ServerInfo } from "../../../electron/mapi/server/type";
 
 // const serverCloudStore = useServerCloudStore()
 const taskStore = useTaskStore();
 const serverRuntime = ref<Map<string, ServerRuntime>>(new Map());
-const createServerStatus = (record: ServerRecord): ComputedRef<EnumServerStatus> => {
+const createServerStatus = (
+    record: ServerRecord,
+): ComputedRef<EnumServerStatus> => {
     return computed(() => {
         if (record.type === EnumServerType.CLOUD || record.autoStart) {
             return EnumServerStatus.RUNNING;
         }
-        return serverRuntime.value?.get(record.key)?.status || EnumServerStatus.STOPPED;
+        return (
+            serverRuntime.value?.get(record.key)?.status ||
+            EnumServerStatus.STOPPED
+        );
     });
 };
-const getServerRuntimeComputedValue = (record: ServerRecord): ComputedRef<ServerRuntime> => {
+const getServerRuntimeComputedValue = (
+    record: ServerRecord,
+): ComputedRef<ServerRuntime> => {
     return computed(() => {
         let defaultStatus = EnumServerStatus.STOPPED;
         if (record.type === EnumServerType.CLOUD || record.autoStart) {
@@ -51,7 +63,10 @@ const getOrCreateServerRuntime = (record: ServerRecord): ServerRuntime => {
     } as ServerRuntime;
     if (record.type === EnumServerType.CLOUD || record.autoStart) {
         defaultValue.status = EnumServerStatus.RUNNING;
-        defaultValue.eventChannelName = createEventChannel(record, defaultValue);
+        defaultValue.eventChannelName = createEventChannel(
+            record,
+            defaultValue,
+        );
         defaultValue.logFile = `logs/${record.name}_${record.version}_${TimeUtil.dateString()}.log`;
     }
     serverRuntime.value?.set(record.key, defaultValue);
@@ -61,12 +76,15 @@ const deleteServerRuntime = (record: ServerRecord) => {
     serverRuntime.value?.delete(record.key);
 };
 
-const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime) => {
+const createEventChannel = (
+    server: ServerRecord,
+    serverRuntime?: ServerRuntime,
+) => {
     if (!serverRuntime) {
         serverRuntime = getOrCreateServerRuntime(server);
     }
     const eventChannel = window.__page.createChannel(function (channelData) {
-        const {type, data} = channelData;
+        const { type, data } = channelData;
         switch (type) {
             case "success":
                 clearTimeout(serverRuntime.pingCheckTimer);
@@ -110,8 +128,8 @@ const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime)
             case "taskRunning":
             case "taskResult":
             case "taskStatus":
-                const {id} = data;
-                const {biz, bizId} = serverStoreInstance.parseTaskId(id);
+                const { id } = data;
+                const { biz, bizId } = serverStoreInstance.parseTaskId(id);
                 // console.log('task', {type, biz, bizId, data})
                 const taskUpdate = async (bizId: string, data: any) => {
                     const bizer = taskStore.get(biz);
@@ -127,7 +145,7 @@ const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime)
                             biz,
                             bizId,
                         } as any,
-                        "running"
+                        "running",
                     );
                 };
                 if ("taskRunning" === type) {
@@ -150,8 +168,12 @@ const createEventChannel = (server: ServerRecord, serverRuntime?: ServerRuntime)
 };
 
 const updateRunningServerCount = async () => {
-    const count = serverStoreInstance.records.filter(r => {
-        return r.type === EnumServerType.LOCAL_DIR && r.status === EnumServerStatus.RUNNING && !r.autoStart;
+    const count = serverStoreInstance.records.filter((r) => {
+        return (
+            r.type === EnumServerType.LOCAL_DIR &&
+            r.status === EnumServerStatus.RUNNING &&
+            !r.autoStart
+        );
     }).length;
     await $mapi.server.runningServerCount(count);
 };
@@ -167,7 +189,7 @@ export const serverStore = defineStore("server", {
             // await serverCloudStore.waitReady()
         },
         async init() {
-            await $mapi.storage.get("server", "records", []).then(records => {
+            await $mapi.storage.get("server", "records", []).then((records) => {
                 records.forEach((record: ServerRecord) => {
                     record.status = createServerStatus(record);
                     record.runtime = getServerRuntimeComputedValue(record);
@@ -177,14 +199,21 @@ export const serverStore = defineStore("server", {
                 });
             });
             taskStore.onChange(null, (bizId, type) => {
-                if (type === 'requestCancel') {
-                    TaskService.get(bizId).then(record => {
-                        if (record && record.serverName && record.serverVersion) {
-                            this.cancelByNameVersion(record.serverName, record.serverVersion).then();
+                if (type === "requestCancel") {
+                    TaskService.get(bizId).then((record) => {
+                        if (
+                            record &&
+                            record.serverName &&
+                            record.serverVersion
+                        ) {
+                            this.cancelByNameVersion(
+                                record.serverName,
+                                record.serverVersion,
+                            ).then();
                         }
-                    })
+                    });
                 }
-            })
+            });
             await this.refresh();
             this.isReady = true;
         },
@@ -194,9 +223,12 @@ export const serverStore = defineStore("server", {
             });
             const localRecords: ServerRecord[] = [];
             for (let dir of dirs) {
-                const config = await $mapi.file.read(`model/${dir.name}/config.json`, {
-                    isDataPath: true,
-                });
+                const config = await $mapi.file.read(
+                    `model/${dir.name}/config.json`,
+                    {
+                        isDataPath: true,
+                    },
+                );
                 let json;
                 try {
                     json = JSON.parse(config);
@@ -223,7 +255,9 @@ export const serverStore = defineStore("server", {
             }
             let changed = false;
             for (let lr of localRecords) {
-                const record = this.records.find(record => record.key === lr.key);
+                const record = this.records.find(
+                    (record) => record.key === lr.key,
+                );
                 if (!record) {
                     lr.status = createServerStatus(lr);
                     lr.runtime = getServerRuntimeComputedValue(lr);
@@ -249,7 +283,10 @@ export const serverStore = defineStore("server", {
             let server: any = null;
             let serverInfo: any = null;
             if (record.serverName && record.serverVersion) {
-                server = await this.getByNameVersion(record.serverName, record.serverVersion);
+                server = await this.getByNameVersion(
+                    record.serverName,
+                    record.serverVersion,
+                );
                 // console.log('SoundTts.runFunc.server', server)
                 if (!server) {
                     throw "server not found";
@@ -276,14 +313,17 @@ export const serverStore = defineStore("server", {
             };
         },
         findRecord(server: ServerRecord) {
-            return this.records.find(record => record.key === server.key);
+            return this.records.find((record) => record.key === server.key);
         },
         start: async function (server: ServerRecord) {
             const record = this.findRecord(server);
             if (!record) {
                 throw "RecordNotFound";
             }
-            if (record.status === EnumServerStatus.STOPPED || record.status === EnumServerStatus.ERROR) {
+            if (
+                record.status === EnumServerStatus.STOPPED ||
+                record.status === EnumServerStatus.ERROR
+            ) {
             } else {
                 throw "StatusError";
             }
@@ -308,16 +348,22 @@ export const serverStore = defineStore("server", {
                 }
                 $mapi.server
                     .ping(serverInfo)
-                    .then(success => {
+                    .then((success) => {
                         if (success) {
                             serverRuntime.status = EnumServerStatus.RUNNING;
                             updateRunningServerCount().then();
                         } else {
-                            serverRuntime.pingCheckTimer = setTimeout(pingCheck, 2000);
+                            serverRuntime.pingCheckTimer = setTimeout(
+                                pingCheck,
+                                2000,
+                            );
                         }
                     })
-                    .catch(err => {
-                        serverRuntime.pingCheckTimer = setTimeout(pingCheck, 2000);
+                    .catch((err) => {
+                        serverRuntime.pingCheckTimer = setTimeout(
+                            pingCheck,
+                            2000,
+                        );
                     });
             };
             serverRuntime.pingCheckTimer = setTimeout(pingCheck, 2 * 1000);
@@ -346,7 +392,7 @@ export const serverStore = defineStore("server", {
             await $mapi.server.cancel(serverInfo);
         },
         async updateSetting(key: string, setting: any) {
-            const record = this.records.find(record => record.key === key);
+            const record = this.records.find((record) => record.key === key);
             if (!record) {
                 return;
             }
@@ -354,7 +400,9 @@ export const serverStore = defineStore("server", {
             await this.sync();
         },
         async delete(server: ServerRecord) {
-            const index = this.records.findIndex(record => record.key === server.key);
+            const index = this.records.findIndex(
+                (record) => record.key === server.key,
+            );
             if (index === -1) {
                 return;
             }
@@ -381,7 +429,9 @@ export const serverStore = defineStore("server", {
             await this.sync();
         },
         async add(server: ServerRecord) {
-            let record = this.records.find(record => record.key === server.key);
+            let record = this.records.find(
+                (record) => record.key === server.key,
+            );
             if (record) {
                 return;
             }
@@ -392,7 +442,7 @@ export const serverStore = defineStore("server", {
         },
         async sync() {
             const savedRecords = toRaw(cloneDeep(this.records));
-            savedRecords.forEach(record => {
+            savedRecords.forEach((record) => {
                 record.status = undefined;
                 record.runtime = undefined;
             });
@@ -402,13 +452,18 @@ export const serverStore = defineStore("server", {
             // if (key.startsWith('Cloud')) {
             //     return serverCloudStore.getByKey(key)
             // }
-            return this.records.find(record => record.key === key);
+            return this.records.find((record) => record.key === key);
         },
-        async getByNameVersion(name: string, version: string): Promise<ServerRecord | undefined> {
+        async getByNameVersion(
+            name: string,
+            version: string,
+        ): Promise<ServerRecord | undefined> {
             // if (name.startsWith('Cloud')) {
             //     return serverCloudStore.getByNameVersion(name, version)
             // }
-            return this.records.find(record => record.name === name && record.version === version);
+            return this.records.find(
+                (record) => record.name === name && record.version === version,
+            );
         },
         async cancelByNameVersion(name: string, version: string) {
             const record = await this.getByNameVersion(name, version);
@@ -423,15 +478,23 @@ export const serverStore = defineStore("server", {
             serverInfo: ServerInfo,
             method: string,
             data: ServerCallFunctionData,
-            option?: ServerCallFunctionOption
+            option?: ServerCallFunctionOption,
         ): Promise<ServerCallFunctionResult> {
             await this.callStart(serverInfo);
-            const res = await $mapi.server.callFunctionWithException(serverInfo, method, data, option);
+            const res = await $mapi.server.callFunctionWithException(
+                serverInfo,
+                method,
+                data,
+                option,
+            );
             await this.callEnd(serverInfo);
             return res;
         },
         async callStart(serverInfo: ServerInfo) {
-            const server = await this.getByNameVersion(serverInfo.name, serverInfo.version);
+            const server = await this.getByNameVersion(
+                serverInfo.name,
+                serverInfo.version,
+            );
             if (!server) {
                 throw new Error("ServerNotFound");
             }
@@ -441,7 +504,10 @@ export const serverStore = defineStore("server", {
             }
         },
         async callEnd(serverInfo: ServerInfo) {
-            const server = await this.getByNameVersion(serverInfo.name, serverInfo.version);
+            const server = await this.getByNameVersion(
+                serverInfo.name,
+                serverInfo.version,
+            );
             if (!server) {
                 throw new Error("ServerNotFound");
             }
@@ -462,18 +528,23 @@ export const serverStore = defineStore("server", {
                 config: JSON.parse(JSON.stringify(server)),
             };
             if (server.type === EnumServerType.LOCAL) {
-                result.localPath = await $mapi.file.fullPath(server.localPath as string);
+                result.localPath = await $mapi.file.fullPath(
+                    server.localPath as string,
+                );
             } else if (server.type === EnumServerType.LOCAL_DIR) {
                 result.localPath = server.localPath as string;
             } else if (server.type === EnumServerType.CLOUD) {
                 result.localPath = server.localPath as string;
             } else if (server.type === EnumServerType.REMOTE) {
-                result.localPath = await $mapi.file.fullPath(server.localPath as string);
+                result.localPath = await $mapi.file.fullPath(
+                    server.localPath as string,
+                );
             }
             const serverRuntime = getOrCreateServerRuntime(server);
             if (serverRuntime) {
                 result.logFile = serverRuntime.logFile;
-                result.eventChannelName = serverRuntime.eventChannelName as string;
+                result.eventChannelName =
+                    serverRuntime.eventChannelName as string;
             }
             return result as ServerInfo;
         },

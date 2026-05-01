@@ -36,7 +36,7 @@
         "postinstall": "electron-builder install-app-deps",
         "postuninstall": "electron-builder install-app-deps",
         "re-sqlite": "npx electron-rebuild -f -w better-sqlite3",
-        "format": "prettier --write \"src/**/*.{ts,tsx,vue,js}\" \"electron/**/*.{ts,tsx,js}\"",
+        "format": "prettier --write --log-level warn \"src/**/*.{ts,tsx,vue,js}\" \"electron/**/*.{ts,tsx,js}\"",
         "dev:seed": "tsx test/dev-seed.ts"
     },
     "devDependencies": {

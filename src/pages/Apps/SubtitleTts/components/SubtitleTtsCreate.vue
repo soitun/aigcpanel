@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import FileSelector from "../../../../components/common/FileSelector.vue";
 import { dataAutoSaveDraft } from "../../../../components/common/util";
 import { Dialog } from "../../../../lib/dialog";
@@ -17,6 +17,10 @@ const { clearDraft } = dataAutoSaveDraft(
     "SubtitleTtsCreate.formData",
     formData.value,
 );
+
+onMounted(() => {});
+
+onUnmounted(() => {});
 
 const doSubmit = async () => {
     const soundGenerateValue = await soundGenerateForm.value?.getValue();
@@ -44,11 +48,12 @@ const doSubmit = async () => {
         },
         param: {},
     };
-    await TaskService.submit(record);
+    const id = await TaskService.submit(record);
     formData.value.srt = "";
     emit("submitted");
     Dialog.tipSuccess("任务已提交");
     clearDraft();
+    return id;
 };
 </script>
 

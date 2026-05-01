@@ -1,17 +1,50 @@
 import express from "express";
 import type { Request, Response } from "express";
 import http from "node:http";
+import fs from "node:fs";
+import path from "node:path";
+import crypto from "node:crypto";
 import { ipcMain } from "electron";
 import { Log } from "../log/main";
 import ConfigMain from "../config/main";
 import StorageMain from "../storage/main";
 import { Events } from "../event/main";
 import { DBMain } from "../db/main";
+import { AppEnv } from "../env";
 import docHtml from "./doc.html?raw";
 
 let server: http.Server | null = null;
 let isRunning = false;
 let runningPort = 0;
+let runningToken = "";
+
+const getAvailablePort = (): Promise<number> => {
+    return new Promise((resolve, reject) => {
+        const s = http.createServer();
+        s.listen(0, "127.0.0.1", () => {
+            const addr = s.address() as { port: number };
+            const port = addr.port;
+            s.close(() => resolve(port));
+        });
+        s.on("error", reject);
+    });
+};
+
+const generateToken = (): string => {
+    return (
+        crypto.randomUUID().replace(/-/g, "") +
+        crypto.randomUUID().replace(/-/g, "")
+    );
+};
+
+const writeCliAuthFile = (port: number, token: string): void => {
+    try {
+        const filePath = path.join(AppEnv.userData, "cli-auth.json");
+        fs.writeFileSync(filePath, JSON.stringify({ port, token }), "utf-8");
+    } catch (e) {
+        Log.error("httpserver.writeCliAuthFile.error", e);
+    }
+};
 
 const functionArgsMap: Record<string, string[]> = {
     soundTts: ["text"],
@@ -158,13 +191,16 @@ const sendJson = (res: Response, statusCode: number, data: any) => {
     res.status(statusCode).json(data);
 };
 
-const createApp = (port: number) => {
+const createApp = (port: number, token: string) => {
     const app = express();
     app.use(express.json());
     app.use((_req, res, next) => {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-        res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+        res.setHeader(
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization",
+        );
         if (_req.method === "OPTIONS") {
             res.status(200).end();
             return;
@@ -177,6 +213,15 @@ const createApp = (port: number) => {
         res.status(200)
             .set("Content-Type", "text/html; charset=utf-8")
             .send(html);
+    });
+
+    app.use((_req, res, next) => {
+        const auth = _req.headers["authorization"] || "";
+        if (!auth.startsWith("Bearer ") || auth.slice(7) !== token) {
+            sendJson(res, 401, { code: -1, msg: "Unauthorized" });
+            return;
+        }
+        next();
     });
 
     app.post("/api/model/list", async (_req, res) => {
@@ -357,17 +402,20 @@ const start = async (port?: number): Promise<void> => {
     if (isRunning) {
         await stop();
     }
-    if (!port) {
-        port = await ConfigMain.get("httpServerPort", 59999);
-    }
+    const resolvedPort = port || (await getAvailablePort());
+    const token = generateToken();
+    await ConfigMain.set("httpServerPort", resolvedPort);
+    await ConfigMain.set("httpServerToken", token);
+    writeCliAuthFile(resolvedPort, token);
     return new Promise((resolve, reject) => {
-        const app = createApp(port!);
+        const app = createApp(resolvedPort, token);
         const s = http.createServer(app);
-        s.listen(port, "127.0.0.1", () => {
+        s.listen(resolvedPort, "127.0.0.1", () => {
             server = s;
             isRunning = true;
-            runningPort = port!;
-            Log.info("httpserver.start", { port });
+            runningPort = resolvedPort;
+            runningToken = token;
+            Log.info("httpserver.start", { port: resolvedPort });
             resolve();
         });
         s.on("error", (err: any) => {
@@ -414,24 +462,6 @@ ipcMain.handle("httpserver:start", async (_, port?: number) => {
 
 ipcMain.handle("httpserver:stop", async () => {
     await stop();
-    return { code: 0 };
-});
-
-ipcMain.handle("httpserver:getPort", async () => {
-    return await ConfigMain.get("httpServerPort", 59999);
-});
-
-ipcMain.handle("httpserver:setPort", async (_, port: number) => {
-    await ConfigMain.set("httpServerPort", port);
-    return { code: 0 };
-});
-
-ipcMain.handle("httpserver:getEnabled", async () => {
-    return await ConfigMain.get("httpServerEnabled", true);
-});
-
-ipcMain.handle("httpserver:setEnabled", async (_, enabled: boolean) => {
-    await ConfigMain.set("httpServerEnabled", enabled);
     return { code: 0 };
 });
 

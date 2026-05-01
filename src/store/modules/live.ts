@@ -14,9 +14,9 @@ import { useServerStore } from "./server";
 const serverStore = useServerStore();
 
 export const liveModels = [
-    {value: "wav2lip", title: "Wav2Lip标准版"},
-    {value: "wav2lip384", title: "Wav2Lip清晰版"},
-]
+    { value: "wav2lip", title: "Wav2Lip标准版" },
+    { value: "wav2lip384", title: "Wav2Lip清晰版" },
+];
 
 const SCENE_ID = "live";
 const EMPTY_LIVE_STATUS = {
@@ -67,12 +67,14 @@ const EMPTY_LIVE_STATUS = {
 export const liveStore = defineStore("live", {
     state: () => ({
         server: computed(() => {
-            return serverStore.records.find(item => item.functions.includes("live")) as ServerRecord | undefined;
+            return serverStore.records.find((item) =>
+                item.functions.includes("live"),
+            ) as ServerRecord | undefined;
         }) as any,
         available: computed(() => {
-            const server = serverStore.records.find(item => item.functions.includes("live")) as
-                | ServerRecord
-                | undefined;
+            const server = serverStore.records.find((item) =>
+                item.functions.includes("live"),
+            ) as ServerRecord | undefined;
             return server && server.status === EnumServerStatus.RUNNING;
         }),
         serverConfig: {
@@ -91,7 +93,7 @@ export const liveStore = defineStore("live", {
             }[],
         },
         localConfig: {
-            model: "wav2lip" as typeof liveModels[number]["value"],
+            model: "wav2lip" as (typeof liveModels)[number]["value"],
             mode: "avatar" as "avatar" | "audio",
             avatar: {
                 width: 720,
@@ -135,40 +137,63 @@ export const liveStore = defineStore("live", {
         async init() {
             const localConfig = await $mapi.storage.get("live", "config", {});
             // console.log('live.init', localConfig)
-            this.localConfig.model = localConfig.model || this.localConfig.model;
+            this.localConfig.model =
+                localConfig.model || this.localConfig.model;
             this.localConfig.mode = localConfig.mode || this.localConfig.mode;
-            this.localConfig.avatar.width = localConfig.avatar?.width || this.localConfig.avatar.width;
-            this.localConfig.avatar.height = localConfig.avatar?.height || this.localConfig.avatar.height;
-            this.localConfig.avatar.avatarId = localConfig.avatar?.avatarId || this.localConfig.avatar.avatarId;
-            this.localConfig.video.enable = localConfig.video?.enable || this.localConfig.video.enable;
-            this.localConfig.video.width = localConfig.video?.width || this.localConfig.video.width;
-            this.localConfig.video.height = localConfig.video?.height || this.localConfig.video.height;
+            this.localConfig.avatar.width =
+                localConfig.avatar?.width || this.localConfig.avatar.width;
+            this.localConfig.avatar.height =
+                localConfig.avatar?.height || this.localConfig.avatar.height;
+            this.localConfig.avatar.avatarId =
+                localConfig.avatar?.avatarId ||
+                this.localConfig.avatar.avatarId;
+            this.localConfig.video.enable =
+                localConfig.video?.enable || this.localConfig.video.enable;
+            this.localConfig.video.width =
+                localConfig.video?.width || this.localConfig.video.width;
+            this.localConfig.video.height =
+                localConfig.video?.height || this.localConfig.video.height;
             this.localConfig.config.flowVideoMode =
-                localConfig.config?.flowVideoMode || this.localConfig.config.flowVideoMode;
+                localConfig.config?.flowVideoMode ||
+                this.localConfig.config.flowVideoMode;
             this.localConfig.config.flowTalkMode =
-                localConfig.config?.flowTalkMode || this.localConfig.config.flowTalkMode;
+                localConfig.config?.flowTalkMode ||
+                this.localConfig.config.flowTalkMode;
             this.localConfig.config.flowTalkDelayMin =
-                localConfig.config?.flowTalkDelayMin || this.localConfig.config.flowTalkDelayMin;
+                localConfig.config?.flowTalkDelayMin ||
+                this.localConfig.config.flowTalkDelayMin;
             this.localConfig.config.flowTalkDelayMax =
-                localConfig.config?.flowTalkDelayMax || this.localConfig.config.flowTalkDelayMax;
+                localConfig.config?.flowTalkDelayMax ||
+                this.localConfig.config.flowTalkDelayMax;
             this.localConfig.config.ttsProvider =
-                localConfig.config?.ttsProvider || this.localConfig.config.ttsProvider;
+                localConfig.config?.ttsProvider ||
+                this.localConfig.config.ttsProvider;
             this.localConfig.config.ttsProviderParam =
-                localConfig.config?.ttsProviderParam || this.localConfig.config.ttsProviderParam;
+                localConfig.config?.ttsProviderParam ||
+                this.localConfig.config.ttsProviderParam;
             this.localConfig.config.ttsProviderSetting =
-                localConfig.config?.ttsProviderSetting || this.localConfig.config.ttsProviderSetting;
+                localConfig.config?.ttsProviderSetting ||
+                this.localConfig.config.ttsProviderSetting;
             this.localConfig.config.eventDefaultUsername =
-                localConfig.config?.eventDefaultUsername || this.localConfig.config.eventDefaultUsername;
+                localConfig.config?.eventDefaultUsername ||
+                this.localConfig.config.eventDefaultUsername;
             this.localConfig.config.eventEnterIgnoreSecond =
-                localConfig.config?.eventEnterIgnoreSecond || this.localConfig.config.eventEnterIgnoreSecond;
+                localConfig.config?.eventEnterIgnoreSecond ||
+                this.localConfig.config.eventEnterIgnoreSecond;
             this.localConfig.config.liveMonitorType =
-                localConfig.config?.liveMonitorType || this.localConfig.config.liveMonitorType;
+                localConfig.config?.liveMonitorType ||
+                this.localConfig.config.liveMonitorType;
             this.localConfig.config.liveMonitorUrl =
-                localConfig.config?.liveMonitorUrl || this.localConfig.config.liveMonitorUrl;
+                localConfig.config?.liveMonitorUrl ||
+                this.localConfig.config.liveMonitorUrl;
             await this.statusUpdate();
         },
         async saveLocalConfig() {
-            await $mapi.storage.set("live", "config", ObjectUtil.clone(this.localConfig));
+            await $mapi.storage.set(
+                "live",
+                "config",
+                ObjectUtil.clone(this.localConfig),
+            );
         },
         async onKnowledgeUpdate() {
             if (this.status !== "running") {
@@ -232,13 +257,20 @@ export const liveStore = defineStore("live", {
                 this.liveStatus.videoHls = data.videoHls || "";
                 this.liveStatus.audioRtmp = data.audioRtmp || "";
                 this.liveStatus.audioHls = data.audioHls || "";
-                this.liveStatus.runtime.avatarStatus = data.runtime.avatarStatus || "";
-                this.liveStatus.runtime.avatarVideoFps = data.runtime.avatarVideoFps || 0;
-                this.liveStatus.runtime.avatarAudioFps = data.runtime.avatarAudioFps || 0;
-                this.liveStatus.runtime.videoStatus = data.runtime.videoStatus || "";
-                this.liveStatus.runtime.videoVideoFps = data.runtime.videoVideoFps || 0;
-                this.liveStatus.runtime.videoAudioFps = data.runtime.videoAudioFps || 0;
-                this.liveStatus.runtime.audioStatus = data.runtime.audioStatus || "";
+                this.liveStatus.runtime.avatarStatus =
+                    data.runtime.avatarStatus || "";
+                this.liveStatus.runtime.avatarVideoFps =
+                    data.runtime.avatarVideoFps || 0;
+                this.liveStatus.runtime.avatarAudioFps =
+                    data.runtime.avatarAudioFps || 0;
+                this.liveStatus.runtime.videoStatus =
+                    data.runtime.videoStatus || "";
+                this.liveStatus.runtime.videoVideoFps =
+                    data.runtime.videoVideoFps || 0;
+                this.liveStatus.runtime.videoAudioFps =
+                    data.runtime.videoAudioFps || 0;
+                this.liveStatus.runtime.audioStatus =
+                    data.runtime.audioStatus || "";
                 this.liveStatus.runtime.audioFps = data.runtime.audioFps || 0;
             } else {
                 this.liveStatus = ObjectUtil.clone(EMPTY_LIVE_STATUS);
@@ -254,7 +286,7 @@ export const liveStore = defineStore("live", {
             url: string,
             param: {
                 [key: string]: any;
-            } = {}
+            } = {},
         ) {
             if (!this.server) {
                 return {
@@ -264,12 +296,16 @@ export const liveStore = defineStore("live", {
                 };
             }
             const serverInfo = await serverStore.serverInfo(this.server);
-            return await $mapi.server.callFunctionWithException(serverInfo, "apiRequest", {
-                id: "live",
-                result: {},
-                url,
-                param,
-            });
+            return await $mapi.server.callFunctionWithException(
+                serverInfo,
+                "apiRequest",
+                {
+                    id: "live",
+                    result: {},
+                    url,
+                    param,
+                },
+            );
         },
         async configUpdate() {
             const res = await this.apiRequest("config", {});
@@ -284,7 +320,9 @@ export const liveStore = defineStore("live", {
                 if (!["server-live-indextts"].includes(server.name)) {
                     continue;
                 }
-                const res = await $mapi.server.config(await serverStore.serverInfo(server));
+                const res = await $mapi.server.config(
+                    await serverStore.serverInfo(server),
+                );
                 if (res.code) {
                     Dialog.tipError(mapError(res.msg));
                     continue;
@@ -313,7 +351,9 @@ export const liveStore = defineStore("live", {
         async buildData() {
             const avatars: any[] = [];
             if (this.localConfig.mode === "avatar") {
-                const videoTemplate = await VideoTemplateService.get(this.localConfig.avatar.avatarId);
+                const videoTemplate = await VideoTemplateService.get(
+                    this.localConfig.avatar.avatarId,
+                );
                 if (!videoTemplate) {
                     throw t("live.noAvatarSelected");
                 }
@@ -325,7 +365,9 @@ export const liveStore = defineStore("live", {
             }
             const flowVideos: any[] = [];
             if (this.localConfig.video.enable) {
-                const storageFlowVideos = (await StorageService.list("LiveKnowledge")).filter(s => {
+                const storageFlowVideos = (
+                    await StorageService.list("LiveKnowledge")
+                ).filter((s) => {
                     return s.content.type === "flowVideo" && s.content.enable;
                 });
                 if (!(storageFlowVideos && storageFlowVideos.length > 0)) {
@@ -340,14 +382,16 @@ export const liveStore = defineStore("live", {
                 }
             }
             const flowTalks: any[] = [];
-            const storageFlowTalks = (await StorageService.list("LiveKnowledge")).filter(s => {
+            const storageFlowTalks = (
+                await StorageService.list("LiveKnowledge")
+            ).filter((s) => {
                 return s.content.type === "flowTalk" && s.content.enable;
             });
             if (!(storageFlowTalks && storageFlowTalks.length > 0)) {
                 throw t("live.noLoopMaterialSelected");
             }
             for (const s of storageFlowTalks) {
-                s.content.replies = s.content.replies.map(r => {
+                s.content.replies = s.content.replies.map((r) => {
                     return {
                         value: r.value,
                     };
@@ -355,7 +399,7 @@ export const liveStore = defineStore("live", {
                 flowTalks.push({
                     id: "FlowTalk" + s.id,
                     title: s.title,
-                    talks: [{value: s.content.reply}, ...s.content.replies],
+                    talks: [{ value: s.content.reply }, ...s.content.replies],
                     video: s.content.url,
                 });
             }
@@ -366,7 +410,7 @@ export const liveStore = defineStore("live", {
                 if (!s.content.enable) {
                     continue;
                 }
-                s.content.replies = s.content.replies.map(r => {
+                s.content.replies = s.content.replies.map((r) => {
                     return {
                         value: r.value,
                     };
@@ -375,7 +419,10 @@ export const liveStore = defineStore("live", {
                     users.push({
                         id: "User" + s.id,
                         title: s.title,
-                        talks: [{value: s.content.reply}, ...s.content.replies],
+                        talks: [
+                            { value: s.content.reply },
+                            ...s.content.replies,
+                        ],
                         keywords: s.content.keywords,
                         video: s.content.url,
                     });
@@ -383,13 +430,16 @@ export const liveStore = defineStore("live", {
                     systems.push({
                         id: "System" + s.id,
                         title: s.title,
-                        talks: [{value: s.content.reply}, ...s.content.replies],
+                        talks: [
+                            { value: s.content.reply },
+                            ...s.content.replies,
+                        ],
                         systemType: s.content.systemType,
                         video: s.content.url,
                     });
                 }
             }
-            return {avatars, flowVideos, flowTalks, users, systems};
+            return { avatars, flowVideos, flowTalks, users, systems };
         },
         async update() {
             const configPost = {
@@ -437,9 +487,12 @@ export const liveStore = defineStore("live", {
                     flowTalkDelayMax: this.localConfig.config.flowTalkDelayMax,
                     ttsProvider: this.localConfig.config.ttsProvider,
                     ttsProviderParam: this.localConfig.config.ttsProviderParam,
-                    ttsProviderSetting: this.localConfig.config.ttsProviderSetting,
-                    eventDefaultUsername: this.localConfig.config.eventDefaultUsername,
-                    eventEnterIgnoreSecond: this.localConfig.config.eventEnterIgnoreSecond,
+                    ttsProviderSetting:
+                        this.localConfig.config.ttsProviderSetting,
+                    eventDefaultUsername:
+                        this.localConfig.config.eventDefaultUsername,
+                    eventEnterIgnoreSecond:
+                        this.localConfig.config.eventEnterIgnoreSecond,
                 },
                 data: await this.buildData(),
             };
@@ -459,7 +512,9 @@ export const liveStore = defineStore("live", {
         },
         async stop() {
             this.status = "stopping";
-            const res = await this.apiRequest("scene/stop", {sceneId: SCENE_ID});
+            const res = await this.apiRequest("scene/stop", {
+                sceneId: SCENE_ID,
+            });
             // console.log('live.stop', res)
             if (res.code) {
                 this.status = "error";
@@ -470,7 +525,10 @@ export const liveStore = defineStore("live", {
             this.statusMsg = "";
         },
         async talk(text) {
-            const res = await this.apiRequest("scene/talk", {sceneId: SCENE_ID, data: {text}});
+            const res = await this.apiRequest("scene/talk", {
+                sceneId: SCENE_ID,
+                data: { text },
+            });
             if (res.code) {
                 Dialog.tipError(t("common.sendFailed") + ":" + res.msg);
                 return;
@@ -478,7 +536,7 @@ export const liveStore = defineStore("live", {
             Dialog.tipSuccess(t("common.sendSuccess"));
         },
         fireEvent(type, data) {
-            this.apiRequest("scene/event", {sceneId: SCENE_ID, type, data});
+            this.apiRequest("scene/event", { sceneId: SCENE_ID, type, data });
         },
         onMonitorBroadcast(data: any) {
             // console.log('MonitorEvent', JSON.stringify(data))
@@ -528,8 +586,7 @@ export const liveStore = defineStore("live", {
 });
 
 const live = liveStore(store);
-live.init().then(() => {
-});
+live.init().then(() => {});
 
 export const useLiveStore = () => {
     return live;

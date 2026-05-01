@@ -1,4 +1,4 @@
-import {getDataContent} from "../../../components/common/dataConfig";
+import { getDataContent } from "../../../components/common/dataConfig";
 
 export const LiveBlackWordContent = [
     // 平台竞争对手
@@ -35,19 +35,24 @@ export const LiveBlackWordContent = [
 ].join(",");
 
 // 检测文本中的违规词汇
-export const detectBlackWords = async (text: string): Promise<{ word: string; index: number }[]> => {
+export const detectBlackWords = async (
+    text: string,
+): Promise<{ word: string; index: number }[]> => {
     const violations: { word: string; index: number }[] = [];
-    const content = await getDataContent("LiveBlackWordContent", LiveBlackWordContent);
+    const content = await getDataContent(
+        "LiveBlackWordContent",
+        LiveBlackWordContent,
+    );
     const blackWords = content
         .split(",")
-        .map(word => word.trim())
-        .filter(word => word.length > 0);
-    blackWords.forEach(word => {
+        .map((word) => word.trim())
+        .filter((word) => word.length > 0);
+    blackWords.forEach((word) => {
         let startIndex = 0;
         while (true) {
             const index = text.indexOf(word, startIndex);
             if (index === -1) break;
-            violations.push({word, index});
+            violations.push({ word, index });
             startIndex = index + word.length;
         }
     });
@@ -60,11 +65,17 @@ export const highlightBlackWords = async (text: string): Promise<string> => {
     const violations = await detectBlackWords(text);
 
     // 从后往前替换，避免索引变化
-    violations.reverse().forEach(violation => {
+    violations.reverse().forEach((violation) => {
         const before = result.substring(0, violation.index);
-        const word = result.substring(violation.index, violation.index + violation.word.length);
+        const word = result.substring(
+            violation.index,
+            violation.index + violation.word.length,
+        );
         const after = result.substring(violation.index + violation.word.length);
-        result = before + `<span class="bg-red-200 text-red-800 px-1 rounded">${word}</span>` + after;
+        result =
+            before +
+            `<span class="bg-red-200 text-red-800 px-1 rounded">${word}</span>` +
+            after;
     });
 
     return result;

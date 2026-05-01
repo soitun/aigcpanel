@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {onBeforeMount, onMounted, ref} from "vue";
+import { onBeforeMount, onMounted, ref } from "vue";
 import PageNav from "./../components/PageNav.vue";
-import {AppConfig} from "../config";
+import { AppConfig } from "../config";
 import AppQuitConfirm from "../components/AppQuitConfirm.vue";
-import {useDragWindow} from "../components/common/dragWindow";
+import { useDragWindow } from "../components/common/dragWindow";
 
 const appQuitConfirm = ref<InstanceType<typeof AppQuitConfirm> | null>(null);
 const isOsx = ref(false);
@@ -18,9 +18,9 @@ window.__page.onShowQuitConfirmDialog(() => {
     appQuitConfirm.value?.show();
 });
 
-const {onDragWindowMouseDown} = useDragWindow({
+const { onDragWindowMouseDown } = useDragWindow({
     name: "main",
-    ignore: e => {
+    ignore: (e) => {
         return !!(e.target && (e.target as any).tagName === "INPUT");
     },
 });
@@ -44,7 +44,7 @@ onMounted(() => {
     <div class="window-container">
         <div
             class="window-header flex h-10 items-center border-b border-solid border-gray-200 dark:border-gray-800"
-            :class="{osx: isOsx, fullscreen: isFullscreen}"
+            :class="{ osx: isOsx, fullscreen: isFullscreen }"
         >
             <div
                 class="window-header-title no-drag flex-grow flex items-center"
@@ -56,7 +56,10 @@ onMounted(() => {
                 </div>
                 <div class="p-2 flex-grow">
                     {{ AppConfig.title }}
-                    <span class="bg-gray-200 text-gray-500 rounded-lg px-1 inline-block">{{ $t("社区版") }}</span>
+                    <span
+                        class="bg-gray-200 text-gray-500 rounded-lg px-1 inline-block"
+                        >{{ $t("社区版") }}</span
+                    >
                 </div>
             </div>
             <div v-if="!isOsx" class="p-1 leading-4">
@@ -72,14 +75,20 @@ onMounted(() => {
                 >
                     <i class="iconfont text-sm icon-max"></i>
                 </div>
-                <div class="inline-block w-6 h-6 leading-6 cursor-pointer hover:text-red-500" @click="doQuit">
+                <div
+                    class="inline-block w-6 h-6 leading-6 cursor-pointer hover:text-red-500"
+                    @click="doQuit"
+                >
                     <i class="iconfont text-sm icon-close"></i>
                 </div>
             </div>
         </div>
         <div class="window-body">
             <div class="page-container flex">
-                <div class="w-16 flex-shrink-0 h-full text-white" style="background-color: var(--color-bg-page-nav)">
+                <div
+                    class="w-16 flex-shrink-0 h-full text-white"
+                    style="background-color: var(--color-bg-page-nav)"
+                >
                     <PageNav />
                 </div>
                 <div class="flex-grow overflow-y-auto">

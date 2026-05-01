@@ -1,14 +1,14 @@
-import {net} from "electron";
-import {Client, handle_file} from "@gradio/client";
-import {platformArch, platformName, platformUUID} from "../../lib/env";
-import {Events} from "../event/main";
-import {Apps} from "../app";
-import {Files} from "../file/main";
+import { net } from "electron";
+import { Client, handle_file } from "@gradio/client";
+import { platformArch, platformName, platformUUID } from "../../lib/env";
+import { Events } from "../event/main";
+import { Apps } from "../app";
+import { Files } from "../file/main";
 import fs from "node:fs";
-import User, {UserApi} from "../user/main";
-import {EncodeUtil, MemoryMapCacheUtil} from "../../lib/util";
-import {ServerContext, ServerFunctionDataType} from "./type";
-import {Log} from "../log/main";
+import User, { UserApi } from "../user/main";
+import { EncodeUtil, MemoryMapCacheUtil } from "../../lib/util";
+import { ServerContext, ServerFunctionDataType } from "./type";
+import { Log } from "../log/main";
 
 type RequestOptionType = {
     method?: "POST" | "GET";
@@ -33,7 +33,7 @@ const request = async (url, data?: {}, option?: RequestOptionType) => {
             retryTimes: 0,
             retryInterval: 5,
         },
-        option
+        option,
     );
     if (option["method"] === "GET") {
         url += "?";
@@ -47,9 +47,9 @@ const request = async (url, data?: {}, option?: RequestOptionType) => {
             method: option["method"],
             headers: option["headers"],
         });
-        req.on("response", response => {
+        req.on("response", (response) => {
             let body = "";
-            response.on("data", chunk => {
+            response.on("data", (chunk) => {
                 body += chunk.toString();
             });
             response.on("end", () => {
@@ -57,14 +57,25 @@ const request = async (url, data?: {}, option?: RequestOptionType) => {
                     try {
                         resolve(JSON.parse(body));
                     } catch (e) {
-                        if (option.retry > 0 && option.retryTimes < option.retry) {
+                        if (
+                            option.retry > 0 &&
+                            option.retryTimes < option.retry
+                        ) {
                             option.retryTimes++;
-                            Log.info("request", `retry ${option.retryTimes} ${url}`);
+                            Log.info(
+                                "request",
+                                `retry ${option.retryTimes} ${url}`,
+                            );
                             setTimeout(() => {
-                                request(url, data, option).then(resolve).catch(reject);
+                                request(url, data, option)
+                                    .then(resolve)
+                                    .catch(reject);
                             }, option.retryInterval * 1000);
                         } else {
-                            resolve({code: -1, msg: `ResponseError: ${body}`});
+                            resolve({
+                                code: -1,
+                                msg: `ResponseError: ${body}`,
+                            });
                         }
                     }
                 } else {
@@ -72,7 +83,7 @@ const request = async (url, data?: {}, option?: RequestOptionType) => {
                 }
             });
         });
-        req.on("error", err => {
+        req.on("error", (err) => {
             if (option.retry > 0 && option.retryTimes < option.retry) {
                 option.retryTimes++;
                 Log.info("request", `retry ${option.retryTimes} ${url}`);
@@ -95,7 +106,7 @@ const requestPost = async (url, data?: {}, option?: RequestOptionType) => {
         {
             method: "POST",
         },
-        option
+        option,
     );
     return request(url, data, option);
 };
@@ -105,12 +116,16 @@ const requestGet = async (url, data?: {}, option?: RequestOptionType) => {
         {
             method: "GET",
         },
-        option
+        option,
     );
     return request(url, data, option);
 };
 
-const requestPostSuccess = async (url, data?: {}, option?: RequestOptionType) => {
+const requestPostSuccess = async (
+    url,
+    data?: {},
+    option?: RequestOptionType,
+) => {
     const res = await requestPost(url, data, option);
     if (res["code"] === 0) {
         return res;
@@ -121,7 +136,7 @@ const requestPostSuccess = async (url, data?: {}, option?: RequestOptionType) =>
 const requestUrlFileToLocal = async (url, path) => {
     return new Promise((resolve, reject) => {
         const req = net.request(url);
-        req.on("response", response => {
+        req.on("response", (response) => {
             const file = fs.createWriteStream(path);
             // @ts-ignore
             response.pipe(file);
@@ -130,7 +145,7 @@ const requestUrlFileToLocal = async (url, path) => {
                 resolve("x");
             });
         });
-        req.on("error", err => {
+        req.on("error", (err) => {
             reject(err);
         });
         req.end();
@@ -145,7 +160,7 @@ const requestEventSource = async (
         headers?: Record<string, string>;
         onMessage: (data: any) => void;
         onEnd?: () => void;
-    }
+    },
 ) => {
     option = Object.assign(
         {
@@ -158,7 +173,7 @@ const requestEventSource = async (
                 console.log("onEnd");
             },
         },
-        option
+        option,
     );
     // return new Promise((resolve, reject) => {
     //     const req = net.request({
@@ -213,11 +228,11 @@ const requestEventSource = async (
     const decoder = new TextDecoder();
     let buffer = "";
     while (true) {
-        const {done, value} = await reader.read();
+        const { done, value } = await reader.read();
         if (done) {
             break;
         }
-        buffer += decoder.decode(value, {stream: true});
+        buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split("\n");
         buffer = lines.pop();
         // console.log('fetchEventSource', JSON.stringify(buffer))
@@ -243,8 +258,8 @@ const env = async () => {
     return result;
 };
 
-const sleep = async ms => {
-    return new Promise(resolve => {
+const sleep = async (ms) => {
+    return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
 };
@@ -262,7 +277,7 @@ const launcherSubmitAndQuery = async (
     data: ServerFunctionDataType,
     option?: {
         timeout: number;
-    }
+    },
 ): Promise<{
     result: {
         [key: string]: any;
@@ -273,9 +288,12 @@ const launcherSubmitAndQuery = async (
         {
             timeout: 24 * 3600,
         },
-        option
+        option,
     );
-    const submitRet = (await requestPost(`${context.url()}submit`, data)) as any;
+    const submitRet = (await requestPost(
+        `${context.url()}submit`,
+        data,
+    )) as any;
     // console.log('submitRet', JSON.stringify(submitRet))
     if (submitRet.code) {
         throw new Error(`submit ${submitRet.msg}`);
@@ -299,7 +317,7 @@ const launcherSubmitAndQuery = async (
             },
             {
                 retry: 3,
-            }
+            },
         )) as any;
         // console.log('queryRet', JSON.stringify(queryRet))
         if (queryRet.code) {
@@ -312,8 +330,11 @@ const launcherSubmitAndQuery = async (
                 await Files.appendText(context.ServerInfo.logFile, logs);
                 const result = extractResultFromLogs(data.id, logs);
                 if (result) {
-                    launcherResult.result = Object.assign(launcherResult.result, result);
-                    context.send("taskResult", {id: data.id, result});
+                    launcherResult.result = Object.assign(
+                        launcherResult.result,
+                        result,
+                    );
+                    context.send("taskResult", { id: data.id, result });
                 }
             }
         }
@@ -336,11 +357,14 @@ const launcherSubmitAndQuery = async (
 
 const launcherPrepareConfigJson = async (data: any) => {
     const configJson = await Files.temp("json");
-    await Files.write(configJson, JSON.stringify(data), {isDataPath: false});
+    await Files.write(configJson, JSON.stringify(data), { isDataPath: false });
     return configJson;
 };
 
-const launcherSubmitConfigJsonAndQuery = async (context: ServerContext, configData: any) => {
+const launcherSubmitConfigJsonAndQuery = async (
+    context: ServerContext,
+    configData: any,
+) => {
     if (!("setting" in configData)) {
         configData.setting = context.ServerInfo.setting;
     }
@@ -353,15 +377,17 @@ const launcherSubmitConfigJsonAndQuery = async (context: ServerContext, configDa
         },
         root: context.ServerInfo.localPath,
     });
-    await Files.deletes(configJsonPath, {isDataPath: false});
+    await Files.deletes(configJsonPath, { isDataPath: false });
     return result;
 };
 
 const extractResultFromLogs = (dataId: string, logs: string) => {
     let result = null;
-    logs.split("\n").forEach(line => {
+    logs.split("\n").forEach((line) => {
         // regex AigcPanelRunResult[VideoGen_121][xxxxx=]
-        const match = line.match(new RegExp(`AigcPanelRunResult\\[${dataId}\\]\\[(.*?)\\]`));
+        const match = line.match(
+            new RegExp(`AigcPanelRunResult\\[${dataId}\\]\\[(.*?)\\]`),
+        );
         // console.log('match', {_data, match})
         if (match) {
             const matchResult = JSON.parse(EncodeUtil.base64Decode(match[1]));
@@ -375,7 +401,7 @@ const availablePort = async (
     port: number,
     setting: {
         port?: number;
-    }
+    },
 ) => {
     setting = setting || {};
     if (port) {

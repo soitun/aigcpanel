@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import { onMounted, ref } from "vue";
 import Router from "../router";
 import ProUpgrade from "../components/common/ProUpgrade.vue";
 
@@ -12,7 +12,9 @@ onMounted(() => {
 
 <template>
     <div class="pb-device-container bg-white h-full relative select-none flex">
-        <div class="p-6 w-52 flex-shrink-0 border-r border-solid border-gray-100 overflow-x-hidden overflow-y-auto">
+        <div
+            class="p-6 w-52 flex-shrink-0 border-r border-solid border-gray-100 overflow-x-hidden overflow-y-auto"
+        >
             <div
                 class="p-2 rounded-lg mb-4 cursor-pointer"
                 :class="tab === 'knowledge' ? 'bg-gray-200' : ''"

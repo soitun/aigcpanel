@@ -1,29 +1,29 @@
-import {app, BrowserWindow, desktopCapturer, session, shell} from "electron";
-import {optimizer} from "@electron-toolkit/utils";
-import path from "node:path"
+import { app, BrowserWindow, desktopCapturer, session, shell } from "electron";
+import { optimizer } from "@electron-toolkit/utils";
+import path from "node:path";
 import fs from "node:fs";
 
 /** process.js 必须位于非依赖项的顶部 */
-import {isDummy} from "../lib/process";
-import {AppEnv, AppRuntime} from "../mapi/env";
-import {MAPI} from "../mapi/main";
+import { isDummy } from "../lib/process";
+import { AppEnv, AppRuntime } from "../mapi/env";
+import { MAPI } from "../mapi/main";
 
-import {WindowConfig} from "../config/window";
-import {AppConfig} from "../../src/config";
+import { WindowConfig } from "../config/window";
+import { AppConfig } from "../../src/config";
 import Log from "../mapi/log/main";
-import {ConfigMenu} from "../config/menu";
-import {ConfigLang, t} from "../config/lang";
-import {ConfigContextMenu} from "../config/contextMenu";
-import {preloadDefault, rendererLoadPath} from "../lib/env-main";
-import {Page} from "../page";
-import {ConfigTray} from "../config/tray";
-import {icnsLogoPath, icoLogoPath, logoPath} from "../config/icon";
-import {isDev, isMac, isPackaged} from "../lib/env";
-import {executeHooks} from "../lib/hooks";
-import {DevToolsManager} from "../lib/devtools";
-import {AppsMain} from "../mapi/app/main";
-import {ServerMain} from "../mapi/server/main";
-import {HttpServerMain} from "../mapi/httpserver/main";
+import { ConfigMenu } from "../config/menu";
+import { ConfigLang, t } from "../config/lang";
+import { ConfigContextMenu } from "../config/contextMenu";
+import { preloadDefault, rendererLoadPath } from "../lib/env-main";
+import { Page } from "../page";
+import { ConfigTray } from "../config/tray";
+import { icnsLogoPath, icoLogoPath, logoPath } from "../config/icon";
+import { isDev, isMac, isPackaged } from "../lib/env";
+import { executeHooks } from "../lib/hooks";
+import { DevToolsManager } from "../lib/devtools";
+import { AppsMain } from "../mapi/app/main";
+import { ServerMain } from "../mapi/server/main";
+import { HttpServerMain } from "../mapi/httpserver/main";
 import ConfigMain from "../mapi/config/main";
 
 const isDummyNew = isDummy;
@@ -32,7 +32,7 @@ if (process.env["ELECTRON_ENV_PROD"]) {
     DevToolsManager.setEnable(false);
 }
 
-process.on("uncaughtException", reason => {
+process.on("uncaughtException", (reason) => {
     let error: any = reason;
     if (error instanceof Error) {
         error = [error.message, error.stack].join("\n");
@@ -40,7 +40,7 @@ process.on("uncaughtException", reason => {
     Log.error("UncaughtException", error);
 });
 
-process.on("unhandledRejection", reason => {
+process.on("unhandledRejection", (reason) => {
     Log.error("UnhandledRejection", reason);
     let error: any = reason;
     if (error instanceof Error) {
@@ -67,11 +67,11 @@ AppEnv.userData = app.getPath("userData");
 AppEnv.dataRoot = path.join(AppEnv.userData, "data");
 
 if (!fs.existsSync(AppEnv.dataRoot)) {
-    fs.mkdirSync(AppEnv.dataRoot, {recursive: true});
+    fs.mkdirSync(AppEnv.dataRoot, { recursive: true });
 }
 for (const dir of ["logs", "storage"]) {
     if (!fs.existsSync(path.join(AppEnv.dataRoot, dir))) {
-        fs.mkdirSync(path.join(AppEnv.dataRoot, dir), {recursive: true});
+        fs.mkdirSync(path.join(AppEnv.dataRoot, dir), { recursive: true });
     }
 }
 
@@ -110,7 +110,7 @@ async function createWindow() {
     AppRuntime.mainWindow = new BrowserWindow({
         show: !hasSplashWindow,
         title: AppConfig.title,
-        ...(!isPackaged ? {icon} : {}),
+        ...(!isPackaged ? { icon } : {}),
         frame: false,
         transparent: false,
         hasShadow: true,
@@ -121,7 +121,7 @@ async function createWindow() {
         height: WindowConfig.initHeight,
         backgroundColor: await AppsMain.defaultDarkModeBackgroundColor(),
         titleBarStyle: "hidden",
-        trafficLightPosition: {x: 10, y: 11},
+        trafficLightPosition: { x: 10, y: 11 },
         webPreferences: {
             preload: preloadDefault,
             // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -146,7 +146,7 @@ async function createWindow() {
     });
 
     if (isMac) {
-        AppRuntime.mainWindow.on("close", event => {
+        AppRuntime.mainWindow.on("close", (event) => {
             // @ts-ignore
             if (!app.quitForce && !isDev) {
                 executeHooks(AppRuntime.mainWindow, "ShowQuitConfirmDialog");
@@ -180,20 +180,24 @@ async function createWindow() {
         Page.ready("main");
         DevToolsManager.autoShow(AppRuntime.mainWindow);
     });
-    AppRuntime.mainWindow.webContents.setWindowOpenHandler(({url}) => {
+    AppRuntime.mainWindow.webContents.setWindowOpenHandler(({ url }) => {
         if (url.startsWith("https:")) shell.openExternal(url);
-        return {action: "deny"};
+        return { action: "deny" };
     });
 }
 
 app.whenReady()
     .then(() => {
-        session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
-            desktopCapturer.getSources({types: ["screen"]}).then(sources => {
-                // Grant access to the first screen found.
-                callback({video: sources[0], audio: "loopback"});
-            });
-        });
+        session.defaultSession.setDisplayMediaRequestHandler(
+            (request, callback) => {
+                desktopCapturer
+                    .getSources({ types: ["screen"] })
+                    .then((sources) => {
+                        // Grant access to the first screen found.
+                        callback({ video: sources[0], audio: "loopback" });
+                    });
+            },
+        );
     })
     .then(ConfigLang.readyAsync)
     .then(() => {
@@ -213,7 +217,7 @@ app.whenReady()
         createWindow().then();
     });
 
-app.on("before-quit", event => {
+app.on("before-quit", (event) => {
     const localServerRunningCount = ServerMain.getRunningServerCount();
     if (localServerRunningCount > 0) {
         //  && isPackaged
@@ -221,7 +225,7 @@ app.on("before-quit", event => {
         AppsMain.toast(
             t("有 {count} 个本地模型服务正在运行，请停止后再关闭应用", {
                 count: localServerRunningCount,
-            })
+            }),
         );
     }
 });

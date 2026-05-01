@@ -1,6 +1,6 @@
-import {EasyServer} from "./EasyServer";
-import {ServerLive} from "./server-live";
-import {RemoteServer} from "./RemoteServer";
+import { EasyServer } from "./EasyServer";
+import { ServerLive } from "./server-live";
+import { RemoteServer } from "./RemoteServer";
 
 export const AigcServer = {
     EasyServer: EasyServer,

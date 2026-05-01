@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
 import { t } from "../../../lang";
 import { Dialog } from "../../../lib/dialog";
@@ -31,6 +31,8 @@ onMounted(() => {
     formData.value.soundGenerateId = old.soundGenerateId || 0;
     formData.value.soundCustomFile = old.soundCustomFile || "";
 });
+
+onUnmounted(() => {});
 
 watch(
     () => formData.value,
@@ -94,6 +96,7 @@ const doSubmit = async () => {
     const id = await TaskService.submit(record);
     Dialog.tipSuccess(t("task.videoGenSubmitted"));
     emit("submitted");
+    return id;
 };
 
 const refresh = async (type: "videoTemplate") => {

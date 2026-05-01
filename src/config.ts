@@ -1,5 +1,5 @@
 import packageJson from "../package.json";
-import {TimeUtil} from "../electron/lib/util";
+import { TimeUtil } from "../electron/lib/util";
 
 const BASE_URL = "https://aigcpanel.com";
 
