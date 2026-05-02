@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
+import DataConfigDialogButton from "../components/common/DataConfigDialogButton.vue";
+import SettingAbout from "../components/Setting/SettingAbout.vue";
+import SettingBasic from "../components/Setting/SettingBasic.vue";
+import SettingCli from "../components/Setting/SettingCli.vue";
+import SettingEnv from "../components/Setting/SettingEnv.vue";
 import { t } from "../lang";
 import { TabContentScroller } from "../lib/ui";
-import SettingBasic from "../components/Setting/SettingBasic.vue";
-import SettingEnv from "../components/Setting/SettingEnv.vue";
-import SettingAbout from "../components/Setting/SettingAbout.vue";
-import SettingCli from "../components/Setting/SettingCli.vue";
+import ModelPromptDataConfigButton from "../module/Model/ModelPromptDataConfigButton.vue";
 import { LiveBlackWordContent } from "./Live/config/blackWord";
 import { LiveReplyGenerateContent } from "./Live/config/replyGenerate";
 import {
     SoundAsrResultOptimizedPrompt,
     SoundGenerateTextFormItems,
     SoundGenerateTextPrompt,
-} from "./Sound/config/prompt";
-import { SoundGenerateReplaceContent } from "./Sound/config/replaceContent";
-import DataConfigDialogButton from "../components/common/DataConfigDialogButton.vue";
-import ModelPromptDataConfigButton from "../module/Model/ModelPromptDataConfigButton.vue";
+} from "./Sound/components/config/prompt";
+import { SoundGenerateReplaceContent } from "./Sound/components/config/replaceContent";
 
 let tabContentScroller: TabContentScroller | null = null;
 const contentContainer = ref<HTMLElement | null>(null);
@@ -77,7 +77,7 @@ onBeforeUnmount(() => {
             <div data-section="cli" class="p-2 rounded-lg mb-4 cursor-pointer">
                 <div class="text-base">
                     <icon-computer />
-                    CLI工具
+                    {{ t("setting.cli") }}
                 </div>
             </div>
 
@@ -113,36 +113,44 @@ onBeforeUnmount(() => {
                     <div>
                         <div class="flex gap-1">
                             <DataConfigDialogButton
-                                title="直播违规词"
+                                :title="t('live.violationWords')"
                                 name="LiveBlackWordContent"
-                                placeholder="多个词语请用英文逗号分隔"
+                                :placeholder="t('hint.multipleWordsComma')"
                                 :default-value="LiveBlackWordContent"
                             />
                             <ModelPromptDataConfigButton
-                                title="直播回复生成提示词"
+                                :title="t('live.replyGeneratePrompt')"
                                 name="LiveReplyGenerateContent"
-                                prompt-placeholder="支持使用变量：{reply}"
+                                :prompt-placeholder="
+                                    t('hint.supportVariableReply')
+                                "
                                 :default-prompt="LiveReplyGenerateContent"
                                 :param="{
-                                    reply: '示例回复内容',
-                                    count: '数量',
+                                    reply: t('live.sampleReplyContent'),
+                                    count: t('common.count'),
                                 }"
                             />
                             <ModelPromptDataConfigButton
-                                title="ASR结果优化提示词"
+                                :title="t('sound.asrOptimizePrompt')"
                                 name="SoundReplaceAsrResultOptimizedPrompt"
-                                prompt-placeholder="支持使用变量：{content}"
+                                :prompt-placeholder="
+                                    t('hint.supportVariableContent')
+                                "
                                 :default-prompt="SoundAsrResultOptimizedPrompt"
-                                :param="{ content: '识别结果内容' }"
+                                :param="{
+                                    content: t(
+                                        'sound.recognitionResultContent',
+                                    ),
+                                }"
                             />
                             <DataConfigDialogButton
-                                title="声音合成优化"
+                                :title="t('sound.synthesisOptimization')"
                                 name="SoundGenerateReplaceContent"
-                                help="声音合成时会自动把文本中的“键”替换为“值”，可用于修正发音"
+                                :help="t('sound.synthesisReplaceDesc')"
                                 :default-value="SoundGenerateReplaceContent"
                             />
                             <ModelPromptDataConfigButton
-                                title="声音合成内容生成"
+                                :title="t('sound.contentGeneration')"
                                 name="SoundGenerateTextPrompt"
                                 :param="
                                     SoundGenerateTextFormItems.map((i) => ({
@@ -168,7 +176,9 @@ onBeforeUnmount(() => {
                     class="border-b border-solid border-gray-200 my-6 dark:border-gray-700"
                 ></div>
                 <div data-section="cli" class="scroll-mt-4">
-                    <div class="text-base font-bold mb-4">CLI工具</div>
+                    <div class="text-base font-bold mb-4">
+                        {{ t("setting.cli") }}
+                    </div>
                     <div>
                         <SettingCli />
                     </div>

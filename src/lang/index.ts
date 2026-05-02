@@ -1,8 +1,18 @@
 import { createI18n } from "vue-i18n";
 
-import { isDev } from "../lib/env";
 import enUS from "./en-US.json";
 import zhCN from "./zh-CN.json";
+
+// Module locales
+
+import componentsEnUS from "../components/locales/en-US.json";
+import componentsZhCN from "../components/locales/zh-CN.json";
+import appsEnUS from "../pages/Apps/locales/en-US.json";
+import appsZhCN from "../pages/Apps/locales/zh-CN.json";
+import soundEnUS from "../pages/Sound/locales/en-US.json";
+import soundZhCN from "../pages/Sound/locales/zh-CN.json";
+import videoEnUS from "../pages/Video/locales/en-US.json";
+import videoZhCN from "../pages/Video/locales/zh-CN.json";
 
 let localeInit = false;
 export const defaultLocale = "zh-CN";
@@ -11,12 +21,26 @@ export const messageList = [
     {
         name: "en-US",
         label: "English",
-        messages: enUS,
+        messages: {
+            ...enUS,
+
+            ...soundEnUS,
+            ...appsEnUS,
+            ...videoEnUS,
+            ...componentsEnUS,
+        },
     },
     {
         name: "zh-CN",
         label: "简体中文",
-        messages: zhCN,
+        messages: {
+            ...zhCN,
+
+            ...soundZhCN,
+            ...appsZhCN,
+            ...videoZhCN,
+            ...componentsZhCN,
+        },
     },
 ];
 

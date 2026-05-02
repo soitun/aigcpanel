@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useServerStore } from "../../store/modules/server";
-import { EnumServerStatus, ServerRecord } from "../../types/Server";
 import { computed, ref, watch } from "vue";
+import { useServerStore } from "../../store/modules/server";
+import { EnumServerStatus } from "../../types/Server";
 
 import { Dialog } from "../../lib/dialog";
 import { mapError } from "../../lib/error";
@@ -149,7 +149,7 @@ watch(
         </a-optgroup>
         <a-optgroup
             v-if="!showCloudOptgroup"
-            :label="$t('升级Pro版，畅享云模型')"
+            :label="$t('model.upgradeProForCloud')"
         ></a-optgroup>
         <template #label="{ data }">
             <div class="text-sm flex items-center flex-nowrap truncate no-wrap">

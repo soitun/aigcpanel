@@ -1,3 +1,4 @@
+import { t } from "../../lang";
 import Ai360ModelLogo from "./assets/image/models/360.png";
 import Ai360ModelLogoDark from "./assets/image/models/360_dark.png";
 import AdeptModelLogo from "./assets/image/models/adept.png";
@@ -34,8 +35,10 @@ import DianxinModelLogo from "./assets/image/models/dianxin.png";
 import DianxinModelLogoDark from "./assets/image/models/dianxin_dark.png";
 import DoubaoModelLogo from "./assets/image/models/doubao.png";
 import DoubaoModelLogoDark from "./assets/image/models/doubao_dark.png";
-import EmbeddingModelLogo from "./assets/image/models/embedding.png";
-import EmbeddingModelLogoDark from "./assets/image/models/embedding.png";
+import {
+    default as EmbeddingModelLogo,
+    default as EmbeddingModelLogoDark,
+} from "./assets/image/models/embedding.png";
 import FlashaudioModelLogo from "./assets/image/models/flashaudio.png";
 import FlashaudioModelLogoDark from "./assets/image/models/flashaudio_dark.png";
 import FluxModelLogo from "./assets/image/models/flux.png";
@@ -44,14 +47,18 @@ import GeminiModelLogo from "./assets/image/models/gemini.png";
 import GeminiModelLogoDark from "./assets/image/models/gemini_dark.png";
 import GemmaModelLogo from "./assets/image/models/gemma.png";
 import GemmaModelLogoDark from "./assets/image/models/gemma_dark.png";
-import GoogleModelLogo from "./assets/image/models/google.png";
-import GoogleModelLogoDark from "./assets/image/models/google.png";
+import {
+    default as GoogleModelLogo,
+    default as GoogleModelLogoDark,
+} from "./assets/image/models/google.png";
 import ChatGPT35ModelLogo from "./assets/image/models/gpt_3.5.png";
 import ChatGPT4ModelLogo from "./assets/image/models/gpt_4.png";
-import ChatGptModelLogoDark from "./assets/image/models/gpt_dark.png";
-import ChatGPT35ModelLogoDark from "./assets/image/models/gpt_dark.png";
-import ChatGPT4ModelLogoDark from "./assets/image/models/gpt_dark.png";
-import ChatGPTo1ModelLogoDark from "./assets/image/models/gpt_dark.png";
+import {
+    default as ChatGPT35ModelLogoDark,
+    default as ChatGPT4ModelLogoDark,
+    default as ChatGptModelLogoDark,
+    default as ChatGPTo1ModelLogoDark,
+} from "./assets/image/models/gpt_dark.png";
 import ChatGPTo1ModelLogo from "./assets/image/models/gpt_o1.png";
 import GrokModelLogo from "./assets/image/models/grok.png";
 import GrokModelLogoDark from "./assets/image/models/grok_dark.png";
@@ -86,22 +93,28 @@ import MicrosoftModelLogo from "./assets/image/models/microsoft.png";
 import MicrosoftModelLogoDark from "./assets/image/models/microsoft_dark.png";
 import MidjourneyModelLogo from "./assets/image/models/midjourney.png";
 import MidjourneyModelLogoDark from "./assets/image/models/midjourney_dark.png";
-import MinicpmModelLogo from "./assets/image/models/minicpm.webp";
-import MinicpmModelLogoDark from "./assets/image/models/minicpm.webp";
+import {
+    default as MinicpmModelLogo,
+    default as MinicpmModelLogoDark,
+} from "./assets/image/models/minicpm.webp";
 import MinimaxModelLogo from "./assets/image/models/minimax.png";
 import MinimaxModelLogoDark from "./assets/image/models/minimax_dark.png";
 import MistralModelLogo from "./assets/image/models/mixtral.png";
 import MistralModelLogoDark from "./assets/image/models/mixtral_dark.png";
 import MoonshotModelLogo from "./assets/image/models/moonshot.png";
 import MoonshotModelLogoDark from "./assets/image/models/moonshot_dark.png";
-import NousResearchModelLogo from "./assets/image/models/nousresearch.png";
-import NousResearchModelLogoDark from "./assets/image/models/nousresearch.png";
+import {
+    default as NousResearchModelLogo,
+    default as NousResearchModelLogoDark,
+} from "./assets/image/models/nousresearch.png";
 import NvidiaModelLogo from "./assets/image/models/nvidia.png";
 import NvidiaModelLogoDark from "./assets/image/models/nvidia_dark.png";
 import PalmModelLogo from "./assets/image/models/palm.png";
 import PalmModelLogoDark from "./assets/image/models/palm_dark.png";
-import PerplexityModelLogo from "./assets/image/models/perplexity.png";
-import PerplexityModelLogoDark from "./assets/image/models/perplexity.png";
+import {
+    default as PerplexityModelLogo,
+    default as PerplexityModelLogoDark,
+} from "./assets/image/models/perplexity.png";
 import PixtralModelLogo from "./assets/image/models/pixtral.png";
 import PixtralModelLogoDark from "./assets/image/models/pixtral_dark.png";
 import QwenModelLogo from "./assets/image/models/qwen.png";
@@ -388,31 +401,31 @@ export const SystemModels: Record<string, Partial<Model>[]> = {
             id: "text-embedding-3-small",
             provider: "o3",
             name: "text-embedding-3-small",
-            group: "嵌入模型",
+            group: t("model.embeddingGroup"),
         },
         {
             id: "text-embedding-ada-002",
             provider: "o3",
             name: "text-embedding-ada-002",
-            group: "嵌入模型",
+            group: t("model.embeddingGroup"),
         },
         {
             id: "text-embedding-v2",
             provider: "o3",
             name: "text-embedding-v2",
-            group: "嵌入模型",
+            group: t("model.embeddingGroup"),
         },
         {
             id: "Doubao-embedding",
             provider: "o3",
             name: "Doubao-embedding",
-            group: "嵌入模型",
+            group: t("model.embeddingGroup"),
         },
         {
             id: "Doubao-embedding-large",
             provider: "o3",
             name: "Doubao-embedding-large",
-            group: "嵌入模型",
+            group: t("model.embeddingGroup"),
         },
     ],
     ollama: [],
@@ -1562,31 +1575,31 @@ export const SystemModels: Record<string, Partial<Model>[]> = {
             id: "Qwen/Qwen2.5-7B-Instruct",
             provider: "dmxapi",
             name: "Qwen/Qwen2.5-7B-Instruct",
-            group: "免费模型",
+            group: t("model.freeGroup"),
         },
         {
             id: "ERNIE-Speed-128K",
             provider: "dmxapi",
             name: "ERNIE-Speed-128K",
-            group: "免费模型",
+            group: t("model.freeGroup"),
         },
         {
             id: "THUDM/glm-4-9b-chat",
             provider: "dmxapi",
             name: "THUDM/glm-4-9b-chat",
-            group: "免费模型",
+            group: t("model.freeGroup"),
         },
         {
             id: "glm-4-flash",
             provider: "dmxapi",
             name: "glm-4-flash",
-            group: "免费模型",
+            group: t("model.freeGroup"),
         },
         {
             id: "hunyuan-lite",
             provider: "dmxapi",
             name: "hunyuan-lite",
-            group: "免费模型",
+            group: t("model.freeGroup"),
         },
         {
             id: "gpt-4o",

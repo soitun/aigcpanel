@@ -1,23 +1,23 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import ServerNameVersion from "../../../components/Server/ServerNameVersion.vue";
 import TaskBatchDeleteAction from "../../../components/Server/TaskBatchDeleteAction.vue";
 import TaskBatchDownloadAction from "../../../components/Server/TaskBatchDownloadAction.vue";
 import TaskDeleteAction from "../../../components/Server/TaskDeleteAction.vue";
 import TaskDownloadAction from "../../../components/Server/TaskDownloadAction.vue";
 import TaskDuration from "../../../components/Server/TaskDuration.vue";
 import TaskTitleField from "../../../components/Server/TaskTitleField.vue";
+import TextTruncateView from "../../../components/TextTruncateView.vue";
 import AudioPlayer from "../../../components/common/AudioPlayer.vue";
 import TaskBizStatus from "../../../components/common/TaskBizStatus.vue";
 import VideoPlayer from "../../../components/common/VideoPlayer.vue";
 import { useCheckAll } from "../../../components/common/check-all";
-import { TaskRecord, TaskService } from "../../../service/TaskService";
 import { usePaginate } from "../../../hooks/paginate";
 import { useTaskChangeRefresh } from "../../../hooks/task";
-import VideoGenFlowCreate from "./components/VideoGenFlowCreate.vue";
-import ServerNameVersion from "../../../components/Server/ServerNameVersion.vue";
-import VideoGenFormViewBody from "../../Video/components/VideoGenFormViewBody.vue";
+import { TaskRecord, TaskService } from "../../../service/TaskService";
 import SoundGenerateFormViewBody from "../../Sound/components/SoundGenerateFormViewBody.vue";
-import TextTruncateView from "../../../components/TextTruncateView.vue";
+import VideoGenFormViewBody from "../../Video/components/VideoGenFormViewBody.vue";
+import VideoGenFlowCreate from "./components/VideoGenFlowCreate.vue";
 
 const videoGenFlowCreate = ref<InstanceType<typeof VideoGenFlowCreate> | null>(
     null,
@@ -47,13 +47,18 @@ onMounted(() => {
     <div class="p-5">
         <div class="app-header mb-4 flex items-center">
             <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">数字人一键合成</div>
+                <div class="text-3xl font-bold">{{ $t("app.videoGen") }}</div>
                 <div class="text-gray-400 ml-3">
-                    快速完成文本输入→音频合成→数字人合成
+                    {{ $t("app.videoGenDesc") }}
                 </div>
             </div>
             <div class="flex items-center">
-                <a-tooltip v-if="0" :content="'清空历史'" position="right" mini>
+                <a-tooltip
+                    v-if="0"
+                    :content="$t('common.clearHistory')"
+                    position="right"
+                    mini
+                >
                     <a-button class="ml-1">
                         <template #icon>
                             <icon-delete />
@@ -78,7 +83,7 @@ onMounted(() => {
                                 :indeterminate="isIndeterminate"
                                 @change="onCheckAll"
                             >
-                                全选
+                                {{ $t("common.selectAll") }}
                             </a-checkbox>
                         </div>
                         <TaskBatchDeleteAction

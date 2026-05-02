@@ -1,6 +1,6 @@
 import { getDataContent } from "../components/common/dataConfig";
 import { t } from "../lang";
-import { SoundGenerateReplaceContent } from "../pages/Sound/config/replaceContent";
+import { SoundGenerateReplaceContent } from "../pages/Sound/components/config/replaceContent";
 import { TaskBiz } from "../service/TaskService";
 import { useServerStore } from "../store/modules/server";
 

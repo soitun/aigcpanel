@@ -43,14 +43,18 @@ defineExpose({
     <a-modal
         v-model:visible="visible"
         title-align="start"
-        :title="'图生图设置'"
+        :title="$t('app.imageToImageSettings')"
         width="600px"
         :destroyOnClose="true"
     >
         <template #footer>
             <div class="flex justify-end space-x-2">
-                <a-button @click="visible = false">取消</a-button>
-                <a-button type="primary" @click="doSubmit">保存</a-button>
+                <a-button @click="visible = false">{{
+                    $t("common.cancel")
+                }}</a-button>
+                <a-button type="primary" @click="doSubmit">{{
+                    $t("common.save")
+                }}</a-button>
             </div>
         </template>
         <div

@@ -50,7 +50,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file />
-                    {{ "分割文本" }}
+                    {{ $t("app.splitText") }}
                 </div>
             </div>
             <div class="flex-grow pt-1">
@@ -65,7 +65,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file-audio />
-                    {{ "音频合成" }}
+                    {{ $t("app.audioSynthesis") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -112,7 +112,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file-audio />
-                    {{ "合并音频" }}
+                    {{ $t("app.mergeAudio") }}
                 </div>
             </div>
             <div class="flex-grow">

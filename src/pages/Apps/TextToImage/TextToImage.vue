@@ -41,8 +41,10 @@ const doRefresh = async () => {
     <div class="p-5">
         <div class="app-header mb-4 flex items-center">
             <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">{{ "文生图" }}</div>
-                <div class="text-gray-400 ml-3">{{ "将文本转换为图像" }}</div>
+                <div class="text-3xl font-bold">{{ $t("model.txt2img") }}</div>
+                <div class="text-gray-400 ml-3">
+                    {{ $t("app.textToImageDesc") }}
+                </div>
             </div>
             <ToggleButton v-model="stepsVisible" />
         </div>
@@ -51,13 +53,13 @@ const doRefresh = async () => {
             :steps="[
                 {
                     key: 1,
-                    label: '输入提示词',
-                    description: '输入描述图像的文本',
+                    label: $t('app.inputPromptLabel'),
+                    description: $t('app.inputPromptDesc'),
                 },
                 {
                     key: 2,
-                    label: '合并图像',
-                    description: '将所有图像片段合并成一个长图像',
+                    label: $t('app.mergeImage'),
+                    description: $t('app.mergeImageDesc'),
                 },
             ]"
         />
@@ -74,7 +76,7 @@ const doRefresh = async () => {
                                 :indeterminate="isIndeterminate"
                                 @change="onCheckAll"
                             >
-                                {{ "全选" }}
+                                {{ $t("common.selectAll") }}
                             </a-checkbox>
                         </div>
                         <TaskBatchDeleteAction

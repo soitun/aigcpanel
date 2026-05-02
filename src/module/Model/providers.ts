@@ -1,3 +1,5 @@
+import { t } from "../../lang";
+import BuildInProviderLogo from "./../../assets/image/logo.svg";
 import ZhinaoProviderLogo from "./assets/image/models/360.png";
 import HunyuanProviderLogo from "./assets/image/models/hunyuan.png";
 import AzureProviderLogo from "./assets/image/models/microsoft.png";
@@ -42,9 +44,8 @@ import VoyageAIProviderLogo from "./assets/image/providers/voyageai.png";
 import XirangProviderLogo from "./assets/image/providers/xirang.png";
 import ZeroOneProviderLogo from "./assets/image/providers/zero-one.png";
 import ZhipuProviderLogo from "./assets/image/providers/zhipu.png";
-import BuildInProviderLogo from "./../../assets/image/logo.svg";
-import { Provider } from "./types";
 import { ModelProvider } from "./provider/provider";
+import { Provider } from "./types";
 
 const ProviderLogoMap = {
     buildIn: BuildInProviderLogo,
@@ -108,19 +109,19 @@ export function getProviderUrl(provider: Provider) {
 }
 
 export const getProviderTitle = (providerId: string) => {
-    const map = {
-        buildIn: "大模型",
+    const map: Record<string, string> = {
+        buildIn: t("provider.buildIn"),
         aihubmix: "AiHubMix",
         alayanew: "Alaya NeW",
         anthropic: "Anthropic",
         "azure-openai": "Azure OpenAI",
-        baichuan: "百川",
-        "baidu-cloud": "百度云千帆",
+        baichuan: t("provider.baichuan"),
+        "baidu-cloud": t("provider.baiduCloud"),
         copilot: "GitHub Copilot",
-        dashscope: "阿里云百炼",
-        deepseek: "深度求索",
+        dashscope: t("provider.dashscope"),
+        deepseek: t("provider.deepseek"),
         dmxapi: "DMXAPI",
-        doubao: "火山引擎",
+        doubao: t("provider.doubao"),
         fireworks: "Fireworks",
         gemini: "Gemini",
         "gitee-ai": "Gitee AI",
@@ -129,32 +130,32 @@ export const getProviderTitle = (providerId: string) => {
         "graphrag-kylin-mountain": "GraphRAG",
         grok: "Grok",
         groq: "Groq",
-        hunyuan: "腾讯混元",
+        hunyuan: t("provider.hunyuan"),
         hyperbolic: "Hyperbolic",
-        infini: "无问芯穹",
+        infini: t("provider.infini"),
         jina: "Jina",
         lmstudio: "LM Studio",
         minimax: "MiniMax",
         mistral: "Mistral",
-        modelscope: "ModelScope 魔搭",
-        moonshot: "月之暗面",
-        nvidia: "英伟达",
+        modelscope: t("provider.modelscope"),
+        moonshot: t("provider.moonshot"),
+        nvidia: t("provider.nvidia"),
         o3: "O3",
         ocoolai: "ocoolAI",
         ollama: "Ollama",
         openai: "OpenAI",
         openrouter: "OpenRouter",
         perplexity: "Perplexity",
-        ppio: "PPIO 派欧云",
+        ppio: t("provider.ppio"),
         qwenlm: "QwenLM",
-        silicon: "硅基流动",
-        stepfun: "阶跃星辰",
-        "tencent-cloud-ti": "腾讯云TI",
+        silicon: t("provider.silicon"),
+        stepfun: t("provider.stepfun"),
+        "tencent-cloud-ti": t("provider.tencentCloudTi"),
         together: "Together",
-        xirang: "天翼云息壤",
-        yi: "零一万物",
-        zhinao: "360智脑",
-        zhipu: "智谱AI",
+        xirang: t("provider.xirang"),
+        yi: t("provider.yi"),
+        zhinao: t("provider.zhinao"),
+        zhipu: t("provider.zhipu"),
         voyageai: "Voyage AI",
     };
     return map[providerId as keyof typeof map] || providerId;

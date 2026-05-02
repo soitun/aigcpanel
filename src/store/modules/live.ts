@@ -14,8 +14,8 @@ import { useServerStore } from "./server";
 const serverStore = useServerStore();
 
 export const liveModels = [
-    { value: "wav2lip", title: "Wav2Lip标准版" },
-    { value: "wav2lip384", title: "Wav2Lip清晰版" },
+    { value: "wav2lip", title: t("live.wav2lipStandard") },
+    { value: "wav2lip384", title: t("live.wav2lipHQ") },
 ];
 
 const SCENE_ID = "live";
@@ -291,7 +291,7 @@ export const liveStore = defineStore("live", {
             if (!this.server) {
                 return {
                     code: -1,
-                    msg: "没有可用的直播服务器",
+                    msg: t("error.noLiveServerAvailable"),
                     data: {},
                 } as ServerCallFunctionResult;
             }
@@ -570,7 +570,7 @@ export const liveStore = defineStore("live", {
             window.__page.offBroadcast("MonitorEvent", this.onMonitorBroadcast);
             window.__page.onBroadcast("MonitorEvent", this.onMonitorBroadcast);
             await $mapi.app.windowOpen("monitor", {
-                title: "直播监听",
+                title: t("live.listeningTitle"),
                 width: 1300,
                 height: 800,
                 url: this.localConfig.config.liveMonitorUrl,

@@ -1,4 +1,5 @@
 import { defineAsyncComponent } from "vue";
+import { t } from "../../../../lang";
 import {
     NodeFunctionCall,
     NodeRunController,
@@ -11,8 +12,8 @@ import ImageToImageIcon from "./../assets/icon.svg";
 
 export default <NodeFunctionCall>{
     name: "ImageToImage",
-    title: "图生图",
-    description: "将图像转换为图像",
+    title: t("model.img2img"),
+    description: t("app.imageToImageDesc"),
     icon: ImageToImageIcon,
     comp: defineAsyncComponent(() => import("./ImageToImageNode.vue")),
     inputFields: [
@@ -55,10 +56,13 @@ export default <NodeFunctionCall>{
                     !taskRunData.imageToImage
                 ) {
                     const missing: string[] = [];
-                    if (!taskRunData.image) missing.push("图像");
-                    if (!taskRunData.prompt) missing.push("提示文本");
-                    if (!taskRunData.imageToImage) missing.push("图像生成服务");
-                    throw `参数错误：缺少 ${missing.join(", ")}`;
+                    if (!taskRunData.image) missing.push(t("app.imageLabel"));
+                    if (!taskRunData.prompt) missing.push(t("app.promptText"));
+                    if (!taskRunData.imageToImage)
+                        missing.push(t("app.imageGenerateService"));
+                    throw t("workflow.paramErrorMissing", {
+                        items: missing.join(", "),
+                    });
                 }
                 return await ImageToImageRun(taskRunData);
             },
@@ -69,13 +73,13 @@ export default <NodeFunctionCall>{
     },
     async check(node) {
         if (!node.properties?.data?.imageToImage) {
-            throw "请配置图像生成服务";
+            throw t("hint.configureImageGenerateService");
         }
         if (node.properties?.inputFields?.[0].value === "") {
-            throw "请输入图像参数";
+            throw t("hint.inputImageParam");
         }
         if (node.properties?.inputFields?.[1].value === "") {
-            throw "请输入提示参数";
+            throw t("hint.inputPromptParam");
         }
     },
 };

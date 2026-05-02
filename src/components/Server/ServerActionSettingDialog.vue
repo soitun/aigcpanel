@@ -35,7 +35,7 @@ const gpus = ref<
 
 const getGpus = async () => {
     let gpus: any = [];
-    gpus.push({ id: "", name: "默认", size: 0 });
+    gpus.push({ id: "", name: t("common.default"), size: 0 });
     gpus = gpus.concat(await window.$mapi.server.listGpus());
     return gpus;
 };

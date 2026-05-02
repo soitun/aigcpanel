@@ -202,7 +202,7 @@ const doSelectCloud = async () => {
     let isPro = false;
 
     if (!isPro) {
-        Dialog.tipError(t("请升级Pro版使用"));
+        Dialog.tipError(t("error.upgradeToProVersion"));
     }
 };
 defineExpose({

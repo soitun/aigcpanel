@@ -19,7 +19,7 @@
                 <div class="px-3 pt-3 mb-2">
                     <a-input
                         v-model="filterKeywords"
-                        placeholder="请输入音色名称"
+                        :placeholder="$t('speaker.inputVoiceName')"
                         allow-clear
                         class="w-full"
                         size="small"
@@ -36,7 +36,7 @@
                             :type="!filterLang ? 'primary' : undefined"
                             @click="filterLang = ''"
                         >
-                            所有语言
+                            {{ $t("speaker.allLanguages") }}
                         </a-button>
                         <a-button
                             v-for="l in langs"
@@ -61,7 +61,9 @@
                             <div>
                                 <icon-info-circle class="text-5xl" />
                             </div>
-                            <div class="mt-2">没有找到相关音色</div>
+                            <div class="mt-2">
+                                {{ $t("speaker.noMatchingTimbre") }}
+                            </div>
                         </div>
                     </div>
                     <div v-for="s in filterRecords" :key="s.name">
@@ -96,7 +98,7 @@
                                     @click="doSelect(s)"
                                     round
                                 >
-                                    选择</a-button
+                                    {{ $t("speaker.select") }}</a-button
                                 >
                             </div>
                         </div>

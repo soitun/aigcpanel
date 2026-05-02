@@ -48,7 +48,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file />
-                    {{ "处理图像" }}
+                    {{ $t("app.processImage") }}
                 </div>
             </div>
             <div class="flex-grow pt-1">
@@ -63,7 +63,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file-image />
-                    {{ "图像生成" }}
+                    {{ $t("app.imageGeneration") }}
                 </div>
             </div>
             <div class="flex-grow">

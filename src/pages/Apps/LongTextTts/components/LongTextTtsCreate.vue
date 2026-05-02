@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import { dataAutoSaveDraft } from "../../../../components/common/util";
+import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
 import { TaskRecord, TaskService } from "../../../../service/TaskService";
 import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
@@ -27,7 +28,7 @@ const doSubmit = async () => {
         return;
     }
     if (!formData.value.text.trim()) {
-        Dialog.tipError("请输入长文本");
+        Dialog.tipError(t("app.inputLongText"));
         return;
     }
     const taskTitle = formData.value.text.substring(0, 20) + "...";
@@ -46,7 +47,7 @@ const doSubmit = async () => {
     const id = await TaskService.submit(record);
     formData.value.text = "";
     emit("submitted");
-    Dialog.tipSuccess("任务已提交");
+    Dialog.tipSuccess(t("common.taskSubmitted"));
     clearDraft();
     return id;
 };
@@ -55,10 +56,10 @@ const doSubmit = async () => {
 <template>
     <div class="rounded-xl shadow border p-4">
         <div class="mb-4">
-            <div class="mb-2 font-bold">{{ "长文本" }}</div>
+            <div class="mb-2 font-bold">{{ $t("app.longTextLabel") }}</div>
             <a-textarea
                 v-model="formData.text"
-                :placeholder="'请输入要转换为音频的长文本'"
+                :placeholder="$t('app.inputLongTextPlaceholder')"
                 :auto-size="{ minRows: 6, maxRows: 20 }"
             />
         </div>
@@ -66,7 +67,7 @@ const doSubmit = async () => {
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 <i-mdi-send class="mr-2" />
-                {{ "提交任务" }}
+                {{ $t("soundReplace.submitTask") }}
             </a-button>
         </div>
     </div>

@@ -2,6 +2,7 @@
 import { onBeforeMount, onMounted, ref } from "vue";
 import PageNav from "./../components/PageNav.vue";
 import { AppConfig } from "../config";
+import { t } from "../lang";
 import AppQuitConfirm from "../components/AppQuitConfirm.vue";
 import { useDragWindow } from "../components/common/dragWindow";
 
@@ -36,7 +37,7 @@ const doQuit = async () => {
     await appQuitConfirm.value?.show();
 };
 
-let appEditionBadge = "社区版";
+let appEditionBadge = t("common.communityEdition");
 
 onMounted(() => {
     // document.body.setAttribute('arco-theme', 'dark')

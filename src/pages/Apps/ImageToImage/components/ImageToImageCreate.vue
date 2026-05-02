@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
+import FileSelector from "../../../../components/common/FileSelector.vue";
+import ImagePreviewBox from "../../../../components/common/ImagePreviewBox.vue";
 import { dataAutoSaveDraft } from "../../../../components/common/util";
+import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
 import { TaskRecord, TaskService } from "../../../../service/TaskService";
 import ImageToImageForm from "../../common/ImageToImageForm.vue";
-import FileSelector from "../../../../components/common/FileSelector.vue";
-import ImagePreviewBox from "../../../../components/common/ImagePreviewBox.vue";
 
 const emit = defineEmits<{
     submitted: [];
@@ -30,15 +31,15 @@ const doSubmit = async () => {
         return;
     }
     if (!formData.value.image) {
-        Dialog.tipError("请选择图像");
+        Dialog.tipError(t("error.pleaseSelectImage"));
         return;
     }
     if (!(await $mapi.file.exists(formData.value.image))) {
-        Dialog.tipError("所选图像文件不存在，请重新选择");
+        Dialog.tipError(t("error.imageFileNotSelected"));
         return;
     }
     if (!formData.value.prompt.trim()) {
-        Dialog.tipError("请输入提示");
+        Dialog.tipError(t("error.pleaseInputPrompt"));
         return;
     }
     const taskTitle = formData.value.prompt.substring(0, 20) + "...";
@@ -59,7 +60,7 @@ const doSubmit = async () => {
     formData.value.image = "";
     formData.value.prompt = "";
     emit("submitted");
-    Dialog.tipSuccess("任务已提交");
+    Dialog.tipSuccess(t("common.taskSubmitted"));
     clearDraft();
     return id;
 };
@@ -69,7 +70,7 @@ const doSubmit = async () => {
     <div class="rounded-xl shadow border p-4">
         <div class="mb-4 flex items-start">
             <div class="pt-1 w-5">
-                <a-tooltip :content="'输入图像'" mini>
+                <a-tooltip :content="$t('hint.inputInputImage')" mini>
                     <icon-video-camera />
                 </a-tooltip>
             </div>
@@ -89,14 +90,14 @@ const doSubmit = async () => {
         <div class="mb-4">
             <a-textarea
                 v-model="formData.prompt"
-                :placeholder="'请输入生成图像的提示'"
+                :placeholder="$t('hint.inputPrompt')"
                 :auto-size="{ minRows: 2, maxRows: 10 }"
             />
         </div>
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 <i-mdi-send class="mr-2" />
-                {{ "提交任务" }}
+                {{ $t("soundReplace.submitTask") }}
             </a-button>
         </div>
     </div>

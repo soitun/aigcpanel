@@ -3,6 +3,7 @@ import { onMounted, ref, watch } from "vue";
 import ParamForm from "../../../components/common/ParamForm.vue";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
 import ServerSelector from "../../../components/Server/ServerSelector.vue";
+import { t } from "../../../lang";
 import { Dialog } from "../../../lib/dialog";
 import { StorageUtil } from "../../../lib/storage";
 import { useServerStore } from "../../../store/modules/server";
@@ -43,11 +44,11 @@ const getValue = async (): Promise<TextToImageParamType | undefined> => {
 
     const server = await serverStore.getByKey(data.serverKey);
     if (!server) {
-        Dialog.tipError("请选择文生图模型");
+        Dialog.tipError(t("error.pleaseSelectTextToImageModel"));
         return;
     }
     if (server.status !== EnumServerStatus.RUNNING) {
-        Dialog.tipError("文生图模型未启动");
+        Dialog.tipError(t("error.textToImageModelNotStarted"));
         return;
     }
 
@@ -57,7 +58,7 @@ const getValue = async (): Promise<TextToImageParamType | undefined> => {
     data.param = paramForm.value ? paramForm.value.getValue() : {};
 
     if (!data.param) {
-        Dialog.tipError("文生图参数不正确");
+        Dialog.tipError(t("error.textToImageParamInvalid"));
         return;
     }
 
@@ -85,11 +86,11 @@ defineExpose({
             <div class="inline-block w-5">
                 <icon-settings />
             </div>
-            文生图配置
+            {{ $t("app.textToImageConfig") }}
         </div>
         <div class="flex items-start min-h-8 max-w-lg w-full gap-1">
             <div class="pt-2">
-                <a-tooltip :content="'文生图模型'" mini>
+                <a-tooltip :content="$t('app.textToImageModel')" mini>
                     <i-mdi-server-outline class="w-4 h-4" />
                 </a-tooltip>
             </div>

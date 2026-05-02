@@ -43,13 +43,15 @@ defineExpose({
     <a-modal
         v-model:visible="visible"
         title-align="start"
-        title="长文本转音频设置"
+        :title="$t('app.longTextTtsSettings')"
         width="600px"
         :destroyOnClose="true"
     >
         <template #footer>
             <div class="flex justify-end space-x-2">
-                <a-button type="primary" @click="doSubmit">保存</a-button>
+                <a-button type="primary" @click="doSubmit">{{
+                    $t("common.save")
+                }}</a-button>
             </div>
         </template>
         <div

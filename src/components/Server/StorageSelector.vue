@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { StorageRecord, StorageService } from "../../service/StorageService";
 import { nextTick, onMounted, ref } from "vue";
+import { t } from "../../lang";
+import { StorageRecord, StorageService } from "../../service/StorageService";
 
 const props = defineProps({
     modelValue: {
@@ -13,7 +14,7 @@ const props = defineProps({
     },
     title: {
         type: String,
-        default: "请选择",
+        default: () => t("common.select"),
     },
     recordFilter: {
         type: Function,
@@ -100,7 +101,7 @@ const onSelectChange = (keys: number[]) => {
                 <template #icon>
                     <icon-plus />
                 </template>
-                点击选择
+                {{ $t("common.clickToSelect") }}
             </a-button>
         </div>
     </div>
@@ -111,8 +112,12 @@ const onSelectChange = (keys: number[]) => {
         :destroy-on-close="true"
     >
         <template #footer>
-            <a-button @click="visible = false">取消</a-button>
-            <a-button type="primary" @click="doConfirm">确定</a-button>
+            <a-button @click="visible = false">{{
+                $t("common.cancel")
+            }}</a-button>
+            <a-button type="primary" @click="doConfirm">{{
+                $t("common.confirm")
+            }}</a-button>
         </template>
         <div class="-mx-4 -my-5">
             <a-table
@@ -124,7 +129,7 @@ const onSelectChange = (keys: number[]) => {
                 :bordered="false"
                 :pagination="false"
                 :virtual-list-props="{ height: '50vh' }"
-                :columns="[{ title: '名称', dataIndex: 'title' }]"
+                :columns="[{ title: $t('common.name'), dataIndex: 'title' }]"
             >
             </a-table>
         </div>

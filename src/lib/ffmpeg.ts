@@ -1,4 +1,5 @@
 import { ffprobeGetMediaDuration, ffprobeVideoInfo } from "./ffprobe";
+import { t } from "../lang";
 
 let hardwareEncodersCache: { [key: string]: boolean } | null = null;
 
@@ -375,7 +376,7 @@ export const ffmpegMergeAudio = async (
             !currentRecord.audio ||
             !(await $mapi.file.exists(currentRecord.audio))
         ) {
-            throw `音频文件不存在: ${currentRecord.audio}`;
+            throw `${t("error.audioFileNotExists")}: ${currentRecord.audio}`;
         }
         // 计算当前片段的时长限制
         const startMs = currentRecord.start;
@@ -411,7 +412,7 @@ export const ffmpegMergeAudio = async (
     }
 
     if (!wavFiles.length) {
-        throw "没有生成任何音频文件";
+        throw t("error.noAudioGenerated");
     }
 
     const output = await $mapi.file.temp("wav");
@@ -436,16 +437,18 @@ export const ffmpegMergeAudio = async (
                 inputSources.length +
                 ":duration=longest:normalize=0",
         ].join("");
+        const filterScriptFile = await $mapi.file.temp("txt");
+        await $mapi.file.write(filterScriptFile, filterComplex);
         await $mapi.app.spawnBinary("ffmpeg", [
             ...inputs,
-            "-filter_complex",
-            filterComplex,
+            "-filter_complex_script",
+            filterScriptFile,
             output,
         ]);
     }
     // 检查合并后的音频是否存在
     if (!(await $mapi.file.exists(output))) {
-        throw `音频合并失败: ${output}`;
+        throw `${t("error.audioMergeFailed")}: ${output}`;
     }
     return {
         output,
@@ -478,7 +481,7 @@ export const ffmpegCombineVideoAudio = async (video: string, audio: string) => {
     ]);
     // 检查最终视频是否生成成功
     if (!(await $mapi.file.exists(output))) {
-        throw `视频音频合成失败`;
+        throw t("error.videoAudioSynthesisFailed");
     }
     return output;
 };
@@ -499,14 +502,14 @@ export const ffmpegVideoToAudio = async (video: string) => {
         file,
     ]);
     if (!(await $mapi.file.exists(file))) {
-        throw "转换成为音频失败，请检查视频文件是否存在或ffmpeg是否正常工作";
+        throw t("error.audioConvertFailed");
     }
     return file;
 };
 
 export const ffmpegConcatAudio = async (audios: string[]): Promise<string> => {
     if (audios.length === 0) {
-        throw "没有提供任何音频文件";
+        throw t("error.noAudioProvided");
     }
     if (audios.length === 1) {
         return audios[0];
@@ -537,7 +540,7 @@ export const ffmpegConcatAudio = async (audios: string[]): Promise<string> => {
         output,
     ]);
     if (!(await $mapi.file.exists(output))) {
-        throw "音频合并失败";
+        throw t("error.audioMergeFailed");
     }
     return output;
 };
@@ -603,7 +606,7 @@ export const ffmpegVideoNormal = async (
     // console.log("FFmpeg videoNormal args:", args.join(" "));
     await $mapi.app.spawnBinary("ffmpeg", args);
     if (!(await $mapi.file.exists(output))) {
-        throw "视频处理失败，请检查视频文件是否存在或ffmpeg是否正常工作";
+        throw t("error.videoProcessFailed");
     }
     return output;
 };
@@ -629,7 +632,7 @@ export const ffmpegVideoPreview = async (input: string): Promise<string> => {
     ];
     await $mapi.app.spawnBinary("ffmpeg", args);
     if (!(await $mapi.file.exists(output))) {
-        throw "视频预览格式转换失败";
+        throw t("error.videoPreviewConvertFailed");
     }
     return output;
 };

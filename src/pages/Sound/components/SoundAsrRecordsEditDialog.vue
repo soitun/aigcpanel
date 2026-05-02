@@ -7,8 +7,8 @@ import { TimeUtil } from "../../../lib/util";
 import ModelGenerateButton, {
     ModelGenerateButtonOptionType,
 } from "../../../module/Model/ModelGenerateButton.vue";
-import { SoundAsrResultOptimizedPrompt } from "../config/prompt";
-import { SoundGenerateReplaceContent } from "../config/replaceContent";
+import { SoundAsrResultOptimizedPrompt } from "./config/prompt";
+import { SoundGenerateReplaceContent } from "./config/replaceContent";
 import SoundAsrRecordsSubtitlePreviewDialog from "./SoundAsrRecordsSubtitlePreviewDialog.vue";
 import SoundGeneratePreviewBox from "./SoundGeneratePreviewBox.vue";
 
@@ -547,9 +547,9 @@ defineExpose({
                 </div>
                 <DataConfigDialogButton
                     size="small"
-                    title="声音合成优化"
+                    :title="$t('sound.synthesisOptimization')"
                     name="SoundGenerateReplaceContent"
-                    help="声音合成时会自动把文本中的“键”替换为“值”，可用于修正发音"
+                    :help="$t('sound.synthesisReplaceDesc')"
                     :default-value="SoundGenerateReplaceContent"
                 >
                     <div class="mb-2">
@@ -672,7 +672,7 @@ defineExpose({
                     </a-button>
                     <ModelGenerateButton
                         biz="SoundReplaceAsrResultOptimizedPrompt"
-                        title="AI一键优化"
+                        :title="$t('sound.aiOneClickOptimize')"
                         :option="aiOption"
                     />
                 </div>
@@ -752,7 +752,7 @@ defineExpose({
                                             <template #icon>
                                                 <icon-arrow-up />
                                             </template>
-                                            合并到前一条
+                                            {{ $t("soundAsrEdit.mergeToPrev") }}
                                         </a-button>
                                         <a-checkbox
                                             :model-value="
@@ -776,7 +776,7 @@ defineExpose({
                                         size="mini"
                                         :textarea-attrs="{ tabindex: index }"
                                         show-word-limit
-                                        placeholder="输入文本"
+                                        :placeholder="$t('hint.inputText')"
                                     />
                                 </div>
                                 <div v-if="index === currentIndex" class="px-2">

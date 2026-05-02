@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from "vue";
+import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
 import { StorageUtil } from "../../../../lib/storage";
 import { PermissionService } from "../../../../service/PermissionService";
@@ -62,7 +63,7 @@ const doSubmit = async () => {
     }
     // console.log('VideoGenFlow.submit',JSON.stringify(record))
     const id = await TaskService.submit(record);
-    Dialog.tipSuccess("任务已经提交成功，等待视频生成完成");
+    Dialog.tipSuccess(t("task.videoGenSubmitted"));
     formData.value.text = "";
     emit("submitted");
     return id;
@@ -81,12 +82,12 @@ const emit = defineEmits({
             <a-textarea
                 v-model="formData.text"
                 :auto-size="{ minRows: 2 }"
-                :placeholder="'输入语音内容开始生成视频'"
+                :placeholder="$t('app.inputVideoGenPlaceholder')"
             ></a-textarea>
         </div>
         <div>
             <a-button class="mr-2" type="primary" @click="doSubmit">
-                开始生成视频
+                {{ $t("task.startVideoGen") }}
             </a-button>
         </div>
     </div>

@@ -41,8 +41,12 @@ const doRefresh = async () => {
     <div class="p-5">
         <div class="app-header mb-4 flex items-center">
             <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">长文本转音频</div>
-                <div class="text-gray-400 ml-3">将长文本转换为音频</div>
+                <div class="text-3xl font-bold">
+                    {{ $t("app.longTextTts") }}
+                </div>
+                <div class="text-gray-400 ml-3">
+                    {{ $t("app.longTextTtsDesc") }}
+                </div>
             </div>
             <ToggleButton v-model="stepsVisible" />
         </div>
@@ -51,18 +55,18 @@ const doRefresh = async () => {
             :steps="[
                 {
                     key: 1,
-                    label: '分割文本',
-                    description: '将长文本分割成不超过150字的片段',
+                    label: $t('app.splitText'),
+                    description: $t('app.longTextTtsSplitDesc'),
                 },
                 {
                     key: 2,
-                    label: '音频合成',
-                    description: '为每个片段合成音频',
+                    label: $t('app.audioSynthesis'),
+                    description: $t('app.longTextTtsAudioDesc'),
                 },
                 {
                     key: 3,
-                    label: '合并音频',
-                    description: '将所有音频片段合并成一个长音频',
+                    label: $t('app.mergeAudio'),
+                    description: $t('app.longTextTtsMergeDesc'),
                 },
             ]"
         />
@@ -79,7 +83,7 @@ const doRefresh = async () => {
                                 :indeterminate="isIndeterminate"
                                 @change="onCheckAll"
                             >
-                                全选
+                                {{ $t("common.selectAll") }}
                             </a-checkbox>
                         </div>
                         <TaskBatchDeleteAction

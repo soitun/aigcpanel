@@ -1,3 +1,4 @@
+import { t } from "../../../lang";
 import {
     NodeRunController,
     NodeRunParam,
@@ -30,7 +31,7 @@ export const workflowRun = async <
 ): Promise<NodeRunResult> => {
     const result: NodeRunResult = {
         status: "error" as NodeRunResultStatus,
-        statusMsg: "未知错误",
+        statusMsg: t("error.unknownError"),
         runOutputs: {},
         runData: {},
         pauseByType: "",
@@ -42,7 +43,7 @@ export const workflowRun = async <
     const taskResult = await res.result();
     if (taskResult.code) {
         result.status = "error";
-        result.statusMsg = taskResult.msg || "任务失败";
+        result.statusMsg = taskResult.msg || t("error.taskFailed");
     } else if (taskResult.data?.status === "success") {
         result.status = "success";
         await taskSuccessCallback(result, taskResult.data);
@@ -52,7 +53,7 @@ export const workflowRun = async <
         result.pauseById = res.taskId;
     } else {
         result.status = "error";
-        result.statusMsg = taskResult.msg || "任务失败";
+        result.statusMsg = taskResult.msg || t("error.taskFailed");
     }
     return result;
 };

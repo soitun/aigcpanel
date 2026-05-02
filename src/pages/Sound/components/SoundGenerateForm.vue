@@ -123,7 +123,7 @@ const getValue = async (): Promise<SoundGenerateParamType | undefined> => {
         data.promptText = prompt.content.promptText;
         if (data.promptUrl && !data.promptUrl.startsWith("http")) {
             if (!(await window.$mapi.file.exists(data.promptUrl))) {
-                Dialog.tipError("音色参考音频文件不存在，请重新设置音色");
+                Dialog.tipError(t("sound.timbreAudioNotFound"));
                 return;
             }
         }

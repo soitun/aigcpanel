@@ -41,9 +41,11 @@ const doRefresh = async () => {
     <div class="p-5">
         <div class="app-header mb-4 flex items-center">
             <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">{{ "字幕转音频" }}</div>
+                <div class="text-3xl font-bold">
+                    {{ $t("task.subtitleToAudio") }}
+                </div>
                 <div class="text-gray-400 ml-3">
-                    {{ "将SRT字幕文件转换为音频" }}
+                    {{ $t("app.subtitleTtsDesc") }}
                 </div>
             </div>
             <ToggleButton v-model="stepsVisible" />
@@ -53,13 +55,13 @@ const doRefresh = async () => {
             :steps="[
                 {
                     key: 1,
-                    label: '解析字幕文件',
-                    description: '读取SRT字幕文件并解析时间和文本',
+                    label: $t('app.subtitleParseLabel'),
+                    description: $t('app.subtitleParseDesc'),
                 },
                 {
                     key: 2,
-                    label: '音频合成',
-                    description: '根据字幕顺序合成音频，支持自动速度调整',
+                    label: $t('app.audioSynthesis'),
+                    description: $t('app.subtitleAudioDesc'),
                 },
             ]"
         />
@@ -76,7 +78,7 @@ const doRefresh = async () => {
                                 :indeterminate="isIndeterminate"
                                 @change="onCheckAll"
                             >
-                                {{ "全选" }}
+                                {{ $t("common.selectAll") }}
                             </a-checkbox>
                         </div>
                         <TaskBatchDeleteAction

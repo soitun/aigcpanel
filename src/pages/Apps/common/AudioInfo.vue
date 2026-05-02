@@ -23,7 +23,7 @@ const props = withDefaults(
         <icon-file-audio />
     </a-tag>
     <a-tag class="rounded-lg"
-        >{{ label ? "时长" : ""
+        >{{ label ? $t("common.duration") : ""
         }}{{ TimeUtil.secondsToTime(data.audioDuration || 0) }}</a-tag
     >
     <a-tag class="rounded-lg">{{ data.audioChannels }} Channels</a-tag>

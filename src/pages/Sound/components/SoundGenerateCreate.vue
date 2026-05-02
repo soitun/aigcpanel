@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { StorageUtil } from "../../../lib/storage";
-import SoundGenerateForm from "./SoundGenerateForm.vue";
 import BatchTextareaInputAction from "../../../components/BatchTextareaInputAction.vue";
-import { Dialog } from "../../../lib/dialog";
 import { t } from "../../../lang";
-import { TaskRecord, TaskService } from "../../../service/TaskService";
-import { PermissionService } from "../../../service/PermissionService";
+import { Dialog } from "../../../lib/dialog";
+import { StorageUtil } from "../../../lib/storage";
 import ModelAgentButton from "../../../module/Model/ModelAgentButton.vue";
+import { PermissionService } from "../../../service/PermissionService";
+import { TaskRecord, TaskService } from "../../../service/TaskService";
 import {
     SoundGenerateTextFormItems,
     SoundGenerateTextPrompt,
-} from "../config/prompt";
+} from "./config/prompt";
+import SoundGenerateForm from "./SoundGenerateForm.vue";
 
 const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm>>();
 const formData = ref({

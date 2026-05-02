@@ -41,14 +41,14 @@ defineExpose({
     <a-modal
         v-model:visible="visible"
         title-align="start"
-        :title="'文生图设置'"
+        :title="$t('app.textToImageSettings')"
         width="600px"
         :destroyOnClose="true"
     >
         <template #footer>
             <div class="flex justify-end space-x-2">
                 <a-button type="primary" @click="doSubmit">{{
-                    "保存"
+                    $t("common.save")
                 }}</a-button>
             </div>
         </template>

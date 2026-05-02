@@ -1,4 +1,5 @@
 import { defineAsyncComponent } from "vue";
+import { t } from "../../../../lang";
 import {
     NodeFunctionCall,
     NodeRunController,
@@ -11,8 +12,8 @@ import TextToImageIcon from "./../assets/icon.svg";
 
 export default <NodeFunctionCall>{
     name: "TextToImage",
-    title: "文生图",
-    description: "将文本转换为图像",
+    title: t("model.txt2img"),
+    description: t("app.textToImageDesc"),
     icon: TextToImageIcon,
     comp: defineAsyncComponent(() => import("./TextToImageNode.vue")),
     inputFields: [
@@ -45,9 +46,12 @@ export default <NodeFunctionCall>{
                 };
                 if (!taskRunData.prompt || !taskRunData.textToImage) {
                     const missing: string[] = [];
-                    if (!taskRunData.prompt) missing.push("提示文本");
-                    if (!taskRunData.textToImage) missing.push("图像生成服务");
-                    throw `参数错误：缺少 ${missing.join(", ")}`;
+                    if (!taskRunData.prompt) missing.push(t("app.promptText"));
+                    if (!taskRunData.textToImage)
+                        missing.push(t("app.imageGenerateService"));
+                    throw t("workflow.paramErrorMissing", {
+                        items: missing.join(", "),
+                    });
                 }
                 return await TextToImageRun(taskRunData);
             },
@@ -58,10 +62,10 @@ export default <NodeFunctionCall>{
     },
     async check(node) {
         if (!node.properties?.data?.textToImage) {
-            throw "请配置图像生成服务";
+            throw t("hint.configureImageGenerateService");
         }
         if (node.properties?.inputFields?.[0].value === "") {
-            throw "请输入文本参数";
+            throw t("hint.inputTextParam");
         }
     },
 };

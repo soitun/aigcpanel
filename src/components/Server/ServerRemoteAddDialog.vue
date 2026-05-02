@@ -3,9 +3,9 @@ import axios from "axios";
 import { ref, watch } from "vue";
 import { t } from "../../lang";
 import { Dialog } from "../../lib/dialog";
+import { StringUtil } from "../../lib/util";
 import { useServerStore } from "../../store/modules/server";
 import { EnumServerType, ServerRecord } from "../../types/Server";
-import { StringUtil } from "../../lib/util";
 
 const serverStore = useServerStore();
 const visible = ref(false);
@@ -180,7 +180,9 @@ const emit = defineEmits({
                 class="mb-4 bg-gray-50 p-3 rounded border border-gray-200"
             >
                 <div class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-                    <div class="text-gray-500 text-right">名称</div>
+                    <div class="text-gray-500 text-right">
+                        {{ $t("common.name") }}
+                    </div>
                     <div class="font-medium text-gray-800">
                         {{ fetchedConfig.title }}
                         <div class="inline-block rounded-3xl bg-gray-100 px-3">
@@ -204,7 +206,7 @@ const emit = defineEmits({
                     @click="doCheck"
                     :loading="loading"
                 >
-                    {{ "校验" }}
+                    {{ $t("common.check") }}
                 </a-button>
                 <a-button
                     v-else

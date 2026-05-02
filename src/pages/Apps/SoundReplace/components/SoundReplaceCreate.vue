@@ -43,7 +43,7 @@ const doSubmit = async () => {
         return;
     }
     if (!(await $mapi.file.exists(formData.value.video))) {
-        Dialog.tipError("所选视频文件不存在，请重新选择");
+        Dialog.tipError(t("error.videoFileNotSelected"));
         return;
     }
     const taskTitle = $mapi.file.pathToName(formData.value.video, false);

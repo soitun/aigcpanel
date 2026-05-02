@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
+import FileSelector from "../../../components/common/FileSelector.vue";
 import { t } from "../../../lang";
 import { Dialog } from "../../../lib/dialog";
 import { PermissionService } from "../../../service/PermissionService";
 import { TaskRecord, TaskService } from "../../../service/TaskService";
 import SoundAsrForm from "./SoundAsrForm.vue";
-import FileSelector from "../../../components/common/FileSelector.vue";
 
 const emit = defineEmits<{
     submitted: [];
@@ -52,7 +52,7 @@ const doSubmit = async () => {
             return;
         }
         if (!(await window.$mapi.file.exists(formData.value.audio))) {
-            Dialog.tipError("所选音频文件不存在，请重新选择");
+            Dialog.tipError(t("error.audioFileNotSelected"));
             return;
         }
 

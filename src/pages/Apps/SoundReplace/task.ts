@@ -1,3 +1,4 @@
+import { t } from "../../../lang";
 import {
     ffmpegCombineVideoAudio,
     ffmpegMergeAudio,
@@ -315,12 +316,12 @@ export const SoundReplace: TaskBiz = {
         if (jobResult.step === "Confirm") {
             await TaskService.update(bizId, {
                 status: "pause",
-                statusMsg: "任务未完成，需要手动确认文字",
+                statusMsg: t("error.taskNotComplete"),
             });
         } else if (jobResult.step === "CombineConfirm") {
             await TaskService.update(bizId, {
                 status: "pause",
-                statusMsg: "任务未完成，需要手动确认终稿",
+                statusMsg: t("error.taskNotCompleteFinal"),
             });
         } else if (jobResult.step === "End") {
             const subTitleRecords = subtitleGenerateRecords(
