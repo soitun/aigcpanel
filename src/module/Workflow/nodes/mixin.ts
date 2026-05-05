@@ -3,7 +3,6 @@ import { defineComponent } from "vue";
 import { t } from "../../../lang";
 import { ObjectUtil } from "../../../lib/util";
 import NodeMoreAction from "../components/NodeMoreAction.vue";
-import { getGraphModel, setNodeHeightById } from "../core/global";
 import { NodeProperties } from "../core/type";
 import { vueNodesMap } from "../registry";
 
@@ -16,6 +15,7 @@ export const NodeMixin = defineComponent({
         return {
             title: t("节点"),
             node: null as any,
+            graphModel: null as any,
             properties: null as NodeProperties | null,
             icon: null as any,
             resizeObserver: null as ResizeObserver | null,
@@ -25,11 +25,12 @@ export const NodeMixin = defineComponent({
         init(option?: { icon?: string }) {
             option = Object.assign({}, option);
             this.node = (this as any).getNode();
+            this.graphModel = (this as any).getGraph();
             const props = this.node?.getProperties();
             this.title = props.title || t("未知节点");
             this.icon = props.icon || option.icon || "";
             this.properties = ObjectUtil.clone(props);
-            getGraphModel().eventCenter.on(
+            this.graphModel.eventCenter.on(
                 EventType.NODE_PROPERTIES_CHANGE,
                 this.watchProperties,
             );
@@ -38,7 +39,25 @@ export const NodeMixin = defineComponent({
                     const { width, height } = entry.contentRect;
                     // 使用requestAnimationFrame来确保DOM更新完成
                     requestAnimationFrame(() => {
-                        setNodeHeightById(this.node.id, height + 2);
+                        if (!this.graphModel || !this.node) return;
+                        const nodeModel = this.graphModel.nodes.find(
+                            (n: any) => n.id === this.node.id,
+                        );
+                        if (nodeModel) {
+                            nodeModel.setProperty("height", height + 2);
+                            this.graphModel.edges.forEach((edge: any) => {
+                                if (
+                                    edge.sourceNodeId === this.node.id ||
+                                    edge.targetNodeId === this.node.id
+                                ) {
+                                    if (edge.updatePathByAnchor) {
+                                        edge.updatePathByAnchor();
+                                    } else {
+                                        edge.initPoints();
+                                    }
+                                }
+                            });
+                        }
                     });
                 }
             });
@@ -56,7 +75,7 @@ export const NodeMixin = defineComponent({
     },
     beforeUnmount(): any {
         this.resizeObserver?.disconnect();
-        getGraphModel().eventCenter.off(
+        this.graphModel?.eventCenter.off(
             EventType.NODE_PROPERTIES_CHANGE,
             this.watchProperties,
         );

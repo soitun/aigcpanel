@@ -11,7 +11,7 @@
                 @fit-view="doFitView"
             />
             <NodeConfigPanel
-                v-if="lf"
+                v-if="lf && !readonly"
                 :selected-node="selectedNode"
                 @close="onNodeConfigClose"
             />
@@ -22,17 +22,28 @@
 <script setup lang="ts">
 import LogicFlow from "@logicflow/core";
 import "@logicflow/core/es/index.css";
-import { onBeforeUnmount, onMounted, onUnmounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, onUnmounted, nextTick, ref } from "vue";
 import { t } from "../../lang";
 import { Dialog } from "../../lib/dialog";
 import FloatingToolbar from "./components/FloatingToolbar.vue";
 import NodeConfigPanel from "./components/NodeConfigPanel.vue";
 import { init } from "./core/base";
-import { clearNodeRunDataById, getEditor, setEditor } from "./core/global";
+import { clearNodeRunDataById, setEditor } from "./core/global";
 import { NodeProperties, WorkflowData } from "./core/type";
 import { autoLayoutWorkflow } from "./core/util";
 import { WorkflowDemoInit } from "./demo/init";
 import "./style.less";
+
+const props = withDefaults(
+    defineProps<{
+        instanceName?: string;
+        readonly?: boolean;
+    }>(),
+    {
+        instanceName: "main",
+        readonly: false,
+    },
+);
 
 const emit = defineEmits<{
     change: [];
@@ -46,44 +57,44 @@ const selectedNode = ref<any>(null);
 const editorData = ref<WorkflowData | null>(null);
 
 const doZoomIn = () => {
-    if (getEditor()) {
-        getEditor().zoom(true);
+    if (lf.value) {
+        lf.value.zoom(true);
         updateZoomLevel();
     }
 };
 
 const doZoomOut = () => {
-    if (getEditor()) {
-        getEditor().zoom(false);
+    if (lf.value) {
+        lf.value.zoom(false);
         updateZoomLevel();
     }
 };
 
 const doFitView = () => {
-    if (getEditor()) {
-        getEditor().fitView();
+    if (lf.value) {
+        lf.value.fitView();
         updateZoomLevel();
     }
 };
 
 const doResetZoom = () => {
-    if (getEditor()) {
-        getEditor().resetZoom();
+    if (lf.value) {
+        lf.value.resetZoom();
         updateZoomLevel();
     }
 };
 
 const onNodeConfigClose = () => {
     selectedNode.value = null;
-    if (getEditor()) {
-        getEditor().clearSelectElements();
+    if (lf.value) {
+        lf.value.clearSelectElements();
     }
     emit("change");
 };
 
 const updateZoomLevel = () => {
-    if (getEditor()) {
-        zoomLevel.value = getEditor().getTransform().SCALE_X;
+    if (lf.value) {
+        zoomLevel.value = lf.value.getTransform().SCALE_X;
     }
 };
 
@@ -91,8 +102,8 @@ const setNodeProperties = (
     nodeId: string,
     properties: Partial<NodeProperties>,
 ) => {
-    if (getEditor()) {
-        const nodeModel = getEditor().getNodeModelById(nodeId);
+    if (lf.value) {
+        const nodeModel = lf.value.getNodeModelById(nodeId);
         if (nodeModel) {
             for (const key in properties) {
                 nodeModel.setProperty(key, properties[key]);
@@ -149,8 +160,8 @@ const render = (data: WorkflowData) => {
         node.y = node.y + node.properties.height / 2 || 0;
     });
     // console.log('WorkflowEditor.render', data);
-    getEditor()?.render({});
-    getEditor()?.render(data as any);
+    lf.value?.render({});
+    lf.value?.render(data as any);
 };
 
 const onKeyUp = (event: KeyboardEvent) => {
@@ -173,12 +184,27 @@ const editorDestroy = async () => {
     window.removeEventListener("keyup", onKeyUp);
 };
 
-onMounted(() => {
+onMounted(async () => {
+    // 等待容器挂载到 DOM 并获得实际尺寸，避免 LogicFlow 无法获取画布宽高
+    await nextTick();
+    await new Promise<void>((resolve) => {
+        const check = () => {
+            if (
+                container.value &&
+                (container.value as HTMLElement).offsetWidth > 0
+            ) {
+                resolve();
+            } else {
+                requestAnimationFrame(check);
+            }
+        };
+        check();
+    });
     const graph = new LogicFlow({
         container: container.value as any,
         textEdit: false,
-        adjustEdge: true,
-        adjustEdgeStartAndEnd: true,
+        adjustEdge: !props.readonly,
+        adjustEdgeStartAndEnd: !props.readonly,
         hoverOutline: false,
         background: {
             backgroundColor: "#f5f6f7",
@@ -192,77 +218,83 @@ onMounted(() => {
             },
         },
         keyboard: {
-            enabled: true,
-            shortcuts: [
-                {
-                    keys: ["backspace"],
-                    action: "keyup",
-                    callback: (e: KeyboardEvent) => {
-                        const selectedElements =
-                            getEditor().getSelectElements();
-                        if (selectedElements) {
-                            for (const n of selectedElements.nodes) {
-                                if (n.type === "Start") {
-                                    Dialog.tipError(t("开始节点不能删除"));
-                                    return;
-                                }
-                            }
-                            selectedElements.nodes.forEach((node) => {
-                                if (
-                                    selectedNode.value &&
-                                    selectedNode.value.id === node.id
-                                ) {
-                                    selectedNode.value = null;
-                                }
-                                getEditor().deleteNode(node.id);
-                            });
-                            selectedElements.edges.forEach((edge) => {
-                                getEditor().deleteEdge(edge.id);
-                            });
-                        }
-                        emit("change");
-                    },
-                },
-            ],
+            enabled: !props.readonly,
+            shortcuts: props.readonly
+                ? []
+                : [
+                      {
+                          keys: ["backspace"],
+                          action: "keyup",
+                          callback: (e: KeyboardEvent) => {
+                              const selectedElements =
+                                  lf.value.getSelectElements();
+                              if (selectedElements) {
+                                  for (const n of selectedElements.nodes) {
+                                      if (n.type === "Start") {
+                                          Dialog.tipError(
+                                              t("开始节点不能删除"),
+                                          );
+                                          return;
+                                      }
+                                  }
+                                  selectedElements.nodes.forEach((node) => {
+                                      if (
+                                          selectedNode.value &&
+                                          selectedNode.value.id === node.id
+                                      ) {
+                                          selectedNode.value = null;
+                                      }
+                                      lf.value.deleteNode(node.id);
+                                  });
+                                  selectedElements.edges.forEach((edge) => {
+                                      lf.value.deleteEdge(edge.id);
+                                  });
+                              }
+                              emit("change");
+                          },
+                      },
+                  ],
         },
-        isSilentMode: false,
+        isSilentMode: props.readonly,
     });
     lf.value = graph;
-    setEditor(graph);
-    init(getEditor());
-    getEditor().on("workflow:runToNode", (nodeId: string) => {
+    if (props.instanceName === "main") {
+        setEditor(graph);
+    }
+    init(lf.value);
+    lf.value.on("workflow:runToNode", (nodeId: string) => {
         emit("runToNode", nodeId);
     });
-    getEditor().on("node:click", ({ data }) => {
+    lf.value.on("node:click", ({ data }) => {
         selectedNode.value = data;
         emit("change");
     });
-    getEditor().on("blank:click", () => {
+    lf.value.on("blank:click", () => {
         selectedNode.value = null;
         emit("change");
     });
-    getEditor().on("node:mouseenter", ({ data }) => {
-        const nodeModel = getEditor().getNodeModelById(data.id);
+    lf.value.on("node:mouseenter", ({ data }) => {
+        const nodeModel = lf.value.getNodeModelById(data.id);
         if (nodeModel) {
             nodeModel.isShowAnchor = true;
         }
     });
-    getEditor().on("node:mouseleave", ({ data }) => {
-        const nodeModel = getEditor().getNodeModelById(data.id);
+    lf.value.on("node:mouseleave", ({ data }) => {
+        const nodeModel = lf.value.getNodeModelById(data.id);
         if (nodeModel) {
             nodeModel.isShowAnchor = true;
         }
     });
-    getEditor().on("node:focus", ({ data }) => {
+    lf.value.on("node:focus", ({ data }) => {
         lf.value.container.focus();
     });
-    getEditor().on("edge:focus", ({ data }) => {
+    lf.value.on("edge:focus", ({ data }) => {
         lf.value.container.focus();
     });
-    getEditor().on("node:dragend", () => {
+    lf.value.on("node:dragend", () => {
         emit("change");
     });
-    getEditor().on("edge:add", ({ data }) => {
+    lf.value.on("edge:add", ({ data }) => {
         const { sourceAnchorId, targetAnchorId, id } = data;
         if (!sourceAnchorId || !targetAnchorId) return;
         const isSourceInput = sourceAnchorId.includes("input_");
@@ -272,18 +304,18 @@ onMounted(() => {
             (!isSourceInput && !isTargetInput)
         ) {
             Dialog.tipError(t("不能连接相同类型的锚点"));
-            getEditor().deleteEdge(id);
+            lf.value.deleteEdge(id);
         } else {
             emit("change");
         }
     });
-    getEditor().on("edge:delete", () => {
+    lf.value.on("edge:delete", () => {
         emit("change");
     });
-    getEditor().on("node:add", () => {
+    lf.value.on("node:add", () => {
         emit("change");
     });
-    getEditor().on("blank:dragend", () => {
+    lf.value.on("blank:dragend", () => {
         emit("change");
     });
     render(WorkflowDemoInit);
@@ -292,19 +324,21 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     editorDestroy().then();
-    getEditor()?.destroy();
+    lf.value?.destroy();
 });
 
 onUnmounted(() => {
-    setEditor(null);
+    if (props.instanceName === "main") {
+        setEditor(null);
+    }
 });
 
 const isReady = () => {
-    return !!getEditor();
+    return !!lf.value;
 };
 
 const getData = (): WorkflowData | null => {
-    const rawData = getEditor()?.getGraphData() as any;
+    const rawData = lf.value?.getGraphData() as any;
     if (!rawData) return null;
     const data: WorkflowData = {
         status: editorData.value?.status || "idle",
@@ -344,8 +378,8 @@ const getData = (): WorkflowData | null => {
         viewScale: 1,
     };
     // 获取当前视图信息
-    if (getEditor()) {
-        const transform = getEditor().getTransform();
+    if (lf.value) {
+        const transform = lf.value.getTransform();
         data.viewPositionX = transform.TRANSLATE_X;
         data.viewPositionY = transform.TRANSLATE_Y;
         data.viewScale = transform.SCALE_X;
@@ -374,8 +408,8 @@ const setData = (data: WorkflowData | null) => {
             data.viewPositionY !== undefined &&
             data.viewScale !== undefined
         ) {
-            getEditor().translate(data.viewPositionX, data.viewPositionY);
-            getEditor().zoom(data.viewScale);
+            lf.value.translate(data.viewPositionX, data.viewPositionY);
+            lf.value.zoom(data.viewScale);
             updateZoomLevel();
         }
     } else {

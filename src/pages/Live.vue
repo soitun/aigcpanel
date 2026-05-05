@@ -1,13 +1,19 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import Router from "../router";
 import ProUpgrade from "../components/common/ProUpgrade.vue";
 
 const tab = ref("");
 
+const syncTab = () => {
+    tab.value = (Router.currentRoute.value.query.tab as string) || "monitor";
+};
+
 onMounted(() => {
-    tab.value = (Router.currentRoute.value.query.tab as string) || "knowledge";
+    syncTab();
 });
+
+watch(() => Router.currentRoute.value.query.tab, syncTab);
 </script>
 
 <template>
@@ -17,26 +23,38 @@ onMounted(() => {
         >
             <div
                 class="p-2 rounded-lg mb-4 cursor-pointer"
-                :class="tab === 'knowledge' ? 'bg-gray-200' : ''"
-                @click="tab = 'knowledge'"
-            >
-                <div class="text-base flex items-center">
-                    <div class="inline-block w-6">
-                        <icon-book />
-                    </div>
-                    直播知识库
-                </div>
-            </div>
-            <div
-                class="p-2 rounded-lg mb-4 cursor-pointer"
                 :class="tab === 'monitor' ? 'bg-gray-200' : ''"
                 @click="tab = 'monitor'"
             >
                 <div class="text-base flex items-center">
-                    <div class="inline-block w-6">
-                        <icon-command />
-                    </div>
-                    直播控制台
+                    <i-mdi-broadcast
+                        class="w-5 h-5 inline-block mr-1 text-rose-500"
+                    />
+                    直播服务
+                </div>
+            </div>
+            <div
+                class="p-2 rounded-lg mb-4 cursor-pointer"
+                :class="tab === 'avatar' ? 'bg-gray-200' : ''"
+                @click="tab = 'avatar'"
+            >
+                <div class="text-base flex items-center">
+                    <i-mdi-account-circle
+                        class="w-5 h-5 inline-block mr-1 text-blue-500"
+                    />
+                    直播形象
+                </div>
+            </div>
+            <div
+                class="p-2 rounded-lg mb-4 cursor-pointer"
+                :class="tab === 'knowledge' ? 'bg-gray-200' : ''"
+                @click="tab = 'knowledge'"
+            >
+                <div class="text-base flex items-center">
+                    <i-mdi-book-open-variant
+                        class="w-5 h-5 inline-block mr-1 text-amber-500"
+                    />
+                    直播知识库
                 </div>
             </div>
             <div
@@ -45,9 +63,9 @@ onMounted(() => {
                 @click="tab = 'event'"
             >
                 <div class="text-base flex items-center">
-                    <div class="inline-block w-6">
-                        <icon-message />
-                    </div>
+                    <i-mdi-chat
+                        class="w-5 h-5 inline-block mr-1 text-emerald-500"
+                    />
                     直播互动
                 </div>
             </div>
@@ -57,9 +75,9 @@ onMounted(() => {
                 @click="tab = 'liveTalk'"
             >
                 <div class="text-base flex items-center">
-                    <div class="inline-block w-6">
-                        <icon-history />
-                    </div>
+                    <i-mdi-history
+                        class="w-5 h-5 inline-block mr-1 text-violet-500"
+                    />
                     播报历史
                 </div>
             </div>

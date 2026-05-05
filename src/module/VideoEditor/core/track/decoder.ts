@@ -100,6 +100,13 @@ class CustomImageDecoder extends BaseCustomDecoder {
     #framesMap = new Map<string, VideoFrame[]>();
 
     reset() {
+        this.#framesMap.forEach((frames) => {
+            frames.forEach((frame) => {
+                try {
+                    frame.close();
+                } catch (_) {}
+            });
+        });
         this.#framesMap.clear();
         this.clipMap.forEach((clip) => {
             clip.destroy();

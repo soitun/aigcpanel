@@ -39,14 +39,14 @@ export const autoLayoutWorkflow = (
     edges: WorkflowEdge[],
     options?: {
         colSpacing?: number;
-        rowSpacing?: number;
+        rowGap?: number;
         maxPerRow?: number;
         startX?: number;
         startY?: number;
     },
 ): WorkflowNode[] => {
     const colSpacing = options?.colSpacing ?? 280;
-    const rowSpacing = options?.rowSpacing ?? 240;
+    const rowGap = options?.rowGap ?? 40;
     const maxPerRow = options?.maxPerRow ?? 5;
     const startX = options?.startX ?? 100;
     const startY = options?.startY ?? 100;
@@ -105,21 +105,28 @@ export const autoLayoutWorkflow = (
         }
     }
 
-    // 按层分配位置，每行最多 maxPerRow 个
+    // 按层分配位置，每行最多 maxPerRow 个，Y 坐标基于上一行实际高度累积
     const nodeById = new Map(nodes.map((n) => [n.id, n]));
-    let currentRow = 0;
+    let currentRowY = startY;
     for (const level of levels) {
         // 将本层节点按 maxPerRow 拆分成多行
         for (let i = 0; i < level.length; i += maxPerRow) {
-            const rowNodes = level.slice(i, i + maxPerRow);
-            for (let col = 0; col < rowNodes.length; col++) {
-                const n = nodeById.get(rowNodes[col]);
+            const rowNodeIds = level.slice(i, i + maxPerRow);
+            // 计算本行最大节点高度（至少 200）
+            const rowMaxHeight = Math.max(
+                ...rowNodeIds.map(
+                    (id) => nodeById.get(id)?.properties?.height || 200,
+                ),
+                200,
+            );
+            for (let col = 0; col < rowNodeIds.length; col++) {
+                const n = nodeById.get(rowNodeIds[col]);
                 if (n) {
                     n.x = startX + col * colSpacing;
-                    n.y = startY + currentRow * rowSpacing;
+                    n.y = currentRowY;
                 }
             }
-            currentRow++;
+            currentRowY += rowMaxHeight + rowGap;
         }
     }
 

@@ -361,17 +361,23 @@ const watchProperties = (eventData: any) => {
 };
 
 onMounted(() => {
-    getGraphModel().eventCenter.on(
-        EventType.NODE_PROPERTIES_CHANGE,
-        watchProperties,
-    );
+    const graphModel = getGraphModel();
+    if (graphModel) {
+        graphModel.eventCenter.on(
+            EventType.NODE_PROPERTIES_CHANGE,
+            watchProperties,
+        );
+    }
 });
 
 onBeforeUnmount(() => {
-    getGraphModel().eventCenter.off(
-        EventType.NODE_PROPERTIES_CHANGE,
-        watchProperties,
-    );
+    const graphModel = getGraphModel();
+    if (graphModel) {
+        graphModel.eventCenter.off(
+            EventType.NODE_PROPERTIES_CHANGE,
+            watchProperties,
+        );
+    }
 });
 
 const onConfigComponentMounted = (el: InstanceType<any> | null) => {

@@ -11,7 +11,7 @@ import {
     WorkflowLogRecord,
     WorkflowLogService,
 } from "../../../service/WorkflowService";
-import WorkflowLogViewDialog from "./WorkflowLogViewDialog.vue";
+import WorkflowHistoryViewDialog from "./WorkflowHistoryViewDialog.vue";
 import MEmpty from "../../../components/common/MEmpty.vue";
 
 interface Props {
@@ -20,14 +20,10 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const emit = defineEmits<{
-    (e: "on-load-log", workflowLogId: number): void;
-}>();
-
 const visible = ref(false);
 const historyRecords = ref<WorkflowLogRecord[]>([]);
-const workflowLogViewDialog = ref<InstanceType<
-    typeof WorkflowLogViewDialog
+const workflowHistoryViewDialog = ref<InstanceType<
+    typeof WorkflowHistoryViewDialog
 > | null>(null);
 
 const show = () => {
@@ -43,16 +39,7 @@ const doLoad = async () => {
 };
 
 const doView = (record: WorkflowLogRecord) => {
-    workflowLogViewDialog.value?.show(record);
-};
-
-const doLoadToCanvas = (record: WorkflowLogRecord) => {
-    if (!record.data) {
-        Dialog.tipError("该运行记录没有数据，无法加载到画布");
-        return;
-    }
-    visible.value = false;
-    emit("on-load-log", record.id!);
+    workflowHistoryViewDialog.value?.show(record);
 };
 
 const doDelete = async (record: WorkflowLogRecord) => {
@@ -145,7 +132,7 @@ defineExpose({
                             </div>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <a-tooltip :content="$t('查看结果')">
+                            <a-tooltip :content="$t('查看工作流')">
                                 <a-button
                                     size="small"
                                     type="primary"
@@ -153,18 +140,6 @@ defineExpose({
                                 >
                                     <template #icon>
                                         <icon-eye />
-                                    </template>
-                                </a-button>
-                            </a-tooltip>
-                            <a-tooltip :content="$t('加载到画布')">
-                                <a-button
-                                    size="small"
-                                    type="primary"
-                                    status="success"
-                                    @click="doLoadToCanvas(record)"
-                                >
-                                    <template #icon>
-                                        <icon-refresh />
                                     </template>
                                 </a-button>
                             </a-tooltip>
@@ -193,5 +168,5 @@ defineExpose({
         </div>
     </a-modal>
 
-    <WorkflowLogViewDialog ref="workflowLogViewDialog" />
+    <WorkflowHistoryViewDialog ref="workflowHistoryViewDialog" />
 </template>

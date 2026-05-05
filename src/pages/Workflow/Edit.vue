@@ -572,10 +572,6 @@ onUnmounted(() => {
             />
         </div>
     </div>
-    <WorkflowLogDialog
-        ref="workflowLogDialog"
-        :workflow-id="workflow.id"
-        @on-load-log="onLoadLog"
-    />
+    <WorkflowLogDialog ref="workflowLogDialog" :workflow-id="workflow.id" />
     <WorkflowLogViewDialog ref="workflowLogViewDialog" :record="workflowLog" />
 </template>

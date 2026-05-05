@@ -3,15 +3,41 @@ import { t } from "../../../lang";
 import { Dialog } from "../../../lib/dialog";
 import { NodeProperties } from "./type";
 
-let editor = null;
-export const getEditor: () => LogicFlow = () => {
-    return editor as any;
+const _editors = new Map<string, LogicFlow>();
+let _activeEditorName = "main";
+
+export const getEditor: (name?: string) => LogicFlow = (name?: string) => {
+    return _editors.get(name ?? _activeEditorName) as any;
 };
-export const setEditor = (g) => {
-    editor = g;
+export const setEditor = (
+    nameOrEditor: string | LogicFlow | null,
+    editorInstance?: LogicFlow | null,
+) => {
+    if (typeof nameOrEditor === "string") {
+        if (editorInstance) {
+            _editors.set(nameOrEditor, editorInstance);
+            _activeEditorName = nameOrEditor;
+        } else {
+            _editors.delete(nameOrEditor);
+            if (_activeEditorName === nameOrEditor) {
+                _activeEditorName = "main";
+            }
+        }
+    } else {
+        if (nameOrEditor) {
+            _editors.set("main", nameOrEditor as LogicFlow);
+        } else {
+            _editors.delete("main");
+        }
+        _activeEditorName = "main";
+    }
+};
+export const setActiveEditor = (name: string) => {
+    _activeEditorName = name;
 };
 
 export const getGraphModel = () => {
+    if (!getEditor()) return null as any;
     return getEditor().graphModel;
 };
 
@@ -30,6 +56,7 @@ export const setNodePropertiesById = (
 };
 
 export const setNodeHeightById = (nodeId: string, height: number) => {
+    if (!getEditor()) return;
     const node = getEditor().getNodeModelById(nodeId);
     if (node) {
         setNodePropertiesById(nodeId, {
