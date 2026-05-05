@@ -6,8 +6,8 @@ import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
 import { TaskRecord, TaskService } from "../../../../service/TaskService";
 import { useTaskStore } from "../../../../store/modules/task";
-import SoundAsrForm from "../../../Sound/components/SoundAsrForm.vue";
-import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
+import SoundAsrForm from "../../../Video/components/SoundAsrForm.vue";
+import SoundGenerateForm from "../../../Video/components/SoundGenerateForm.vue";
 
 const emit = defineEmits<{
     submitted: [];

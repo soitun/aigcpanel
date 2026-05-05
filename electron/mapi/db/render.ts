@@ -26,6 +26,19 @@ const deletes = async (sql: string, params: any = []) => {
     return ipcRenderer.invoke("db:delete", sql, params);
 };
 
+const isFileReferenced = async (
+    filePath: string,
+    excludeTable: string,
+    excludeId: number,
+): Promise<boolean> => {
+    return ipcRenderer.invoke(
+        "db:isFileReferenced",
+        filePath,
+        excludeTable,
+        excludeId,
+    );
+};
+
 export default {
     init,
     execute,
@@ -34,4 +47,5 @@ export default {
     select,
     update,
     delete: deletes,
+    isFileReferenced,
 };

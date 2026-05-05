@@ -5,29 +5,21 @@ import { AppConfig } from "../config";
 import { useUserStore } from "../store/modules/user";
 import { t } from "../lang";
 import { useSettingStore } from "../store/modules/setting";
+import WorkflowIcon from "./Icon/WorkflowIcon.vue";
 
 const route = useRouter();
 const user = useUserStore();
 const setting = useSettingStore();
 
 const activeTab = computed(() => {
-    switch (route.currentRoute.value.path) {
-        case "/":
-        case "/home":
-            return "home";
-        case "/server":
-            return "server";
-        case "/setting":
-            return "setting";
-        case "/sound":
-            return "sound";
-        case "/video":
-            return "video";
-        case "/live":
-            return "live";
-        case "/tool":
-            return "tool";
-    }
+    const path = route.currentRoute.value.path;
+    if (path === "/" || path === "/home") return "home";
+    if (path === "/server") return "server";
+    if (path === "/setting") return "setting";
+    if (path === "/video") return "video";
+    if (path === "/live") return "live";
+    if (path === "/tool") return "tool";
+    if (path.startsWith("/workflow")) return "workflow";
 });
 
 const userTip = computed(() => {
@@ -95,25 +87,14 @@ const doUser = async () => {
             </a>
             <a
                 class="page-nav-item block text-center py-3"
-                :class="activeTab === 'sound' ? 'active' : ''"
-                @click="$router.push('/sound')"
-                href="javascript:;"
-            >
-                <div class="flex justify-center">
-                    <i-mdi-volume-high class="text-xl" />
-                </div>
-                <div class="text-sm">{{ $t("voice.voice") }}</div>
-            </a>
-            <a
-                class="page-nav-item block text-center py-3"
                 :class="activeTab === 'video' ? 'active' : ''"
                 @click="$router.push('/video')"
                 href="javascript:;"
             >
                 <div class="flex justify-center">
-                    <i-mdi-video-outline class="text-xl" />
+                    <i-mdi-account-circle-outline class="text-xl" />
                 </div>
-                <div class="text-sm">{{ $t("media.video") }}</div>
+                <div class="text-sm">数字人</div>
             </a>
             <a
                 class="page-nav-item block text-center py-3"
@@ -124,7 +105,7 @@ const doUser = async () => {
                 <div class="flex justify-center">
                     <icon-live-broadcast class="text-xl" />
                 </div>
-                <div class="text-sm">{{ $t("live.live") }}</div>
+                <div class="text-sm">直播</div>
             </a>
             <a
                 class="page-nav-item block text-center py-3"
@@ -135,7 +116,18 @@ const doUser = async () => {
                 <div class="flex justify-center">
                     <icon-tool class="text-xl" />
                 </div>
-                <div class="text-sm">{{ $t("nav.toolbox") }}</div>
+                <div class="text-sm">小工具</div>
+            </a>
+            <a
+                class="page-nav-item block text-center py-3"
+                :class="activeTab === 'workflow' ? 'active' : ''"
+                @click="$router.push('/workflow')"
+                href="javascript:;"
+            >
+                <div class="flex justify-center">
+                    <WorkflowIcon class="h-5 w-5" />
+                </div>
+                <div class="text-sm">工作流</div>
             </a>
             <a
                 class="page-nav-item block text-center py-3"
@@ -146,7 +138,7 @@ const doUser = async () => {
                 <div class="flex justify-center">
                     <i-mdi-server-outline class="text-xl" />
                 </div>
-                <div class="text-sm">{{ $t("model.model") }}</div>
+                <div class="text-sm">AI模型</div>
             </a>
             <a
                 class="page-nav-item block text-center py-3"

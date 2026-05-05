@@ -416,6 +416,13 @@ export const modelStore = defineStore("model", {
             }
             await this.sync();
         },
+        async providerDelete(providerId: string) {
+            const idx = this.providers.findIndex((p) => p.id === providerId);
+            if (idx !== -1) {
+                this.providers.splice(idx, 1);
+            }
+            await this.sync();
+        },
         async modelAdd(providerId: string, model: Partial<Model>) {
             const provider = this.providers.find((p) => p.id === providerId);
             if (!provider) {

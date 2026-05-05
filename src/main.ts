@@ -19,9 +19,11 @@ import { CommonComponents } from "./components/common";
 import { TaskManager } from "./task";
 import { useSettingStore } from "./store/modules/setting";
 import { useServerStore } from "./store/modules/server";
+import { useModelStore } from "./module/Model/store/model";
 
 import { TaskService } from "./service/TaskService";
 import { reportErrorRender } from "../electron/mapi/log/beacon-render";
+import { useTaskStore } from "./store/modules/task";
 
 const settingStore = useSettingStore();
 
@@ -43,6 +45,26 @@ app.config.globalProperties.$mapi = window.$mapi;
 app.config.globalProperties.$dialog = Dialog;
 app.config.globalProperties.$t = t as any;
 TaskManager.init();
+
+// 注册工作流 channel 监听器：主进程调度 → 渲染进程执行
+window["__page"].channel["workflow:execute"] = async ({
+    workflowLogId,
+    params,
+}: {
+    workflowLogId: string;
+    params: any;
+}) => {
+    const taskStore = useTaskStore();
+    taskStore.dispatch("Workflow", workflowLogId, params).then();
+};
+window["__page"].channel["workflow:cancel"] = async ({
+    workflowLogId,
+}: {
+    workflowLogId: string;
+}) => {
+    const taskStore = useTaskStore();
+    taskStore.requestCancel("Workflow", workflowLogId);
+};
 
 app.mount("#app").$nextTick(() => {
     postMessage({ payload: "removeLoading" }, "*");

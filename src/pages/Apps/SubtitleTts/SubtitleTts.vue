@@ -11,6 +11,8 @@ import { TaskChangeType } from "../../../store/modules/task";
 import Steps from "../common/Steps.vue";
 import SubtitleTtsCreate from "./components/SubtitleTtsCreate.vue";
 import SubtitleTtsItem from "./components/SubtitleTtsItem.vue";
+import ListerTop from "../../../components/common/ListerTop.vue";
+import MEmpty from "../../../components/common/MEmpty.vue";
 
 const { page, records, recordsForPage } = usePaginate<TaskRecord>({
     pageSize: 10,
@@ -67,36 +69,34 @@ const doRefresh = async () => {
         />
         <div>
             <SubtitleTtsCreate @submitted="doRefresh" />
-            <div v-if="records.length > 0">
-                <div
-                    class="rounded-xl shadow border p-4 mt-4 mb-4 hover:shadow-lg flex items-center"
+            <ListerTop
+                class="mt-4"
+                :total="records.length"
+                @refresh="doRefresh"
+            >
+                <a-checkbox
+                    :model-value="isAllChecked"
+                    :indeterminate="isIndeterminate"
+                    @change="onCheckAll"
                 >
-                    <div class="flex-grow flex items-center">
-                        <div class="mr-3">
-                            <a-checkbox
-                                :model-value="isAllChecked"
-                                :indeterminate="isIndeterminate"
-                                @change="onCheckAll"
-                            >
-                                {{ $t("common.selectAll") }}
-                            </a-checkbox>
-                        </div>
-                        <TaskBatchDeleteAction
-                            :records="checkRecords"
-                            @update="doRefresh"
-                        />
-                        <TaskBatchDownloadAction :records="checkRecords" />
-                    </div>
-                    <div>
-                        <a-pagination
-                            v-model:current="page"
-                            :total="records.length"
-                            :page-size="10"
-                            show-total
-                            simple
-                        />
-                    </div>
-                </div>
+                    {{ $t("common.selectAll") }}
+                </a-checkbox>
+                <TaskBatchDeleteAction
+                    :records="checkRecords"
+                    @update="doRefresh"
+                />
+                <TaskBatchDownloadAction :records="checkRecords" />
+                <template #actions>
+                    <a-pagination
+                        v-model:current="page"
+                        :total="records.length"
+                        :page-size="10"
+                        show-total
+                        simple
+                    />
+                </template>
+            </ListerTop>
+            <div v-if="records.length > 0">
                 <div v-for="r in recordsForPage" :key="r.id">
                     <SubtitleTtsItem
                         :record="r"

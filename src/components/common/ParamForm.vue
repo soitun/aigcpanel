@@ -4,7 +4,7 @@ import { nextTick, ref, watch } from "vue";
 import { t } from "../../lang";
 import { Dialog } from "../../lib/dialog";
 import SpeakerSelector from "./SpeakerSelector.vue";
-import SoundPromptSelector from "../../pages/Sound/components/SoundPromptSelector.vue";
+import SoundPromptSelector from "../../pages/Video/components/SoundPromptSelector.vue";
 
 type FieldBasicType = {
     name: string;
@@ -41,7 +41,7 @@ const formData = ref<Array<FieldBasicModelType>>([]);
 watch(
     () => props.param,
     (value) => {
-        formData.value = value?.map((item) => {
+        formData.value = (value?.map((item) => {
             const itemClone = cloneDeep(item);
             // if (itemClone.type === "speaker") {
             //     itemClone["speakerParam"] = [];
@@ -65,7 +65,7 @@ watch(
                 ...itemClone,
                 value: value,
             };
-        }) as any;
+        }) || []) as any;
     },
     {
         immediate: true,

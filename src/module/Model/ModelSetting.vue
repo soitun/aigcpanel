@@ -40,6 +40,7 @@ const provider = computed(() => {
     return modelStore.providers.find((p) => p.id === currentProviderId.value);
 });
 const providerUrl = computed(() => {
+    if (!provider.value) return "";
     return getProviderUrl(provider.value as any);
 });
 const providerModelGroups = computed(() => {
@@ -158,6 +159,14 @@ watch(
                             @click="providerEdit?.show(provider)"
                         >
                             <icon-edit />
+                        </a>
+                        <a
+                            v-if="!provider.isSystem"
+                            href="javascript:;"
+                            class="mr-2"
+                            @click="modelStore.providerDelete(provider.id)"
+                        >
+                            <icon-delete />
                         </a>
                         <a
                             v-if="provider?.websites.official"

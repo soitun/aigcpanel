@@ -8,13 +8,13 @@ import {
 } from "../../../../module/Workflow/core/type";
 import { workflowRun } from "../../common/workflow";
 import { SubtitleTtsRun } from "../task";
-import SubtitleTtsIcon from "./../assets/icon.svg";
+import AppIcon from "~icons/mdi/subtitles";
 
 export default <NodeFunctionCall>{
     name: "SubtitleTts",
     title: t("task.subtitleToAudio"),
     description: t("app.subtitleTtsDesc"),
-    icon: SubtitleTtsIcon,
+    icon: AppIcon,
     comp: defineAsyncComponent(() => import("./SubtitleTtsNode.vue")),
     inputFields: [
         {

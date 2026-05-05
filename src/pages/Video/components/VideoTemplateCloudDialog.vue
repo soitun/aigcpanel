@@ -12,6 +12,8 @@ import {
     useServerCloudStore,
     VideoTemplateCloudRecord,
 } from "../../../store/modules/serverCloud";
+import MEmpty from "../../../components/common/MEmpty.vue";
+import MLoading from "../../../components/common/MLoading.vue";
 
 const serverCloudStore = useServerCloudStore();
 

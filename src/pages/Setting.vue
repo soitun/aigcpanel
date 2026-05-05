@@ -14,8 +14,8 @@ import {
     SoundAsrResultOptimizedPrompt,
     SoundGenerateTextFormItems,
     SoundGenerateTextPrompt,
-} from "./Sound/components/config/prompt";
-import { SoundGenerateReplaceContent } from "./Sound/components/config/replaceContent";
+} from "./Video/components/config/prompt";
+import { SoundGenerateReplaceContent } from "./Video/components/config/replaceContent";
 
 let tabContentScroller: TabContentScroller | null = null;
 const contentContainer = ref<HTMLElement | null>(null);

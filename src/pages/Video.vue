@@ -1,25 +1,24 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { t } from "../lang";
 import Router from "../router";
+import SoundGenerate from "./Video/SoundGenerate.vue";
 import VideoGen from "./Video/VideoGen.vue";
 import VideoTemplate from "./Video/VideoTemplate.vue";
-import { VideoApps } from "./Apps/all";
+import VideoGenFlow from "./Apps/VideoGenFlow/VideoGenFlow.vue";
 
 const tab = ref("");
 
+const syncTab = () => {
+    tab.value =
+        (Router.currentRoute.value.query.tab as string) || "soundGenerate";
+};
+
 onMounted(() => {
-    tab.value = (Router.currentRoute.value.query.tab as string) || "videoGen";
+    syncTab();
 });
 
-const dynamicComponent = computed(() => {
-    for (const app of VideoApps) {
-        if (app.name === tab.value) {
-            return app.component;
-        }
-    }
-    return null;
-});
+watch(() => Router.currentRoute.value.query.tab, syncTab);
 </script>
 
 <template>
@@ -27,44 +26,79 @@ const dynamicComponent = computed(() => {
         <div
             class="p-6 w-52 flex-shrink-0 border-r border-solid border-gray-100 overflow-x-hidden overflow-y-auto"
         >
+            <div class="text-xs text-gray-400 mb-2 uppercase">声音</div>
             <div
-                class="p-2 rounded-lg mb-4 cursor-pointer"
-                :class="tab === 'videoGen' ? 'bg-gray-200' : ''"
-                @click="tab = 'videoGen'"
+                class="p-2 rounded-lg mb-2 cursor-pointer"
+                :class="tab === 'soundGenerate' ? 'bg-gray-200' : ''"
+                @click="tab = 'soundGenerate'"
             >
                 <div class="text-base truncate flex items-center">
-                    <i-mdi-video-outline class="w-6 h-6 inline-block" />
-                    {{ t("avatar.synthesis") }}
+                    <i-mdi-waveform
+                        class="w-5 h-5 inline-block text-indigo-500 mr-1"
+                    />
+                    {{ t("voice.synthesis") }}
                 </div>
             </div>
+            <div class="text-xs text-gray-400 mb-2 mt-4 uppercase">视频</div>
             <div
-                class="p-2 rounded-lg mb-4 cursor-pointer"
+                class="p-2 rounded-lg mb-2 cursor-pointer"
                 :class="tab === 'videoTemplate' ? 'bg-gray-200' : ''"
                 @click="tab = 'videoTemplate'"
             >
                 <div class="text-base truncate flex items-center">
-                    <i-mdi-video-box class="w-6 h-6 inline-block" />
+                    <i-mdi-account-box
+                        class="w-5 h-5 inline-block text-blue-500 mr-1"
+                    />
                     {{ t("avatar.avatar") }}
                 </div>
             </div>
             <div
-                v-for="s in VideoApps"
-                class="p-2 rounded-lg mb-4 cursor-pointer"
-                :class="tab === s.name ? 'bg-gray-200' : ''"
-                @click="tab = s.name"
+                class="p-2 rounded-lg mb-2 cursor-pointer"
+                :class="tab === 'videoGen' ? 'bg-gray-200' : ''"
+                @click="tab = 'videoGen'"
             >
                 <div class="text-base truncate flex items-center">
-                    <img :src="s.icon" class="w-4 h-4 mr-2 object-contain" />
-                    {{ s.title }}
+                    <i-mdi-video-account
+                        class="w-5 h-5 inline-block text-violet-500 mr-1"
+                    />
+                    {{ t("avatar.synthesis") }}
+                </div>
+            </div>
+            <div
+                class="p-2 rounded-lg mb-2 cursor-pointer"
+                :class="tab === 'VideoGenFlow' ? 'bg-gray-200' : ''"
+                @click="tab = 'VideoGenFlow'"
+            >
+                <div class="text-base truncate flex items-center">
+                    <i-mdi-auto-fix
+                        class="w-5 h-5 inline-block text-emerald-500 mr-1"
+                    />
+                    {{ t("avatar.oneClickSynthesis") }}
                 </div>
             </div>
         </div>
         <div class="flex-grow h-full overflow-y-auto">
-            <VideoGen v-if="tab === 'videoGen'" />
-            <VideoTemplate v-else-if="tab === 'videoTemplate'" />
-            <component v-else :is="dynamicComponent" />
+            <div
+                v-if="tab === 'soundGenerate'"
+                data-auto-test-id="dh-soundGenerate"
+            >
+                <SoundGenerate />
+            </div>
+            <div v-else-if="tab === 'videoGen'" data-auto-test-id="dh-videoGen">
+                <VideoGen />
+            </div>
+            <div
+                v-else-if="tab === 'videoTemplate'"
+                data-auto-test-id="dh-videoTemplate"
+            >
+                <VideoTemplate />
+            </div>
+            <div
+                v-else-if="tab === 'VideoGenFlow'"
+                data-auto-test-id="dh-VideoGenFlow"
+            >
+                <VideoGenFlow />
+            </div>
         </div>
     </div>
 </template>
-
-<style scoped></style>

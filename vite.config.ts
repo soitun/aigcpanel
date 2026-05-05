@@ -46,6 +46,15 @@ export default defineConfig(({command}) => {
                             }
                             return false;
                         },
+                        nodeTransforms: process.env.VITE_RELEASE === '1' ? [
+                            (node: any) => {
+                                if (node.type === 1 && Array.isArray(node.props)) {
+                                    node.props = node.props.filter((p: any) =>
+                                        !(p.type === 6 && p.name === 'data-auto-test-id')
+                                    );
+                                }
+                            },
+                        ] : [],
                     },
                 },
             }),

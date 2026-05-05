@@ -18,6 +18,14 @@ var modelListCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		// 只保留 name/title/version/functions，去掉 id
+		if data, ok := result["data"].([]any); ok {
+			for _, item := range data {
+				if model, ok := item.(map[string]any); ok {
+					delete(model, "id")
+				}
+			}
+		}
 		return internal.PrintJSON(result)
 	},
 }

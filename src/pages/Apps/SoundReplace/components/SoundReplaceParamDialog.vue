@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref } from "vue";
-import SoundAsrForm from "../../../Sound/components/SoundAsrForm.vue";
-import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
+import SoundAsrForm from "../../../Video/components/SoundAsrForm.vue";
+import SoundGenerateForm from "../../../Video/components/SoundGenerateForm.vue";
 
 const soundAsrForm = ref<InstanceType<typeof SoundAsrForm>>();
 const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(

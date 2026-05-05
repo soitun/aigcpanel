@@ -770,9 +770,9 @@ const hubSave = async (
         });
     }
     if (option.returnFullPath) {
-        return savePathFull;
+        return savePathFull.replace(/\\/g, "/");
     }
-    return savePath;
+    return savePath.replace(/\\/g, "/");
 };
 
 const hubSaveContent = async (
@@ -808,9 +808,9 @@ const hubSaveContent = async (
     const savePathFull = path.join(hubRoot_, savePath);
     await write(savePathFull, content, { isDataPath: false });
     if (option.returnFullPath) {
-        return savePathFull;
+        return savePathFull.replace(/\\/g, "/");
     }
-    return savePath;
+    return savePath.replace(/\\/g, "/");
 };
 
 const tempRoot = async () => {

@@ -8,13 +8,13 @@ import {
 } from "../../../../module/Workflow/core/type";
 import { workflowRun } from "../../common/workflow";
 import { SoundReplaceRun } from "../task";
-import SoundReplaceIcon from "./../assets/icon.svg";
+import AppIcon from "~icons/mdi/microphone-variant";
 
 export default <NodeFunctionCall>{
     name: "SoundReplace",
     title: t("voice.replace"),
     description: t("desc.videoVoiceReplace"),
-    icon: SoundReplaceIcon,
+    icon: AppIcon,
     comp: defineAsyncComponent(() => import("./SoundReplaceNode.vue")),
     inputFields: [
         {

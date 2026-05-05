@@ -13,6 +13,12 @@ import { ffprobeVideoCodec, ffprobeVideoInfo } from "../../../lib/ffprobe";
 const visible = ref(false);
 const videoPlayer = ref<InstanceType<typeof VideoPlayer> | null>(null);
 
+const onVisibleChange = (v: boolean) => {
+    if (!v) {
+        videoPlayer.value?.pause?.();
+    }
+};
+
 const formData = ref({
     name: "",
     video: "",
@@ -106,7 +112,12 @@ const emit = defineEmits({
 </script>
 
 <template>
-    <a-modal v-model:visible="visible" width="800px" title-align="start">
+    <a-modal
+        v-model:visible="visible"
+        width="800px"
+        title-align="start"
+        @update:visible="onVisibleChange"
+    >
         <template #title>
             {{ $t("avatar.addVideo") }}
         </template>

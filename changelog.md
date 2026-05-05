@@ -1,25 +1,26 @@
 ## [Unreleased]
 
+- 新增：工作流支持，支持工作流完成不同节点任务工作搭配
+- 新增：小工具集合，包括语音识别、长文本转音频、声音替换、音频规范化、文生图、圆生圆、视频背景添加、智能剪辑、视频片段放大、视频标注、视频尺寸转换、视频压缩、视频片段变速、视频片段删除/保留、片头片尾图片、视频添加音频、视频合并、媒体格式转换、FFmpeg 处理等 20+ 个实用工具
 - 新增：多语言国际化支持（i18n），新增各模块语言文件（en-US / zh-CN），覆盖字幕转音频、文生图、视频生成、直播、声音合成、支付等功能模块
+- 新增：视频预览自动转码，非 H264/MOV 格式自动转换为可预览格式
+- 新增：提交任务前增加文件存在性校验，适用于图生图、声音替换、字幕合成、语音识别等功能
+- 新增：视频编码检测与预览转换工具函数
+- 新增：HTTP Server 增加接口文档页面 (`/doc`)，支持在设置界面一键打开
+- 新增：命令行工具（aigcpanel CLI），支持模型列表查询和模型函数调用
+- 新增：CLI 工具安装设置界面，支持一键安装到系统路径
+- 新增：主进程错误上报 Beacon 模块，非开发模式下异常自动上报
 - 优化：将全局各页面和组件中的硬编码中文字符串替换为国际化翻译函数调用（`t()` / `$t()`）
 - 优化：声音配置文件（prompt、replaceContent）迁移至 `components/config` 子目录，并同步更新相关导入路径
 - 优化：代码导入顺序整理，统一应用 Prettier 格式化规范
-
-- Add：视频预览自动转码，非 H264/MOV 格式自动转换为可预览格式 ｜ Video preview auto-conversion for non-H264/MOV formats using ffmpeg
-- Add：提交任务前增加文件存在性校验，适用于图生图、声音替换、字幕合成、语音识别等功能 ｜ File existence validation before task submission in ImageToImage, SoundReplace, SubtitleTts, SoundAsr, and SoundGenerate
-- Add：新增视频编码检测与预览转换工具函数 ｜ `ffmpegVideoPreview` and `ffprobeVideoCodec` utilities for video codec detection and conversion
-- Optimize：全局图标迁移，使用 unplugin-icons MDI 图标替换 iconfont 图标 ｜ Migrate iconfont icons to MDI icons via unplugin-icons across all components
-- Optimize：表单视图组件增加空值保护，修复潜在渲染错误 ｜ Add null guards for SoundGenerateFormViewBody, TextToImageFormViewBody, and SoundReplaceItem components
-- Optimize：ModelAgentButton 组件属性改为可选，提升组件灵活性 ｜ Make ModelAgentButton props (systemPrompt, title, placeholder, formItems) optional
-- Add：HTTP Server 增加接口文档页面 (`/doc`)，支持在设置界面一键打开 ｜ Add HTTP Server API documentation page (`/doc`) with one-click access from settings
-- Optimize：HTTP Server 重构为 Express.js 框架，API 由大模型代理改为 AIGC 服务任务调度 ｜ Refactor HTTP Server to Express.js; API redesigned from LLM proxy to AIGC server task dispatcher
-- Optimize：设置界面移除内联接口地址展示，改为独立接口文档页面 ｜ Replace inline API address display in settings with dedicated documentation page
-- Add：新增命令行工具（aigcpanel CLI），支持模型列表查询和模型函数调用 ｜ Add Go-based CLI tool (aigcpanel) with model_list and model_call commands
-- Add：新增 CLI 工具安装设置界面，支持一键安装到系统路径 ｜ Add CLI installation settings page with one-click system path integration
-- Add：新增主进程错误上报 Beacon 模块，非开发模式下异常自动上报 ｜ Add main process error reporting Beacon for automatic exception tracking in production
-- Optimize：VideoGenForm 新增 setValue 方法，支持外部设置表单数据 ｜ Add setValue method to VideoGenForm for external form data injection
-- Optimize：任务提交统一返回任务 ID，适用于语音识别、声音合成、视频生成 ｜ Unify task submit to return task ID in SoundAsr, SoundGenerate, and VideoGen
-- Optimize：代码格式规范统一，应用 Prettier 格式化 ｜ Unify code formatting with Prettier across the codebase
+- 优化：全局图标迁移，使用 unplugin-icons MDI 图标替换 iconfont 图标
+- 优化：表单视图组件增加空值保护，修复潜在渲染错误
+- 优化：ModelAgentButton 组件属性改为可选，提升组件灵活性
+- 优化：HTTP Server 重构为 Express.js 框架，API 由大模型代理改为 AIGC 服务任务调度
+- 优化：设置界面移除内联接口地址展示，改为独立接口文档页面
+- 优化：VideoGenForm 新增 setValue 方法，支持外部设置表单数据
+- 优化：任务提交统一返回任务 ID，适用于语音识别、声音合成、视频生成
+- 优化：代码格式规范统一，应用 Prettier 格式化
 
 ## v1.5.0
 

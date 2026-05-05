@@ -5,7 +5,7 @@ import { doCopy } from "./common/util";
 const props = defineProps({
     text: {
         type: String,
-        required: true,
+        default: "",
     },
     autoTruncate: {
         type: Boolean,
@@ -21,8 +21,9 @@ const props = defineProps({
     },
 });
 const isTruncate = ref(props.autoTruncate);
-const showToggle = computed(() => props.text.length > props.maxLength);
+const showToggle = computed(() => (props.text?.length ?? 0) > props.maxLength);
 const displayText = computed(() => {
+    if (!props.text) return "";
     if (isTruncate.value && showToggle.value) {
         return props.text.slice(0, props.maxLength) + "...";
     }

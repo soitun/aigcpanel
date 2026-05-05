@@ -74,6 +74,12 @@ onBeforeUnmount(() => {
         player.destroy();
     }
 });
+
+const pause = () => {
+    player?.pause?.();
+};
+
+defineExpose({ pause });
 </script>
 
 <template>

@@ -42,7 +42,7 @@ const name = computed(() => {
             {{ name }}
         </div>
     </a-tooltip>
-    <a-button @click="doSelectFile" :class="modelValue ? '' : 'w-64'">
+    <a-button @click="doSelectFile" :class="modelValue ? '' : 'min-w-64'">
         <icon-file />
         {{ modelValue ? t("common.reselect") : t("common.selectFile") }}
         ({{ t("common.extensions", { extensions: extensions.join(", ") }) }})

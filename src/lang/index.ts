@@ -9,8 +9,8 @@ import componentsEnUS from "../components/locales/en-US.json";
 import componentsZhCN from "../components/locales/zh-CN.json";
 import appsEnUS from "../pages/Apps/locales/en-US.json";
 import appsZhCN from "../pages/Apps/locales/zh-CN.json";
-import soundEnUS from "../pages/Sound/locales/en-US.json";
-import soundZhCN from "../pages/Sound/locales/zh-CN.json";
+import soundEnUS from "../pages/Video/locales/en-US.json";
+import soundZhCN from "../pages/Video/locales/zh-CN.json";
 import videoEnUS from "../pages/Video/locales/en-US.json";
 import videoZhCN from "../pages/Video/locales/zh-CN.json";
 

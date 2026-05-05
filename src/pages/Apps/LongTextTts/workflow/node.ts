@@ -8,13 +8,13 @@ import {
 } from "../../../../module/Workflow/core/type";
 import { workflowRun } from "../../common/workflow";
 import { LongTextTtsRun } from "../task";
-import LongTextTtsIcon from "./../assets/icon.svg";
+import AppIcon from "~icons/mdi/waveform";
 
 export default <NodeFunctionCall>{
     name: "LongTextTts",
     title: t("app.longTextTts"),
     description: t("app.longTextTtsDesc"),
-    icon: LongTextTtsIcon,
+    icon: AppIcon,
     comp: defineAsyncComponent(() => import("./LongTextTtsNode.vue")),
     inputFields: [
         {

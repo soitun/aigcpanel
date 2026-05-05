@@ -235,14 +235,28 @@ const createApp = (port: number, token: string) => {
 
     app.post("/api/model/call", async (req, res) => {
         try {
-            const { model, function: funcName, param } = req.body || {};
-            const parts = (model || "").split("|");
-            const serverName = parts[0];
-            const serverVersion = parts.slice(1).join("|");
+            const {
+                model,
+                version,
+                function: funcName,
+                param,
+            } = req.body || {};
+            let serverName: string;
+            let serverVersion: string;
+            if (version !== undefined) {
+                // 新格式：model 和 version 分别传递
+                serverName = model || "";
+                serverVersion = version || "";
+            } else {
+                // 兼容旧格式：model 为 "name|version"
+                const parts = (model || "").split("|");
+                serverName = parts[0];
+                serverVersion = parts.slice(1).join("|");
+            }
             if (!serverName || !serverVersion) {
                 sendJson(res, 400, {
                     code: -1,
-                    msg: 'Invalid model format, expected "name|version"',
+                    msg: "Missing model or version",
                 });
                 return;
             }
@@ -373,6 +387,23 @@ const createApp = (port: number, token: string) => {
                             },
                         },
                     };
+                } else if (record.status === "pause") {
+                    let jobResult: any = null;
+                    try {
+                        jobResult = JSON.parse(record.jobResult);
+                    } catch (_) {}
+                    return {
+                        done: true,
+                        payload: {
+                            code: 0,
+                            data: {
+                                status: "pause",
+                                taskId: String(record.id),
+                                step: jobResult?.step || null,
+                                statusMsg: record.statusMsg || "Task paused",
+                            },
+                        },
+                    };
                 }
                 return { done: false, payload: null };
             };
@@ -391,6 +422,318 @@ const createApp = (port: number, token: string) => {
         }
     });
 
+    // ── GET /api/workflow/list ───────────────────────────────────────────
+    app.get("/api/workflow/list", async (_req, res) => {
+        try {
+            const rows = await DBMain.select(
+                "SELECT id, name, createdAt, updatedAt FROM workflow ORDER BY createdAt DESC",
+                [],
+            );
+            sendJson(res, 200, { code: 0, data: { list: rows } });
+        } catch (e) {
+            sendJson(res, 500, { code: -1, msg: `Internal error: ${e}` });
+        }
+    });
+
+    // ── POST /api/workflow/run-named ─────────────────────────────────────
+    // 运行已存在的工作流（按名称查找），创建运行记录并执行
+    app.post("/api/workflow/run-named", async (req, res) => {
+        try {
+            const { name } = req.body || {};
+            if (!name) {
+                sendJson(res, 400, { code: -1, msg: "Missing name" });
+                return;
+            }
+            const wf = await DBMain.first(
+                "SELECT * FROM workflow WHERE name = ? ORDER BY createdAt DESC LIMIT 1",
+                [name],
+            );
+            if (!wf) {
+                sendJson(res, 404, {
+                    code: -1,
+                    msg: `Workflow not found: ${name}`,
+                });
+                return;
+            }
+            let workflowData: any;
+            try {
+                workflowData = JSON.parse(wf.data);
+            } catch {
+                workflowData = {};
+            }
+            workflowData.status = "idle";
+            const now = Math.floor(Date.now() / 1000);
+            const workflowLogId = await DBMain.insert(
+                `INSERT INTO workflow_log (createdAt, updatedAt, workflowId, name, data, status, startTime, endTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    now,
+                    now,
+                    wf.id,
+                    name,
+                    JSON.stringify(workflowData),
+                    "idle",
+                    Date.now(),
+                    0,
+                ],
+            );
+            sendJson(res, 200, {
+                code: 0,
+                data: {
+                    workflowLogId: String(workflowLogId),
+                    workflowId: String(wf.id),
+                },
+            });
+            Events.callPage("main", "httpserver:submitWorkflow", {
+                workflowLogId: String(workflowLogId),
+            }).catch((err) => {
+                Log.error("httpserver.submitWorkflow.error", err);
+            });
+        } catch (e) {
+            sendJson(res, 500, { code: -1, msg: `Internal error: ${e}` });
+        }
+    });
+
+    // ── POST /api/workflow/cleanup-test ──────────────────────────────────
+    // 删除所有 _test_ 前缀及"新建工作流"命名的工作流及其运行记录
+    app.post("/api/workflow/cleanup-test", async (_req, res) => {
+        try {
+            const testWorkflows = await DBMain.select(
+                `SELECT id FROM workflow WHERE name LIKE '_test_%' OR name = '新建工作流'`,
+                [],
+            );
+            for (const wf of testWorkflows) {
+                await DBMain.execute(
+                    "DELETE FROM workflow_log WHERE workflowId = ?",
+                    [wf.id],
+                );
+                await DBMain.execute("DELETE FROM workflow WHERE id = ?", [
+                    wf.id,
+                ]);
+            }
+            sendJson(res, 200, {
+                code: 0,
+                data: { deleted: testWorkflows.length },
+            });
+        } catch (e) {
+            sendJson(res, 500, { code: -1, msg: `Internal error: ${e}` });
+        }
+    });
+
+    // ── POST /api/workflow/run ───────────────────────────────────────────
+    app.post("/api/workflow/run", async (req, res) => {
+        try {
+            const { data: workflowData } = req.body || {};
+            if (!workflowData || !Array.isArray(workflowData.nodes)) {
+                sendJson(res, 400, { code: -1, msg: "Missing workflow data" });
+                return;
+            }
+            const now = Math.floor(Date.now() / 1000);
+            const workflowId = await DBMain.insert(
+                `INSERT INTO workflow (createdAt, updatedAt, name, data) VALUES (?, ?, ?, ?)`,
+                [now, now, "_test_" + now, JSON.stringify(workflowData)],
+            );
+            workflowData.status = "idle";
+            const workflowLogId = await DBMain.insert(
+                `INSERT INTO workflow_log (createdAt, updatedAt, workflowId, name, data, status, startTime, endTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    now,
+                    now,
+                    workflowId,
+                    "_test_" + now,
+                    JSON.stringify(workflowData),
+                    "idle",
+                    Date.now(),
+                    0,
+                ],
+            );
+            sendJson(res, 200, {
+                code: 0,
+                data: {
+                    workflowLogId: String(workflowLogId),
+                    workflowId: String(workflowId),
+                },
+            });
+            Events.callPage("main", "httpserver:submitWorkflow", {
+                workflowLogId: String(workflowLogId),
+            }).catch((err) => {
+                Log.error("httpserver.submitWorkflow.error", err);
+            });
+        } catch (e) {
+            sendJson(res, 500, { code: -1, msg: `Internal error: ${e}` });
+        }
+    });
+
+    // ── POST /api/workflow/query ─────────────────────────────────────────
+    app.post("/api/workflow/query", async (req, res) => {
+        try {
+            const { workflowLogId } = req.body || {};
+            if (!workflowLogId) {
+                sendJson(res, 400, { code: -1, msg: "Missing workflowLogId" });
+                return;
+            }
+            const LONG_POLL_MS = 10_000;
+            const POLL_INTERVAL_MS = 500;
+            const deadline = Date.now() + LONG_POLL_MS;
+            while (true) {
+                const record = await DBMain.first(
+                    "SELECT * FROM workflow_log WHERE id = ?",
+                    [workflowLogId],
+                );
+                if (!record) {
+                    sendJson(res, 200, {
+                        code: 0,
+                        data: { status: "error", statusMsg: "Not found" },
+                    });
+                    return;
+                }
+                if (
+                    record.status === "success" ||
+                    record.status === "error" ||
+                    record.status === "pause"
+                ) {
+                    let logData: any = null;
+                    try {
+                        logData = JSON.parse(record.data);
+                    } catch {}
+                    sendJson(res, 200, {
+                        code: 0,
+                        data: {
+                            status: record.status,
+                            statusMsg: record.statusMsg,
+                            logData,
+                        },
+                    });
+                    return;
+                }
+                if (Date.now() >= deadline) break;
+                await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+            }
+            sendJson(res, 200, { code: 0, data: { status: "pending" } });
+        } catch (e) {
+            sendJson(res, 500, { code: -1, msg: `Internal error: ${e}` });
+        }
+    });
+
+    // ── POST /api/task/submit ────────────────────────────────────────────
+    app.post("/api/task/submit", async (req, res) => {
+        try {
+            const { biz, modelConfig, param, title } = req.body || {};
+            if (!biz) {
+                sendJson(res, 400, { code: -1, msg: "Missing biz" });
+                return;
+            }
+            const taskTitle = title || biz + "-task";
+            const taskDbId = await DBMain.insert(
+                `INSERT INTO data_task (biz, title, status, startTime, serverName, serverTitle, serverVersion, param, jobResult, modelConfig, result, type)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    biz,
+                    taskTitle,
+                    "queue",
+                    Date.now(),
+                    "",
+                    "",
+                    "",
+                    JSON.stringify(param || {}),
+                    JSON.stringify({}),
+                    JSON.stringify(modelConfig || {}),
+                    JSON.stringify({}),
+                    1,
+                ],
+            );
+            const taskId = String(taskDbId);
+            sendJson(res, 200, { code: 0, data: { taskId } });
+            Events.callPage("main", "httpserver:submitTask", {
+                biz,
+                taskId,
+            }).catch((err) => {
+                Log.error("httpserver.submitTask.error", err);
+            });
+        } catch (e) {
+            sendJson(res, 500, { code: -1, msg: `Internal error: ${e}` });
+        }
+    });
+
+    // ── POST /api/task/continue ──────────────────────────────────────────
+    // Continue a paused task with stage-specific data.
+    // Body: { taskId, stage, data }
+    // stage: the current paused step (e.g. "Config", "Confirm")
+    // data: the stage-specific payload (e.g. { times: [...] })
+    app.post("/api/task/continue", async (req, res) => {
+        try {
+            const { taskId, stage, data } = req.body || {};
+            if (!taskId || !stage) {
+                sendJson(res, 400, {
+                    code: -1,
+                    msg: "Missing taskId or stage",
+                });
+                return;
+            }
+            const record = await DBMain.first(
+                "SELECT * FROM data_task WHERE id = ?",
+                [taskId],
+            );
+            if (!record) {
+                sendJson(res, 200, {
+                    code: -1,
+                    msg: `Task not found: ${taskId}`,
+                });
+                return;
+            }
+            if (record.status !== "pause") {
+                sendJson(res, 200, {
+                    code: -1,
+                    msg: `Task is not paused (current status: ${record.status})`,
+                });
+                return;
+            }
+            // Map stage → next step
+            const stageTransitions: Record<string, Record<string, string>> = {
+                VideoZoom: { Config: "Render", RenderConfirm: "End" },
+                VideoMark: { Config: "Render", RenderConfirm: "End" },
+                VideoSpeedPart: { Config: "Render" },
+                VideoKeepPart: { Config: "Render" },
+                VideoQuickCut: { Confirm: "Merge" },
+            };
+            const biz = record.biz;
+            const transitions = stageTransitions[biz] || {};
+            const nextStep = transitions[stage];
+            if (!nextStep) {
+                sendJson(res, 200, {
+                    code: -1,
+                    msg: `Unknown stage "${stage}" for biz "${biz}"`,
+                });
+                return;
+            }
+            // Merge jobResult update
+            let currentJobResult: any = {};
+            try {
+                currentJobResult = JSON.parse(record.jobResult) || {};
+            } catch (_) {}
+            const updatedJobResult = {
+                ...currentJobResult,
+                step: nextStep,
+                [stage]: {
+                    ...((currentJobResult[stage] as any) || {}),
+                    ...(data || {}),
+                },
+            };
+            await DBMain.execute(
+                "UPDATE data_task SET status = ?, jobResult = ?, statusMsg = ? WHERE id = ?",
+                ["queue", JSON.stringify(updatedJobResult), "", taskId],
+            );
+            sendJson(res, 200, { code: 0, data: { taskId } });
+            Events.callPage("main", "httpserver:submitTask", {
+                biz,
+                taskId,
+            }).catch((err) => {
+                Log.error("httpserver.continueTask.error", err);
+            });
+        } catch (e) {
+            sendJson(res, 500, { code: -1, msg: `Internal error: ${e}` });
+        }
+    });
+
     app.use((_req, res) => {
         sendJson(res, 404, { code: -1, msg: "Not found" });
     });
@@ -404,17 +747,17 @@ const start = async (port?: number): Promise<void> => {
     }
     const resolvedPort = port || (await getAvailablePort());
     const token = generateToken();
-    await ConfigMain.set("httpServerPort", resolvedPort);
-    await ConfigMain.set("httpServerToken", token);
-    writeCliAuthFile(resolvedPort, token);
     return new Promise((resolve, reject) => {
         const app = createApp(resolvedPort, token);
         const s = http.createServer(app);
-        s.listen(resolvedPort, "127.0.0.1", () => {
+        s.listen(resolvedPort, "127.0.0.1", async () => {
             server = s;
             isRunning = true;
             runningPort = resolvedPort;
             runningToken = token;
+            await ConfigMain.set("httpServerPort", resolvedPort);
+            await ConfigMain.set("httpServerToken", token);
+            writeCliAuthFile(resolvedPort, token);
             Log.info("httpserver.start", { port: resolvedPort });
             resolve();
         });

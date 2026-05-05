@@ -17,10 +17,11 @@ export type ModelChatResult = {
 
 export const ModelProvider = {
     apiUrl(type: ProviderType, apiUrl: string, apiHost: string = "") {
-        let url = apiUrl;
+        let url = apiUrl || "";
         if (apiHost) {
             url = apiHost;
         }
+        if (!url) return "";
         // console.log('ModelProvider.apiUrl', {type, apiUrl, apiHost, url});
         switch (type) {
             case "openai":

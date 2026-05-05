@@ -14,10 +14,29 @@ export type TaskBiz =
     | "LongTextTts"
     | "SubtitleTts"
     | "SoundReplace"
+    | "AudioNormal"
     // video apps
     | "TextToImage"
     | "ImageToImage"
-    | "VideoGenFlow";
+    | "VideoGenFlow"
+    // video processing apps
+    | "VideoBackground"
+    | "VideoQuickCut"
+    | "VideoZoom"
+    | "VideoMark"
+    | "VideoSubtitle"
+    | "VideoSpeed"
+    | "VideoSizeConvert"
+    | "VideoCompress"
+    | "VideoSpeedPart"
+    | "VideoKeepPart"
+    | "VideoMergeImage"
+    | "VideoMergeAudio"
+    | "VideoMerge"
+    | "MediaFormatConvert"
+    | "Ffmpeg"
+    // workflow
+    | "Workflow";
 
 export type TaskJobResultStepStatus =
     | undefined
@@ -357,15 +376,23 @@ export const TaskService = {
                 filesForClean.push(...files);
             }
         }
-        for (const file of filesForClean) {
-            await window.$mapi.file.deletes(file);
-        }
         await window.$mapi.db.delete(
             `DELETE
              FROM ${this.tableName()}
              WHERE id = ?`,
             [record.id],
         );
+        for (const file of filesForClean) {
+            const normalFile = file.replace(/\\/g, "/");
+            const referenced = await window.$mapi.db.isFileReferenced(
+                normalFile,
+                this.tableName(),
+                0,
+            );
+            if (!referenced) {
+                await window.$mapi.file.deletes(normalFile);
+            }
+        }
     },
     async count(
         biz: TaskBiz | null,

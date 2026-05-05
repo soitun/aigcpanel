@@ -6,7 +6,7 @@ import {
     FunctionCallNodeProps,
     useFunctionCallNode,
 } from "../../../../module/Workflow/nodes/FunctionCall/lib";
-import ImageToImageFormView from "../../../common/ImageToImageFormView.vue";
+import ImageToImageFormView from "../../common/ImageToImageFormView.vue";
 import ImageToImageParamDialog from "../components/ImageToImageParamDialog.vue";
 
 const props = defineProps<FunctionCallNodeProps>();

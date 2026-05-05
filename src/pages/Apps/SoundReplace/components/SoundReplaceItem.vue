@@ -15,8 +15,8 @@ import TaskJobResultStepView from "../../../../components/common/TaskJobResultSt
 import VideoPreviewBox from "../../../../components/common/VideoPreviewBox.vue";
 import { TaskRecord, TaskService } from "../../../../service/TaskService";
 import { useTaskStore } from "../../../../store/modules/task";
-import SoundAsrRecordsEditDialog from "../../../Sound/components/SoundAsrRecordsEditDialog.vue";
-import SoundGenerateFormViewBody from "../../../Sound/components/SoundGenerateFormViewBody.vue";
+import SoundAsrRecordsEditDialog from "../../../Video/components/SoundAsrRecordsEditDialog.vue";
+import SoundGenerateFormViewBody from "../../../Video/components/SoundGenerateFormViewBody.vue";
 import {
     SoundReplaceJobResultType,
     SoundReplaceModelConfigType,

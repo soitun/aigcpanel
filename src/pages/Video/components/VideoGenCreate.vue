@@ -11,7 +11,7 @@ import {
     VideoTemplateRecord,
     VideoTemplateService,
 } from "../../../service/VideoTemplateService";
-import SoundGenerateSelector from "../../Sound/components/SoundGenerateSelector.vue";
+import SoundGenerateSelector from "./SoundGenerateSelector.vue";
 import VideoGenForm from "./VideoGenForm.vue";
 
 const videoGenForm = ref<InstanceType<typeof VideoGenForm> | null>(null);
@@ -134,39 +134,35 @@ defineExpose({
 <template>
     <div class="rounded-xl shadow border p-4">
         <VideoGenForm ref="videoGenForm" />
-        <div class="font-bold">
+        <div class="font-bold mb-2">
             <icon-settings />
             {{ $t("voice.config") }}
         </div>
-        <div class="flex items-center h-12">
-            <div class="mr-1">
-                <a-tooltip :content="$t('voice.voice')" mini>
-                    <i-mdi-volume-high class="w-4 h-4" />
-                    {{ $t("voice.voice") }}
-                </a-tooltip>
+        <div class="flex items-center flex-wrap gap-2">
+            <div class="flex items-center gap-1 flex-shrink-0">
+                <i-mdi-volume-high class="w-4 h-4" />
+                <span>{{ $t("voice.voice") }}</span>
             </div>
-            <div class="mr-1">
-                <a-radio-group v-model="formData.soundType">
-                    <a-radio value="soundGenerate">
-                        <i-mdi-text-to-speech
-                            class="w-4 h-4 inline-block align-middle"
-                        />
-                        {{ $t("voice.synthesis") }}
-                    </a-radio>
-                    <a-radio value="soundCustom">
-                        <icon-file />
-                        {{ $t("common.localFile") }}
-                    </a-radio>
-                </a-radio-group>
-            </div>
+            <a-radio-group v-model="formData.soundType" class="flex-shrink-0">
+                <a-radio value="soundGenerate">
+                    <i-mdi-text-to-speech
+                        class="w-4 h-4 inline-block align-middle"
+                    />
+                    {{ $t("voice.synthesis") }}
+                </a-radio>
+                <a-radio value="soundCustom">
+                    <icon-file />
+                    {{ $t("common.localFile") }}
+                </a-radio>
+            </a-radio-group>
             <div
-                class="mr-3 w-96 flex-shrink-0"
+                class="flex-shrink-0 min-w-64"
                 v-if="formData.soundType === 'soundGenerate'"
             >
                 <SoundGenerateSelector v-model="formData.soundGenerateId" />
             </div>
             <div
-                class="mr-3 w-96 flex-shrink-0"
+                class="flex-shrink-0"
                 v-if="formData.soundType === 'soundCustom'"
             >
                 <a-button @click="doSoundCustomSelect">

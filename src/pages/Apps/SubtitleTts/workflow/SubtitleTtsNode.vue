@@ -6,7 +6,7 @@ import {
     FunctionCallNodeProps,
     useFunctionCallNode,
 } from "../../../../module/Workflow/nodes/FunctionCall/lib";
-import SoundGenerateFormView from "../../../Sound/components/SoundGenerateFormView.vue";
+import SoundGenerateFormView from "../../../Video/components/SoundGenerateFormView.vue";
 import SubtitleTtsParamDialog from "../components/SubtitleTtsParamDialog.vue";
 
 const props = defineProps<FunctionCallNodeProps>();

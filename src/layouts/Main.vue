@@ -5,6 +5,10 @@ import { AppConfig } from "../config";
 import { t } from "../lang";
 import AppQuitConfirm from "../components/AppQuitConfirm.vue";
 import { useDragWindow } from "../components/common/dragWindow";
+import { useRouter } from "vue-router";
+import { isDev } from "../lib/env";
+
+const router = useRouter();
 
 const appQuitConfirm = ref<InstanceType<typeof AppQuitConfirm> | null>(null);
 const isOsx = ref(false);
@@ -42,6 +46,18 @@ let appEditionBadge = t("common.communityEdition");
 onMounted(() => {
     // document.body.setAttribute('arco-theme', 'dark')
 });
+
+const debugVisible = ref(false);
+const currentRoute = ref("");
+const doDebugCopyRoute = async () => {
+    currentRoute.value = router.currentRoute.value.fullPath;
+    await window.$mapi.app.setClipboardText(currentRoute.value);
+    window.$mapi.app.toast(t("common.copied"), "success");
+};
+const doDebugToggle = () => {
+    currentRoute.value = router.currentRoute.value.fullPath;
+    debugVisible.value = !debugVisible.value;
+};
 </script>
 <template>
     <div class="window-container">
@@ -102,4 +118,32 @@ onMounted(() => {
         </div>
     </div>
     <AppQuitConfirm ref="appQuitConfirm" />
+    <!-- 调试弹窗 -->
+    <template v-if="isDev">
+        <div class="fixed bottom-4 right-4 z-50">
+            <a-button
+                shape="circle"
+                size="mini"
+                class="opacity-50 hover:opacity-100"
+                @click="doDebugToggle"
+            >
+                <template #icon><icon-bug /></template>
+            </a-button>
+        </div>
+        <div
+            v-if="debugVisible"
+            class="fixed bottom-14 right-4 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-3 w-80"
+        >
+            <div class="font-bold text-sm mb-2">调试信息</div>
+            <div class="flex items-center gap-2">
+                <div class="text-xs text-gray-500 flex-grow truncate">
+                    {{ currentRoute }}
+                </div>
+                <a-button size="mini" @click="doDebugCopyRoute">
+                    <template #icon><icon-copy /></template>
+                    复制路由
+                </a-button>
+            </div>
+        </div>
+    </template>
 </template>

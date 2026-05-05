@@ -179,6 +179,48 @@ ipcMain.handle("db:delete", (event, sql: string, params: any) => {
     return db.delete(sql, params);
 });
 
+ipcMain.handle(
+    "db:isFileReferenced",
+    (
+        event,
+        filePath: string,
+        excludeTable: string,
+        excludeId: number,
+    ): boolean => {
+        const normalPath = filePath.replace(/\\/g, "/");
+        const tables = dbConn
+            .prepare(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name != 'migrate'",
+            )
+            .all() as { name: string }[];
+        for (const table of tables) {
+            const cols = dbConn
+                .prepare(`PRAGMA table_info("${table.name}")`)
+                .all() as { name: string; type: string }[];
+            for (const col of cols) {
+                const t = col.type.toUpperCase();
+                if (t === "INTEGER" || t === "REAL") continue;
+                let result: any;
+                if (table.name === excludeTable) {
+                    result = dbConn
+                        .prepare(
+                            `SELECT 1 as found FROM "${table.name}" WHERE "${col.name}" LIKE ? AND id != ? LIMIT 1`,
+                        )
+                        .get(`%${normalPath}%`, excludeId);
+                } else {
+                    result = dbConn
+                        .prepare(
+                            `SELECT 1 as found FROM "${table.name}" WHERE "${col.name}" LIKE ? LIMIT 1`,
+                        )
+                        .get(`%${normalPath}%`);
+                }
+                if (result?.found) return true;
+            }
+        }
+        return false;
+    },
+);
+
 export const DBMain = {
     init,
     execute: db.execute,

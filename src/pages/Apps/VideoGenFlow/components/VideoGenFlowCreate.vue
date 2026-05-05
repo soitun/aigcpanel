@@ -5,7 +5,7 @@ import { Dialog } from "../../../../lib/dialog";
 import { StorageUtil } from "../../../../lib/storage";
 import { PermissionService } from "../../../../service/PermissionService";
 import { TaskRecord, TaskService } from "../../../../service/TaskService";
-import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
+import SoundGenerateForm from "../../../Video/components/SoundGenerateForm.vue";
 import VideoGenForm from "../../../Video/components/VideoGenForm.vue";
 
 const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(

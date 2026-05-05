@@ -16,6 +16,7 @@ import { useServerStore } from "../store/modules/server";
 import { EnumServerType } from "../types/Server";
 
 import ServerRemoteAddDialog from "../components/Server/ServerRemoteAddDialog.vue";
+import ListerTop from "../components/common/ListerTop.vue";
 
 const addDialog = ref<InstanceType<typeof ServerAddDialog> | null>(null);
 const remoteAddDialog = ref<InstanceType<typeof ServerRemoteAddDialog> | null>(
@@ -52,12 +53,12 @@ const typeName = (type: string) => {
     <div
         class="pb-device-container bg-white p-6 min-h-full relative select-none"
     >
-        <div class="mb-4 flex items-center">
-            <div class="text-3xl font-bold flex-grow">
-                {{ $t("model.model") }}
-            </div>
-            <div class="flex items-center">
-                <a-button class="ml-1" @click="modelSettingDialog?.show()">
+        <div class="mb-2 flex items-center">
+            <div class="text-3xl font-bold flex-grow">AI模型</div>
+        </div>
+        <ListerTop :total="serverStore.records.length" @refresh="doRefresh">
+            <template #actions>
+                <a-button @click="modelSettingDialog?.show()">
                     <template #icon>
                         <icon-command />
                     </template>
@@ -66,7 +67,6 @@ const typeName = (type: string) => {
 
                 <a-button
                     v-if="serverStore.records.length > 0"
-                    class="ml-1"
                     @click="remoteAddDialog?.show()"
                 >
                     <template #icon>
@@ -76,7 +76,6 @@ const typeName = (type: string) => {
                 </a-button>
                 <a-button
                     v-if="serverStore.records.length > 0"
-                    class="ml-1"
                     @click="addDialog?.show()"
                 >
                     <template #icon>
@@ -84,8 +83,8 @@ const typeName = (type: string) => {
                     </template>
                     {{ $t("model.addLocal") }}
                 </a-button>
-            </div>
-        </div>
+            </template>
+        </ListerTop>
         <div>
             <div v-if="!serverStore.records.length" class="py-20">
                 <div class="text-center">

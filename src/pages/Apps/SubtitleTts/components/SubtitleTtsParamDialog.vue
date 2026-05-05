@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref } from "vue";
-import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
+import SoundGenerateForm from "../../../Video/components/SoundGenerateForm.vue";
 
 const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(
     null,

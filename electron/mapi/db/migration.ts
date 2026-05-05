@@ -299,6 +299,57 @@ const versions = [
             );
         },
     },
+    {
+        version: 12,
+        up: async (db: DB) => {
+            await db.execute(`CREATE TABLE IF NOT EXISTS workflow
+                              (
+                                  id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                                  createdAt INTEGER DEFAULT (strftime('%s', 'now')),
+                                  updatedAt INTEGER DEFAULT (strftime('%s', 'now')),
+                                  name      TEXT,
+                                  data      TEXT,
+                                  thumb     TEXT
+                              )`);
+            await db.execute(`CREATE TABLE IF NOT EXISTS workflow_log
+                              (
+                                  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                                  createdAt   INTEGER DEFAULT (strftime('%s', 'now')),
+                                  updatedAt   INTEGER DEFAULT (strftime('%s', 'now')),
+                                  workflowId  INTEGER,
+                                  name        TEXT,
+                                  seqId       INTEGER,
+                                  pauseByType TEXT,
+                                  pauseById   TEXT,
+                                  data        TEXT,
+                                  status      TEXT,
+                                  statusMsg   TEXT,
+                                  startTime   INTEGER,
+                                  endTime     INTEGER
+                              )`);
+        },
+    },
+    {
+        version: 13,
+        up: async (db: DB) => {
+            await db.execute(`CREATE TABLE IF NOT EXISTS live_avatar (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   createdAt INTEGER DEFAULT (strftime('%s', 'now')),
+                   updatedAt INTEGER DEFAULT (strftime('%s', 'now')),
+                   name TEXT,
+                   video TEXT,
+                   info TEXT
+            )`);
+        },
+    },
+    {
+        version: 14,
+        up: async (db: DB) => {
+            await db.execute(`DROP TABLE IF EXISTS data_video_gen`);
+            await db.execute(`DROP TABLE IF EXISTS data_sound_tts`);
+            await db.execute(`DROP TABLE IF EXISTS data_sound_clone`);
+        },
+    },
 ];
 
 export default {

@@ -5,7 +5,7 @@ import { dataAutoSaveDraft } from "../../../../components/common/util";
 import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
 import { TaskRecord, TaskService } from "../../../../service/TaskService";
-import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
+import SoundGenerateForm from "../../../Video/components/SoundGenerateForm.vue";
 
 const emit = defineEmits<{
     submitted: [];

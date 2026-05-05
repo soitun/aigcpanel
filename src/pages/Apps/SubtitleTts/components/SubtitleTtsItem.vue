@@ -12,7 +12,7 @@ import ItemsLimitedView from "../../../../components/common/ItemsLimitedView.vue
 import TaskBizStatus from "../../../../components/common/TaskBizStatus.vue";
 import TaskJobResultStepView from "../../../../components/common/TaskJobResultStepView.vue";
 import { TaskRecord } from "../../../../service/TaskService";
-import SoundGenerateFormViewBody from "../../../Sound/components/SoundGenerateFormViewBody.vue";
+import SoundGenerateFormViewBody from "../../../Video/components/SoundGenerateFormViewBody.vue";
 import { SubtitleTtsJobResultType, SubtitleTtsModelConfigType } from "../type";
 
 const props = defineProps<{

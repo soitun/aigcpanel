@@ -11,6 +11,9 @@ import {
 import VideoInfo from "../Apps/common/VideoInfo.vue";
 import VideoTemplateCloudDialog from "./components/VideoTemplateCloudDialog.vue";
 import VideoTemplateEditDialog from "./components/VideoTemplateEditDialog.vue";
+import ListerTop from "../../components/common/ListerTop.vue";
+import MEmpty from "../../components/common/MEmpty.vue";
+import MLoading from "../../components/common/MLoading.vue";
 
 const editDialog = ref<InstanceType<typeof VideoTemplateEditDialog>>();
 const cloudDialog = ref<InstanceType<typeof VideoTemplateCloudDialog>>();
@@ -45,26 +48,30 @@ const onUpdate = async () => {
 
 <template>
     <div class="p-5">
-        <div class="mb-4 flex items-center">
-            <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">{{ $t("avatar.avatar") }}</div>
-                <div class="text-gray-400 ml-3">{{ $t("avatar.manage") }}</div>
-            </div>
-            <div class="flex items-center">
-                <a-button @click="cloudDialog?.show()" class="ml-2">
+        <div class="mb-2 flex items-end">
+            <div class="text-3xl font-bold">{{ $t("avatar.avatar") }}</div>
+            <div class="text-gray-400 ml-3">{{ $t("avatar.manage") }}</div>
+        </div>
+        <ListerTop
+            :loading="loading"
+            :total="records.length"
+            @refresh="doRefresh"
+        >
+            <template #actions>
+                <a-button @click="cloudDialog?.show()">
                     <template #icon>
-                        <icon-cloud />
+                        <i-mdi-cloud-download />
                     </template>
                     {{ $t("model.cloudAvatar") }}
                 </a-button>
-                <a-button @click="editDialog?.add()" class="ml-2">
+                <a-button @click="editDialog?.add()">
                     <template #icon>
-                        <icon-plus />
+                        <i-mdi-plus />
                     </template>
                     {{ $t("common.add") }}
                 </a-button>
-            </div>
-        </div>
+            </template>
+        </ListerTop>
         <div>
             <m-empty v-if="!records.length && !loading" />
             <m-loading v-else-if="!records.length && loading" page />
@@ -93,7 +100,7 @@ const onUpdate = async () => {
                                             class="ml-1 text-gray-400"
                                             href="javascript:;"
                                         >
-                                            <icon-pen />
+                                            <i-mdi-pencil />
                                         </a>
                                     </InputInlineEditor>
                                 </div>
@@ -101,14 +108,14 @@ const onUpdate = async () => {
                             <div>
                                 <a-button @click="doDelete(r)">
                                     <template #icon>
-                                        <icon-delete />
+                                        <i-mdi-delete />
                                     </template>
                                 </a-button>
                             </div>
                         </div>
                         <div class="mb-3">
                             <div class="h-48 bg-black p-2 rounded-lg">
-                                <VideoPlayer :url="'file://' + r.video" />
+                                <VideoPlayer :url="r.video" />
                             </div>
                         </div>
                         <div class="flex gap-1">

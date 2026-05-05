@@ -12,6 +12,7 @@ import misc from "./misc/main";
 import updater from "./updater/main";
 import server from "./server/main";
 import httpserver from "./httpserver/main";
+import "./workflow/main";
 
 const $mapi = {
     app,

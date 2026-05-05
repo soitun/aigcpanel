@@ -2,22 +2,31 @@
 import { nextTick, onMounted, ref } from "vue";
 import FeedbackTicketButton from "../components/common/FeedbackTicketButton.vue";
 
+import WorkflowIcon from "../components/Icon/WorkflowIcon.vue";
 import { TimeUtil } from "../lib/util";
 import { TaskService } from "../service/TaskService";
+import {
+    WorkflowLogService,
+    WorkflowService,
+} from "../service/WorkflowService";
+import { StorageService } from "../service/StorageService";
+import { VideoTemplateService } from "../service/VideoTemplateService";
 import Router from "../router";
 import { AllApps } from "./Apps/all";
-
-const loading = ref(true);
 
 const usageData = ref({
     soundGenerate: undefined as undefined | number,
     soundGenerateToday: undefined as undefined | number,
-    soundAsr: undefined as undefined | number,
-    soundAsrToday: undefined as undefined | number,
+    videoTemplateCount: undefined as undefined | number,
     videoGen: undefined as undefined | number,
     videoGenToday: undefined as undefined | number,
-    taskTotal: undefined as undefined | number,
-    taskTotalToday: undefined as undefined | number,
+    toolTotal: undefined as undefined | number,
+    toolTotalToday: undefined as undefined | number,
+    workflowCount: undefined as undefined | number,
+    workflowTotal: undefined as undefined | number,
+    workflowTotalToday: undefined as undefined | number,
+    liveAvatarCount: undefined as undefined | number,
+    liveKnowledgeCount: undefined as undefined | number,
 });
 
 const doUrl = (url: string) => {
@@ -29,337 +38,501 @@ const doUrl = (url: string) => {
 };
 
 onMounted(async () => {
-    loading.value = false;
     nextTick(async () => {
         const todayStart = TimeUtil.formatDate(Date.now()) + " 00:00:00";
         const todayStartTimestamp = TimeUtil.datetimeToTimestamp(todayStart);
-        usageData.value.soundGenerate =
-            await TaskService.count("SoundGenerate");
-        usageData.value.soundGenerateToday = await TaskService.count(
-            "SoundGenerate",
-            todayStartTimestamp,
+        const [
+            soundGenerate,
+            soundGenerateToday,
+            videoTemplateCount,
+            videoGen,
+            videoGenToday,
+            taskTotal,
+            taskTotalToday,
+            workflowCount,
+            workflowTotal,
+            workflowTotalToday,
+            liveAvatarCount,
+            liveKnowledgeCount,
+        ] = await Promise.all([
+            TaskService.count("SoundGenerate"),
+            TaskService.count("SoundGenerate", todayStartTimestamp),
+            VideoTemplateService.count(),
+            TaskService.count("VideoGen"),
+            TaskService.count("VideoGen", todayStartTimestamp),
+            TaskService.count(null),
+            TaskService.count(null, todayStartTimestamp),
+            WorkflowService.count(),
+            WorkflowLogService.count(),
+            WorkflowLogService.count(todayStartTimestamp),
+            StorageService.count("LiveAvatar"),
+            StorageService.count("LiveKnowledge"),
+        ]);
+        usageData.value.soundGenerate = soundGenerate;
+        usageData.value.soundGenerateToday = soundGenerateToday;
+        usageData.value.videoTemplateCount = videoTemplateCount;
+        usageData.value.videoGen = videoGen;
+        usageData.value.videoGenToday = videoGenToday;
+        usageData.value.toolTotal = Math.max(
+            0,
+            taskTotal - soundGenerate - videoGen,
         );
-        usageData.value.soundAsr = await TaskService.count("SoundAsr");
-        usageData.value.soundAsrToday = await TaskService.count(
-            "SoundAsr",
-            todayStartTimestamp,
+        usageData.value.toolTotalToday = Math.max(
+            0,
+            taskTotalToday - soundGenerateToday - videoGenToday,
         );
-        usageData.value.videoGen = await TaskService.count("VideoGen");
-        usageData.value.videoGenToday = await TaskService.count(
-            "VideoGen",
-            todayStartTimestamp,
-        );
-        usageData.value.taskTotal = await TaskService.count(null);
-        usageData.value.taskTotalToday = await TaskService.count(
-            null,
-            todayStartTimestamp,
-        );
+        usageData.value.workflowCount = workflowCount;
+        usageData.value.workflowTotal = workflowTotal;
+        usageData.value.workflowTotalToday = workflowTotalToday;
+        usageData.value.liveAvatarCount = liveAvatarCount;
+        usageData.value.liveKnowledgeCount = liveKnowledgeCount;
     });
 });
 </script>
 
 <template>
     <div
-        class="page-narrow-container p-6 pb-home h-full overflow-hidden overflow-y-auto"
+        class="page-narrow-container p-6 pb-home h-full overflow-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900"
     >
-        <div class="flex">
-            <div class="text-3xl font-bold mb-5 flex-grow">
+        <!-- 标题 -->
+        <div class="flex items-center mb-6">
+            <div
+                class="text-2xl font-bold flex-grow text-gray-800 dark:text-gray-100"
+            >
                 {{ $t("welcome.title") }}
             </div>
-            <div>
-                <a
-                    target="_blank"
-                    class="text-red-500"
-                    href="https://aigcpanel.com/forum"
-                >
-                    <icon-message class="mr-1" />
-                    {{ $t("feedback.help") }}
-                </a>
-            </div>
+            <a
+                target="_blank"
+                class="text-gray-500 hover:text-blue-500 transition-colors text-sm flex items-center"
+                href="https://aigcpanel.com/forum"
+            >
+                <icon-message class="mr-1" />
+                {{ $t("feedback.help") }}
+            </a>
         </div>
-        <div class="mb-5">
-            <div class="flex gap-5 pb-top-area">
-                <div
-                    class="flex-grow w-0 bg-white rounded-lg p-3 bg-contain bg-right bg-no-repeat hover:shadow-lg"
-                >
-                    <div class="font-bold text-xl mb-1">
-                        {{ $t("voice.synthesis") }}
+
+        <!-- 导航卡片 -->
+        <div
+            class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6"
+            data-auto-test-id="home-nav-cards"
+        >
+            <div
+                class="bg-white dark:bg-gray-800 rounded-xl p-5 cursor-pointer hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all group flex items-center justify-between relative overflow-hidden"
+                data-nav="soundGenerate"
+                @click="$router.push('/video?tab=soundGenerate')"
+            >
+                <div class="flex-grow z-10 w-0">
+                    <div
+                        class="font-bold text-gray-800 dark:text-gray-200 text-base mb-1"
+                    >
+                        语音合成
                     </div>
-                    <div class="h-8 truncate overflow-hidden text-gray-500">
+                    <div class="text-gray-500 text-xs truncate pr-2">
                         {{ $t("intro.modelsSupported") }}
                     </div>
-                    <div>
-                        <a-button
-                            type="primary"
-                            @click="$router.push('/sound?tab=soundGenerate')"
-                        >
-                            {{ $t("common.useNow") }}
-                        </a-button>
-                    </div>
                 </div>
                 <div
-                    class="flex-grow w-0 bg-white rounded-lg p-3 bg-contain bg-right bg-no-repeat hover:shadow-lg"
+                    class="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center flex-shrink-0 group-hover:scale-125 group-hover:rotate-12 transition-all duration-300"
                 >
-                    <div class="font-bold text-xl mb-1">
-                        {{ $t("voice.recognition") }}
-                    </div>
-                    <div class="h-8 truncate overflow-hidden text-gray-500">
-                        {{ $t("desc.recognitionDownload") }}
-                    </div>
-                    <div>
-                        <a-button
-                            type="primary"
-                            @click="$router.push('/sound?tab=soundAsr')"
-                        >
-                            {{ $t("common.useNow") }}
-                        </a-button>
-                    </div>
+                    <i-mdi-waveform class="text-indigo-500 text-2xl" />
                 </div>
-                <div
-                    class="flex-grow w-0 bg-white rounded-lg p-3 bg-contain bg-right bg-no-repeat hover:shadow-lg"
-                >
-                    <div class="font-bold text-xl mb-1">
-                        {{ $t("avatar.synthesis") }}
+            </div>
+            <div
+                class="bg-white dark:bg-gray-800 rounded-xl p-5 cursor-pointer hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all group flex items-center justify-between relative overflow-hidden"
+                data-nav="videoGen"
+                @click="$router.push('/video?tab=videoGen')"
+            >
+                <div class="flex-grow z-10 w-0">
+                    <div
+                        class="font-bold text-gray-800 dark:text-gray-200 text-base mb-1"
+                    >
+                        数字人合成
                     </div>
-                    <div class="h-8 truncate overflow-hidden text-gray-500">
+                    <div class="text-gray-500 text-xs truncate pr-2">
                         {{ $t("avatar.audioToVideo") }}
                     </div>
-                    <div>
-                        <a-button
-                            type="primary"
-                            @click="$router.push('/video?tab=videoGen')"
-                        >
-                            {{ $t("common.useNow") }}
-                        </a-button>
+                </div>
+                <div
+                    class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 group-hover:scale-125 group-hover:rotate-12 transition-all duration-300"
+                >
+                    <i-mdi-video-account class="text-blue-500 text-2xl" />
+                </div>
+            </div>
+            <div
+                class="bg-white dark:bg-gray-800 rounded-xl p-5 cursor-pointer hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all group flex items-center justify-between relative overflow-hidden"
+                data-nav="tool"
+                @click="$router.push('/tool')"
+            >
+                <div class="flex-grow z-10 w-0">
+                    <div
+                        class="font-bold text-gray-800 dark:text-gray-200 text-base mb-1"
+                    >
+                        小工具
+                    </div>
+                    <div class="text-gray-500 text-xs truncate pr-2">
+                        视频音频处理工具集
                     </div>
                 </div>
                 <div
-                    class="flex-grow w-0 bg-white rounded-lg p-3 bg-contain bg-right bg-no-repeat hover:shadow-lg"
+                    class="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0 group-hover:scale-125 group-hover:rotate-12 transition-all duration-300"
                 >
-                    <div class="font-bold text-xl mb-1">
-                        {{ $t("avatar.live") }}
+                    <icon-tool class="text-amber-500 text-2xl" />
+                </div>
+            </div>
+            <div
+                class="bg-white dark:bg-gray-800 rounded-xl p-5 cursor-pointer hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all group flex items-center justify-between relative overflow-hidden"
+                data-nav="workflow"
+                @click="$router.push('/workflow')"
+            >
+                <div class="flex-grow z-10 w-0">
+                    <div
+                        class="font-bold text-gray-800 dark:text-gray-200 text-base mb-1"
+                    >
+                        工作流
                     </div>
-                    <div class="h-8 truncate overflow-hidden text-gray-500">
+                    <div class="text-gray-500 text-xs truncate pr-2">
+                        自动化任务编排执行
+                    </div>
+                </div>
+                <div
+                    class="w-12 h-12 rounded-full bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center flex-shrink-0 group-hover:scale-125 group-hover:rotate-12 transition-all duration-300"
+                >
+                    <WorkflowIcon class="text-violet-500 w-6 h-6" />
+                </div>
+            </div>
+            <div
+                class="bg-white dark:bg-gray-800 rounded-xl p-5 cursor-pointer hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all group flex items-center justify-between relative overflow-hidden"
+                data-nav="live"
+                @click="$router.push('/live')"
+            >
+                <div class="flex-grow z-10 w-0">
+                    <div
+                        class="font-bold text-gray-800 dark:text-gray-200 text-base mb-1"
+                    >
+                        智能直播
+                    </div>
+                    <div class="text-gray-500 text-xs truncate pr-2">
                         {{ $t("intro.interactionSupport") }}
                     </div>
-                    <div>
-                        <a-button type="primary" @click="$router.push('/live')">
-                            {{ $t("common.useNow") }}
-                        </a-button>
-                    </div>
+                </div>
+                <div
+                    class="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center flex-shrink-0 group-hover:scale-125 group-hover:rotate-12 transition-all duration-300"
+                >
+                    <icon-live-broadcast class="text-rose-500 text-2xl" />
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-lg p-4 mb-5 hover:shadow-lg">
-            <div class="text-xl font-bold mb-4">
+
+        <!-- 数据统计 -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl p-5 mb-6 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow"
+            data-auto-test-id="home-statistics"
+        >
+            <div
+                class="text-base font-bold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-200"
+            >
                 <icon-bar-chart />
                 {{ $t("dashboard.statistics") }}
             </div>
-            <div class="flex">
-                <div class="flex-grow w-0">
-                    <div class="mb-3">
-                        {{ $t("voice.synthesis") }}
-                    </div>
-                    <div class="font-bold text-2xl mb-3">
-                        <a-statistic
-                            animation
-                            placeholder="-"
-                            :value="usageData.soundGenerate as any"
-                        />
-                    </div>
-                    <div>
-                        {{ $t("dashboard.today") }} +
-                        <a-statistic
-                            animation
-                            placeholder="-"
-                            :value-style="{
-                                color:
-                                    usageData.soundGenerateToday &&
-                                    usageData.soundGenerateToday > 0
-                                        ? 'green'
-                                        : 'gray',
-                                fontSize: '14px',
-                            }"
-                            :value="usageData.soundGenerateToday as any"
-                        />
-                    </div>
-                </div>
-                <div class="flex-grow w-0">
-                    <div class="mb-3">
-                        {{ $t("voice.recognition") }}
-                    </div>
-                    <div class="font-bold text-2xl mb-3">
-                        <a-statistic
-                            animation
-                            placeholder="-"
-                            :value="usageData.soundAsr as any"
-                        />
-                    </div>
-                    <div>
-                        {{ $t("dashboard.today") }} +
-                        <a-statistic
-                            animation
-                            placeholder="-"
-                            :value-style="{
-                                color:
-                                    usageData.soundAsrToday &&
-                                    usageData.soundAsrToday > 0
-                                        ? 'green'
-                                        : 'gray',
-                                fontSize: '14px',
-                            }"
-                            :value="usageData.soundAsrToday as any"
-                        />
-                    </div>
-                </div>
-                <div class="flex-grow w-0">
-                    <div class="mb-3">
-                        {{ $t("avatar.synthesis") }}
-                    </div>
-                    <div class="font-bold text-2xl mb-3">
-                        <a-statistic
-                            animation
-                            placeholder="-"
-                            :value="usageData.videoGen as any"
-                        />
-                    </div>
-                    <div>
-                        {{ $t("dashboard.today") }} +
-                        <a-statistic
-                            animation
-                            placeholder="-"
-                            :value-style="{
-                                color:
-                                    usageData.videoGenToday &&
-                                    usageData.videoGenToday > 0
-                                        ? 'green'
-                                        : 'gray',
-                                fontSize: '14px',
-                            }"
-                            :value="usageData.videoGenToday as any"
-                        />
-                    </div>
-                </div>
-                <div class="flex-grow w-0">
-                    <div class="mb-3">
-                        {{ $t("dashboard.todayTotalTasks") }}
-                    </div>
-                    <div class="font-bold text-2xl mb-3">
-                        <a-statistic
-                            animation
-                            placeholder="-"
-                            :value="usageData.taskTotal as any"
-                        />
-                    </div>
-                    <div>
-                        {{ $t("dashboard.today") }} +
-                        <a-statistic
-                            animation
-                            placeholder="-"
-                            :value-style="{
-                                color:
-                                    usageData.taskTotalToday &&
-                                    usageData.taskTotalToday > 0
-                                        ? 'green'
-                                        : 'gray',
-                                fontSize: '14px',
-                            }"
-                            :value="usageData.taskTotalToday as any"
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="mb-4">
-            <div class="flex gap-5">
-                <a
-                    href="https://aigcpanel.com/zh/asset"
-                    target="_blank"
-                    class="bg-white rounded-lg p-3 flex items-center flex-grow w-0 hover:shadow-lg"
-                >
-                    <div class="flex-grow">
-                        <div class="font-bold text-xl mb-3">
-                            {{ $t("model.market") }}
-                        </div>
-                        <div class="text-gray-600">
-                            {{ $t("intro.modelsUpdate") }}
-                        </div>
-                    </div>
-                    <div>
-                        <icon-right class="text-2xl text-gray-400" />
-                    </div>
-                </a>
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                <!-- 语音合成 -->
                 <div
-                    class="bg-white rounded-lg p-3 flex items-center flex-grow w-0 hover:shadow-lg"
+                    class="flex flex-col gap-2 p-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/20"
                 >
-                    <div class="flex-grow">
-                        <div class="font-bold text-xl mb-3">
-                            {{ $t("nav.feedback") }}
+                    <div class="flex items-center gap-1.5">
+                        <span
+                            class="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0"
+                        ></span>
+                        <span
+                            class="text-xs font-medium text-gray-600 dark:text-gray-400"
+                            >语音合成</span
+                        >
+                    </div>
+                    <div class="flex items-end gap-4">
+                        <div>
+                            <div
+                                class="text-xl font-bold text-gray-800 dark:text-gray-100"
+                            >
+                                {{ usageData.soundGenerate ?? "-" }}
+                            </div>
+                            <div class="text-xs text-gray-400">总数</div>
                         </div>
-                        <div class="text-gray-600">
-                            {{ $t("feedback.anytime") }}
+                        <div>
+                            <div
+                                class="text-xl font-bold"
+                                :class="
+                                    (usageData.soundGenerateToday ?? 0) > 0
+                                        ? 'text-emerald-500'
+                                        : 'text-gray-400'
+                                "
+                            >
+                                +{{ usageData.soundGenerateToday ?? "-" }}
+                            </div>
+                            <div class="text-xs text-gray-400">今日</div>
                         </div>
                     </div>
-                    <div>
-                        <FeedbackTicketButton />
+                </div>
+                <!-- 数字人合成 -->
+                <div
+                    class="flex flex-col gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20"
+                >
+                    <div class="flex items-center gap-1.5">
+                        <span
+                            class="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"
+                        ></span>
+                        <span
+                            class="text-xs font-medium text-gray-600 dark:text-gray-400"
+                            >数字人合成</span
+                        >
+                    </div>
+                    <div class="flex items-end gap-4">
+                        <div>
+                            <div
+                                class="text-xl font-bold text-gray-800 dark:text-gray-100"
+                            >
+                                {{ usageData.videoGen ?? "-" }}
+                            </div>
+                            <div class="text-xs text-gray-400">总数</div>
+                        </div>
+                        <div>
+                            <div
+                                class="text-xl font-bold"
+                                :class="
+                                    (usageData.videoGenToday ?? 0) > 0
+                                        ? 'text-emerald-500'
+                                        : 'text-gray-400'
+                                "
+                            >
+                                +{{ usageData.videoGenToday ?? "-" }}
+                            </div>
+                            <div class="text-xs text-gray-400">今日</div>
+                        </div>
+                        <div class="ml-auto self-start">
+                            <div class="text-xs text-gray-400">
+                                形象{{ usageData.videoTemplateCount ?? "-" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 小工具 -->
+                <div
+                    class="flex flex-col gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20"
+                >
+                    <div class="flex items-center gap-1.5">
+                        <span
+                            class="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"
+                        ></span>
+                        <span
+                            class="text-xs font-medium text-gray-600 dark:text-gray-400"
+                            >小工具</span
+                        >
+                    </div>
+                    <div class="flex items-end gap-4">
+                        <div>
+                            <div
+                                class="text-xl font-bold text-gray-800 dark:text-gray-100"
+                            >
+                                {{ usageData.toolTotal ?? "-" }}
+                            </div>
+                            <div class="text-xs text-gray-400">总数</div>
+                        </div>
+                        <div>
+                            <div
+                                class="text-xl font-bold"
+                                :class="
+                                    (usageData.toolTotalToday ?? 0) > 0
+                                        ? 'text-emerald-500'
+                                        : 'text-gray-400'
+                                "
+                            >
+                                +{{ usageData.toolTotalToday ?? "-" }}
+                            </div>
+                            <div class="text-xs text-gray-400">今日</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 工作流 -->
+                <div
+                    class="flex flex-col gap-2 p-3 rounded-lg bg-violet-50 dark:bg-violet-900/20"
+                >
+                    <div class="flex items-center gap-1.5">
+                        <span
+                            class="w-2 h-2 rounded-full bg-violet-500 flex-shrink-0"
+                        ></span>
+                        <span
+                            class="text-xs font-medium text-gray-600 dark:text-gray-400"
+                            >工作流</span
+                        >
+                    </div>
+                    <div class="flex items-end gap-4">
+                        <div>
+                            <div
+                                class="text-xl font-bold text-gray-800 dark:text-gray-100"
+                            >
+                                {{ usageData.workflowTotal ?? "-" }}
+                            </div>
+                            <div class="text-xs text-gray-400">总数</div>
+                        </div>
+                        <div>
+                            <div
+                                class="text-xl font-bold"
+                                :class="
+                                    (usageData.workflowTotalToday ?? 0) > 0
+                                        ? 'text-emerald-500'
+                                        : 'text-gray-400'
+                                "
+                            >
+                                +{{ usageData.workflowTotalToday ?? "-" }}
+                            </div>
+                            <div class="text-xs text-gray-400">今日</div>
+                        </div>
+                        <div class="ml-auto self-start">
+                            <div class="text-xs text-gray-400">
+                                共{{ usageData.workflowCount ?? "-" }}个
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 智能直播 -->
+                <div
+                    class="flex flex-col gap-2 p-3 rounded-lg bg-rose-50 dark:bg-rose-900/20"
+                >
+                    <div class="flex items-center gap-1.5">
+                        <span
+                            class="w-2 h-2 rounded-full bg-rose-500 flex-shrink-0"
+                        ></span>
+                        <span
+                            class="text-xs font-medium text-gray-600 dark:text-gray-400"
+                            >智能直播</span
+                        >
+                    </div>
+                    <div class="flex items-end gap-4">
+                        <div>
+                            <div
+                                class="text-xl font-bold text-gray-800 dark:text-gray-100"
+                            >
+                                {{ usageData.liveAvatarCount ?? "-" }}
+                            </div>
+                            <div class="text-xs text-gray-400">形象</div>
+                        </div>
+                        <div>
+                            <div
+                                class="text-xl font-bold text-gray-800 dark:text-gray-100"
+                            >
+                                {{ usageData.liveKnowledgeCount ?? "-" }}
+                            </div>
+                            <div class="text-xs text-gray-400">知识库</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-lg p-4 mb-5">
-            <div class="text-xl font-bold mb-4">
-                <icon-tool />
-                {{ $t("nav.apps") }}
+
+        <!-- 云端 AI 模型 / 模型市场 / 工单反馈 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <a
+                href="https://aigcpanel.com/zh/asset"
+                target="_blank"
+                class="bg-white dark:bg-gray-800 rounded-xl p-4 flex items-center hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all group"
+            >
+                <div
+                    class="w-14 h-14 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center mr-3 flex-shrink-0 text-emerald-500"
+                >
+                    <icon-apps class="text-2xl" />
+                </div>
+                <div class="flex-grow">
+                    <div
+                        class="font-medium text-sm text-gray-800 dark:text-gray-200"
+                    >
+                        {{ $t("model.market") }}
+                    </div>
+                    <div class="text-gray-400 text-xs mt-0.5">
+                        {{ $t("intro.modelsUpdate") }}
+                    </div>
+                </div>
+                <icon-right
+                    class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                />
+            </a>
+
+            <div
+                class="bg-white dark:bg-gray-800 rounded-xl p-4 flex items-center hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all group"
+            >
+                <div
+                    class="w-14 h-14 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-center mr-3 flex-shrink-0 text-gray-500 dark:text-gray-400"
+                >
+                    <icon-message class="text-2xl" />
+                </div>
+                <div class="flex-grow">
+                    <div
+                        class="font-medium text-sm text-gray-800 dark:text-gray-200"
+                    >
+                        {{ $t("nav.feedback") }}
+                    </div>
+                    <div class="text-gray-400 text-xs mt-0.5">
+                        {{ $t("feedback.anytime") }}
+                    </div>
+                </div>
+                <FeedbackTicketButton />
             </div>
-            <div class="flex flex-wrap gap-5 mt-3">
+        </div>
+
+        <!-- 小工具功能卡片 -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl p-5 mb-5 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow"
+            data-auto-test-id="home-tool-apps"
+        >
+            <div
+                class="text-base font-bold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-200"
+            >
+                <icon-tool />
+                小工具
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 <div
                     v-for="(app, index) in AllApps"
                     :key="index"
-                    class="bg-white rounded-lg p-3 flex items-center flex-grow w-64 cursor-pointer border hover:shadow-xl"
+                    class="flex items-center gap-4 px-4 py-3 rounded-xl border border-gray-100 dark:border-gray-700 cursor-pointer hover:shadow-md hover:border-gray-200 dark:hover:border-gray-600 transition-all group"
+                    :data-app="app.name ?? index"
                     @click="doUrl(app.url)"
                 >
-                    <div>
-                        <img
-                            :src="app.icon"
-                            class="w-8 h-8 object-contain mr-3"
+                    <div
+                        class="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-700/60 flex items-center justify-center flex-shrink-0"
+                    >
+                        <component
+                            :is="
+                                typeof app.icon === 'string' ? 'img' : app.icon
+                            "
+                            :src="
+                                typeof app.icon === 'string'
+                                    ? app.icon
+                                    : undefined
+                            "
+                            class="w-6 h-6 object-contain opacity-80 group-hover:opacity-100 transition-opacity"
+                            :style="
+                                typeof app.icon === 'string'
+                                    ? {}
+                                    : { color: app.color }
+                            "
                         />
                     </div>
-                    <div class="flex-grow">
-                        <div class="font-bold text-lg mb-1">
+                    <div class="min-w-0 flex-grow">
+                        <div
+                            class="font-medium text-sm text-gray-700 dark:text-gray-300 truncate"
+                        >
                             {{ app.title }}
                         </div>
-                        <div class="h-8 truncate overflow-hidden text-gray-500">
+                        <div class="text-gray-400 text-xs truncate mt-0.5">
                             {{ app.description }}
                         </div>
                     </div>
-                    <div>
-                        <icon-right class="text-gray-400" />
-                    </div>
+                    <icon-right
+                        class="text-gray-300 dark:text-gray-600 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
                 </div>
             </div>
         </div>
     </div>
 </template>
 
-<style lang="less" scoped>
-.pb-top-area > div {
-    background-size: 3rem;
-    background-position: 95% center;
-
-    &:nth-child(1) {
-        background-image: url(./../assets/image/icon/soundGenerate.png);
-    }
-
-    &:nth-child(2) {
-        background-image: url(./../assets/image/icon/soundAsr.png);
-    }
-
-    &:nth-child(3) {
-        background-image: url(./../assets/image/icon/videoGen.png);
-    }
-
-    &:nth-child(4) {
-        background-image: url(./../assets/image/icon/live.png);
-    }
-}
-</style>
+<style scoped></style>

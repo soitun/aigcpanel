@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import SoundAsrForm from "../../../Sound/components/SoundAsrForm.vue";
-import SoundGenerateForm from "../../../Sound/components/SoundGenerateForm.vue";
-import SoundGenerateFormView from "../../../Sound/components/SoundGenerateFormView.vue";
-import SoundAsrFormView from "../../../Sound/components/SoundAsrFormView.vue";
+import SoundAsrForm from "../../../Video/components/SoundAsrForm.vue";
+import SoundGenerateForm from "../../../Video/components/SoundGenerateForm.vue";
+import SoundGenerateFormView from "../../../Video/components/SoundGenerateFormView.vue";
+import SoundAsrFormView from "../../../Video/components/SoundAsrFormView.vue";
 
 const props = defineProps<{
     node: any;

@@ -8,13 +8,13 @@ import {
 } from "../../../../module/Workflow/core/type";
 import { workflowRun } from "../../common/workflow";
 import { TextToImageRun } from "../task";
-import TextToImageIcon from "./../assets/icon.svg";
+import AppIcon from "~icons/mdi/image-text";
 
 export default <NodeFunctionCall>{
     name: "TextToImage",
     title: t("model.txt2img"),
     description: t("app.textToImageDesc"),
-    icon: TextToImageIcon,
+    icon: AppIcon,
     comp: defineAsyncComponent(() => import("./TextToImageNode.vue")),
     inputFields: [
         {

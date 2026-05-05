@@ -2,6 +2,7 @@
 import { t } from "../lang";
 import { ref } from "vue";
 import { Dialog } from "../lib/dialog";
+import MEmpty from "./common/MEmpty.vue";
 
 const props = defineProps({
     text: {

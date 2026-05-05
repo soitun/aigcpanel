@@ -19,6 +19,8 @@ import VideoGenCreate from "./components/VideoGenCreate.vue";
 import VideoGenFormViewBody from "./components/VideoGenFormViewBody.vue";
 import ServerNameVersion from "../../components/Server/ServerNameVersion.vue";
 import TextTruncateView from "../../components/TextTruncateView.vue";
+import ListerTop from "../../components/common/ListerTop.vue";
+import MEmpty from "../../components/common/MEmpty.vue";
 
 const videoGenCreate = ref<InstanceType<typeof VideoGenCreate> | null>(null);
 
@@ -44,60 +46,42 @@ const doRefresh = async () => {
 
 <template>
     <div class="p-5">
-        <div class="mb-4 flex items-center">
-            <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">
-                    {{ $t("avatar.synthesis") }}
-                </div>
-                <div class="text-gray-400 ml-3">{{ $t("intro.lipSync") }}</div>
+        <div class="mb-4 flex items-end">
+            <div class="text-3xl font-bold">
+                {{ $t("avatar.synthesis") }}
             </div>
-            <div class="flex items-center">
-                <a-tooltip
-                    v-if="0"
-                    :content="$t('common.clearHistory')"
-                    position="right"
-                    mini
-                >
-                    <a-button class="ml-1">
-                        <template #icon>
-                            <icon-delete />
-                        </template>
-                    </a-button>
-                </a-tooltip>
-            </div>
+            <div class="text-gray-400 ml-3">{{ $t("intro.lipSync") }}</div>
         </div>
         <div>
             <VideoGenCreate ref="videoGenCreate" @submitted="doRefresh" />
-            <div v-if="records.length > 0">
-                <div
-                    class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center"
+            <ListerTop
+                class="mt-4"
+                :total="records.length"
+                @refresh="doRefresh"
+            >
+                <a-checkbox
+                    :model-value="isAllChecked"
+                    :indeterminate="isIndeterminate"
+                    @change="onCheckAll"
                 >
-                    <div class="flex-grow flex items-center">
-                        <div class="mr-3">
-                            <a-checkbox
-                                :model-value="isAllChecked"
-                                :indeterminate="isIndeterminate"
-                                @change="onCheckAll"
-                            >
-                                {{ $t("common.selectAll") }}
-                            </a-checkbox>
-                        </div>
-                        <TaskBatchDeleteAction
-                            :records="checkRecords"
-                            @update="doRefresh"
-                        />
-                        <TaskBatchDownloadAction :records="checkRecords" />
-                    </div>
-                    <div>
-                        <a-pagination
-                            v-model:current="page"
-                            :total="records.length"
-                            :page-size="10"
-                            show-total
-                            simple
-                        />
-                    </div>
-                </div>
+                    {{ $t("common.selectAll") }}
+                </a-checkbox>
+                <TaskBatchDeleteAction
+                    :records="checkRecords"
+                    @update="doRefresh"
+                />
+                <TaskBatchDownloadAction :records="checkRecords" />
+                <template #actions>
+                    <a-pagination
+                        v-model:current="page"
+                        :total="records.length"
+                        :page-size="10"
+                        show-total
+                        simple
+                    />
+                </template>
+            </ListerTop>
+            <div v-if="records.length > 0">
                 <div v-for="r in recordsForPage" :key="r.id">
                     <div
                         class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg"

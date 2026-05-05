@@ -69,7 +69,7 @@ defineExpose({
 <template>
     <a-select
         ref="select"
-        style="width: auto"
+        style="min-width: 200px; width: auto"
         :placeholder="$t('model.select')"
     >
         <template #label>

@@ -15,9 +15,11 @@ import { useCheckAll } from "../../../components/common/check-all";
 import { usePaginate } from "../../../hooks/paginate";
 import { useTaskChangeRefresh } from "../../../hooks/task";
 import { TaskRecord, TaskService } from "../../../service/TaskService";
-import SoundGenerateFormViewBody from "../../Sound/components/SoundGenerateFormViewBody.vue";
+import SoundGenerateFormViewBody from "../../Video/components/SoundGenerateFormViewBody.vue";
 import VideoGenFormViewBody from "../../Video/components/VideoGenFormViewBody.vue";
 import VideoGenFlowCreate from "./components/VideoGenFlowCreate.vue";
+import ListerTop from "../../../components/common/ListerTop.vue";
+import MEmpty from "../../../components/common/MEmpty.vue";
 
 const videoGenFlowCreate = ref<InstanceType<typeof VideoGenFlowCreate> | null>(
     null,
@@ -72,36 +74,34 @@ onMounted(() => {
                 ref="videoGenFlowCreate"
                 @submitted="doRefresh"
             />
-            <div v-if="records.length > 0">
-                <div
-                    class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg flex items-center"
+            <ListerTop
+                class="mt-4"
+                :total="records.length"
+                @refresh="doRefresh"
+            >
+                <a-checkbox
+                    :model-value="isAllChecked"
+                    :indeterminate="isIndeterminate"
+                    @change="onCheckAll"
                 >
-                    <div class="flex-grow flex items-center">
-                        <div class="mr-3">
-                            <a-checkbox
-                                :model-value="isAllChecked"
-                                :indeterminate="isIndeterminate"
-                                @change="onCheckAll"
-                            >
-                                {{ $t("common.selectAll") }}
-                            </a-checkbox>
-                        </div>
-                        <TaskBatchDeleteAction
-                            :records="checkRecords"
-                            @update="doRefresh"
-                        />
-                        <TaskBatchDownloadAction :records="checkRecords" />
-                    </div>
-                    <div>
-                        <a-pagination
-                            v-model:current="page"
-                            :total="records.length"
-                            :page-size="10"
-                            show-total
-                            simple
-                        />
-                    </div>
-                </div>
+                    {{ $t("common.selectAll") }}
+                </a-checkbox>
+                <TaskBatchDeleteAction
+                    :records="checkRecords"
+                    @update="doRefresh"
+                />
+                <TaskBatchDownloadAction :records="checkRecords" />
+                <template #actions>
+                    <a-pagination
+                        v-model:current="page"
+                        :total="records.length"
+                        :page-size="10"
+                        show-total
+                        simple
+                    />
+                </template>
+            </ListerTop>
+            <div v-if="records.length > 0">
                 <div v-for="r in recordsForPage" :key="r.id">
                     <div
                         class="rounded-xl shadow border p-4 mt-4 hover:shadow-lg"

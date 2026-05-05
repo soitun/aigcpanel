@@ -85,4 +85,11 @@ export const VideoTemplateService = {
             values,
         );
     },
+    async count(): Promise<number> {
+        const result = await window.$mapi.db.first(
+            `SELECT COUNT(*) as cnt FROM ${this.tableName()}`,
+            [],
+        );
+        return result.cnt;
+    },
 };

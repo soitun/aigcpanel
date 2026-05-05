@@ -8,13 +8,13 @@ import {
 } from "../../../../module/Workflow/core/type";
 import { workflowRun } from "../../common/workflow";
 import { ImageToImageRun } from "../task";
-import ImageToImageIcon from "./../assets/icon.svg";
+import AppIcon from "~icons/mdi/image-filter-none";
 
 export default <NodeFunctionCall>{
     name: "ImageToImage",
     title: t("model.img2img"),
     description: t("app.imageToImageDesc"),
-    icon: ImageToImageIcon,
+    icon: AppIcon,
     comp: defineAsyncComponent(() => import("./ImageToImageNode.vue")),
     inputFields: [
         {

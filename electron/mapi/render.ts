@@ -16,6 +16,7 @@ import misc from "./misc/render";
 
 import server from "./server/render";
 import httpserver from "./httpserver/render";
+import workflow from "./workflow/render";
 
 export const MAPI = {
     init(env: typeof AppEnv = null) {
@@ -36,6 +37,7 @@ export const MAPI = {
                 misc,
                 server,
                 httpserver,
+                workflow,
             });
             db.init();
             event.init();
