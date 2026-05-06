@@ -68,6 +68,17 @@ jobs:
         run: |
           brew install python-setuptools
 
+      - name: Build Prepare (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install gtk-runtime -y --no-progress
+          $gtkInstall = Get-ChildItem "C:\Program Files\" | Where-Object { $_.Name -like "*GTK*" } | Select-Object -First 1 -ExpandProperty FullName
+          if ($gtkInstall -and -not (Test-Path "C:\GTK")) {
+            New-Item -ItemType Junction -Path "C:\GTK" -Target $gtkInstall
+          }
+          "C:\GTK\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Cert Prepare (macOS)
         if: runner.os == 'macOS'
         env:
@@ -95,7 +106,8 @@ jobs:
           echo "find-identity"
           security find-identity -p codesigning
 
-      - name: Install Dependencies
+      - name: Install Dependencies (macOS)
+        if: runner.os == 'macOS'
         working-directory: code
         run: npm install
 
