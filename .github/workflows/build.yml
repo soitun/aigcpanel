@@ -121,8 +121,7 @@ jobs:
 
       - name: Build Release Files
         working-directory: code
-        run: |
-            npm run build
+        run: npm run build
         env:
           DEBUG: "electron-notarize:*"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
