@@ -50,6 +50,19 @@ jobs:
         with:
           node-version: 20
 
+      - name: Build Prepare (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            pkg-config \
+            libcairo2-dev \
+            libpango1.0-dev \
+            libjpeg-dev \
+            libgif-dev \
+            librsvg2-dev
+
       - name: Build Prepare (macOS)
         if: runner.os == 'macOS'
         run: |
