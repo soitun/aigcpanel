@@ -84,7 +84,9 @@ jobs:
           $src = "C:\vcpkg\installed\x64-windows"
           foreach ($d in @("include", "lib", "bin")) {
             New-Item -ItemType Directory -Force -Path "C:\GTK\$d" | Out-Null
-            robocopy "$src\$d" "C:\GTK\$d" /E /NFL /NDL /NJH /NJS | Out-Null
+            robocopy "$src\$d" "C:\GTK\$d" /E /NFL /NDL /NJH /NJS
+            if ($LASTEXITCODE -ge 8) { throw "robocopy failed with exit code $LASTEXITCODE" }
+            $global:LASTEXITCODE = 0
           }
           # canvas expects png16.lib but vcpkg provides libpng16.lib
           if (Test-Path "C:\GTK\lib\libpng16.lib") {
@@ -193,6 +195,7 @@ jobs:
           key-secret: ${{ secrets.OSS_2_KEY_SECRET }}
           region: ${{ secrets.OSS_2_REGION }}
           bucket: ${{ secrets.OSS_2_BUCKET }}
+          callbackTitle: ✅AIGCPanel打包成功
           callback: ${{ secrets.OSS_2_CALLBACK }}
           assets: |
             code/dist-release/*.exe:apps/aigcpanel-${{ env.DIST_FILE_NAME }}/
