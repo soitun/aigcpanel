@@ -111,6 +111,12 @@ jobs:
         working-directory: code
         run: npm install
 
+      - name: Install Dependencies (Windows)
+        if: runner.os == 'Windows'
+        working-directory: code
+        shell: pwsh
+        run: npm install
+
       - name: init ( Windows )
         if: runner.os == 'Windows'
         working-directory: code
