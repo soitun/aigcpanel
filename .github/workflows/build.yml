@@ -68,14 +68,31 @@ jobs:
         run: |
           brew install python-setuptools
 
+      - name: Cache vcpkg packages (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/cache@v4
+        with:
+          path: C:\vcpkg\installed\x64-windows
+          key: vcpkg-canvas-x64-windows-v1
+
       - name: Build Prepare (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          choco install gtk-runtime -y --no-progress
-          $gtkInstall = Get-ChildItem "C:\Program Files\" | Where-Object { $_.Name -like "*GTK*" } | Select-Object -First 1 -ExpandProperty FullName
-          if ($gtkInstall -and -not (Test-Path "C:\GTK")) {
-            New-Item -ItemType Junction -Path "C:\GTK" -Target $gtkInstall
+          # Install Cairo/Pango dev libraries for canvas@2.11.2 source compilation
+          & C:\vcpkg\vcpkg.exe install --triplet x64-windows cairo pango libjpeg-turbo
+          $src = "C:\vcpkg\installed\x64-windows"
+          foreach ($d in @("include", "lib", "bin")) {
+            New-Item -ItemType Directory -Force -Path "C:\GTK\$d" | Out-Null
+            robocopy "$src\$d" "C:\GTK\$d" /E /NFL /NDL /NJH /NJS | Out-Null
+          }
+          # canvas expects png16.lib but vcpkg provides libpng16.lib
+          if (Test-Path "C:\GTK\lib\libpng16.lib") {
+            Copy-Item "C:\GTK\lib\libpng16.lib" "C:\GTK\lib\png16.lib"
+          }
+          # gthread-2.0 is merged into glib in newer versions
+          if (-not (Test-Path "C:\GTK\lib\gthread-2.0.lib") -and (Test-Path "C:\GTK\lib\glib-2.0.lib")) {
+            Copy-Item "C:\GTK\lib\glib-2.0.lib" "C:\GTK\lib\gthread-2.0.lib"
           }
           "C:\GTK\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
