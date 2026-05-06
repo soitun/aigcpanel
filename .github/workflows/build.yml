@@ -106,8 +106,8 @@ jobs:
           echo "find-identity"
           security find-identity -p codesigning
 
-      - name: Install Dependencies (macOS)
-        if: runner.os == 'macOS'
+      - name: Install Dependencies (Linux/macOS)
+        if: runner.os == 'Linux' || runner.os == 'macOS'
         working-directory: code
         run: npm install
 
