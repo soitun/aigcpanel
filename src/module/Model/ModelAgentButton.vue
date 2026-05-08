@@ -115,10 +115,9 @@ const doGenerate = async () => {
 </script>
 
 <template>
-    <ModelGenerator ref="modelGenerator" :biz="biz" />
     <a-button class="mr-1" @click="showDialog" :loading="buttonLoading">
         <template #icon>
-            <icon-robot />
+            <slot name="icon"><icon-robot /></slot>
         </template>
         {{ title }}
     </a-button>
@@ -132,6 +131,9 @@ const doGenerate = async () => {
             }}</a-button>
         </template>
         <div>
+            <div class="mb-3">
+                <ModelGenerator ref="modelGenerator" :biz="biz" />
+            </div>
             <div v-if="formItems.length > 0">
                 <a-form layout="vertical" :model="{}">
                     <a-form-item

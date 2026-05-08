@@ -7,6 +7,11 @@ import { PermissionService } from "../../../../service/PermissionService";
 import { TaskRecord, TaskService } from "../../../../service/TaskService";
 import SoundGenerateForm from "../../../Video/components/SoundGenerateForm.vue";
 import VideoGenForm from "../../../Video/components/VideoGenForm.vue";
+import ModelAgentButton from "../../../../module/Model/ModelAgentButton.vue";
+import {
+    SoundGenerateTextFormItems,
+    SoundGenerateTextPrompt,
+} from "../../../Video/components/config/prompt";
 
 const soundGenerateForm = ref<InstanceType<typeof SoundGenerateForm> | null>(
     null,
@@ -78,12 +83,21 @@ const emit = defineEmits({
     <div class="rounded-xl shadow border p-4">
         <VideoGenForm ref="videoGenForm" />
         <SoundGenerateForm ref="soundGenerateForm" />
-        <div class="mb-4">
+        <div class="mb-4 relative">
             <a-textarea
                 v-model="formData.text"
                 :auto-size="{ minRows: 2 }"
                 :placeholder="$t('app.inputVideoGenPlaceholder')"
             ></a-textarea>
+            <div class="absolute bottom-1 right-1">
+                <ModelAgentButton
+                    biz="VideoGenFlowTextPrompt"
+                    title="文案生成"
+                    @result="formData.text = $event"
+                    :form-items="SoundGenerateTextFormItems"
+                    :prompt-default="SoundGenerateTextPrompt"
+                />
+            </div>
         </div>
         <div>
             <a-button class="mr-2" type="primary" @click="doSubmit">

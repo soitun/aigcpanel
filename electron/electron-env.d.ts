@@ -1,5 +1,7 @@
 /// <reference types="vite-plugin-electron/electron-env" />
 
+declare const __BUILD_ID__: string;
+
 declare namespace NodeJS {
     interface ProcessEnv {
         /**

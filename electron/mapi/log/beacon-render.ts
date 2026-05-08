@@ -4,10 +4,13 @@
  */
 import { AppConfig } from "../../../src/config";
 
+declare const __BUILD_ID__: string;
+
 const BEACON_URL = "https://g.tecmz.com/grow/load.gif";
 const BEACON_APP = "aigcpanel";
 const isPackaged = process.env["IS_PACKAGED"] === "true";
 const sessionId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+const buildId = typeof __BUILD_ID__ !== "undefined" ? __BUILD_ID__ : "unknown";
 
 interface BeaconEvent {
     et: "error";
@@ -16,6 +19,7 @@ interface BeaconEvent {
     sid: string;
     ts: number;
     type: string;
+    bid: string;
     props: {
         msg: string;
         stack?: string;
@@ -62,6 +66,7 @@ export const reportErrorRender = (
         sid: sessionId,
         ts: Date.now(),
         type: `app-${AppConfig.version}`,
+        bid: buildId,
         props: { msg, stack, src, line, col },
     });
     schedule();

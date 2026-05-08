@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onBeforeMount, onMounted, ref } from "vue";
-import PageNav from "./../components/PageNav.vue";
-import { AppConfig } from "../config";
-import { t } from "../lang";
+import { useRouter } from "vue-router";
 import AppQuitConfirm from "../components/AppQuitConfirm.vue";
 import { useDragWindow } from "../components/common/dragWindow";
-import { useRouter } from "vue-router";
+import { AppConfig } from "../config";
+import { t } from "../lang";
 import { isDev } from "../lib/env";
+import PageNav from "./../components/PageNav.vue";
 
 const router = useRouter();
 
@@ -52,7 +52,7 @@ const currentRoute = ref("");
 const doDebugCopyRoute = async () => {
     currentRoute.value = router.currentRoute.value.fullPath;
     await window.$mapi.app.setClipboardText(currentRoute.value);
-    window.$mapi.app.toast(t("common.copied"), "success");
+    window.$mapi.app.toast(t("common.copySuccess"), "success");
 };
 const doDebugToggle = () => {
     currentRoute.value = router.currentRoute.value.fullPath;
@@ -120,7 +120,7 @@ const doDebugToggle = () => {
     <AppQuitConfirm ref="appQuitConfirm" />
     <!-- 调试弹窗 -->
     <template v-if="isDev">
-        <div class="fixed bottom-4 right-4 z-50">
+        <div class="fixed top-10 left-0 z-50">
             <a-button
                 shape="circle"
                 size="mini"
@@ -132,7 +132,7 @@ const doDebugToggle = () => {
         </div>
         <div
             v-if="debugVisible"
-            class="fixed bottom-14 right-4 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-3 w-80"
+            class="fixed top-14 left-4 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-3 w-80"
         >
             <div class="font-bold text-sm mb-2">调试信息</div>
             <div class="flex items-center gap-2">

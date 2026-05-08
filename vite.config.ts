@@ -26,8 +26,13 @@ export default defineConfig(({command}) => {
 
     const isServe = command === "serve";
     const isBuild = command === "build";
-    const sourcemap = isServe || !!process.env.VSCODE_DEBUG;
+    const sourcemap = isServe || !!process.env.VSCODE_DEBUG ? true : 'hidden';
     const minify = isBuild && !process.env.VSCODE_DEBUG;
+    const _platformMap: Record<string, string> = { win32: "win", darwin: "osx", linux: "linux" };
+    const _archMap: Record<string, string> = { x64: "x64", arm64: "arm64", ia32: "x86" };
+    const _platform = _platformMap[process.platform] ?? process.platform;
+    const _arch = _archMap[process.arch] ?? process.arch;
+    const buildId = `${_platform}-${_arch}-${dayjs().tz("Asia/Shanghai").format("YYYYMMDDHHmmss")}`;
 
     const externalPackages = [
         ...Object.keys("dependencies" in pkg ? pkg.dependencies : {}),
@@ -75,7 +80,6 @@ export default defineConfig(({command}) => {
             {
                 name: "add-build-time",
                 generateBundle() {
-                    const buildId = dayjs().tz("Asia/Shanghai").format("YYYYMMDDHHmmss");
                     this.emitFile({
                         type: "asset",
                         fileName: "build.json",
@@ -129,6 +133,9 @@ export default defineConfig(({command}) => {
                         }
                     },
                     vite: {
+                        define: {
+                            __BUILD_ID__: JSON.stringify(buildId),
+                        },
                         build: {
                             sourcemap,
                             minify: minify,
@@ -176,6 +183,9 @@ export default defineConfig(({command}) => {
             ]),
             renderer(),
         ],
+        define: {
+            __BUILD_ID__: JSON.stringify(buildId),
+        },
         build: {
             sourcemap: sourcemap,
             rollupOptions: {

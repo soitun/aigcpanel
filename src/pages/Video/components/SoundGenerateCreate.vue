@@ -104,21 +104,23 @@ const emit = defineEmits({
 
 <template>
     <div class="rounded-xl shadow border p-4">
-        <div class="mb-1">
+        <div class="mb-1 relative">
             <a-textarea
                 v-model="formData.text"
                 :auto-size="{ minRows: 2 }"
                 :placeholder="$t('hint.inputVoiceSynthesis')"
             ></a-textarea>
+            <div class="absolute z-50 bottom-3 right-1">
+                <ModelAgentButton
+                    biz="SoundGenerateTextPrompt"
+                    title="文案生成"
+                    @result="formData.text = $event"
+                    :form-items="SoundGenerateTextFormItems"
+                    :prompt-default="SoundGenerateTextPrompt"
+                />
+            </div>
         </div>
-        <div class="mb-2 flex gap-1">
-            <ModelAgentButton
-                biz="SoundGenerateTextPrompt"
-                @result="formData.text = $event"
-                :form-items="SoundGenerateTextFormItems"
-                :prompt-default="SoundGenerateTextPrompt"
-            />
-        </div>
+        <div class="mb-2 flex gap-1"></div>
         <SoundGenerateForm ref="soundGenerateForm" />
         <div class="flex gap-1">
             <a-button class="mr-2" type="primary" @click="doSubmit">
