@@ -92,21 +92,13 @@ jobs:
       - name: Install Dependencies (Linux/macOS)
         if: runner.os == 'Linux' || runner.os == 'macOS'
         working-directory: code
-        run: |
-          # canvas is only used in renderer via fabric (browser Canvas API), no native rebuild needed
-          npm install --ignore-scripts
-          rm -rf node_modules/canvas
-          npx electron-builder install-app-deps
+        run: npm install
 
       - name: Install Dependencies (Windows)
         if: runner.os == 'Windows'
         working-directory: code
         shell: pwsh
-        run: |
-          # canvas is only used in renderer via fabric (browser Canvas API), no native rebuild needed
-          npm install --ignore-scripts
-          if (Test-Path node_modules\canvas) { Remove-Item -Recurse -Force node_modules\canvas }
-          npx electron-builder install-app-deps
+        run: npm install
 
       - name: init ( Windows )
         if: runner.os == 'Windows'
@@ -150,6 +142,28 @@ jobs:
         if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
           find code/dist-release/ -type f -name 'AigcPanelPro-*' -exec bash -c 'f="{}"; mv "$f" "${f/AigcPanelPro-/AigcPanel-}"' \;
+
+      - name: Upload Sourcemaps
+        if: runner.os == 'Linux'
+        working-directory: code
+        env:
+          GROW_URL: ${{ secrets.GROW_URL }}
+          GROW_APP_NAME: ${{ secrets.GROW_APP_NAME }}
+          GROW_ADMIN_API_TOKEN: ${{ secrets.GROW_ADMIN_API_TOKEN }}
+        run: |
+          BUILD_ID=$(node -p "require('./dist/build.json').buildId")
+          echo "Uploading sourcemaps for buildId=${BUILD_ID} ..."
+          find dist dist-electron/main -name "*.map" | while read f; do
+            echo "  uploading $f"
+            RESP=$(curl -s -X POST "${GROW_URL}/api/admin/grow/buildUpload" \
+              -H "Authorization: Bearer ${GROW_ADMIN_API_TOKEN}" \
+              -F "appName=${GROW_APP_NAME}" \
+              -F "buildId=${BUILD_ID}" \
+              -F "file=@${f}" \
+              -F "name=${f}")
+            echo "  response: ${RESP}"
+          done
+          echo "Sourcemap upload done."
 
       - name: Rename output files (Windows)
         if: runner.os == 'Windows'
