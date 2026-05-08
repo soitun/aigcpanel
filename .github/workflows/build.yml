@@ -180,7 +180,7 @@ jobs:
           key-secret: ${{ secrets.OSS_2_KEY_SECRET }}
           region: ${{ secrets.OSS_2_REGION }}
           bucket: ${{ secrets.OSS_2_BUCKET }}
-          callbackTitle: ✅AIGCPanel打包成功
+          callbackTitle: ✅AIGCPanel-${{ runner.os }}-打包成功
           callback: ${{ secrets.OSS_2_CALLBACK }}
           assets: |
             code/dist-release/*.exe:apps/aigcpanel-${{ env.DIST_FILE_NAME }}/
