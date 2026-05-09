@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import TaskCancelAction from "../../../../components/Server/TaskCancelAction.vue";
 import TaskContinueAction from "../../../../components/Server/TaskContinueAction.vue";
 import TaskDeleteAction from "../../../../components/Server/TaskDeleteAction.vue";
 import TaskDownloadAction from "../../../../components/Server/TaskDownloadAction.vue";
@@ -128,6 +129,7 @@ const props = defineProps<{
                     @update="onRefresh"
                 />
                 <TaskContinueAction :record="record" @update="onRefresh" />
+                <TaskCancelAction :record="record" />
             </div>
         </div>
     </div>

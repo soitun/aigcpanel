@@ -32,7 +32,10 @@ const isCloud = computed(() => {
 
 <template>
     <a-tooltip
-        v-if="!isCloud && record.status === 'running'"
+        v-if="
+            !isCloud &&
+            (record.status === 'running' || record.status === 'queue')
+        "
         :content="$t('task.cancel')"
         mini
     >

@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue";
 import ServerNameVersion from "../../../components/Server/ServerNameVersion.vue";
 import TaskBatchDeleteAction from "../../../components/Server/TaskBatchDeleteAction.vue";
 import TaskBatchDownloadAction from "../../../components/Server/TaskBatchDownloadAction.vue";
+import TaskCancelAction from "../../../components/Server/TaskCancelAction.vue";
 import TaskDeleteAction from "../../../components/Server/TaskDeleteAction.vue";
 import TaskDownloadAction from "../../../components/Server/TaskDownloadAction.vue";
 import TaskDuration from "../../../components/Server/TaskDuration.vue";
@@ -189,6 +190,7 @@ onMounted(() => {
                                     :record="r"
                                     @update="doRefresh"
                                 />
+                                <TaskCancelAction :record="r" />
                             </div>
                         </div>
                     </div>
