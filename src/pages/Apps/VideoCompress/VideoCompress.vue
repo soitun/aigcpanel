@@ -13,6 +13,7 @@ import VideoCompressCreate from "./components/VideoCompressCreate.vue";
 import VideoCompressItem from "./components/VideoCompressItem.vue";
 import ListerTop from "../../../components/common/ListerTop.vue";
 import MEmpty from "../../../components/common/MEmpty.vue";
+import PageHeader from "../../../components/PageHeader.vue";
 
 const { page, records, recordsForPage } = usePaginate<TaskRecord>({
     pageSize: 10,
@@ -41,15 +42,14 @@ const doRefresh = async () => {
 
 <template>
     <div class="p-5">
-        <div class="app-header mb-4 flex items-center">
-            <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">视频压缩</div>
-                <div class="text-gray-400 ml-3">
-                    对视频进行压缩处理，调整编码、分辨率和压缩程度
-                </div>
-            </div>
-            <ToggleButton v-model="stepsVisible" />
-        </div>
+        <PageHeader
+            title="视频压缩"
+            desc="对视频进行压缩处理，调整编码、分辨率和压缩程度"
+        >
+            <template #actions
+                ><ToggleButton v-model="stepsVisible"
+            /></template>
+        </PageHeader>
         <Steps
             v-if="stepsVisible"
             :steps="[

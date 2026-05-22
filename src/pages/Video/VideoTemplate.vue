@@ -14,6 +14,7 @@ import VideoTemplateEditDialog from "./components/VideoTemplateEditDialog.vue";
 import ListerTop from "../../components/common/ListerTop.vue";
 import MEmpty from "../../components/common/MEmpty.vue";
 import MLoading from "../../components/common/MLoading.vue";
+import PageHeader from "../../components/PageHeader.vue";
 
 const editDialog = ref<InstanceType<typeof VideoTemplateEditDialog>>();
 const cloudDialog = ref<InstanceType<typeof VideoTemplateCloudDialog>>();
@@ -48,10 +49,7 @@ const onUpdate = async () => {
 
 <template>
     <div class="p-5">
-        <div class="mb-2 flex items-end">
-            <div class="text-3xl font-bold">{{ $t("avatar.avatar") }}</div>
-            <div class="text-gray-400 ml-3">{{ $t("avatar.manage") }}</div>
-        </div>
+        <PageHeader :title="$t('avatar.avatar')" :desc="$t('avatar.manage')" />
         <ListerTop
             :loading="loading"
             :total="records.length"

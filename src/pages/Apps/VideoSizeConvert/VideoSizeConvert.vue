@@ -13,6 +13,7 @@ import VideoSizeConvertCreate from "./components/VideoSizeConvertCreate.vue";
 import VideoSizeConvertItem from "./components/VideoSizeConvertItem.vue";
 import ListerTop from "../../../components/common/ListerTop.vue";
 import MEmpty from "../../../components/common/MEmpty.vue";
+import PageHeader from "../../../components/PageHeader.vue";
 
 const { page, records, recordsForPage } = usePaginate<TaskRecord>({
     pageSize: 10,
@@ -44,15 +45,14 @@ const doRefresh = async () => {
 
 <template>
     <div class="p-5">
-        <div class="app-header mb-4 flex items-center">
-            <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">视频尺寸转换</div>
-                <div class="text-gray-400 ml-3">
-                    调整视频尺寸，支持横屏、竖屏预设和多种填充方式
-                </div>
-            </div>
-            <ToggleButton v-model="stepsVisible" />
-        </div>
+        <PageHeader
+            title="视频尺寸转换"
+            desc="调整视频尺寸，支持横屏、竖屏预设和多种填充方式"
+        >
+            <template #actions
+                ><ToggleButton v-model="stepsVisible"
+            /></template>
+        </PageHeader>
         <Steps
             v-if="stepsVisible"
             :steps="[

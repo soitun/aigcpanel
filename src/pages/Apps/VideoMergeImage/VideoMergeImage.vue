@@ -13,6 +13,7 @@ import VideoMergeImageCreate from "./components/VideoMergeImageCreate.vue";
 import VideoMergeImageItem from "./components/VideoMergeImageItem.vue";
 import ListerTop from "../../../components/common/ListerTop.vue";
 import MEmpty from "../../../components/common/MEmpty.vue";
+import PageHeader from "../../../components/PageHeader.vue";
 
 const { page, records, recordsForPage } = usePaginate<TaskRecord>({
     pageSize: 10,
@@ -44,15 +45,14 @@ const doRefresh = async () => {
 
 <template>
     <div class="p-5">
-        <div class="app-header mb-4 flex items-center">
-            <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">片头片尾图片</div>
-                <div class="text-gray-400 ml-3">
-                    将图片合并到视频的开头或结尾，支持设置图片显示时长
-                </div>
-            </div>
-            <ToggleButton v-model="stepsVisible" />
-        </div>
+        <PageHeader
+            title="片头片尾图片"
+            desc="将图片合并到视频的开头或结尾，支持设置图片显示时长"
+        >
+            <template #actions
+                ><ToggleButton v-model="stepsVisible"
+            /></template>
+        </PageHeader>
         <Steps
             v-if="stepsVisible"
             :steps="[
@@ -115,10 +115,3 @@ const doRefresh = async () => {
         </div>
     </div>
 </template>
-
-<style scoped>
-.app-header {
-    border-bottom: 1px solid var(--color-border-2);
-    padding-bottom: 1rem;
-}
-</style>

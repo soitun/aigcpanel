@@ -13,6 +13,7 @@ import MediaFormatConvertCreate from "./components/MediaFormatConvertCreate.vue"
 import MediaFormatConvertItem from "./components/MediaFormatConvertItem.vue";
 import ListerTop from "../../../components/common/ListerTop.vue";
 import MEmpty from "../../../components/common/MEmpty.vue";
+import PageHeader from "../../../components/PageHeader.vue";
 
 const { page, records, recordsForPage } = usePaginate<TaskRecord>({
     pageSize: 10,
@@ -44,15 +45,14 @@ const doRefresh = async () => {
 
 <template>
     <div class="p-5">
-        <div class="app-header mb-4 flex items-center">
-            <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">媒体格式转换</div>
-                <div class="text-gray-400 ml-3">
-                    转换视频和音频格式，支持多种编码和格式
-                </div>
-            </div>
-            <ToggleButton v-model="stepsVisible" />
-        </div>
+        <PageHeader
+            title="媒体格式转换"
+            desc="转换视频和音频格式，支持多种编码和格式"
+        >
+            <template #actions
+                ><ToggleButton v-model="stepsVisible"
+            /></template>
+        </PageHeader>
         <Steps
             v-if="stepsVisible"
             :steps="[

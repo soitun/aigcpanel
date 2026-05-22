@@ -13,6 +13,7 @@ import VideoMarkItem from "./components/VideoMarkItem.vue";
 import Steps from "../common/Steps.vue";
 import ListerTop from "../../../components/common/ListerTop.vue";
 import MEmpty from "../../../components/common/MEmpty.vue";
+import PageHeader from "../../../components/PageHeader.vue";
 
 const { page, records, recordsForPage } = usePaginate<TaskRecord>({
     pageSize: 10,
@@ -44,15 +45,14 @@ const doRefresh = async () => {
 
 <template>
     <div class="p-5">
-        <div class="app-header mb-4 flex items-center">
-            <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">视频标注</div>
-                <div class="text-gray-400 ml-3">
-                    对视频中的片段进行标注，突出显示重要内容
-                </div>
-            </div>
-            <ToggleButton v-model="stepsVisible" />
-        </div>
+        <PageHeader
+            title="视频标注"
+            desc="对视频中的片段进行标注，突出显示重要内容"
+        >
+            <template #actions
+                ><ToggleButton v-model="stepsVisible"
+            /></template>
+        </PageHeader>
         <Steps
             v-if="stepsVisible"
             :steps="[

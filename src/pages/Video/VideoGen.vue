@@ -21,6 +21,7 @@ import ServerNameVersion from "../../components/Server/ServerNameVersion.vue";
 import TextTruncateView from "../../components/TextTruncateView.vue";
 import ListerTop from "../../components/common/ListerTop.vue";
 import MEmpty from "../../components/common/MEmpty.vue";
+import PageHeader from "../../components/PageHeader.vue";
 
 const videoGenCreate = ref<InstanceType<typeof VideoGenCreate> | null>(null);
 
@@ -46,12 +47,10 @@ const doRefresh = async () => {
 
 <template>
     <div class="p-5">
-        <div class="mb-4 flex items-end">
-            <div class="text-3xl font-bold">
-                {{ $t("avatar.synthesis") }}
-            </div>
-            <div class="text-gray-400 ml-3">{{ $t("intro.lipSync") }}</div>
-        </div>
+        <PageHeader
+            :title="$t('avatar.synthesis')"
+            :desc="$t('intro.lipSync')"
+        />
         <div>
             <VideoGenCreate ref="videoGenCreate" @submitted="doRefresh" />
             <ListerTop

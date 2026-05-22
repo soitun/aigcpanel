@@ -13,6 +13,7 @@ import VideoMergeCreate from "./components/VideoMergeCreate.vue";
 import VideoMergeItem from "./components/VideoMergeItem.vue";
 import ListerTop from "../../../components/common/ListerTop.vue";
 import MEmpty from "../../../components/common/MEmpty.vue";
+import PageHeader from "../../../components/PageHeader.vue";
 
 const { page, records, recordsForPage } = usePaginate<TaskRecord>({
     pageSize: 10,
@@ -41,15 +42,14 @@ const doRefresh = async () => {
 
 <template>
     <div class="p-5">
-        <div class="app-header mb-4 flex items-center">
-            <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">视频合并</div>
-                <div class="text-gray-400 ml-3">
-                    将多个视频文件合并为一个视频，支持拼接和叠加
-                </div>
-            </div>
-            <ToggleButton v-model="stepsVisible" />
-        </div>
+        <PageHeader
+            title="视频合并"
+            desc="将多个视频文件合并为一个视频，支持拼接和叠加"
+        >
+            <template #actions
+                ><ToggleButton v-model="stepsVisible"
+            /></template>
+        </PageHeader>
         <Steps
             v-if="stepsVisible"
             :steps="[

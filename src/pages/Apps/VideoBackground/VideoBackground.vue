@@ -13,6 +13,7 @@ import VideoBackgroundCreate from "./components/VideoBackgroundCreate.vue";
 import VideoBackgroundItem from "./components/VideoBackgroundItem.vue";
 import ListerTop from "../../../components/common/ListerTop.vue";
 import MEmpty from "../../../components/common/MEmpty.vue";
+import PageHeader from "../../../components/PageHeader.vue";
 
 const { page, records, recordsForPage } = usePaginate<TaskRecord>({
     pageSize: 10,
@@ -44,15 +45,14 @@ const doRefresh = async () => {
 
 <template>
     <div class="p-5">
-        <div class="app-header mb-4 flex items-center">
-            <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">视频背景</div>
-                <div class="text-gray-400 ml-3">
-                    为视频添加背景图片，支持自定义尺寸和位置
-                </div>
-            </div>
-            <ToggleButton v-model="stepsVisible" />
-        </div>
+        <PageHeader
+            title="视频背景"
+            desc="为视频添加背景图片，支持自定义尺寸和位置"
+        >
+            <template #actions
+                ><ToggleButton v-model="stepsVisible"
+            /></template>
+        </PageHeader>
         <Steps
             v-if="stepsVisible"
             :steps="[

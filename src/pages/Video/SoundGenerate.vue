@@ -21,6 +21,7 @@ import ServerTaskResultParam from "../../components/Server/ServerTaskResultParam
 import TaskContinueAction from "../../components/Server/TaskContinueAction.vue";
 import ListerTop from "../../components/common/ListerTop.vue";
 import MEmpty from "../../components/common/MEmpty.vue";
+import PageHeader from "../../components/PageHeader.vue";
 
 const { page, records, recordsForPage } = usePaginate<TaskRecord>();
 
@@ -44,14 +45,10 @@ onMounted(async () => {
 
 <template>
     <div class="p-5">
-        <div class="mb-4 flex items-end">
-            <div class="text-3xl font-bold">
-                {{ $t("voice.synthesis") }}
-            </div>
-            <div class="text-gray-400 ml-3">
-                {{ $t("intro.voiceClone") }}
-            </div>
-        </div>
+        <PageHeader
+            :title="$t('voice.synthesis')"
+            :desc="$t('intro.voiceClone')"
+        />
         <div>
             <SoundGenerateCreate @submitted="doRefresh" />
             <ListerTop

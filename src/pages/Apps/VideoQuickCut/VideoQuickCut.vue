@@ -13,6 +13,7 @@ import VideoQuickCutCreate from "./components/VideoQuickCutCreate.vue";
 import VideoQuickCutItem from "./components/VideoQuickCutItem.vue";
 import ListerTop from "../../../components/common/ListerTop.vue";
 import MEmpty from "../../../components/common/MEmpty.vue";
+import PageHeader from "../../../components/PageHeader.vue";
 
 const { page, records, recordsForPage } = usePaginate<TaskRecord>({
     pageSize: 10,
@@ -44,17 +45,14 @@ const doRefresh = async () => {
 
 <template>
     <div class="p-5">
-        <div class="app-header mb-4 flex items-center">
-            <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">{{ "快速剪辑" }}</div>
-                <div class="text-gray-400 ml-3">
-                    {{
-                        "通过语音识别进行视频快速剪辑，支持内容片段的自定义包括或去除"
-                    }}
-                </div>
-            </div>
-            <ToggleButton v-model="stepsVisible" />
-        </div>
+        <PageHeader
+            title="快速剪辑"
+            desc="通过语音识别进行视频快速剪辑，支持内容片段的自定义包括或去除"
+        >
+            <template #actions
+                ><ToggleButton v-model="stepsVisible"
+            /></template>
+        </PageHeader>
         <Steps
             v-if="stepsVisible"
             :steps="[

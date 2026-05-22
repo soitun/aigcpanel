@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
-import store from "../index";
 import { AppConfig } from "../../config";
+import store from "../index";
 import { useSettingStore } from "./setting";
 
 const setting = useSettingStore();
@@ -22,6 +22,7 @@ export const userStore = defineStore("user", {
                     id: null as string | null,
                     flag: null as string | null,
                     title: null as string | null,
+                    icon: null as string | null,
                     isDefault: true,
                 },
                 functions: {} as Record<string, any>,
@@ -30,6 +31,7 @@ export const userStore = defineStore("user", {
                     id: string | null;
                     flag: string | null;
                     title: string | null;
+                    icon: string | null;
                     isDefault: boolean;
                 };
                 functions: Record<string, any>;

@@ -21,6 +21,7 @@ import VideoGenFormViewBody from "../../Video/components/VideoGenFormViewBody.vu
 import VideoGenFlowCreate from "./components/VideoGenFlowCreate.vue";
 import ListerTop from "../../../components/common/ListerTop.vue";
 import MEmpty from "../../../components/common/MEmpty.vue";
+import PageHeader from "../../../components/PageHeader.vue";
 
 const videoGenFlowCreate = ref<InstanceType<typeof VideoGenFlowCreate> | null>(
     null,
@@ -48,28 +49,10 @@ onMounted(() => {
 
 <template>
     <div class="p-5">
-        <div class="app-header mb-4 flex items-center">
-            <div class="flex-grow flex items-end">
-                <div class="text-3xl font-bold">{{ $t("app.videoGen") }}</div>
-                <div class="text-gray-400 ml-3">
-                    {{ $t("app.videoGenDesc") }}
-                </div>
-            </div>
-            <div class="flex items-center">
-                <a-tooltip
-                    v-if="0"
-                    :content="$t('common.clearHistory')"
-                    position="right"
-                    mini
-                >
-                    <a-button class="ml-1">
-                        <template #icon>
-                            <icon-delete />
-                        </template>
-                    </a-button>
-                </a-tooltip>
-            </div>
-        </div>
+        <PageHeader
+            :title="$t('app.videoGen')"
+            :desc="$t('app.videoGenDesc')"
+        />
         <div>
             <VideoGenFlowCreate
                 ref="videoGenFlowCreate"
