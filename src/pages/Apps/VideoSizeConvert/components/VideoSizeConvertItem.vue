@@ -15,6 +15,9 @@ import {
     VideoSizeConvertJobResultType,
     VideoSizeConvertModelConfigType,
 } from "../type";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps<{
     record: TaskRecord<
@@ -28,13 +31,13 @@ const props = defineProps<{
 const getFillModeText = (fillMode: string) => {
     switch (fillMode) {
         case "blur":
-            return "模糊填充";
+            return t("common.blurFill");
         case "black":
-            return "黑边填充";
+            return t("common.blackFill");
         case "crop":
-            return "裁剪填充";
+            return t("common.cropFill");
         case "stretch":
-            return "拉伸填充";
+            return t("common.stretchFill");
         default:
             return fillMode;
     }
@@ -74,7 +77,7 @@ const getFillModeText = (fillMode: string) => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    解析视频
+                    {{ $t("common.parseVideo") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -89,19 +92,20 @@ const getFillModeText = (fillMode: string) => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-settings />
-                    尺寸配置
+                    {{ $t("common.sizeConfig") }}
                 </div>
             </div>
             <div class="flex-grow">
                 <TaskJobResultStepView :record="record" step="Config">
                     <div class="flex items-center gap-1 mb-2">
                         <a-tag class="rounded-lg"
-                            >目标尺寸 {{ record.modelConfig?.targetWidth }}x{{
+                            >{{ $t("common.targetSize") }}
+                            {{ record.modelConfig?.targetWidth }}x{{
                                 record.modelConfig?.targetHeight
                             }}
                         </a-tag>
                         <a-tag class="rounded-lg"
-                            >填充模式
+                            >{{ $t("common.fillMode") }}
                             {{
                                 getFillModeText(
                                     record.modelConfig?.fillMode || "",
@@ -116,7 +120,7 @@ const getFillModeText = (fillMode: string) => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    视频渲染
+                    {{ $t("common.videoRender") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Render">

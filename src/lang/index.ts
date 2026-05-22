@@ -9,10 +9,44 @@ import componentsEnUS from "../components/locales/en-US.json";
 import componentsZhCN from "../components/locales/zh-CN.json";
 import appsEnUS from "../pages/Apps/locales/en-US.json";
 import appsZhCN from "../pages/Apps/locales/zh-CN.json";
-import soundEnUS from "../pages/Video/locales/en-US.json";
-import soundZhCN from "../pages/Video/locales/zh-CN.json";
-import videoEnUS from "../pages/Video/locales/en-US.json";
-import videoZhCN from "../pages/Video/locales/zh-CN.json";
+import {
+    default as soundEnUS,
+    default as videoEnUS,
+} from "../pages/Video/locales/en-US.json";
+import {
+    default as soundZhCN,
+    default as videoZhCN,
+} from "../pages/Video/locales/zh-CN.json";
+
+// Apps sub-module locales
+import imageToImageEnUS from "../pages/Apps/ImageToImage/lang/en-US.json";
+import imageToImageZhCN from "../pages/Apps/ImageToImage/lang/zh-CN.json";
+import longTextTtsEnUS from "../pages/Apps/LongTextTts/lang/en-US.json";
+import longTextTtsZhCN from "../pages/Apps/LongTextTts/lang/zh-CN.json";
+import soundReplaceEnUS from "../pages/Apps/SoundReplace/lang/en-US.json";
+import soundReplaceZhCN from "../pages/Apps/SoundReplace/lang/zh-CN.json";
+import subtitleTtsEnUS from "../pages/Apps/SubtitleTts/lang/en-US.json";
+import subtitleTtsZhCN from "../pages/Apps/SubtitleTts/lang/zh-CN.json";
+import textToImageEnUS from "../pages/Apps/TextToImage/lang/en-US.json";
+import textToImageZhCN from "../pages/Apps/TextToImage/lang/zh-CN.json";
+import videoGenFlowEnUS from "../pages/Apps/VideoGenFlow/lang/en-US.json";
+import videoGenFlowZhCN from "../pages/Apps/VideoGenFlow/lang/zh-CN.json";
+import videoMergeAudioEnUS from "../pages/Apps/VideoMergeAudio/lang/en-US.json";
+import videoMergeAudioZhCN from "../pages/Apps/VideoMergeAudio/lang/zh-CN.json";
+import videoMergeImageEnUS from "../pages/Apps/VideoMergeImage/lang/en-US.json";
+import videoMergeImageZhCN from "../pages/Apps/VideoMergeImage/lang/zh-CN.json";
+import videoQuickCutEnUS from "../pages/Apps/VideoQuickCut/lang/en-US.json";
+import videoQuickCutZhCN from "../pages/Apps/VideoQuickCut/lang/zh-CN.json";
+import videoSizeConvertEnUS from "../pages/Apps/VideoSizeConvert/lang/en-US.json";
+import videoSizeConvertZhCN from "../pages/Apps/VideoSizeConvert/lang/zh-CN.json";
+import videoSpeedEnUS from "../pages/Apps/VideoSpeed/lang/en-US.json";
+import videoSpeedZhCN from "../pages/Apps/VideoSpeed/lang/zh-CN.json";
+import videoSpeedPartEnUS from "../pages/Apps/VideoSpeedPart/lang/en-US.json";
+import videoSpeedPartZhCN from "../pages/Apps/VideoSpeedPart/lang/zh-CN.json";
+import videoSubtitleEnUS from "../pages/Apps/VideoSubtitle/lang/en-US.json";
+import videoSubtitleZhCN from "../pages/Apps/VideoSubtitle/lang/zh-CN.json";
+import videoZoomEnUS from "../pages/Apps/VideoZoom/lang/en-US.json";
+import videoZoomZhCN from "../pages/Apps/VideoZoom/lang/zh-CN.json";
 
 let localeInit = false;
 export const defaultLocale = "zh-CN";
@@ -28,6 +62,21 @@ export const messageList = [
             ...appsEnUS,
             ...videoEnUS,
             ...componentsEnUS,
+            // Apps sub-modules
+            ...imageToImageEnUS,
+            ...longTextTtsEnUS,
+            ...soundReplaceEnUS,
+            ...subtitleTtsEnUS,
+            ...textToImageEnUS,
+            ...videoGenFlowEnUS,
+            ...videoMergeAudioEnUS,
+            ...videoMergeImageEnUS,
+            ...videoQuickCutEnUS,
+            ...videoSizeConvertEnUS,
+            ...videoSpeedEnUS,
+            ...videoSpeedPartEnUS,
+            ...videoSubtitleEnUS,
+            ...videoZoomEnUS,
         },
     },
     {
@@ -40,6 +89,21 @@ export const messageList = [
             ...appsZhCN,
             ...videoZhCN,
             ...componentsZhCN,
+            // Apps sub-modules
+            ...imageToImageZhCN,
+            ...longTextTtsZhCN,
+            ...soundReplaceZhCN,
+            ...subtitleTtsZhCN,
+            ...textToImageZhCN,
+            ...videoGenFlowZhCN,
+            ...videoMergeAudioZhCN,
+            ...videoMergeImageZhCN,
+            ...videoQuickCutZhCN,
+            ...videoSizeConvertZhCN,
+            ...videoSpeedZhCN,
+            ...videoSpeedPartZhCN,
+            ...videoSubtitleZhCN,
+            ...videoZoomZhCN,
         },
     },
 ];

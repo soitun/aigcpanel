@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
+import { t } from "../../../lang";
 import TaskBatchDeleteAction from "../../../components/Server/TaskBatchDeleteAction.vue";
 import TaskBatchDownloadAction from "../../../components/Server/TaskBatchDownloadAction.vue";
 import ToggleButton from "../../../components/common/ToggleButton.vue";
@@ -90,7 +91,7 @@ const doRefresh = async () => {
                     :indeterminate="isIndeterminate"
                     @change="onCheckAll"
                 >
-                    {{ "全选" }}
+                    {{ $t("common.selectAll") }}
                 </a-checkbox>
                 <TaskBatchDeleteAction
                     :records="checkRecords"

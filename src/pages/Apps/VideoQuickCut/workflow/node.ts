@@ -1,4 +1,6 @@
 import { defineAsyncComponent } from "vue";
+import AppIcon from "~icons/mdi/content-cut";
+import { t } from "../../../../lang";
 import {
     NodeFunctionCall,
     NodeRunController,
@@ -7,7 +9,6 @@ import {
 } from "../../../../module/Workflow/core/type";
 import { workflowRun } from "../../common/workflow";
 import { VideoQuickCutRun } from "../task";
-import AppIcon from "~icons/mdi/content-cut";
 
 export default <NodeFunctionCall>{
     name: "VideoQuickCut",
@@ -46,10 +47,10 @@ export default <NodeFunctionCall>{
                     soundAsr: soundAsr,
                 };
                 if (!taskRunData.video) {
-                    throw "参数错误：缺少视频文件";
+                    throw t("error.missingVideoFile");
                 }
                 if (!taskRunData.soundAsr) {
-                    throw "请配置语音识别参数";
+                    throw t("error.configureSpeechRecognition");
                 }
                 return await VideoQuickCutRun(taskRunData);
             },
@@ -60,10 +61,10 @@ export default <NodeFunctionCall>{
     },
     async check(node) {
         if (!node.properties?.data?.soundAsr) {
-            throw "请配置语音识别参数";
+            throw t("error.configureSpeechRecognition");
         }
         if (node.properties?.inputFields?.[0].value === "") {
-            throw "请输入视频参数";
+            throw t("error.inputVideoParam");
         }
     },
 };

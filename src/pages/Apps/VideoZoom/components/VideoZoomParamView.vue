@@ -9,9 +9,11 @@ const props = defineProps<{
 <template>
     <div class="flex flex-wrap mb-2 gap-1">
         <a-tag class="rounded-lg"
-            >放大持续时间
+            >{{ $t("common.zoomDuration") }}
             {{
-                data.zoomDurationMs ? data.zoomDurationMs + "ms" : "未配置"
+                data.zoomDurationMs
+                    ? data.zoomDurationMs + "ms"
+                    : $t("common.notConfigured")
             }}</a-tag
         >
     </div>

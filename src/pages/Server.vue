@@ -17,6 +17,7 @@ import { EnumServerType } from "../types/Server";
 
 import ServerRemoteAddDialog from "../components/Server/ServerRemoteAddDialog.vue";
 import ListerTop from "../components/common/ListerTop.vue";
+import PageHeader from "../components/PageHeader.vue";
 
 const addDialog = ref<InstanceType<typeof ServerAddDialog> | null>(null);
 const remoteAddDialog = ref<InstanceType<typeof ServerRemoteAddDialog> | null>(
@@ -53,10 +54,7 @@ const typeName = (type: string) => {
     <div
         class="pb-device-container bg-white p-6 min-h-full relative select-none"
     >
-        <div class="mb-2 flex items-center">
-            <div class="text-3xl font-bold flex-grow">AI模型</div>
-        </div>
-        <ListerTop :total="serverStore.records.length" @refresh="doRefresh">
+        <PageHeader title="AI模型">
             <template #actions>
                 <a-button @click="modelSettingDialog?.show()">
                     <template #icon>
@@ -84,7 +82,8 @@ const typeName = (type: string) => {
                     {{ $t("model.addLocal") }}
                 </a-button>
             </template>
-        </ListerTop>
+        </PageHeader>
+        <ListerTop :total="serverStore.records.length" @refresh="doRefresh" />
         <div>
             <div v-if="!serverStore.records.length" class="py-20">
                 <div class="text-center">

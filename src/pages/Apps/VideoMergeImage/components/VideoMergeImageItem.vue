@@ -54,7 +54,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    解析视频
+                    {{ $t("common.parseVideo") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -69,7 +69,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-image />
-                    合并配置
+                    {{ $t("common.mergeConfig") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -79,25 +79,28 @@ const props = defineProps<{
                             v-if="record.modelConfig?.position === 'start'"
                             class="rounded-lg"
                         >
-                            片头: {{ record.modelConfig?.duration }}s
+                            {{ $t("common.positionStart") }}:
+                            {{ record.modelConfig?.duration }}s
                         </a-tag>
                         <a-tag
                             v-else-if="record.modelConfig?.position === 'end'"
                             class="rounded-lg"
                         >
-                            片尾: {{ record.modelConfig?.duration }}s
+                            {{ $t("common.positionEnd") }}:
+                            {{ record.modelConfig?.duration }}s
                         </a-tag>
                         <a-tag
                             v-if="record.modelConfig?.animation === 'zoom'"
                             class="rounded-lg"
                         >
-                            放大: {{ record.modelConfig?.zoomPercent }}%
+                            {{ $t("common.zoomIn2") }}:
+                            {{ record.modelConfig?.zoomPercent }}%
                         </a-tag>
                         <a-tag
                             v-else-if="record.modelConfig?.animation === 'none'"
                             class="rounded-lg"
                         >
-                            无动画
+                            {{ $t("common.noAnimation") }}
                         </a-tag>
                     </div>
                 </TaskJobResultStepView>
@@ -107,7 +110,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    视频渲染
+                    {{ $t("common.videoRender") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Render">

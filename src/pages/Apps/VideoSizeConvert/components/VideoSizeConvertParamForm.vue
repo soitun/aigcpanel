@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
 
 const formData = ref({
@@ -58,11 +59,11 @@ const getValue = async (): Promise<VideoSizeConvertForm | undefined> => {
     data.targetHeight = formData.value.targetHeight;
     data.fillMode = formData.value.fillMode;
     if (data.targetWidth <= 0 || isNaN(data.targetWidth)) {
-        Dialog.tipError("请设置有效的目标宽度");
+        Dialog.tipError(t("error.validTargetWidth"));
         return;
     }
     if (data.targetHeight <= 0 || isNaN(data.targetHeight)) {
-        Dialog.tipError("请设置有效的目标高度");
+        Dialog.tipError(t("error.validTargetHeight"));
         return;
     }
     return data;
@@ -90,7 +91,7 @@ defineExpose({
 <template>
     <div class="mb-4 flex items-start">
         <div class="pt-1 w-5">
-            <a-tooltip :content="'目标尺寸'" mini>
+            <a-tooltip :content="$t('common.targetSize')" mini>
                 <icon-expand />
             </a-tooltip>
         </div>
@@ -100,7 +101,7 @@ defineExpose({
                 :min="1"
                 :max="4096"
                 :step="1"
-                placeholder="宽度"
+                :placeholder="$t('common.width')"
                 style="width: 100px"
                 @change="updatePreset"
             />
@@ -110,13 +111,13 @@ defineExpose({
                 :min="1"
                 :max="4096"
                 :step="1"
-                placeholder="高度"
+                :placeholder="$t('common.height')"
                 style="width: 100px"
                 @change="updatePreset"
             />
             <a-select
                 v-model="selectedPreset"
-                placeholder="选择预设尺寸"
+                :placeholder="$t('common.selectPreset')"
                 style="width: 200px"
                 @change="onPresetChange"
             >
@@ -132,16 +133,18 @@ defineExpose({
     </div>
     <div class="mb-4 flex items-start">
         <div class="pt-1 w-5">
-            <a-tooltip :content="'填充方式'" mini>
+            <a-tooltip :content="$t('common.fillMode')" mini>
                 <icon-image />
             </a-tooltip>
         </div>
         <div class="flex items-center gap-2">
             <a-radio-group v-model="formData.fillMode">
-                <a-radio value="black">黑边填充</a-radio>
-                <a-radio value="blur">模糊填充</a-radio>
-                <a-radio value="crop">裁剪填充</a-radio>
-                <a-radio value="stretch">拉伸填充</a-radio>
+                <a-radio value="black">{{ $t("common.blackFill") }}</a-radio>
+                <a-radio value="blur">{{ $t("common.blurFill") }}</a-radio>
+                <a-radio value="crop">{{ $t("common.cropFill") }}</a-radio>
+                <a-radio value="stretch">{{
+                    $t("common.stretchFill")
+                }}</a-radio>
             </a-radio-group>
         </div>
     </div>

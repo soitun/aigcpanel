@@ -1,4 +1,6 @@
 import { defineAsyncComponent } from "vue";
+import AppIcon from "~icons/mdi/speedometer";
+import { t } from "../../../../lang";
 import {
     NodeFunctionCall,
     NodeRunController,
@@ -7,7 +9,6 @@ import {
 } from "../../../../module/Workflow/core/type";
 import { workflowRun } from "../../common/workflow";
 import { VideoSpeedRun } from "../task";
-import AppIcon from "~icons/mdi/speedometer";
 
 export default <NodeFunctionCall>{
     name: "VideoSpeed",
@@ -45,7 +46,7 @@ export default <NodeFunctionCall>{
                     speed: param.node.properties?.data?.speed || 1.0,
                 };
                 if (!taskRunData.video) {
-                    throw "参数错误：缺少视频文件";
+                    throw t("error.missingVideoFile");
                 }
                 return await VideoSpeedRun(taskRunData);
             },
@@ -56,10 +57,10 @@ export default <NodeFunctionCall>{
     },
     async check(node) {
         if (!node.properties?.data?.speed) {
-            throw "请输入变速参数";
+            throw t("error.inputSpeedParam");
         }
         if (node.properties?.inputFields?.[0].value === "") {
-            throw "请输入视频参数";
+            throw t("error.inputVideoParam");
         }
     },
 };

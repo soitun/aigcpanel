@@ -1,3 +1,4 @@
+import { t } from "../../../lang";
 import { ffmpegVideoToAudio } from "../../../lib/ffmpeg";
 import { ffprobeVideoInfo } from "../../../lib/ffprobe";
 import { serverSoundAsr } from "../../../lib/server";
@@ -193,7 +194,7 @@ export const VideoQuickCut: TaskBiz = {
         if (jobResult.step === "Confirm") {
             await TaskService.update(bizId, {
                 status: "pause",
-                statusMsg: "任务未完成，需要手动确认剪辑片段",
+                statusMsg: t("msg.taskNotCompleteConfirmSegments"),
             });
         } else if (jobResult.step === "End") {
             await TaskService.update(bizId, {

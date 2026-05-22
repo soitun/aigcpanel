@@ -42,13 +42,20 @@ defineExpose({
     <a-modal
         v-model:visible="visible"
         title-align="start"
-        :title="'片头片尾设置'"
+        :title="
+            $t('common.positionStart') +
+            '/' +
+            $t('common.positionEnd') +
+            $t('common.setting')
+        "
         width="800px"
         :destroyOnClose="true"
     >
         <template #footer>
             <div class="flex justify-end space-x-2">
-                <a-button type="primary" @click="doSubmit">保存</a-button>
+                <a-button type="primary" @click="doSubmit">{{
+                    $t("common.save")
+                }}</a-button>
             </div>
         </template>
         <div

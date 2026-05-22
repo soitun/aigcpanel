@@ -4,25 +4,26 @@ import router from "./router";
 import store from "./store";
 
 import ArcoVue, { Message } from "@arco-design/web-vue";
-import ArcoVueIcon from "@arco-design/web-vue/es/icon";
 import "@arco-design/web-vue/dist/arco.css";
+import ArcoVueIcon from "@arco-design/web-vue/es/icon";
 
-import { enUS, zhCN } from "date-fns/locale";
+import { zhCN } from "date-fns/locale";
 import timeago from "vue-timeago3";
 
 import { i18n, t } from "./lang";
 
-import "./style.less";
 import { Dialog } from "./lib/dialog";
+import "./style.less";
 
 import { CommonComponents } from "./components/common";
-import { TaskManager } from "./task";
-import { useSettingStore } from "./store/modules/setting";
-import { useServerStore } from "./store/modules/server";
 import { useModelStore } from "./module/Model/store/model";
+import { useServerStore } from "./store/modules/server";
+import { useSettingStore } from "./store/modules/setting";
+import { useUserStore } from "./store/modules/user";
+import { TaskManager } from "./task";
 
-import { TaskService } from "./service/TaskService";
 import { reportErrorRender } from "../electron/mapi/log/beacon-render";
+import { TaskService } from "./service/TaskService";
 import { useTaskStore } from "./store/modules/task";
 
 const settingStore = useSettingStore();

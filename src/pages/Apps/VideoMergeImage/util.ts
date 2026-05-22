@@ -1,3 +1,4 @@
+import { t } from "../../../lang";
 import { ffmpegOptimized } from "../../../lib/ffmpeg";
 import { ffprobeVideoInfo } from "../../../lib/ffprobe";
 
@@ -19,7 +20,7 @@ export const videoMergeImageExecute = async (
 
     const videoInfo = await ffprobeVideoInfo(videoPath);
     if (!videoInfo) {
-        throw new Error("无法获取视频信息");
+        throw new Error(t("error.videoInfo"));
     }
 
     const imageVideo = await $mapi.file.temp("mp4");

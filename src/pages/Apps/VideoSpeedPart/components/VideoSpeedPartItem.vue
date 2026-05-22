@@ -80,7 +80,7 @@ const onSave = async (times: VideoEditorTimeRangeRecord[]) => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-sound />
-                    解析视频
+                    {{ $t("common.parseVideo") }}
                 </div>
             </div>
             <div class="flex-grow pt-1">
@@ -95,7 +95,7 @@ const onSave = async (times: VideoEditorTimeRangeRecord[]) => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-tag />
-                    加速标识
+                    {{ $t("common.speedMark") }}
                 </div>
             </div>
             <div class="flex-grow pt-1">
@@ -132,7 +132,7 @@ const onSave = async (times: VideoEditorTimeRangeRecord[]) => {
                                 <template #icon>
                                     <icon-check-circle />
                                 </template>
-                                设置加速时间范围
+                                {{ $t("common.setSpeedTimeRange") }}
                             </a-button>
                         </div>
                     </template>
@@ -143,7 +143,7 @@ const onSave = async (times: VideoEditorTimeRangeRecord[]) => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    视频合成
+                    {{ $t("common.videoSynthesis") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Render">
@@ -171,7 +171,7 @@ const onSave = async (times: VideoEditorTimeRangeRecord[]) => {
     </div>
     <VideoEditorTimeRangeListSelectorDialog
         ref="videoEditorTimeRangeListSelectorDialog"
-        :save-title="'保存并继续'"
+        :save-title="$t('common.saveAndContinue')"
         @save="onSave"
     />
 </template>

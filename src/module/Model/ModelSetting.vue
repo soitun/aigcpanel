@@ -19,16 +19,6 @@ const providerEdit = ref<InstanceType<typeof ProviderEditDialog> | null>(null);
 const modelAdd = ref<InstanceType<typeof ModelAddDialog> | null>(null);
 const modelEdit = ref<InstanceType<typeof ModelEditDialog> | null>(null);
 const providerTest = ref<InstanceType<typeof ProviderTestDialog> | null>(null);
-const doUser = async () => {
-    if (!setting.basic.userEnable) {
-        return;
-    }
-    await window.$mapi.user.open({
-        readyParam: {
-            page: "ChargeLLMPX",
-        },
-    });
-};
 
 const keywords = ref("");
 const currentProviderId = ref("");
@@ -241,27 +231,7 @@ watch(
                 <div
                     class="mb-3 flex border rounded p-3 items-center"
                     v-if="provider.id === 'buildIn'"
-                >
-                    <div class="flex-grow">
-                        {{ $t("user.energy") }}
-                        <span class="font-bold"
-                            >{{
-                                (
-                                    (userStore.data.llmpx?.quota || 0) / 1000
-                                ).toFixed(2)
-                            }}K</span
-                        >
-                    </div>
-                    <div class="text-gray-400">
-                        <icon-check class="text-green-600" />
-                        {{ $t("model.builtinDesc") }}
-                    </div>
-                    <div>
-                        <a-button class="ml-2" @click="doUser">
-                            {{ $t("common.recharge") }}
-                        </a-button>
-                    </div>
-                </div>
+                ></div>
                 <div class="mb-3">
                     <div class="mb-2 font-bold">{{ $t("model.model") }}</div>
                     <div
@@ -311,9 +281,15 @@ watch(
                                         <div class="flex-grow">
                                             {{ m.name }}
                                         </div>
+                                        <div
+                                            v-if="
+                                                provider.id === 'buildIn' &&
+                                                m.rate != null
+                                            "
+                                            class="mr-3 text-xs text-gray-400"
+                                        ></div>
                                         <div class="flex items-center">
                                             <a-switch
-                                                v-if="provider.id !== 'buildIn'"
                                                 :model-value="m.enabled"
                                                 @change="
                                                     modelStore.changeModel(

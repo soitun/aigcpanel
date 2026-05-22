@@ -21,11 +21,11 @@ const { clearDraft } = dataAutoSaveDraft(
 
 const doSubmit = async () => {
     if (!formData.value.video) {
-        Dialog.tipError("请选择视频文件");
+        Dialog.tipError(t("error.selectVideoFile"));
         return;
     }
     if (!formData.value.subtitle) {
-        Dialog.tipError("请选择字幕文件");
+        Dialog.tipError(t("error.selectSubtitleFile"));
         return;
     }
 
@@ -56,7 +56,7 @@ const doSubmit = async () => {
     <div class="rounded-xl shadow border p-4">
         <div class="mb-4 flex items-start">
             <div class="pt-1 w-5">
-                <a-tooltip :content="'视频文件'" mini>
+                <a-tooltip :content="$t('common.videoFile')" mini>
                     <icon-video-camera />
                 </a-tooltip>
             </div>
@@ -66,7 +66,7 @@ const doSubmit = async () => {
         </div>
         <div class="mb-4 flex items-start">
             <div class="pt-1 w-5">
-                <a-tooltip :content="'字幕文件'" mini>
+                <a-tooltip :content="$t('common.subtitleFile')" mini>
                     <icon-file />
                 </a-tooltip>
             </div>
@@ -80,7 +80,7 @@ const doSubmit = async () => {
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 <icon-send class="mr-2" />
-                {{ "提交任务" }}
+                {{ $t("common.submitTask") }}
             </a-button>
         </div>
     </div>

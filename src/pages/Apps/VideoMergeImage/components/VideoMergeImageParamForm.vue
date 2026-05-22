@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
 
 const formData = ref({
@@ -29,7 +30,7 @@ const getValue = async (): Promise<VideoMergeImageForm | undefined> => {
 
     data.duration = formData.value.duration;
     if (data.duration <= 0 || isNaN(data.duration)) {
-        Dialog.tipError("请设置有效的片头图片时长");
+        Dialog.tipError(t("error.validDuration"));
         return;
     }
     data.position = formData.value.position;
@@ -37,7 +38,7 @@ const getValue = async (): Promise<VideoMergeImageForm | undefined> => {
     if (data.animation === "zoom") {
         data.zoomPercent = formData.value.zoomPercent;
         if (data.zoomPercent <= 0 || isNaN(data.zoomPercent)) {
-            Dialog.tipError("请设置有效的放大百分比");
+            Dialog.tipError(t("error.validZoomPercent"));
             return;
         }
     }
@@ -70,18 +71,26 @@ defineExpose({
     <div>
         <div class="mb-4 flex items-start">
             <div class="pt-1 w-20">
-                <a-tooltip :content="'片头图片'" mini> 位置 </a-tooltip>
+                <a-tooltip :content="$t('common.positionStartImage')" mini>
+                    {{ $t("common.position") }}
+                </a-tooltip>
             </div>
             <div class="flex items-center gap-2">
                 <a-radio-group v-model="formData.position" type="button">
-                    <a-radio value="start">片头</a-radio>
-                    <a-radio value="end">片尾</a-radio>
+                    <a-radio value="start">{{
+                        $t("common.positionStart")
+                    }}</a-radio>
+                    <a-radio value="end">{{
+                        $t("common.positionEnd")
+                    }}</a-radio>
                 </a-radio-group>
             </div>
         </div>
         <div class="mb-4 flex items-start">
             <div class="pt-1 w-20">
-                <a-tooltip :content="'片头图片'" mini> 长度 </a-tooltip>
+                <a-tooltip :content="$t('common.positionStartImage')" mini>
+                    {{ $t("common.length") }}
+                </a-tooltip>
             </div>
             <div class="flex items-center gap-2">
                 <a-input-number
@@ -92,7 +101,7 @@ defineExpose({
                     :precision="1"
                     style="width: 80px"
                 />
-                <span class="text-gray-500">秒</span>
+                <span class="text-gray-500">{{ $t("common.second") }}</span>
                 <div class="flex gap-1">
                     <a-button
                         v-for="preset in durationPresets"
@@ -113,18 +122,22 @@ defineExpose({
         </div>
         <div class="mb-4 flex items-start">
             <div class="pt-1 w-20">
-                <a-tooltip :content="'图片动画'" mini> 动画 </a-tooltip>
+                <a-tooltip :content="$t('common.animation')" mini>
+                    {{ $t("common.animation") }}
+                </a-tooltip>
             </div>
             <div class="flex items-center gap-2">
                 <a-radio-group v-model="formData.animation" type="button">
-                    <a-radio value="none">无</a-radio>
-                    <a-radio value="zoom">放大</a-radio>
+                    <a-radio value="none">{{ $t("common.none") }}</a-radio>
+                    <a-radio value="zoom">{{ $t("common.zoomIn2") }}</a-radio>
                 </a-radio-group>
             </div>
         </div>
         <div v-if="formData.animation === 'zoom'" class="mb-4 flex items-start">
             <div class="pt-1 w-20">
-                <a-tooltip :content="'放大百分比'" mini> 放大% </a-tooltip>
+                <a-tooltip :content="$t('common.zoomPercent')" mini>
+                    {{ $t("common.zoomPercent") }}
+                </a-tooltip>
             </div>
             <div class="flex items-center gap-2">
                 <a-input-number

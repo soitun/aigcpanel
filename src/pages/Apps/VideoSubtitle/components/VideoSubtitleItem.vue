@@ -59,7 +59,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-sound />
-                    解析视频
+                    {{ $t("common.parseVideo") }}
                 </div>
             </div>
             <div class="flex-grow pt-1">
@@ -74,7 +74,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    视频合成
+                    {{ $t("common.videoSynthesis") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Render">

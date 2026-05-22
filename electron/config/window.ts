@@ -1,5 +1,5 @@
 export const WindowConfig = {
-    alwaysOpenDevTools: true,
+    alwaysOpenDevTools: !process.env.ELECTRON_NO_DEVTOOLS,
     minWidth: 1200,
     minHeight: 700,
     initWidth: 1200,

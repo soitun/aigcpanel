@@ -12,35 +12,37 @@ const props = defineProps<{
 <template>
     <div class="flex flex-wrap mb-2 gap-1">
         <a-tag class="rounded-lg"
-            >音量
+            >{{ $t("common.volume") }}
             {{
-                data.volume !== undefined ? `${data.volume}%` : "未配置"
+                data.volume !== undefined
+                    ? `${data.volume}%`
+                    : $t("common.notConfigured")
             }}</a-tag
         >
         <a-tag class="rounded-lg"
-            >循环音频
+            >{{ $t("common.loopAudio") }}
             {{
                 data.loopAudio !== undefined
                     ? data.loopAudio
-                        ? "是"
-                        : "否"
-                    : "未配置"
+                        ? $t("common.yes")
+                        : $t("common.no")
+                    : $t("common.notConfigured")
             }}</a-tag
         >
         <a-tag class="rounded-lg"
-            >淡入时间
+            >{{ $t("common.fadeIn") }}
             {{
                 data.fadeInTime !== undefined
                     ? `${data.fadeInTime}ms`
-                    : "未配置"
+                    : $t("common.notConfigured")
             }}</a-tag
         >
         <a-tag class="rounded-lg"
-            >淡出时间
+            >{{ $t("common.fadeOut") }}
             {{
                 data.fadeOutTime !== undefined
                     ? `${data.fadeOutTime}ms`
-                    : "未配置"
+                    : $t("common.notConfigured")
             }}</a-tag
         >
     </div>

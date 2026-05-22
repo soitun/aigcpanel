@@ -85,7 +85,7 @@ const doRefresh = async () => {
                     :indeterminate="isIndeterminate"
                     @change="onCheckAll"
                 >
-                    全选
+                    {{ $t("common.selectAll") }}
                 </a-checkbox>
                 <TaskBatchDeleteAction
                     :records="checkRecords"

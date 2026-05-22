@@ -1,4 +1,6 @@
 import { defineAsyncComponent } from "vue";
+import AppIcon from "~icons/mdi/music-note-plus";
+import { t } from "../../../../lang";
 import {
     NodeFunctionCall,
     NodeRunController,
@@ -7,7 +9,6 @@ import {
 } from "../../../../module/Workflow/core/type";
 import { workflowRun } from "../../common/workflow";
 import { VideoMergeAudioRun } from "../task";
-import AppIcon from "~icons/mdi/music-note-plus";
 
 export default <NodeFunctionCall>{
     name: "VideoMergeAudio",
@@ -60,10 +61,10 @@ export default <NodeFunctionCall>{
                     fadeOutTime: fadeOutTime,
                 };
                 if (!taskRunData.video) {
-                    throw "视频参数错误";
+                    throw t("error.videoParamError");
                 }
                 if (!taskRunData.audio) {
-                    throw "音频参数错误";
+                    throw t("error.audioParamError");
                 }
                 return await VideoMergeAudioRun(taskRunData);
             },
@@ -74,13 +75,13 @@ export default <NodeFunctionCall>{
     },
     async check(node) {
         if (!node.properties?.data?.volume) {
-            throw "请输入音量参数";
+            throw t("error.inputVolumeParam");
         }
         if (node.properties?.inputFields?.[0].value === "") {
-            throw "请输入视频参数";
+            throw t("error.inputVideoParam");
         }
         if (node.properties?.inputFields?.[1].value === "") {
-            throw "请输入音频参数";
+            throw t("error.inputAudioParam");
         }
     },
 };

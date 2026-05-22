@@ -1,5 +1,5 @@
 import { t } from "../../lang";
-import BuildInProviderLogo from "./../../assets/image/logo.svg";
+
 import ZhinaoProviderLogo from "./assets/image/models/360.png";
 import HunyuanProviderLogo from "./assets/image/models/hunyuan.png";
 import AzureProviderLogo from "./assets/image/models/microsoft.png";
@@ -48,7 +48,6 @@ import { ModelProvider } from "./provider/provider";
 import { Provider } from "./types";
 
 const ProviderLogoMap = {
-    buildIn: BuildInProviderLogo,
     openai: OpenAiProviderLogo,
     silicon: SiliconFlowProviderLogo,
     deepseek: DeepSeekProviderLogo,
@@ -110,7 +109,6 @@ export function getProviderUrl(provider: Provider) {
 
 export const getProviderTitle = (providerId: string) => {
     const map: Record<string, string> = {
-        buildIn: t("provider.buildIn"),
         aihubmix: "AiHubMix",
         alayanew: "Alaya NeW",
         anthropic: "Anthropic",

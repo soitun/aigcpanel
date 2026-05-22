@@ -53,7 +53,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    解析视频
+                    {{ $t("common.parseVideo") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -68,7 +68,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-settings />
-                    变速配置
+                    {{ $t("common.speedConfig") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -85,7 +85,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    视频渲染
+                    {{ $t("common.videoRender") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Render">

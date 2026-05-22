@@ -1,3 +1,4 @@
+import { t } from "../../../lang";
 import { ffprobeVideoInfo } from "../../../lib/ffprobe";
 import {
     TaskRecord,
@@ -152,7 +153,7 @@ export const VideoSpeedPart: TaskBiz = {
         if (jobResult.step === "Config") {
             await TaskService.update(bizId, {
                 status: "pause",
-                statusMsg: "任务未完成，需要手动确认",
+                statusMsg: t("msg.taskNotCompleteConfirm"),
             });
         } else if (jobResult.step === "End") {
             await TaskService.update(bizId, {

@@ -1,3 +1,4 @@
+import { t } from "../../../lang";
 import { ffmpegOptimized } from "../../../lib/ffmpeg";
 import { VideoQuickCutSegment } from "./type";
 
@@ -11,7 +12,7 @@ export const videoQuickCutExecute = async (
     const includeSegments = segments.filter((seg) => seg.include);
 
     if (includeSegments.length === 0) {
-        throw new Error("没有选择任何片段");
+        throw new Error(t("error.noSegmentSelected"));
     }
 
     // 构建FFmpeg命令，使用concat filter合并多个片段

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref } from "vue";
+import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
 import { VideoQuickCutSegment } from "../type";
 import { TimeUtil } from "../../../../lib/util";
@@ -13,7 +14,7 @@ type RecordSegment = VideoQuickCutSegment & {
 const props = defineProps({
     saveTitle: {
         type: String,
-        default: "保存",
+        default: () => t("common.save"),
     },
 });
 
@@ -148,7 +149,7 @@ const onTimeUpdate = () => {
                 videoRef.value.currentTime = nextRecord.startSeconds || 0;
             } else {
                 videoRef.value.pause();
-                Dialog.tipSuccess("已播放到最后一个勾选片段");
+                Dialog.tipSuccess(t("msg.playedLastSelected"));
             }
         }
     }
@@ -211,7 +212,7 @@ const doMerge = () => {
     const first = sorted[0];
     const last = sorted[sorted.length - 1];
     if (last - first !== sorted.length - 1) {
-        Dialog.tipError("只能合并连续的片段");
+        Dialog.tipError(t("error.onlyMergeConsecutive"));
         return;
     }
     const text = currentRecords.value
@@ -251,7 +252,7 @@ const doSplit = () => {
             sliderValue.value < record.endSeconds!
         )
     ) {
-        Dialog.tipError("时间范围不合法，必须在片段中间");
+        Dialog.tipError(t("error.timeRangeInvalid"));
         return;
     }
     const newRecord = {
@@ -274,9 +275,9 @@ const doSplit = () => {
 
 <template>
     <a-modal v-model:visible="visible" width="95vw" title-align="start">
-        <template #title> 手动剪辑片段 </template>
+        <template #title> {{ $t("common.manualEditSegment") }} </template>
         <template #footer>
-            <a-button @click="doCancel">取消</a-button>
+            <a-button @click="doCancel">{{ $t("common.cancel") }}</a-button>
             <a-button type="primary" @click="doSave">{{
                 props.saveTitle
             }}</a-button>
@@ -291,7 +292,7 @@ const doSplit = () => {
                     class="bg-gray-100 p-2 border-b rounded-lg flex items-center"
                 >
                     <div class="text-sm font-medium text-gray-700 flex-grow">
-                        片段
+                        {{ $t("common.segment") }}
                     </div>
                     <div>
                         <a-button
@@ -301,7 +302,7 @@ const doSplit = () => {
                             @click="doSplit"
                             :disabled="currentIndex === -1"
                         >
-                            分割
+                            {{ $t("common.split") }}
                         </a-button>
                         <a-button
                             size="mini"
@@ -310,7 +311,7 @@ const doSplit = () => {
                             @click="doMerge"
                             :disabled="selectedIndexes.length < 2"
                         >
-                            合并
+                            {{ $t("common.merge") }}
                         </a-button>
                     </div>
                 </div>
@@ -318,7 +319,7 @@ const doSplit = () => {
                     v-if="currentRecords.length === 0"
                     class="text-center text-gray-500 py-4"
                 >
-                    没有可编辑的数据
+                    {{ $t("empty.noEditableData") }}
                 </div>
                 <div
                     v-else
@@ -370,7 +371,10 @@ const doSplit = () => {
                                         class="text-xs pt-1 select-none"
                                         @click="onSegmentSelect(index, $event)"
                                     >
-                                        {{ record.text || "[空白片段]" }}
+                                        {{
+                                            record.text ||
+                                            $t("common.emptySegment")
+                                        }}
                                     </div>
                                     <div
                                         v-if="index === currentIndex"
@@ -395,7 +399,7 @@ const doSplit = () => {
                     class="bg-gray-100 p-2 border-b rounded-lg flex items-center"
                 >
                     <div class="text-sm font-medium text-gray-700 flex-grow">
-                        预览
+                        {{ $t("common.preview") }}
                     </div>
                     <div>
                         <a-checkbox
@@ -403,7 +407,7 @@ const doSplit = () => {
                             class="text-xs"
                             @change="onPlayModeChange"
                         >
-                            只播放勾选
+                            {{ $t("common.playOnlySelected") }}
                         </a-checkbox>
                     </div>
                 </div>

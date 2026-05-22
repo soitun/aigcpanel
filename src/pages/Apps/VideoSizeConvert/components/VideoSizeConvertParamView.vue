@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps<{
     data: {
@@ -9,16 +12,16 @@ const props = defineProps<{
     };
 }>();
 
-const fillModeMap = {
-    blur: "模糊填充",
-    black: "黑边填充",
-    crop: "裁剪填充",
-    stretch: "拉伸填充",
+const fillModeMap: Record<string, string> = {
+    blur: "common.blurFill",
+    black: "common.blackFill",
+    crop: "common.cropFill",
+    stretch: "common.stretchFill",
 };
 
 const fillModeText = computed(() => {
     const mode = props.data.fillMode;
-    return fillModeMap[mode as keyof typeof fillModeMap] || mode;
+    return mode && fillModeMap[mode] ? t(fillModeMap[mode]) : mode;
 });
 </script>
 
@@ -27,7 +30,7 @@ const fillModeText = computed(() => {
         <a-tag class="rounded-lg">{{
             data.targetWidth && data.targetHeight
                 ? `${data.targetWidth}x${data.targetHeight} (${fillModeText})`
-                : "未配置"
+                : $t("common.notConfigured")
         }}</a-tag>
     </div>
 </template>

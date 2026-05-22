@@ -55,7 +55,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    解析文件
+                    {{ $t("common.parseVideo") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -73,19 +73,22 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-sound />
-                    音量配置
+                    {{ $t("common.volume") }}{{ $t("common.setting") }}
                 </div>
             </div>
             <div class="flex-grow">
                 <TaskJobResultStepView :record="record" step="Config">
                     <div class="flex items-center gap-1 mb-2">
                         <a-tag class="rounded-lg"
-                            >音频音量 {{ record.modelConfig?.volume }}%</a-tag
+                            >{{ $t("common.volume") }}
+                            {{ record.modelConfig?.volume }}%</a-tag
                         >
                         <a-tag class="rounded-lg"
-                            >循环音频
+                            >{{ $t("common.loopAudio") }}
                             {{
-                                record.modelConfig?.loopAudio ? "是" : "否"
+                                record.modelConfig?.loopAudio
+                                    ? $t("common.yes")
+                                    : $t("common.no")
                             }}</a-tag
                         >
                     </div>
@@ -96,7 +99,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    视频渲染
+                    {{ $t("common.videoRender") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Render">

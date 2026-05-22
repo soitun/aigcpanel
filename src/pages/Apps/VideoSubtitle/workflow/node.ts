@@ -1,4 +1,6 @@
 import { defineAsyncComponent } from "vue";
+import AppIcon from "~icons/mdi/subtitles-outline";
+import { t } from "../../../../lang";
 import {
     NodeFunctionCall,
     NodeRunController,
@@ -7,7 +9,6 @@ import {
 } from "../../../../module/Workflow/core/type";
 import { workflowRun } from "../../common/workflow";
 import { VideoSubtitleRun } from "../task";
-import AppIcon from "~icons/mdi/subtitles-outline";
 
 export default <NodeFunctionCall>{
     name: "VideoSubtitle",
@@ -51,9 +52,12 @@ export default <NodeFunctionCall>{
                 };
                 if (!taskRunData.video || !taskRunData.subtitle) {
                     const missing: string[] = [];
-                    if (!taskRunData.video) missing.push("视频");
-                    if (!taskRunData.subtitle) missing.push("字幕");
-                    throw `参数错误：缺少 ${missing.join(", ")}`;
+                    if (!taskRunData.video) missing.push(t("common.videoFile"));
+                    if (!taskRunData.subtitle)
+                        missing.push(t("common.subtitleFile"));
+                    throw t("error.missingParams", {
+                        params: missing.join(", "),
+                    });
                 }
                 return await VideoSubtitleRun(taskRunData);
             },
@@ -64,10 +68,10 @@ export default <NodeFunctionCall>{
     },
     async check(node) {
         if (node.properties?.inputFields?.[0].value === "") {
-            throw "请输入视频参数";
+            throw t("error.inputVideoParam");
         }
         if (node.properties?.inputFields?.[1].value === "") {
-            throw "请输入字幕参数";
+            throw t("error.inputSubtitleParam");
         }
     },
 };

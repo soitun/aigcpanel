@@ -2,6 +2,7 @@
 import { onMounted, ref, watch } from "vue";
 import Router from "../router";
 import ProUpgradeView from "../components/common/ProUpgradeView.vue";
+import PageHeader from "../components/PageHeader.vue";
 
 const tab = ref("");
 
@@ -30,7 +31,7 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
                     <i-mdi-broadcast
                         class="w-5 h-5 inline-block mr-1 text-rose-500"
                     />
-                    直播服务
+                    {{ $t("live.service") }}
                 </div>
             </div>
             <div
@@ -42,7 +43,7 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
                     <i-mdi-account-circle
                         class="w-5 h-5 inline-block mr-1 text-blue-500"
                     />
-                    直播形象
+                    {{ $t("live.avatar") }}
                 </div>
             </div>
             <div
@@ -54,7 +55,7 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
                     <i-mdi-book-open-variant
                         class="w-5 h-5 inline-block mr-1 text-amber-500"
                     />
-                    直播知识库
+                    {{ $t("live.knowledge") }}
                 </div>
             </div>
             <div
@@ -66,7 +67,7 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
                     <i-mdi-chat
                         class="w-5 h-5 inline-block mr-1 text-emerald-500"
                     />
-                    直播互动
+                    {{ $t("live.event") }}
                 </div>
             </div>
             <div
@@ -78,14 +79,17 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
                     <i-mdi-history
                         class="w-5 h-5 inline-block mr-1 text-violet-500"
                     />
-                    播报历史
+                    {{ $t("live.talkHistory") }}
                 </div>
             </div>
         </div>
-        <div
-            class="flex-grow h-full overflow-y-auto flex items-center justify-center"
-        >
-            <ProUpgradeView />
+        <div class="flex-grow h-full overflow-y-auto">
+            <div class="p-6">
+                <PageHeader :title="$t('live.title')" />
+                <div style="height: calc(100vh - 10rem)">
+                    <ProUpgradeView />
+                </div>
+            </div>
         </div>
     </div>
 </template>

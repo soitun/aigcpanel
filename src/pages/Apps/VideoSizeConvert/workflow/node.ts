@@ -1,4 +1,6 @@
 import { defineAsyncComponent } from "vue";
+import AppIcon from "~icons/mdi/aspect-ratio";
+import { t } from "../../../../lang";
 import {
     NodeFunctionCall,
     NodeRunController,
@@ -7,7 +9,6 @@ import {
 } from "../../../../module/Workflow/core/type";
 import { workflowRun } from "../../common/workflow";
 import { VideoSizeConvertRun } from "../task";
-import AppIcon from "~icons/mdi/aspect-ratio";
 
 export default <NodeFunctionCall>{
     name: "VideoSizeConvert",
@@ -53,7 +54,7 @@ export default <NodeFunctionCall>{
                     fillMode: fillMode,
                 };
                 if (!taskRunData.video) {
-                    throw "参数错误：缺少视频文件";
+                    throw t("error.missingVideoFile");
                 }
                 return await VideoSizeConvertRun(taskRunData);
             },
@@ -67,10 +68,10 @@ export default <NodeFunctionCall>{
             !node.properties?.data?.targetWidth ||
             !node.properties?.data?.targetHeight
         ) {
-            throw "请输入尺寸参数";
+            throw t("error.inputSizeParam");
         }
         if (node.properties?.inputFields?.[0].value === "") {
-            throw "请输入视频参数";
+            throw t("error.inputVideoParam");
         }
     },
 };

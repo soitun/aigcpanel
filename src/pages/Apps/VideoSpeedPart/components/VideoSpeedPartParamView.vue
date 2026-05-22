@@ -9,7 +9,9 @@ const props = defineProps<{
 <template>
     <div class="flex flex-wrap mb-2 gap-1">
         <a-tag class="rounded-lg">{{
-            data.speed ? `加速系数 ${data.speed}x` : "未配置"
+            data.speed
+                ? `${$t("common.accelerationValue", { speed: data.speed })}`
+                : $t("common.notConfigured")
         }}</a-tag>
     </div>
 </template>

@@ -10,6 +10,7 @@ export type Model = {
     types: ModelType[];
     enabled: boolean;
     editable: boolean;
+    rate?: number;
 };
 
 export type Provider = {

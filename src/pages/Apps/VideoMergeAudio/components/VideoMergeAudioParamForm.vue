@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
 
 const formData = ref({
@@ -34,15 +35,15 @@ const getValue = async (): Promise<VideoMergeAudioForm | undefined> => {
     data.fadeInTime = formData.value.fadeInTime;
     data.fadeOutTime = formData.value.fadeOutTime;
     if (data.volume <= 0 || isNaN(data.volume)) {
-        Dialog.tipError("请设置有效的音频音量");
+        Dialog.tipError(t("error.validAudioVolume"));
         return;
     }
     if (data.fadeInTime < 0 || isNaN(data.fadeInTime)) {
-        Dialog.tipError("请设置有效的淡入时间");
+        Dialog.tipError(t("error.validFadeInTime"));
         return;
     }
     if (data.fadeOutTime < 0 || isNaN(data.fadeOutTime)) {
-        Dialog.tipError("请设置有效的淡出时间");
+        Dialog.tipError(t("error.validFadeOutTime"));
         return;
     }
     return data;
@@ -73,9 +74,9 @@ defineExpose({
 <template>
     <div class="mb-4 flex items-start">
         <div class="pt-1 w-32">
-            <a-tooltip :content="'音频音量'" mini>
+            <a-tooltip :content="$t('common.volume')" mini>
                 <icon-sound />
-                音频音量
+                {{ $t("common.volume") }}
             </a-tooltip>
         </div>
         <div class="flex-grow gap-2">
@@ -106,9 +107,9 @@ defineExpose({
     </div>
     <div class="mb-4 flex items-start">
         <div class="pt-1 w-32">
-            <a-tooltip :content="'是否循环音频'" mini>
+            <a-tooltip :content="$t('common.loopAudio')" mini>
                 <icon-loop />
-                是否循环音频
+                {{ $t("common.loopAudio") }}
             </a-tooltip>
         </div>
         <div class="flex items-center gap-2">
@@ -117,9 +118,9 @@ defineExpose({
     </div>
     <div class="mb-4 flex items-start">
         <div class="pt-1 w-32">
-            <a-tooltip :content="'音频淡入时间（毫秒）'" mini>
+            <a-tooltip :content="$t('common.fadeIn')" mini>
                 <icon-arrow-up />
-                淡入时间 (ms)
+                {{ $t("common.fadeIn") }} (ms)
             </a-tooltip>
         </div>
         <div class="flex items-center gap-2">
@@ -134,9 +135,9 @@ defineExpose({
     </div>
     <div class="mb-4 flex items-start">
         <div class="pt-1 w-32">
-            <a-tooltip :content="'音频淡出时间（毫秒）'" mini>
+            <a-tooltip :content="$t('common.fadeOut')" mini>
                 <icon-arrow-down />
-                淡出时间 (ms)
+                {{ $t("common.fadeOut") }} (ms)
             </a-tooltip>
         </div>
         <div class="flex items-center gap-2">

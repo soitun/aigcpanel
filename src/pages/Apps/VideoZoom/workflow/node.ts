@@ -1,4 +1,6 @@
 import { defineAsyncComponent } from "vue";
+import AppIcon from "~icons/mdi/magnify";
+import { t } from "../../../../lang";
 import {
     NodeFunctionCall,
     NodeRunController,
@@ -7,7 +9,6 @@ import {
 } from "../../../../module/Workflow/core/type";
 import { workflowRun } from "../../common/workflow";
 import { VideoZoomRun } from "../task";
-import AppIcon from "~icons/mdi/magnify";
 
 export default <NodeFunctionCall>{
     name: "VideoZoom",
@@ -44,7 +45,7 @@ export default <NodeFunctionCall>{
                     title: param.node.properties?.title + "-" + param.node.id,
                 };
                 if (!taskRunData.video) {
-                    throw "参数错误：缺少视频文件";
+                    throw t("error.missingVideoFile");
                 }
                 return await VideoZoomRun(taskRunData);
             },
@@ -55,7 +56,7 @@ export default <NodeFunctionCall>{
     },
     async check(node) {
         if (node.properties?.inputFields?.[0].value === "") {
-            throw "请输入视频参数";
+            throw t("error.inputVideoParam");
         }
     },
 };

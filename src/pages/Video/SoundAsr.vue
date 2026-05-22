@@ -29,6 +29,7 @@ import SoundAsrCreate from "./components/SoundAsrCreate.vue";
 import SoundAsrRecordsEditDialog from "./components/SoundAsrRecordsEditDialog.vue";
 import ListerTop from "../../components/common/ListerTop.vue";
 import MEmpty from "../../components/common/MEmpty.vue";
+import PageHeader from "../../components/PageHeader.vue";
 
 interface AsrRecord {
     start: number;
@@ -100,14 +101,10 @@ const onEditSave = async (taskId: number, records: AsrRecord[]) => {
 
 <template>
     <div class="p-5">
-        <div class="mb-4 flex items-end">
-            <div class="text-3xl font-bold">
-                {{ $t("voice.recognition") }}
-            </div>
-            <div class="text-gray-400 ml-3">
-                {{ $t("desc.recognitionEdit") }}
-            </div>
-        </div>
+        <PageHeader
+            :title="$t('voice.recognition')"
+            :desc="$t('desc.recognitionEdit')"
+        />
         <div>
             <SoundAsrCreate @submitted="doRefresh" />
             <ListerTop

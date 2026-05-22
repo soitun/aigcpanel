@@ -1,4 +1,6 @@
 import { defineAsyncComponent } from "vue";
+import AppIcon from "~icons/mdi/image-plus";
+import { t } from "../../../../lang";
 import {
     NodeFunctionCall,
     NodeRunController,
@@ -7,7 +9,6 @@ import {
 } from "../../../../module/Workflow/core/type";
 import { workflowRun } from "../../common/workflow";
 import { VideoMergeImageRun } from "../task";
-import AppIcon from "~icons/mdi/image-plus";
 
 export default <NodeFunctionCall>{
     name: "VideoMergeImage",
@@ -62,9 +63,11 @@ export default <NodeFunctionCall>{
                 };
                 if (!taskRunData.video || !taskRunData.image) {
                     const missing: string[] = [];
-                    if (!taskRunData.video) missing.push("视频");
-                    if (!taskRunData.image) missing.push("图像");
-                    throw `参数错误：缺少 ${missing.join(", ")}`;
+                    if (!taskRunData.video) missing.push(t("common.videoFile"));
+                    if (!taskRunData.image) missing.push(t("common.imageFile"));
+                    throw t("error.missingParams", {
+                        params: missing.join(", "),
+                    });
                 }
                 return await VideoMergeImageRun(taskRunData);
             },
@@ -78,20 +81,20 @@ export default <NodeFunctionCall>{
             !node.properties?.data?.position ||
             !node.properties?.data?.duration
         ) {
-            throw "请输入图片位置和持续时间";
+            throw t("error.inputImagePositionDuration");
         }
         if (
             node.properties?.data?.animation === "zoom" &&
             (!node.properties?.data?.zoomPercent ||
                 node.properties?.data?.zoomPercent <= 0)
         ) {
-            throw "请设置有效的放大百分比";
+            throw t("error.validZoomPercent");
         }
         if (node.properties?.inputFields?.[0].value === "") {
-            throw "请输入视频参数";
+            throw t("error.inputVideoParam");
         }
         if (node.properties?.inputFields?.[1].value === "") {
-            throw "请输入图片参数";
+            throw t("error.inputImageParam2");
         }
     },
 };

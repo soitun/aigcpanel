@@ -1,22 +1,22 @@
 import { defineStore } from "pinia";
 import store from "../../../store/index";
 
+import { debounce } from "lodash-es";
+import { watch } from "vue";
+import { AppConfig } from "../../../config";
+import { t } from "../../../lang";
+import { Dialog } from "../../../lib/dialog";
+import { mapError } from "../../../lib/error";
+import { ObjectUtil, StringUtil } from "../../../lib/util";
+import { useUserStore } from "../../../store/modules/user";
+import { SystemModels } from "../models";
+import { ModelChatResult, ModelProvider } from "../provider/provider";
 import {
     getProviderLogo,
     getProviderTitle,
     SystemProviders,
 } from "../providers";
-import { SystemModels } from "../models";
 import { ChatParam, Model, Provider } from "../types";
-import { ObjectUtil, StringUtil } from "../../../lib/util";
-import { debounce } from "lodash-es";
-import { ModelChatResult, ModelProvider } from "../provider/provider";
-import { mapError } from "../../../lib/error";
-import { Dialog } from "../../../lib/dialog";
-import { t } from "../../../lang";
-import { useUserStore } from "../../../store/modules/user";
-import { watch } from "vue";
-import { AppConfig } from "../../../config";
 
 const userStore = useUserStore();
 
@@ -40,35 +40,6 @@ watch(
 );
 
 const mapModelError = (e: any, provider: Provider) => {
-    if (provider.id === "buildIn") {
-        const msg = e + "";
-        const showCharge = () => {
-            $mapi.user
-                .open({
-                    readyParam: {
-                        page: "ChargeLLMPX",
-                    },
-                })
-                .then();
-        };
-        const map = {
-            insufficient_user_quota: {
-                msg: t("error.energyInsufficient"),
-                callback: showCharge,
-            },
-        };
-        for (const key in map) {
-            if (msg.includes(key)) {
-                const error = map[key];
-                if (error.callback) {
-                    setTimeout(() => {
-                        error.callback();
-                    }, 3000);
-                }
-                return error.msg;
-            }
-        }
-    }
     return mapError(e);
 };
 
@@ -184,7 +155,6 @@ export const modelStore = defineStore("model", {
                 }
             }
             this.providers = results;
-            await this.refreshBuildIn(buildInProviderData);
         },
         async enabledModels(): Promise<ModelItem[]> {
             const results: ModelItem[] = [];
@@ -206,66 +176,7 @@ export const modelStore = defineStore("model", {
             });
             return results;
         },
-        async refreshBuildIn(buildInProviderData?: any) {
-            if (
-                userStore.data &&
-                userStore.data.llmpx &&
-                userStore.data.llmpx.models
-            ) {
-                const llmpx = userStore.data.llmpx;
-                const buildInProvider = this.providers.find(
-                    (p) => p.id === "buildIn",
-                );
-                if (!buildInProvider) {
-                    const models: Model[] = [];
-                    for (const m of llmpx.models) {
-                        const modelName = (m as any).name || m;
-                        models.push({
-                            id: modelName,
-                            provider: "buildIn",
-                            name: modelName,
-                            group: "Default",
-                            types: ["text"],
-                            enabled: true,
-                            editable: false,
-                        });
-                    }
-                    // console.log("model.init.buildIn", JSON.stringify({llmpx}, null, 2));
-                    let enabled = true;
-                    if (
-                        buildInProviderData &&
-                        "enabled" in buildInProviderData
-                    ) {
-                        enabled = buildInProviderData.enabled;
-                    }
-                    console.log("model.init.buildIn", {
-                        enabled,
-                        buildInProviderData,
-                    });
-                    this.providers.unshift({
-                        id: "buildIn",
-                        type: "openai",
-                        title: getProviderTitle("buildIn"),
-                        logo: getProviderLogo("buildIn"),
-                        isSystem: true,
-                        apiUrl: llmpx.apiUrl,
-                        websites: {
-                            official: AppConfig.website,
-                            docs: AppConfig.website,
-                            models: AppConfig.website,
-                        },
-                        data: {
-                            apiKey: llmpx.apiKey,
-                            apiHost: "",
-                            models: models,
-                            enabled: enabled,
-                        },
-                    });
-                } else {
-                    buildInProvider.data.apiKey = llmpx.apiKey;
-                }
-            }
-        },
+        async refreshBuildIn(buildInProviderData?: any) {},
         async add(provider: Partial<Provider>) {
             const p = {
                 id: provider.id || StringUtil.random(8),
@@ -312,7 +223,6 @@ export const modelStore = defineStore("model", {
             }
         },
         async test(providerId: string, modelId: string) {
-            await this.refreshBuildIn();
             const provider = this.providers.find((p) => p.id === providerId);
             if (!provider) {
                 return;
@@ -357,7 +267,6 @@ export const modelStore = defineStore("model", {
                 loading: boolean;
             },
         ): Promise<ModelChatResult> {
-            await this.refreshBuildIn();
             if (!providerId || !modelId) {
                 Dialog.tipError(t("hint.selectModel"));
                 return { code: -1, msg: t("hint.selectModel") };
@@ -373,6 +282,7 @@ export const modelStore = defineStore("model", {
             if (!provider) {
                 return { code: -1, msg: "provider not found" };
             }
+
             const m = provider.data.models.find((m) => m.id === modelId);
             if (!m) {
                 return { code: -1, msg: "model not found" };

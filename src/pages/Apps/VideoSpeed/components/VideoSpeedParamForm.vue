@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
 
 const formData = ref({
@@ -24,7 +25,7 @@ const getValue = async (): Promise<VideoSpeedForm | undefined> => {
     const data: any = {};
     data.speed = formData.value.speed;
     if (data.speed <= 0 || isNaN(data.speed)) {
-        Dialog.tipError("请设置有效的播放速度");
+        Dialog.tipError(t("error.validPlaybackSpeed"));
         return;
     }
     return data;
@@ -45,7 +46,7 @@ defineExpose({
 <template>
     <div class="mb-4 flex items-start">
         <div class="pt-1 w-5">
-            <a-tooltip :content="'播放速度'" mini>
+            <a-tooltip :content="$t('common.playbackSpeed')" mini>
                 <icon-clock-circle />
             </a-tooltip>
         </div>
@@ -56,7 +57,7 @@ defineExpose({
                 :max="10"
                 :step="0.1"
                 :precision="2"
-                placeholder="自定义速度"
+                :placeholder="$t('common.customSpeed')"
                 style="width: 120px"
             />
             <div class="flex gap-1">

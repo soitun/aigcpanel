@@ -1,5 +1,4 @@
 /// <reference types="vite/client" />
-import type { Dialog } from "./lib/dialog";
 import type { Router } from "vue-router";
 
 declare const __BUILD_ID__: string;

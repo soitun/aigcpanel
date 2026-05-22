@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
 
 const formData = ref({
@@ -21,7 +22,7 @@ const getValue = async (): Promise<VideoZoomForm | undefined> => {
     const data: any = {};
     data.zoomDurationMs = formData.value.zoomDurationMs;
     if (data.zoomDurationMs <= 0 || isNaN(data.zoomDurationMs)) {
-        Dialog.tipError("请设置有效的放大持续时间");
+        Dialog.tipError(t("error.validZoomDuration"));
         return;
     }
     return data;
@@ -42,9 +43,9 @@ defineExpose({
 <template>
     <div class="mb-4 flex items-start">
         <div class="pt-1 w-32">
-            <a-tooltip :content="'放大持续时间（毫秒）'" mini>
+            <a-tooltip :content="$t('common.zoomDuration')" mini>
                 <icon-zoom-in />
-                放大持续时间
+                {{ $t("common.zoomDuration") }}
             </a-tooltip>
         </div>
         <div class="flex-grow gap-2">

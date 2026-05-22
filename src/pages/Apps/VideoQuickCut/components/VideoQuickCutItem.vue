@@ -74,7 +74,7 @@ const onConfirm = async (taskId: number, records: any[]) => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    转换音频
+                    {{ $t("common.convertAudio") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -89,16 +89,19 @@ const onConfirm = async (taskId: number, records: any[]) => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-sound />
-                    语音识别
+                    {{ $t("common.speechRecognition") }}
                 </div>
             </div>
             <div class="flex-grow">
                 <TaskJobResultStepView :record="record" step="Asr">
                     <div>
                         <a-tag class="rounded-lg">
-                            识别出
-                            {{ (record.jobResult?.Asr.records || []).length }}
-                            个语音片段
+                            {{
+                                $t("common.recognizedSegments", {
+                                    count: (record.jobResult?.Asr.records || [])
+                                        .length,
+                                })
+                            }}
                         </a-tag>
                     </div>
                 </TaskJobResultStepView>
@@ -108,7 +111,7 @@ const onConfirm = async (taskId: number, records: any[]) => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-check />
-                    确认剪辑
+                    {{ $t("common.confirmEdit") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -132,7 +135,7 @@ const onConfirm = async (taskId: number, records: any[]) => {
                                 <template #icon>
                                     <icon-pen />
                                 </template>
-                                手动剪辑片段
+                                {{ $t("common.manualEditSegment") }}
                             </a-button>
                         </div>
                     </template>
@@ -143,7 +146,7 @@ const onConfirm = async (taskId: number, records: any[]) => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    视频合并
+                    {{ $t("common.videoMerge") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Merge">
@@ -171,7 +174,7 @@ const onConfirm = async (taskId: number, records: any[]) => {
     </div>
     <VideoQuickCutConfirmDialog
         ref="videoQuickCutConfirmDialog"
-        :save-title="'保存修改'"
+        :save-title="$t('common.saveModify')"
         @save="onConfirm"
     />
 </template>

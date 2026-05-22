@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
 import { TimeUtil } from "../../../../lib/util";
 import { TaskRecord, TaskService } from "../../../../service/TaskService";
@@ -45,11 +46,11 @@ const updateSegments = async () => {
 const doContinue = async () => {
     const includeCount = props.segments.filter((seg) => seg.include).length;
     if (includeCount === 0) {
-        Dialog.tipError("请至少选择一个片段");
+        Dialog.tipError(t("error.noSegmentSelected"));
         return;
     }
 
-    await Dialog.confirm(`确认包含 ${includeCount} 个片段，继续剪辑视频？`);
+    await Dialog.confirm(t("msg.confirmSegments", { count: includeCount }));
 
     const jobResult = props.record.jobResult;
     if (jobResult && props.record.id) {
@@ -59,7 +60,7 @@ const doContinue = async () => {
             jobResult,
         });
         emit("update");
-        Dialog.tipSuccess("任务已继续，开始剪辑视频");
+        Dialog.tipSuccess(t("msg.continueEditVideo"));
     }
 };
 
@@ -87,21 +88,26 @@ watchSegments();
         >
             <div class="flex items-center gap-4">
                 <div class="text-sm text-gray-600">
-                    已选择 {{ includeCount }} / {{ totalCount }} 个片段
+                    {{
+                        $t("common.segmentCount", {
+                            include: includeCount,
+                            total: totalCount,
+                        })
+                    }}
                 </div>
                 <div class="flex gap-2">
                     <a-button size="mini" @click="onToggleAll(true)">
-                        全选
+                        {{ $t("common.selectAll") }}
                     </a-button>
                     <a-button size="mini" @click="onToggleAll(false)">
-                        全不选
+                        {{ $t("common.deSelectAll") }}
                     </a-button>
                 </div>
             </div>
             <div>
                 <a-button type="primary" size="small" @click="doContinue">
                     <icon-play />
-                    继续剪辑
+                    {{ $t("common.continueEdit") }}
                 </a-button>
             </div>
         </div>
@@ -136,7 +142,11 @@ watchSegments();
                         :color="segment.include ? 'green' : 'red'"
                         size="small"
                     >
-                        {{ segment.include ? "包含" : "排除" }}
+                        {{
+                            segment.include
+                                ? $t("common.include")
+                                : $t("common.exclude")
+                        }}
                     </a-tag>
                 </div>
             </div>

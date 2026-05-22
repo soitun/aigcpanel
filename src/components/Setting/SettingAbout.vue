@@ -18,7 +18,7 @@ const doOpenLog = async () => {
         <div class="w-20">{{ t("common.version") }}</div>
         <div class="flex-grow">
             <div>
-                {{ $t("社区版") }}
+                {{ $t("common.communityEdition") }}
                 v{{ AppConfig.version }} Build {{ setting.buildInfo.buildId }}
             </div>
             <div class="pt-2">
@@ -44,9 +44,9 @@ const doOpenLog = async () => {
         </div>
     </div>
     <div class="flex mb-3 items-center">
-        <div class="w-20">{{ t("声明") }}</div>
+        <div class="w-20">{{ t("about.disclaimer") }}</div>
         <div class="flex-grow">
-            {{ t("本产品为开源软件，遵循 AGPL-3.0 license 协议。") }}
+            {{ t("about.license") }}
         </div>
     </div>
     <div class="mb-3">
