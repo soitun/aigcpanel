@@ -15,17 +15,24 @@ export const userStore = defineStore("user", {
                 id: null as string | null,
                 name: null as string | null,
                 avatar: null as string | null,
+                deviceCode: null as string | null,
             },
             data: {
-                vip: {},
-                functions: {},
+                vip: {
+                    id: null as string | null,
+                    flag: null as string | null,
+                    title: null as string | null,
+                    isDefault: true,
+                },
+                functions: {} as Record<string, any>,
             } as {
                 vip: {
-                    [key: string]: any;
+                    id: string | null;
+                    flag: string | null;
+                    title: string | null;
+                    isDefault: boolean;
                 };
-                functions: {
-                    [key: string]: any;
-                };
+                functions: Record<string, any>;
                 [key: string]: any;
             },
             basic: {} as {

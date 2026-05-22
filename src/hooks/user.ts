@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useUserStore } from "../store/modules/user";
 import { useSettingStore } from "../store/modules/setting";
 
@@ -111,4 +111,10 @@ document.addEventListener('click', (event) => {
         doBack,
         onMount,
     };
+};
+
+export const useUser = () => {
+    const store = useUserStore();
+    const isVip = computed(() => !store.data?.vip?.isDefault);
+    return { isVip, store };
 };
