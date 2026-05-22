@@ -18,10 +18,7 @@ const routes = [
                 path: "workflow",
                 component: () => import("./pages/Workflow.vue"),
             },
-            {
-                path: "workflow/edit/:id",
-                component: () => import("./pages/Workflow/Edit.vue"),
-            },
+
             { path: "setting", component: () => import("./pages/Setting.vue") },
         ],
     },

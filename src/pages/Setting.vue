@@ -8,8 +8,7 @@ import SettingEnv from "../components/Setting/SettingEnv.vue";
 import { t } from "../lang";
 import { TabContentScroller } from "../lib/ui";
 import ModelPromptDataConfigButton from "../module/Model/ModelPromptDataConfigButton.vue";
-import { LiveBlackWordContent } from "./Live/config/blackWord";
-import { LiveReplyGenerateContent } from "./Live/config/replyGenerate";
+
 import {
     SoundAsrResultOptimizedPrompt,
     SoundGenerateTextFormItems,
@@ -112,24 +111,6 @@ onBeforeUnmount(() => {
                     </div>
                     <div>
                         <div class="flex gap-1">
-                            <DataConfigDialogButton
-                                :title="t('live.violationWords')"
-                                name="LiveBlackWordContent"
-                                :placeholder="t('hint.multipleWordsComma')"
-                                :default-value="LiveBlackWordContent"
-                            />
-                            <ModelPromptDataConfigButton
-                                :title="t('live.replyGeneratePrompt')"
-                                name="LiveReplyGenerateContent"
-                                :prompt-placeholder="
-                                    t('hint.supportVariableReply')
-                                "
-                                :default-prompt="LiveReplyGenerateContent"
-                                :param="{
-                                    reply: t('live.sampleReplyContent'),
-                                    count: t('common.count'),
-                                }"
-                            />
                             <ModelPromptDataConfigButton
                                 :title="t('sound.asrOptimizePrompt')"
                                 name="SoundReplaceAsrResultOptimizedPrompt"

@@ -70,13 +70,12 @@ import {
 } from "../pages/Apps/VideoSubtitle/task";
 import { VideoZoom, VideoZoomCleaner } from "../pages/Apps/VideoZoom/task";
 import { TaskService } from "../service/TaskService";
-import { WorkflowLogService } from "../service/WorkflowService";
+
 import { useServerStore } from "../store/modules/server";
 import { useTaskStore } from "../store/modules/task";
 import { SoundAsr } from "./SoundAsr";
 import { SoundGenerate } from "./SoundGenerate";
 import { VideoGen } from "./VideoGen";
-import { Workflow, WorkflowCleaner } from "./Workflow";
 
 const taskStore = useTaskStore();
 const serverStore = useServerStore();
@@ -111,8 +110,6 @@ export const tasks = {
     VideoMerge,
     MediaFormatConvert,
     Ffmpeg,
-    // workflow
-    Workflow,
 };
 
 export const taskCleaners = {
@@ -140,8 +137,6 @@ export const taskCleaners = {
     VideoMerge: VideoMergeCleaner,
     MediaFormatConvert: MediaFormatConvertCleaner,
     Ffmpeg: FfmpegCleaner,
-    // workflow cleaner
-    Workflow: WorkflowCleaner,
 };
 
 export const TaskManager = {
@@ -165,28 +160,13 @@ export const TaskManager = {
                 }
             },
         );
-        window.__page.registerCallPage(
-            "httpserver:submitWorkflow",
-            async (
-                resolve: (data: any) => void,
-                reject: (error: string) => void,
-                data: any,
-            ) => {
-                try {
-                    const { workflowLogId } = data;
-                    await taskStore.dispatch("Workflow", workflowLogId, {});
-                    resolve({ workflowLogId });
-                } catch (e: any) {
-                    reject(String(e));
-                }
-            },
-        );
+
         nextTick(async () => {
             await serverStore.waitReady();
             for (const k in tasks) {
                 await TaskService.restoreForTask(k as any);
             }
-            await WorkflowLogService.restoreForTask();
+
             for (const k in taskCleaners) {
                 TaskService.registerCleaner(k as any, taskCleaners[k]);
             }

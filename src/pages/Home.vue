@@ -2,13 +2,9 @@
 import { nextTick, onMounted, ref } from "vue";
 import FeedbackTicketButton from "../components/common/FeedbackTicketButton.vue";
 
-import WorkflowIcon from "../components/Icon/WorkflowIcon.vue";
 import { TimeUtil } from "../lib/util";
 import { TaskService } from "../service/TaskService";
-import {
-    WorkflowLogService,
-    WorkflowService,
-} from "../service/WorkflowService";
+
 import { StorageService } from "../service/StorageService";
 import { VideoTemplateService } from "../service/VideoTemplateService";
 import Router from "../router";
@@ -22,9 +18,7 @@ const usageData = ref({
     videoGenToday: undefined as undefined | number,
     toolTotal: undefined as undefined | number,
     toolTotalToday: undefined as undefined | number,
-    workflowCount: undefined as undefined | number,
-    workflowTotal: undefined as undefined | number,
-    workflowTotalToday: undefined as undefined | number,
+
     liveAvatarCount: undefined as undefined | number,
     liveKnowledgeCount: undefined as undefined | number,
 });
@@ -49,9 +43,6 @@ onMounted(async () => {
             videoGenToday,
             taskTotal,
             taskTotalToday,
-            workflowCount,
-            workflowTotal,
-            workflowTotalToday,
             liveAvatarCount,
             liveKnowledgeCount,
         ] = await Promise.all([
@@ -62,9 +53,6 @@ onMounted(async () => {
             TaskService.count("VideoGen", todayStartTimestamp),
             TaskService.count(null),
             TaskService.count(null, todayStartTimestamp),
-            WorkflowService.count(),
-            WorkflowLogService.count(),
-            WorkflowLogService.count(todayStartTimestamp),
             StorageService.count("LiveAvatar"),
             StorageService.count("LiveKnowledge"),
         ]);
@@ -81,9 +69,6 @@ onMounted(async () => {
             0,
             taskTotalToday - soundGenerateToday - videoGenToday,
         );
-        usageData.value.workflowCount = workflowCount;
-        usageData.value.workflowTotal = workflowTotal;
-        usageData.value.workflowTotalToday = workflowTotalToday;
         usageData.value.liveAvatarCount = liveAvatarCount;
         usageData.value.liveKnowledgeCount = liveKnowledgeCount;
     });
@@ -179,27 +164,7 @@ onMounted(async () => {
                     <icon-tool class="text-amber-500 text-2xl" />
                 </div>
             </div>
-            <div
-                class="bg-white dark:bg-gray-800 rounded-xl p-5 cursor-pointer hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all group flex items-center justify-between relative overflow-hidden"
-                data-nav="workflow"
-                @click="$router.push('/workflow')"
-            >
-                <div class="flex-grow z-10 w-0">
-                    <div
-                        class="font-bold text-gray-800 dark:text-gray-200 text-base mb-1"
-                    >
-                        工作流
-                    </div>
-                    <div class="text-gray-500 text-xs truncate pr-2">
-                        自动化任务编排执行
-                    </div>
-                </div>
-                <div
-                    class="w-12 h-12 rounded-full bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center flex-shrink-0 group-hover:scale-125 group-hover:rotate-12 transition-all duration-300"
-                >
-                    <WorkflowIcon class="text-violet-500 w-6 h-6" />
-                </div>
-            </div>
+
             <div
                 class="bg-white dark:bg-gray-800 rounded-xl p-5 cursor-pointer hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all group flex items-center justify-between relative overflow-hidden"
                 data-nav="live"
@@ -351,48 +316,7 @@ onMounted(async () => {
                         </div>
                     </div>
                 </div>
-                <!-- 工作流 -->
-                <div
-                    class="flex flex-col gap-2 p-3 rounded-lg bg-violet-50 dark:bg-violet-900/20"
-                >
-                    <div class="flex items-center gap-1.5">
-                        <span
-                            class="w-2 h-2 rounded-full bg-violet-500 flex-shrink-0"
-                        ></span>
-                        <span
-                            class="text-xs font-medium text-gray-600 dark:text-gray-400"
-                            >工作流</span
-                        >
-                    </div>
-                    <div class="flex items-end gap-4">
-                        <div>
-                            <div
-                                class="text-xl font-bold text-gray-800 dark:text-gray-100"
-                            >
-                                {{ usageData.workflowTotal ?? "-" }}
-                            </div>
-                            <div class="text-xs text-gray-400">总数</div>
-                        </div>
-                        <div>
-                            <div
-                                class="text-xl font-bold"
-                                :class="
-                                    (usageData.workflowTotalToday ?? 0) > 0
-                                        ? 'text-emerald-500'
-                                        : 'text-gray-400'
-                                "
-                            >
-                                +{{ usageData.workflowTotalToday ?? "-" }}
-                            </div>
-                            <div class="text-xs text-gray-400">今日</div>
-                        </div>
-                        <div class="ml-auto self-start">
-                            <div class="text-xs text-gray-400">
-                                共{{ usageData.workflowCount ?? "-" }}个
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
                 <!-- 智能直播 -->
                 <div
                     class="flex flex-col gap-2 p-3 rounded-lg bg-rose-50 dark:bg-rose-900/20"

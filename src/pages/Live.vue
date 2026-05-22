@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
 import Router from "../router";
-import ProUpgrade from "../components/common/ProUpgrade.vue";
+import ProUpgradeView from "../components/common/ProUpgradeView.vue";
 
 const tab = ref("");
 
@@ -85,7 +85,7 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
         <div
             class="flex-grow h-full overflow-y-auto flex items-center justify-center"
         >
-            <ProUpgrade />
+            <ProUpgradeView />
         </div>
     </div>
 </template>
