@@ -1,6 +1,6 @@
 # AIGCPanel 数字人
 
-![](./screenshots/home.png)
+![](demo/image/home.png)
 
 ![](https://img.shields.io/badge/Framework-TS+Vue3+Electron-blue)
 [![](https://img.shields.io/badge/WEB-aigcpanel.com-blue)](https://aigcpanel.com)
@@ -90,37 +90,37 @@ AIGCPanel 是一款简单易用的一站式 AI 数字人桌面应用，支持 Wi
 
 快速导航入口 + 数据统计（语音合成、数字人合成、工具箱使用量，以及工作流（VIP）、智能直播形象与知识库数量）。
 
-![](./screenshots/home.png)
+![](demo/image/home.png)
 
 ### 数字人合成
 
 上传形象视频，输入文本或音频，一键生成换口型数字人视频。支持多种口型同步模型切换。
 
-![](./screenshots/video-gen.png)
+![](demo/image/video-gen.png)
 
 ### 我的形象
 
 管理数字人形象模板，支持普通视频和绿幕视频。
 
-![](./screenshots/video-template.png)
+![](demo/image/video-template.png)
 
 ### 语音合成
 
 多模型 TTS，支持语音克隆（上传参考音频）、速度/音调调节，任务列表可批量下载。
 
-![](./screenshots/sound-tts.png)
+![](demo/image/sound-tts.png)
 
 ### 工具箱
 
 25+ 音视频处理工具，覆盖日常 AI 创作所需的全部音视频处理流程。包含声音识别（ASR）、长文本转音频、字幕转音频、声音替换、文生图、图生图，以及背景添加、智能剪辑、字幕、变速、压缩等视频处理工具。
 
-![](./screenshots/tool.png)
+![](demo/image/tool.png)
 
 ### AI 模型管理
 
 统一管理本地模型和远程 API 模型。支持一键启动/停止、实时日志查看、参数配置。云端 AI 模型服务（VIP）无需本地显卡。
 
-![](./screenshots/server.png)
+![](demo/image/server.png)
 
 ### 可视化工作流（VIP）
 
@@ -137,21 +137,21 @@ AIGCPanel 是一款简单易用的一站式 AI 数字人桌面应用，支持 Wi
 | 正则提取 | 从文本中提取结构化内容 |
 | 工具节点 | 直接调用工具箱内任意工具 |
 
-![](./screenshots/workflow.png)
+![](demo/image/workflow.png)
 
 ### 智能直播
 
 多平台弹幕监控 + 自动互动应答。配置知识库后，系统根据弹幕内容自动播报对应的语音或视频。
 
-![](./screenshots/live-monitor.png)
+![](demo/image/live-monitor.png)
 
 **直播知识库**：配置触发词与回复内容，支持文字回复和视频播放两种模式。违禁词检测和回复 Prompt 自定义（VIP）。
 
-![](./screenshots/live-knowledge.png)
+![](demo/image/live-knowledge.png)
 
 **直播形象**：管理直播使用的数字人形象视频。
 
-![](./screenshots/live-avatar.png)
+![](demo/image/live-avatar.png)
 
 ## 安装使用
 

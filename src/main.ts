@@ -16,15 +16,19 @@ import { Dialog } from "./lib/dialog";
 import "./style.less";
 
 import { CommonComponents } from "./components/common";
-import { useModelStore } from "./module/Model/store/model";
-import { useServerStore } from "./store/modules/server";
 import { useSettingStore } from "./store/modules/setting";
-import { useUserStore } from "./store/modules/user";
 import { TaskManager } from "./task";
 
 import { reportErrorRender } from "../electron/mapi/log/beacon-render";
 import { TaskService } from "./service/TaskService";
 import { useTaskStore } from "./store/modules/task";
+import {
+    initTestRegistry,
+    registerGetTask,
+    registerNavigate,
+    testPushError,
+    testRegistry,
+} from "./utils/test";
 
 const settingStore = useSettingStore();
 
@@ -71,6 +75,7 @@ app.mount("#app").$nextTick(() => {
     postMessage({ payload: "removeLoading" }, "*");
 
     window.addEventListener("error", (ev) => {
+        testPushError(ev.message || String(ev));
         reportErrorRender(
             ev.message,
             ev.error?.stack,
@@ -84,7 +89,16 @@ app.mount("#app").$nextTick(() => {
         const err = ev.reason;
         const msg = err instanceof Error ? err.message : String(err);
         const stack = err instanceof Error ? err.stack : undefined;
-
+        testPushError(msg);
         reportErrorRender(msg, stack);
+    });
+
+    initTestRegistry();
+    window.__test = testRegistry;
+    registerNavigate(async (path) => {
+        await router.push(path);
+    });
+    registerGetTask(async (taskId) => {
+        return await TaskService.get(taskId);
     });
 });

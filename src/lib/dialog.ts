@@ -1,7 +1,7 @@
 import { Message, MessageReturn, Modal } from "@arco-design/web-vue";
-import Prompt from "./components/Prompt.vue";
 import { h } from "vue";
-import { i18n, t } from "../lang";
+import { t } from "../lang";
+import Prompt from "./components/Prompt.vue";
 
 let loadingLayers: MessageReturn[] = [];
 
@@ -10,6 +10,7 @@ export const Dialog = {
         Message.success(msg);
     },
     tipError: (msg: string) => {
+        
         Message.error(msg);
     },
     confirm: (content: string, title: string | null = null): Promise<void> => {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { AppConfig } from "../../config";
 
 defineProps({
@@ -7,6 +8,8 @@ defineProps({
         default: "",
     },
 });
+
+
 </script>
 
 <template>

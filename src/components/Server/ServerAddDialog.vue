@@ -11,6 +11,7 @@ import { EnumServerType, ServerRecord } from "../../types/Server";
 import { isDev } from "../../lib/env";
 import ServerAddResolvePanel from "./ServerAddResolvePanel.vue";
 
+
 const resolvePanel = ref<InstanceType<typeof ServerAddResolvePanel> | null>(
     null,
 );
@@ -200,7 +201,7 @@ const doSelectLocalDir = async () => {
 
 const doSelectCloud = async () => {
     let isPro = false;
-
+    
     if (!isPro) {
         Dialog.tipError(t("error.upgradeToProVersion"));
     }
@@ -388,4 +389,5 @@ const emit = defineEmits({
             </div>
         </div>
     </a-modal>
+    
 </template>

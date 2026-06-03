@@ -40,6 +40,7 @@ watch(
 );
 
 const mapModelError = (e: any, provider: Provider) => {
+    
     return mapError(e);
 };
 
@@ -155,6 +156,7 @@ export const modelStore = defineStore("model", {
                 }
             }
             this.providers = results;
+            
         },
         async enabledModels(): Promise<ModelItem[]> {
             const results: ModelItem[] = [];
@@ -176,7 +178,9 @@ export const modelStore = defineStore("model", {
             });
             return results;
         },
-        async refreshBuildIn(buildInProviderData?: any) {},
+        async refreshBuildIn(buildInProviderData?: any) {
+            
+        },
         async add(provider: Partial<Provider>) {
             const p = {
                 id: provider.id || StringUtil.random(8),
@@ -223,6 +227,7 @@ export const modelStore = defineStore("model", {
             }
         },
         async test(providerId: string, modelId: string) {
+            
             const provider = this.providers.find((p) => p.id === providerId);
             if (!provider) {
                 return;
@@ -267,6 +272,7 @@ export const modelStore = defineStore("model", {
                 loading: boolean;
             },
         ): Promise<ModelChatResult> {
+            
             if (!providerId || !modelId) {
                 Dialog.tipError(t("hint.selectModel"));
                 return { code: -1, msg: t("hint.selectModel") };
@@ -282,7 +288,7 @@ export const modelStore = defineStore("model", {
             if (!provider) {
                 return { code: -1, msg: "provider not found" };
             }
-
+            
             const m = provider.data.models.find((m) => m.id === modelId);
             if (!m) {
                 return { code: -1, msg: "model not found" };

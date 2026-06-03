@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import InputInlineEditor from "../../components/common/InputInlineEditor.vue";
 import VideoPlayer from "../../components/common/VideoPlayer.vue";
 import { t } from "../../lang";
@@ -15,6 +15,7 @@ import ListerTop from "../../components/common/ListerTop.vue";
 import MEmpty from "../../components/common/MEmpty.vue";
 import MLoading from "../../components/common/MLoading.vue";
 import PageHeader from "../../components/PageHeader.vue";
+import { testActionSet, testActionUnset } from "../../utils/test";
 
 const editDialog = ref<InstanceType<typeof VideoTemplateEditDialog>>();
 const cloudDialog = ref<InstanceType<typeof VideoTemplateCloudDialog>>();
@@ -29,6 +30,11 @@ const doRefresh = async () => {
 
 onMounted(async () => {
     await doRefresh();
+    
+});
+
+onUnmounted(() => {
+    
 });
 
 const doDelete = async (record: VideoTemplateRecord) => {

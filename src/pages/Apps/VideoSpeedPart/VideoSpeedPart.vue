@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { testActionSet, testActionUnset } from "@/utils/test";
 import { onMounted, onUnmounted, ref } from "vue";
 import { t } from "../../../lang";
 import TaskBatchDeleteAction from "../../../components/Server/TaskBatchDeleteAction.vue";
@@ -37,9 +38,12 @@ const taskStore = useTaskStore();
 
 onMounted(async () => {
     await doRefresh();
+    
 });
 
-onUnmounted(() => {});
+onUnmounted(() => {
+    
+});
 
 const doRefresh = async () => {
     const rawRecords = await TaskService.list("VideoSpeedPart");

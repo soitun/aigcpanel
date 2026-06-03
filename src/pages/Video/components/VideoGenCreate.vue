@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { testActionSet, testActionUnset } from "@/utils/test";
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
 import { t } from "../../../lang";
@@ -30,9 +31,12 @@ onMounted(() => {
     formData.value.soundType = old.soundType || "soundGenerate";
     formData.value.soundGenerateId = old.soundGenerateId || 0;
     formData.value.soundCustomFile = old.soundCustomFile || "";
+    
 });
 
-onUnmounted(() => {});
+onUnmounted(() => {
+    
+});
 
 watch(
     () => formData.value,

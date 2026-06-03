@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { testActionSet, testActionUnset } from "@/utils/test";
 import { onMounted, onUnmounted, ref } from "vue";
 import TaskBatchDeleteAction from "../../../components/Server/TaskBatchDeleteAction.vue";
 import TaskBatchDownloadAction from "../../../components/Server/TaskBatchDownloadAction.vue";
@@ -36,9 +37,12 @@ const taskStore = useTaskStore();
 
 onMounted(async () => {
     await doRefresh();
+    
 });
 
-onUnmounted(() => {});
+onUnmounted(() => {
+    
+});
 
 const doRefresh = async () => {
     const rawRecords = await TaskService.list("VideoKeepPart" as any);

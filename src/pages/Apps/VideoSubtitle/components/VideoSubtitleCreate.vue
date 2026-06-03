@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { testActionSet, testActionUnset } from "@/utils/test";
 import { onMounted, onUnmounted, ref } from "vue";
 import { dataAutoSaveDraft } from "../../../../components/common/util";
 import { t } from "../../../../lang";
@@ -50,6 +51,8 @@ const doSubmit = async () => {
     clearDraft();
     return id;
 };
+
+
 </script>
 
 <template>

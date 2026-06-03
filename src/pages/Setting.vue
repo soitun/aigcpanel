@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, onUnmounted, ref } from "vue";
 import DataConfigDialogButton from "../components/common/DataConfigDialogButton.vue";
 import SettingAbout from "../components/Setting/SettingAbout.vue";
 import SettingBasic from "../components/Setting/SettingBasic.vue";
@@ -15,6 +15,7 @@ import {
     SoundGenerateTextPrompt,
 } from "./Video/components/config/prompt";
 import { SoundGenerateReplaceContent } from "./Video/components/config/replaceContent";
+import { testActionSet, testActionUnset } from "../utils/test";
 
 let tabContentScroller: TabContentScroller | null = null;
 const contentContainer = ref<HTMLElement | null>(null);
@@ -27,9 +28,13 @@ onMounted(() => {
             activeClass: "menu-active",
         },
     );
+    testActionSet("page.ready", () => {});
 });
 onBeforeUnmount(() => {
     tabContentScroller?.destroy();
+});
+onUnmounted(() => {
+    testActionUnset("page.ready");
 });
 </script>
 
@@ -111,6 +116,7 @@ onBeforeUnmount(() => {
                     </div>
                     <div>
                         <div class="flex gap-1">
+                            
                             <ModelPromptDataConfigButton
                                 :title="t('sound.asrOptimizePrompt')"
                                 name="SoundReplaceAsrResultOptimizedPrompt"

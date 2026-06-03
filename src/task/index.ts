@@ -77,6 +77,7 @@ import { SoundAsr } from "./SoundAsr";
 import { SoundGenerate } from "./SoundGenerate";
 import { VideoGen } from "./VideoGen";
 
+
 const taskStore = useTaskStore();
 const serverStore = useServerStore();
 
@@ -110,6 +111,7 @@ export const tasks = {
     VideoMerge,
     MediaFormatConvert,
     Ffmpeg,
+    
 };
 
 export const taskCleaners = {
@@ -137,6 +139,7 @@ export const taskCleaners = {
     VideoMerge: VideoMergeCleaner,
     MediaFormatConvert: MediaFormatConvertCleaner,
     Ffmpeg: FfmpegCleaner,
+    
 };
 
 export const TaskManager = {
@@ -160,13 +163,13 @@ export const TaskManager = {
                 }
             },
         );
-
+        
         nextTick(async () => {
             await serverStore.waitReady();
             for (const k in tasks) {
                 await TaskService.restoreForTask(k as any);
             }
-
+            
             for (const k in taskCleaners) {
                 TaskService.registerCleaner(k as any, taskCleaners[k]);
             }

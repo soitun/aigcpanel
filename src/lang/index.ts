@@ -57,7 +57,7 @@ export const messageList = [
         label: "English",
         messages: {
             ...enUS,
-
+            
             ...soundEnUS,
             ...appsEnUS,
             ...videoEnUS,
@@ -84,7 +84,7 @@ export const messageList = [
         label: "简体中文",
         messages: {
             ...zhCN,
-
+            
             ...soundZhCN,
             ...appsZhCN,
             ...videoZhCN,

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { testActionSet, testActionUnset } from "@/utils/test";
 import { onMounted, onUnmounted, ref } from "vue";
 import FileSelector from "../../../../components/common/FileSelector.vue";
 import ImagePreviewBox from "../../../../components/common/ImagePreviewBox.vue";
@@ -21,9 +22,13 @@ const { clearDraft } = dataAutoSaveDraft(
     formData.value,
 );
 
-onMounted(() => {});
+onMounted(() => {
+    
+});
 
-onUnmounted(() => {});
+onUnmounted(() => {
+    
+});
 
 const doSubmit = async () => {
     const imageToImageValue = await imageToImageForm.value?.getValue();

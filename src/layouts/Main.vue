@@ -43,6 +43,7 @@ const doQuit = async () => {
 
 let appEditionBadge = t("common.communityEdition");
 
+
 onMounted(() => {
     // document.body.setAttribute('arco-theme', 'dark')
 });

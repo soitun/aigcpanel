@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import { t } from "../lang";
 import Router from "../router";
 import SoundGenerate from "./Video/SoundGenerate.vue";
 import VideoGen from "./Video/VideoGen.vue";
 import VideoTemplate from "./Video/VideoTemplate.vue";
 import VideoGenFlow from "./Apps/VideoGenFlow/VideoGenFlow.vue";
+import { testActionSet, testActionUnset } from "../utils/test";
 
 const tab = ref("");
 
@@ -16,6 +17,12 @@ const syncTab = () => {
 
 onMounted(() => {
     syncTab();
+    testActionSet("page.ready", () => {});
+    testActionSet("page.tab", () => tab.value);
+});
+
+onUnmounted(() => {
+    testActionUnset(["page.ready", "page.tab"]);
 });
 
 watch(() => Router.currentRoute.value.query.tab, syncTab);
@@ -78,25 +85,16 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
             </div>
         </div>
         <div class="flex-grow h-full overflow-y-auto">
-            <div
-                v-if="tab === 'soundGenerate'"
-                data-auto-test-id="dh-soundGenerate"
-            >
+            <div v-if="tab === 'soundGenerate'">
                 <SoundGenerate />
             </div>
-            <div v-else-if="tab === 'videoGen'" data-auto-test-id="dh-videoGen">
+            <div v-else-if="tab === 'videoGen'">
                 <VideoGen />
             </div>
-            <div
-                v-else-if="tab === 'videoTemplate'"
-                data-auto-test-id="dh-videoTemplate"
-            >
+            <div v-else-if="tab === 'videoTemplate'">
                 <VideoTemplate />
             </div>
-            <div
-                v-else-if="tab === 'VideoGenFlow'"
-                data-auto-test-id="dh-VideoGenFlow"
-            >
+            <div v-else-if="tab === 'VideoGenFlow'">
                 <VideoGenFlow />
             </div>
         </div>

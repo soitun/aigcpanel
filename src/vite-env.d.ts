@@ -4,7 +4,9 @@ import type { Router } from "vue-router";
 declare const __BUILD_ID__: string;
 
 declare global {
-    interface Window {}
+    interface Window {
+        __test?: import("./utils/test").TestRegistry;
+    }
 }
 
 declare module "*.vue" {

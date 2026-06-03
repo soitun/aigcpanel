@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import Router from "../router";
 import { SoundToolApps, ToolApps, VideoProcessingApps } from "./Apps/all";
+import { testActionSet, testActionUnset } from "../utils/test";
 
 const tab = ref("");
 
@@ -19,6 +20,12 @@ const syncTab = () => {
 
 onMounted(() => {
     syncTab();
+    testActionSet("page.ready", () => {});
+    testActionSet("page.tab", () => tab.value);
+});
+
+onUnmounted(() => {
+    testActionUnset(["page.ready", "page.tab"]);
 });
 
 watch(() => Router.currentRoute.value.query.tab, syncTab);

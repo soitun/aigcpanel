@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { testActionSet, testActionUnset } from "@/utils/test";
 import { onMounted, onUnmounted, ref } from "vue";
 import FileSelector from "../../../components/common/FileSelector.vue";
 import { t } from "../../../lang";
@@ -16,9 +17,13 @@ const formData = ref({
     audio: "",
 });
 
-onMounted(() => {});
+onMounted(() => {
+    
+});
 
-onUnmounted(() => {});
+onUnmounted(() => {
+    
+});
 
 const onSelectAudioFile = async () => {
     try {

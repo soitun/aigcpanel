@@ -18,6 +18,7 @@ import store from "../index";
 import { useTaskStore } from "./task";
 import { ServerInfo } from "../../../electron/mapi/server/type";
 
+
 const taskStore = useTaskStore();
 const serverRuntime = ref<Map<string, ServerRuntime>>(new Map());
 const createServerStatus = (
@@ -185,6 +186,7 @@ export const serverStore = defineStore("server", {
     actions: {
         async waitReady() {
             await wait(() => this.isReady);
+            
         },
         async init() {
             await $mapi.storage.get("server", "records", []).then((records) => {
@@ -447,12 +449,14 @@ export const serverStore = defineStore("server", {
             await $mapi.storage.set("server", "records", savedRecords);
         },
         async getByKey(key: string): Promise<ServerRecord | undefined> {
+            
             return this.records.find((record) => record.key === key);
         },
         async getByNameVersion(
             name: string,
             version: string,
         ): Promise<ServerRecord | undefined> {
+            
             return this.records.find(
                 (record) => record.name === name && record.version === version,
             );

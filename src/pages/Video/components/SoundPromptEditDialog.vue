@@ -70,6 +70,12 @@ const doSave = async () => {
 
 defineExpose({
     add,
+    fill(params: { name?: string; promptText?: string }) {
+        if (params.name !== undefined) formData.value.name = params.name;
+        if (params.promptText !== undefined)
+            formData.value.promptText = params.promptText;
+    },
+    doSave,
 });
 
 const emit = defineEmits({

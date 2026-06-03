@@ -104,6 +104,14 @@ const doSave = async () => {
 
 defineExpose({
     add,
+    fill(params: { name?: string; video?: string }) {
+        if (params.name !== undefined) formData.value.name = params.name;
+        if (params.video !== undefined) {
+            formData.value.video = params.video;
+            previewVideoPath.value = params.video;
+        }
+    },
+    doSave,
 });
 
 const emit = defineEmits({

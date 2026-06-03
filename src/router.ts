@@ -18,7 +18,7 @@ const routes = [
                 path: "workflow",
                 component: () => import("./pages/Workflow.vue"),
             },
-
+            
             { path: "setting", component: () => import("./pages/Setting.vue") },
         ],
     },

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { testActionSet, testActionUnset } from "@/utils/test";
 import { onMounted, onUnmounted, ref } from "vue";
 import FileSelector from "../../../../components/common/FileSelector.vue";
 import { dataAutoSaveDraft } from "../../../../components/common/util";
@@ -19,9 +20,13 @@ const { clearDraft } = dataAutoSaveDraft(
     formData.value,
 );
 
-onMounted(() => {});
+onMounted(() => {
+    
+});
 
-onUnmounted(() => {});
+onUnmounted(() => {
+    
+});
 
 const doSubmit = async () => {
     const soundGenerateValue = await soundGenerateForm.value?.getValue();

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from "vue";
+import { nextTick, onMounted, onUnmounted, ref } from "vue";
 import FeedbackTicketButton from "../components/common/FeedbackTicketButton.vue";
+
 
 import { TimeUtil } from "../lib/util";
 import { TaskService } from "../service/TaskService";
@@ -9,6 +10,9 @@ import { StorageService } from "../service/StorageService";
 import { VideoTemplateService } from "../service/VideoTemplateService";
 import Router from "../router";
 import { AllApps } from "./Apps/all";
+import { testActionSet, testActionUnset } from "../utils/test";
+
+
 
 const usageData = ref({
     soundGenerate: undefined as undefined | number,
@@ -18,7 +22,7 @@ const usageData = ref({
     videoGenToday: undefined as undefined | number,
     toolTotal: undefined as undefined | number,
     toolTotalToday: undefined as undefined | number,
-
+    
     liveAvatarCount: undefined as undefined | number,
     liveKnowledgeCount: undefined as undefined | number,
 });
@@ -32,6 +36,7 @@ const doUrl = (url: string) => {
 };
 
 onMounted(async () => {
+    testActionSet("page.ready", () => {});
     nextTick(async () => {
         const todayStart = TimeUtil.formatDate(Date.now()) + " 00:00:00";
         const todayStartTimestamp = TimeUtil.datetimeToTimestamp(todayStart);
@@ -71,7 +76,12 @@ onMounted(async () => {
         );
         usageData.value.liveAvatarCount = liveAvatarCount;
         usageData.value.liveKnowledgeCount = liveKnowledgeCount;
+        
     });
+});
+
+onUnmounted(() => {
+    testActionUnset("page.ready");
 });
 </script>
 
@@ -97,10 +107,7 @@ onMounted(async () => {
         </div>
 
         <!-- 导航卡片 -->
-        <div
-            class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6"
-            data-auto-test-id="home-nav-cards"
-        >
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <div
                 class="bg-white dark:bg-gray-800 rounded-xl p-5 cursor-pointer hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all group flex items-center justify-between relative overflow-hidden"
                 data-nav="soundGenerate"
@@ -164,7 +171,7 @@ onMounted(async () => {
                     <icon-tool class="text-amber-500 text-2xl" />
                 </div>
             </div>
-
+            
             <div
                 class="bg-white dark:bg-gray-800 rounded-xl p-5 cursor-pointer hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all group flex items-center justify-between relative overflow-hidden"
                 data-nav="live"
@@ -191,7 +198,6 @@ onMounted(async () => {
         <!-- 数据统计 -->
         <div
             class="bg-white dark:bg-gray-800 rounded-xl p-5 mb-6 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow"
-            data-auto-test-id="home-statistics"
         >
             <div
                 class="text-base font-bold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-200"
@@ -316,7 +322,7 @@ onMounted(async () => {
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- 智能直播 -->
                 <div
                     class="flex flex-col gap-2 p-3 rounded-lg bg-rose-50 dark:bg-rose-900/20"
@@ -354,6 +360,8 @@ onMounted(async () => {
 
         <!-- 云端 AI 模型 / 模型市场 / 工单反馈 -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            
+
             <a
                 href="https://aigcpanel.com/zh/asset"
                 target="_blank"
@@ -404,7 +412,6 @@ onMounted(async () => {
         <!-- 小工具功能卡片 -->
         <div
             class="bg-white dark:bg-gray-800 rounded-xl p-5 mb-5 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow"
-            data-auto-test-id="home-tool-apps"
         >
             <div
                 class="text-base font-bold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-200"
@@ -457,6 +464,7 @@ onMounted(async () => {
             </div>
         </div>
     </div>
+    
 </template>
 
 <style scoped></style>

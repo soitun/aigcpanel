@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { testActionSet, testActionUnset } from "@/utils/test";
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
@@ -25,9 +26,12 @@ const formData = ref({
 onMounted(async () => {
     const old = StorageUtil.getObject("VideoGenFlowCreate.formData");
     formData.value.text = old.text || "";
+    
 });
 
-onUnmounted(() => {});
+onUnmounted(() => {
+    
+});
 
 watch(
     () => formData.value,

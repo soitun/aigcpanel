@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import ServerActionDelete from "../components/Server/ServerActionDelete.vue";
 import ServerActionInfo from "../components/Server/ServerActionInfo.vue";
 import ServerActionLog from "../components/Server/ServerActionLog.vue";
@@ -18,6 +18,8 @@ import { EnumServerType } from "../types/Server";
 import ServerRemoteAddDialog from "../components/Server/ServerRemoteAddDialog.vue";
 import ListerTop from "../components/common/ListerTop.vue";
 import PageHeader from "../components/PageHeader.vue";
+import { testActionSet, testActionUnset } from "../utils/test";
+
 
 const addDialog = ref<InstanceType<typeof ServerAddDialog> | null>(null);
 const remoteAddDialog = ref<InstanceType<typeof ServerRemoteAddDialog> | null>(
@@ -48,6 +50,16 @@ const typeName = (type: string) => {
         return t("model.remoteModel");
     }
 };
+
+onMounted(() => {
+    testActionSet("page.ready", () => {});
+    
+});
+
+onUnmounted(() => {
+    testActionUnset("page.ready");
+    
+});
 </script>
 
 <template>
@@ -62,7 +74,7 @@ const typeName = (type: string) => {
                     </template>
                     {{ $t("setting.llm") }}
                 </a-button>
-
+                
                 <a-button
                     v-if="serverStore.records.length > 0"
                     @click="remoteAddDialog?.show()"
@@ -238,6 +250,7 @@ const typeName = (type: string) => {
     <ServerAddDialog ref="addDialog" @update="doRefresh" />
     <ServerRemoteAddDialog ref="remoteAddDialog" @update="doRefresh" />
     <ModelSettingDialog ref="modelSettingDialog" />
+    
 </template>
 
 <style scoped></style>

@@ -48,6 +48,7 @@ import { ModelProvider } from "./provider/provider";
 import { Provider } from "./types";
 
 const ProviderLogoMap = {
+    
     openai: OpenAiProviderLogo,
     silicon: SiliconFlowProviderLogo,
     deepseek: DeepSeekProviderLogo,
@@ -109,6 +110,7 @@ export function getProviderUrl(provider: Provider) {
 
 export const getProviderTitle = (providerId: string) => {
     const map: Record<string, string> = {
+        
         aihubmix: "AiHubMix",
         alayanew: "Alaya NeW",
         anthropic: "Anthropic",

@@ -20,6 +20,7 @@ const modelAdd = ref<InstanceType<typeof ModelAddDialog> | null>(null);
 const modelEdit = ref<InstanceType<typeof ModelEditDialog> | null>(null);
 const providerTest = ref<InstanceType<typeof ProviderTestDialog> | null>(null);
 
+
 const keywords = ref("");
 const currentProviderId = ref("");
 
@@ -231,7 +232,9 @@ watch(
                 <div
                     class="mb-3 flex border rounded p-3 items-center"
                     v-if="provider.id === 'buildIn'"
-                ></div>
+                >
+                    
+                </div>
                 <div class="mb-3">
                     <div class="mb-2 font-bold">{{ $t("model.model") }}</div>
                     <div
@@ -287,7 +290,9 @@ watch(
                                                 m.rate != null
                                             "
                                             class="mr-3 text-xs text-gray-400"
-                                        ></div>
+                                        >
+                                            
+                                        </div>
                                         <div class="flex items-center">
                                             <a-switch
                                                 :model-value="m.enabled"

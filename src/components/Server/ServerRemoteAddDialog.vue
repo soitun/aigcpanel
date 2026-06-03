@@ -142,6 +142,14 @@ const doSubmit = async () => {
 
 defineExpose({
     show,
+    fill(params: { remoteUrl?: string }) {
+        if (params.remoteUrl !== undefined) remoteUrl.value = params.remoteUrl;
+    },
+    doCheck,
+    doSubmit,
+    get fetchedConfig() {
+        return fetchedConfig.value;
+    },
 });
 
 const emit = defineEmits({

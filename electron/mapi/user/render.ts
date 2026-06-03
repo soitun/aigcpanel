@@ -24,6 +24,15 @@ const openWebUrl = async (url: string) => {
     return ipcRenderer.invoke("user:openWebUrl", url);
 };
 
+const save = async (data: {
+    apiToken: string;
+    user: any;
+    data: any;
+    basic: any;
+}) => {
+    return ipcRenderer.invoke("user:save", data);
+};
+
 const apiPost = async (
     url: string,
     data: Record<string, any>,
@@ -38,6 +47,7 @@ export default {
     open,
     get,
     refresh,
+    save,
     getApiToken,
     getWebEnterUrl,
     openWebUrl,

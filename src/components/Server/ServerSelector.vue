@@ -8,6 +8,7 @@ import { mapError } from "../../lib/error";
 
 const serverStore = useServerStore();
 
+
 const select = ref<any>(null);
 const props = defineProps<{
     functionName: string;
@@ -31,6 +32,7 @@ const valueAutoStartStatus = computed(() => {
     return server?.runtime.autoStartStatus || EnumServerStatus.STOPPED;
 });
 const valueStatus = computed(() => {
+    
     return (
         serverStore.records.find((s) => s.key === select.value.modelValue)
             ?.status || EnumServerStatus.STOPPED
@@ -40,7 +42,7 @@ let showCloudOptgroup = false;
 
 const hasRecords = computed(() => {
     let count = recordsFilter.value.length;
-
+    
     return count > 0;
 });
 const emit = defineEmits({
@@ -53,7 +55,7 @@ watch(
             return;
         }
         let config: any = null;
-
+        
         if (!config) {
             const server = await serverStore.getByKey(value);
             if (server) {

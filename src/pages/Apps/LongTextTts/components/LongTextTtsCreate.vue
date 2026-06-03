@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { testActionSet, testActionUnset } from "@/utils/test";
 import { onMounted, onUnmounted, ref } from "vue";
 import { dataAutoSaveDraft } from "../../../../components/common/util";
 import { t } from "../../../../lang";
@@ -18,9 +19,13 @@ const { clearDraft } = dataAutoSaveDraft(
     formData.value,
 );
 
-onMounted(() => {});
+onMounted(() => {
+    
+});
 
-onUnmounted(() => {});
+onUnmounted(() => {
+    
+});
 
 const doSubmit = async () => {
     const soundGenerateValue = await soundGenerateForm.value?.getValue();
