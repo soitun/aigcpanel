@@ -137,7 +137,7 @@ AIGCPanel 是一款简单易用的一站式 AI 数字人桌面应用，支持 Wi
 | 正则提取 | 从文本中提取结构化内容 |
 | 工具节点 | 直接调用工具箱内任意工具 |
 
-![](demo/image/workflow.png)
+![](demo/image/workflow-edit.png)
 
 ### 智能直播
 
