@@ -32,7 +32,7 @@ Examples:
   aigcpanel task --biz VideoCompress --file /path/to/video.mp4
   aigcpanel task --biz SoundGenerate --text "Hello world"
   aigcpanel task --biz VideoZoom --video /path/to/video.mp4
-  aigcpanel task --biz VideoZoom --task-id 123 --stage Config --times-json /tmp/times.json`,
+  aigcpanel task --biz VideoZoom --task-id 123 --stage Config --times-json ./_temp/times.json`,
 	DisableFlagParsing: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		biz, taskId, stage, stageData, modelConfig, helpRequested, err := parseTaskArgs(args)

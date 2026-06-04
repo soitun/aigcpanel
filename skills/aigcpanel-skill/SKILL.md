@@ -126,8 +126,8 @@ aigcpanel task --biz Ffmpeg --file1 /path/to/input.mp4
 
 ```bash
 # VideoZoom 指定放大区域
-echo '[{"start":1.0,"end":3.0,"x":0.2,"y":0.1,"width":0.6,"height":0.8}]' > /tmp/times.json
-aigcpanel task --biz VideoZoom --file /path/to/video.mp4 --times-json /tmp/times.json
+echo '[{"start":1.0,"end":3.0,"x":0.2,"y":0.1,"width":0.6,"height":0.8}]' > ./_temp/times.json
+aigcpanel task --biz VideoZoom --file /path/to/video.mp4 --times-json ./_temp/times.json
 ```
 
 ### 继续暂停的任务
@@ -139,7 +139,7 @@ aigcpanel task --biz VideoZoom --file /path/to/video.mp4 --times-json /tmp/times
 aigcpanel task --biz VideoZoom --file /path/to/video.mp4
 
 # 第二步：确认继续（Config 阶段）
-aigcpanel task --biz VideoZoom --task-id <taskId> --stage Config --times-json /tmp/times.json
+aigcpanel task --biz VideoZoom --task-id <taskId> --stage Config --times-json ./_temp/times.json
 
 # 第三步：渲染确认（RenderConfirm 阶段，如有）
 aigcpanel task --biz VideoZoom --task-id <taskId> --stage RenderConfirm
