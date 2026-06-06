@@ -2,8 +2,6 @@ name: Build
 
 on:
   push:
-    tags:
-      - v*.*.*
     branches:
       - main
   workflow_dispatch:
@@ -183,12 +181,12 @@ jobs:
           region: ${{ secrets.OSS_2_REGION }}
           bucket: ${{ secrets.OSS_2_BUCKET }}
           callbackTitle: ✅AIGCPanel-${{ runner.os }}-打包成功
-          callback: ${{ secrets.OSS_2_CALLBACK }}
+          callback: ${{ github.event_name == 'workflow_dispatch' && secrets.REPORT_URL || secrets.REPORT_URL_ME }}
           assets: |
-            code/dist-release/*.exe:apps/aigcpanel-${{ env.DIST_FILE_NAME }}/
-            code/dist-release/*.dmg:apps/aigcpanel-${{ env.DIST_FILE_NAME }}/
-            code/dist-release/*.AppImage:apps/aigcpanel-${{ env.DIST_FILE_NAME }}/
-            code/dist-release/*.deb:apps/aigcpanel-${{ env.DIST_FILE_NAME }}/
+            code/dist-release/*.exe:apps/aigcpanel-${{ env.DIST_FILE_NAME }}/{random}.bin:{name}
+            code/dist-release/*.dmg:apps/aigcpanel-${{ env.DIST_FILE_NAME }}/{random}.bin:{name}
+            code/dist-release/*.AppImage:apps/aigcpanel-${{ env.DIST_FILE_NAME }}/{random}.bin:{name}
+            code/dist-release/*.deb:apps/aigcpanel-${{ env.DIST_FILE_NAME }}/{random}.bin:{name}
 
       - name: Release Assets
         if: github.event_name == 'push'
