@@ -117,12 +117,12 @@ onMounted(() => {
                                 :status-msg="r.statusMsg"
                             />
                         </div>
-                        <div class="mt-3 flex gap-1">
+                        <div class="mt-3 flex gap-1 flex-wrap">
                             <ServerNameVersion :record="r" />
                             <VideoGenFormViewBody :data="r.modelConfig" />
                         </div>
                         <div
-                            class="mt-3 flex gap-1"
+                            class="mt-3 flex gap-1 flex-wrap"
                             v-if="r.modelConfig.soundGenerate"
                         >
                             <SoundGenerateFormViewBody

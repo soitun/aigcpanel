@@ -40,6 +40,54 @@
 
   <div class="card">
     <div class="card-header">
+      <span class="method post">POST</span>
+      <span class="path">/api/server/install</span>
+      <span class="desc">从本地目录安装模型服务</span>
+    </div>
+    <div class="card-body">
+      <div class="section-title">请求体 (JSON)</div>
+      <table>
+        <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        <tr><td>path<span class="required">*必填</span></td><td>string</td><td>模型服务目录的绝对路径，需包含 <code>config.json</code>。同名同版本已存在时自动覆盖（upsert）。</td></tr>
+      </table>
+      <div class="divider"></div>
+      <div class="section-title">返回示例</div>
+      <pre>{
+  "code": 0,
+  "data": {
+    "key": "server-demo|1.0.0",
+    "name": "server-demo",
+    "version": "1.0.0",
+    "title": "示例模型",
+    "type": "localDir",
+    "functions": ["videoGen", "soundTts", "soundClone", "asr", "textToImage", "imageToImage", "textToVideo", "imageToVideo"],
+    "localPath": "/path/to/server-demo"
+  }
+}</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="method post">POST</span>
+      <span class="path">/api/server/remove</span>
+      <span class="desc">卸载已安装的模型服务</span>
+    </div>
+    <div class="card-body">
+      <div class="section-title">请求体 (JSON)</div>
+      <table>
+        <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        <tr><td>name<span class="required">*必填</span></td><td>string</td><td>模型服务名，如 <code>server-demo</code></td></tr>
+        <tr><td>version<span class="required">*必填</span></td><td>string</td><td>模型版本，如 <code>1.0.0</code></td></tr>
+      </table>
+      <div class="divider"></div>
+      <div class="section-title">返回示例</div>
+      <pre>{ "code": 0, "data": { "removed": 1 } }</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
       <span class="method get">GET</span>
       <span class="path">/api/model/list</span>
       <span class="desc">获取已安装的服务列表</span>

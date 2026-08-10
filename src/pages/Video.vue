@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { t } from "../lang";
+import { getNavTab, rememberNavTab } from "../lib/nav-memory";
 import Router from "../router";
 import SoundGenerate from "./Video/SoundGenerate.vue";
 import VideoGen from "./Video/VideoGen.vue";
@@ -9,11 +10,26 @@ import VideoGenFlow from "./Apps/VideoGenFlow/VideoGenFlow.vue";
 import { testActionSet, testActionUnset } from "../utils/test";
 
 const tab = ref("");
+const VIDEO_TABS = [
+    "soundGenerate",
+    "videoGen",
+    "videoTemplate",
+    "VideoGenFlow",
+];
 
 const syncTab = () => {
-    tab.value =
-        (Router.currentRoute.value.query.tab as string) || "soundGenerate";
+    const next =
+        (Router.currentRoute.value.query.tab as string) ||
+        getNavTab("/video") ||
+        "soundGenerate";
+    tab.value = VIDEO_TABS.includes(next) ? next : "soundGenerate";
 };
+
+watch(tab, (v) => {
+    if (v) {
+        rememberNavTab("/video", v);
+    }
+});
 
 onMounted(() => {
     syncTab();

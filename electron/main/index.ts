@@ -20,6 +20,7 @@ import { ConfigTray } from "../config/tray";
 import { icnsLogoPath, icoLogoPath, logoPath } from "../config/icon";
 import { isDev, isMac, isPackaged } from "../lib/env";
 import { executeHooks } from "../lib/hooks";
+import { loadClientConfig } from "../lib/clientConfig";
 import { DevToolsManager } from "../lib/devtools";
 import { AppsMain } from "../mapi/app/main";
 import { ServerMain } from "../mapi/server/main";
@@ -62,6 +63,16 @@ process.on("unhandledRejection", (reason) => {
 // which would be "Electron" instead of "aigcpanel" without this explicit override)
 if (app.getName() !== "aigcpanel") {
     app.setName("aigcpanel");
+}
+
+// 数据目录覆盖：AIGCPANEL_DATA_ROOT 环境变量（有值时）重定向整个 userData 目录，
+// 使 database.db / storage / config.json / cli-auth.json / logs 及单实例锁全部落到独立目录，
+// 实现「正式使用数据与开发测试完全隔离」。
+// 必须在 requestSingleInstanceLock() 与 app.getPath("userData") 之前执行，否则锁文件与
+// 后续所有 userData 相关路径仍会落在默认目录。
+const clientConfig = loadClientConfig();
+if (clientConfig.dataPath) {
+    app.setPath("userData", clientConfig.dataPath);
 }
 
 app.disableHardwareAcceleration();

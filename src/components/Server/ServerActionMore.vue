@@ -1,14 +1,14 @@
 <script setup lang="ts">
+import { computed } from "vue";
+import { t } from "../../lang";
+import { Dialog } from "../../lib/dialog";
+import { sleep } from "../../lib/util";
+import { useServerStore } from "../../store/modules/server";
 import {
     EnumServerStatus,
     EnumServerType,
     ServerRecord,
 } from "../../types/Server";
-import { Dialog } from "../../lib/dialog";
-import { t } from "../../lang";
-import { sleep } from "../../lib/util";
-import { useServerStore } from "../../store/modules/server";
-import { computed } from "vue";
 
 const serverStore = useServerStore();
 
@@ -47,11 +47,21 @@ const disabled = computed(() => {
 </script>
 
 <template>
-    <a-tooltip :content="$t('common.delete')" mini>
-        <a-button class="mr-2" :disabled="disabled" @click="doDelete()">
-            <template #icon>
-                <icon-delete />
-            </template>
-        </a-button>
-    </a-tooltip>
+    <a-dropdown trigger="click">
+        <a-tooltip :content="$t('common.more')" mini>
+            <a-button type="text">
+                <template #icon>
+                    <icon-more />
+                </template>
+            </a-button>
+        </a-tooltip>
+        <template #content>
+            <a-doption :disabled="disabled" @click="doDelete">
+                <template #icon>
+                    <icon-delete />
+                </template>
+                {{ $t("common.delete") }}
+            </a-doption>
+        </template>
+    </a-dropdown>
 </template>

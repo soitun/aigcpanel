@@ -66,7 +66,7 @@ Examples:
 				return internal.PrintJSON(continueResult)
 			}
 			// Poll for result after continue
-			return pollTask(cfg, taskId)
+			return internal.PollModelTask(cfg, taskId, 120*time.Second)
 		}
 
 		// Submit new task
@@ -80,7 +80,8 @@ Examples:
 
 		code, _ := submitResult["code"].(float64)
 		if code != 0 {
-			return internal.PrintJSON(submitResult)
+			internal.PrintJSON(submitResult)
+			return fmt.Errorf("task submit failed: %v", submitResult["msg"])
 		}
 
 		dataMap, _ := submitResult["data"].(map[string]any)
@@ -89,40 +90,8 @@ Examples:
 			return fmt.Errorf("no taskId returned from task submit")
 		}
 
-		return pollTask(cfg, newTaskId)
+		return internal.PollModelTask(cfg, newTaskId, 120*time.Second)
 	},
-}
-
-// pollTask polls /api/model/query until the task reaches a terminal state.
-func pollTask(cfg *internal.AuthConfig, taskId string) error {
-	deadline := time.Now().Add(120 * time.Second)
-	for time.Now().Before(deadline) {
-		queryResult, err := internal.DoRequest(cfg, "/api/model/query", map[string]any{
-			"taskId": taskId,
-		})
-		if err != nil {
-			return err
-		}
-		qCode, _ := queryResult["code"].(float64)
-		if qCode != 0 {
-			return internal.PrintJSON(queryResult)
-		}
-		qData, _ := queryResult["data"].(map[string]any)
-		status, _ := qData["status"].(string)
-		switch status {
-		case "success", "pause":
-			return internal.PrintJSON(queryResult)
-		case "error", "fail":
-			return internal.PrintJSON(queryResult)
-		default:
-			time.Sleep(500 * time.Millisecond)
-			continue
-		}
-	}
-	return internal.PrintJSON(map[string]any{
-		"code": -1,
-		"msg":  "timeout waiting for task result",
-	})
 }
 
 // parseTaskArgs manually parses --key value style arguments.

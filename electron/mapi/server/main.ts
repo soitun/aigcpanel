@@ -91,7 +91,12 @@ const getModule = async (
                     });
                     try {
                         const config = JSON.parse(configContent);
-                        if (config.entry === "__EasyServer__") {
+                        if (config.type === "comfyui") {
+                            // ComfyUI 类型：使用 ComfyUIServer 模块
+                            server = AigcServer["ComfyUI"] as ServerContext;
+                            server.type = "custom";
+                            server.config = config;
+                        } else if (config.entry === "__EasyServer__") {
                             server = new AigcServer["EasyServer"](config);
                         } else {
                             throw `ServerEntryNotFound : ${config.entry}`;

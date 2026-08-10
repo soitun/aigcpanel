@@ -170,7 +170,7 @@ const getFormatInfo = (): { label: string; value: string }[] => {
             </div>
             <div class="flex-grow">
                 <TaskJobResultStepView :record="record" step="Config">
-                    <div class="flex items-center gap-1 mb-2">
+                    <div class="flex items-center gap-1 mb-2 flex-wrap">
                         <MediaFormatConvertParamView
                             :data="record.modelConfig!"
                         />

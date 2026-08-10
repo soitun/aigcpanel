@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"net/http"
+
 	"aigcpanel-cli/internal"
 
 	"github.com/spf13/cobra"
@@ -14,7 +16,7 @@ var modelListCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		result, err := internal.DoRequest(cfg, "/api/model/list", map[string]any{})
+		result, err := internal.DoRequestMethod(cfg, http.MethodGet, "/api/model/list", nil)
 		if err != nil {
 			return err
 		}

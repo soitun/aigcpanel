@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { getNavTab, rememberNavTab } from "../lib/nav-memory";
 import Router from "../router";
 import { SoundToolApps, ToolApps, VideoProcessingApps } from "./Apps/all";
 import { testActionSet, testActionUnset } from "../utils/test";
@@ -15,8 +16,18 @@ const groups = [
 const allToolApps = [...SoundToolApps, ...ToolApps, ...VideoProcessingApps];
 
 const syncTab = () => {
-    tab.value = (Router.currentRoute.value.query.tab as string) || "SoundAsr";
+    const next =
+        (Router.currentRoute.value.query.tab as string) ||
+        getNavTab("/tool") ||
+        "SoundAsr";
+    tab.value = allToolApps.some((a) => a.name === next) ? next : "SoundAsr";
 };
+
+watch(tab, (v) => {
+    if (v) {
+        rememberNavTab("/tool", v);
+    }
+});
 
 onMounted(() => {
     syncTab();

@@ -79,7 +79,7 @@ const onConfirm = async (taskId: number, records: any[]) => {
             </div>
             <div class="flex-grow">
                 <TaskJobResultStepView :record="record" step="ToAudio">
-                    <div class="flex gap-1">
+                    <div class="flex gap-1 flex-wrap">
                         <VideoInfo :data="record.jobResult?.ToAudio! as any" />
                     </div>
                 </TaskJobResultStepView>

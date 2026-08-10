@@ -84,6 +84,11 @@ defineExpose({
                             :value="model.id"
                         >
                             {{ model.name }}
+                            <icon-file
+                                v-if="model.type === 'text'"
+                                :title="$t('model.typeText')"
+                                class="text-blue-500"
+                            />
                         </a-option>
                     </a-select>
                 </a-form-item>

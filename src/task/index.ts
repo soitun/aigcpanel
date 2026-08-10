@@ -9,6 +9,10 @@ import {
     ImageToImageCleaner,
 } from "../pages/Apps/ImageToImage/task";
 import {
+    ImageToVideo,
+    ImageToVideoCleaner,
+} from "../pages/Apps/ImageToVideo/task";
+import {
     LongTextTts,
     LongTextTtsCleaner,
 } from "../pages/Apps/LongTextTts/task";
@@ -28,6 +32,10 @@ import {
     TextToImage,
     TextToImageCleaner,
 } from "../pages/Apps/TextToImage/task";
+import {
+    TextToVideo,
+    TextToVideoCleaner,
+} from "../pages/Apps/TextToVideo/task";
 import {
     VideoBackground,
     VideoBackgroundCleaner,
@@ -95,6 +103,8 @@ export const tasks = {
     VideoGenFlow,
     TextToImage,
     ImageToImage,
+    TextToVideo,
+    ImageToVideo,
     // video processing apps
     VideoBackground,
     VideoQuickCut,
@@ -123,6 +133,8 @@ export const taskCleaners = {
     // video cleaners
     TextToImage: TextToImageCleaner,
     ImageToImage: ImageToImageCleaner,
+    TextToVideo: TextToVideoCleaner,
+    ImageToVideo: ImageToVideoCleaner,
     // video processing cleaners
     VideoBackground: VideoBackgroundCleaner,
     VideoQuickCut: VideoQuickCutCleaner,
@@ -158,6 +170,21 @@ export const TaskManager = {
                     const { biz, taskId } = data;
                     await taskStore.dispatch(biz, taskId, {});
                     resolve({ taskId });
+                } catch (e: any) {
+                    reject(String(e));
+                }
+            },
+        );
+        // CLI 安装/卸载模型后刷新 server 列表
+        window.__page.registerCallPage(
+            "httpserver:serverReload",
+            async (
+                resolve: (data: any) => void,
+                reject: (error: string) => void,
+            ) => {
+                try {
+                    await useServerStore().reloadRecords();
+                    resolve({ ok: true });
                 } catch (e: any) {
                     reject(String(e));
                 }

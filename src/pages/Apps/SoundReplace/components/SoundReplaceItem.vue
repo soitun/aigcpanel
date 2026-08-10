@@ -329,7 +329,7 @@ const doSaveConfirmRecordItem = async (index: number, text: string) => {
                         </div>
                     </template>
                 </TaskJobResultStepView>
-                <div class="mt-1 flex gap-1">
+                <div class="mt-1 flex gap-1 flex-wrap">
                     <SoundGenerateFormViewBody
                         :data="record.modelConfig?.soundGenerate!"
                     />

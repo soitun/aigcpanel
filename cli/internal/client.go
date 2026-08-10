@@ -10,6 +10,11 @@ import (
 
 // DoRequest sends a POST request to the local AigcPanel HTTP server.
 func DoRequest(cfg *AuthConfig, urlPath string, body any) (map[string]any, error) {
+	return DoRequestMethod(cfg, http.MethodPost, urlPath, body)
+}
+
+// DoRequestMethod sends a request with the given HTTP method.
+func DoRequestMethod(cfg *AuthConfig, method, urlPath string, body any) (map[string]any, error) {
 	var reqBody io.Reader
 	if body != nil {
 		b, err := json.Marshal(body)
@@ -20,7 +25,7 @@ func DoRequest(cfg *AuthConfig, urlPath string, body any) (map[string]any, error
 	}
 
 	url := fmt.Sprintf("http://127.0.0.1:%d%s", cfg.Port, urlPath)
-	req, err := http.NewRequest(http.MethodPost, url, reqBody)
+	req, err := http.NewRequest(method, url, reqBody)
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}

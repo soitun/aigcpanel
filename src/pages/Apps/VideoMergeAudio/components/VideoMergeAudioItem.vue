@@ -60,10 +60,10 @@ const props = defineProps<{
             </div>
             <div class="flex-grow">
                 <TaskJobResultStepView :record="record" step="Prepare">
-                    <div class="flex gap-2 mb-2">
+                    <div class="flex flex-wrap gap-2 mb-2">
                         <VideoInfo :data="record.jobResult?.Prepare!" />
                     </div>
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2">
                         <AudioInfo :data="record.jobResult?.Prepare!" />
                     </div>
                 </TaskJobResultStepView>

@@ -1,6 +1,6 @@
 {
   "name": "aigcpanel",
-  "version": "2.0.0",
+  "version": "2.2.0-beta",
   "main": "dist-electron/main/index.js",
   "description": "开源 AI 数字人视频系统",
   "author": "ModStartLib",
@@ -27,7 +27,7 @@
     "dev:win:pre": "chcp 65001 && set ELECTRON_ENV_PROD=1 && vite",
     "dev:debug": "vite --debug",
     "build:preview": "npm run format && vite build",
-    "build": "npm run format && cross-env VITE_RELEASE=1 vite build && electron-builder",
+    "build": "npm run format && node scripts/build.mjs",
     "build:win": "npm run format && cross-env VITE_RELEASE=1 vite build && electron-builder --win",
     "build:mac": "npm run format && cross-env VITE_RELEASE=1 vite build && electron-builder --mac",
     "build:mac-arm": "npm run format && cross-env VITE_RELEASE=1 vite build && electron-builder --mac --arm64",

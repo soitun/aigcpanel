@@ -10,6 +10,7 @@ import { PageFeedback } from "./feedback";
 import { PagePayment } from "./payment";
 import { PageMonitor } from "./monitor";
 import { PageLog } from "./log";
+import { PageComfyUIView } from "./comfyui-view";
 
 const Pages = {
     user: PageUser,
@@ -19,6 +20,7 @@ const Pages = {
     feedback: PageFeedback,
     monitor: PageMonitor,
     log: PageLog,
+    "comfyui-view": PageComfyUIView,
 };
 
 export const Page = {

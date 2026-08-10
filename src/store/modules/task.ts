@@ -22,23 +22,14 @@ import { StringUtil, TimeUtil } from "../../lib/util";
 import store from "../index";
 
 export type TaskRecordStatus =
-    | "queue"
-    | "running"
-    | "querying"
-    | "success"
-    | "fail"
-    | "delete";
+    "queue" | "running" | "querying" | "success" | "fail" | "delete";
 
 export type TaskRecordRunStatus = "retry" | "success" | "querying";
 
 export type TaskRecordQueryStatus = "running" | "success" | "fail";
 
 export type TaskChangeType =
-    | "running"
-    | "success"
-    | "fail"
-    | "change"
-    | "requestCancel";
+    "running" | "success" | "fail" | "change" | "requestCancel";
 
 export type TaskRecord = {
     id: string;

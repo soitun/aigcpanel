@@ -293,11 +293,7 @@ const getCurrentScreenDisplay = () => {
 
 const calcPositionInCurrentDisplay = (
     position:
-        | "center"
-        | "left-top"
-        | "right-top"
-        | "left-bottom"
-        | "right-bottom",
+        "center" | "left-top" | "right-top" | "left-bottom" | "right-bottom",
     width: number,
     height: number,
 ) => {

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import ServerActionDelete from "../components/Server/ServerActionDelete.vue";
 import ServerActionInfo from "../components/Server/ServerActionInfo.vue";
 import ServerActionLog from "../components/Server/ServerActionLog.vue";
+import ServerActionMore from "../components/Server/ServerActionMore.vue";
 import ServerActionSetting from "../components/Server/ServerActionSetting.vue";
 import ServerActionStartStop from "../components/Server/ServerActionStartStop.vue";
+import ServerActionComfyUIView from "../components/Server/ServerActionComfyUIView.vue";
 import ServerAddDialog from "../components/Server/ServerAddDialog.vue";
 import ServerStartTime from "../components/Server/ServerStartTime.vue";
 import ServerStatus from "../components/Server/ServerStatus.vue";
@@ -53,11 +54,77 @@ const typeName = (type: string) => {
 
 onMounted(() => {
     testActionSet("page.ready", () => {});
+    testActionSet("Server.modelSetting.show", () => {
+        modelSettingDialog.value?.show();
+    });
+    // 添加本地模型（目录）测试流程：show → fill(configPath) → resolve → submit
+    testActionSet("Server.addLocal.show", () => {
+        addDialog.value?.show();
+    });
+    testActionSet("Server.addLocal.fill", async (params: any) => {
+        const ok = await addDialog.value?.parseLocalDir(params.configPath);
+        return { ok: !!ok };
+    });
+    testActionSet("Server.addLocal.resolve", () => {
+        addDialog.value?.resolveManual();
+    });
+    testActionSet("Server.addLocal.submit", async () => {
+        await addDialog.value?.doSubmit();
+        return { ok: true };
+    });
+    // 模型列表与状态查询（供测试断言）
+    testActionSet("Server.list", () => {
+        return serverStore.records.map((r) => ({
+            key: r.key,
+            name: r.name,
+            title: r.title,
+            version: r.version,
+            type: r.type,
+            status: r.status,
+            configType: r.config?.type,
+            localPath: r.localPath,
+        }));
+    });
+    // 测试专用：清空全部本地模型记录（供 UI 导入测试前置清理，避免版本已存在）
+    testActionSet("Server.clearAllForTest", async () => {
+        serverStore.records.splice(0);
+        await serverStore.sync();
+        await serverStore.refresh();
+        return { ok: true };
+    });
+    // comfyui 类型模型：启动 / 停止 / 查看（供测试与外部调用）
+    testActionSet("Server.comfyui.start", async (params: any) => {
+        const record = serverStore.records.find(
+            (r) => r.name === (params?.name || "server-ComfyUI"),
+        );
+        if (!record) throw new Error("comfyui server not found");
+        await serverStore.start(record);
+        return { ok: true };
+    });
+    testActionSet("Server.comfyui.stop", async (params: any) => {
+        const record = serverStore.records.find(
+            (r) => r.name === (params?.name || "server-ComfyUI"),
+        );
+        if (!record) throw new Error("comfyui server not found");
+        await serverStore.stop(record);
+        return { ok: true };
+    });
     
 });
 
 onUnmounted(() => {
-    testActionUnset("page.ready");
+    testActionUnset([
+        "page.ready",
+        "Server.modelSetting.show",
+        "Server.comfyui.start",
+        "Server.comfyui.stop",
+        "Server.addLocal.show",
+        "Server.addLocal.fill",
+        "Server.addLocal.resolve",
+        "Server.addLocal.submit",
+        "Server.list",
+        "Server.clearAllForTest",
+    ]);
     
 });
 </script>
@@ -176,6 +243,13 @@ onUnmounted(() => {
                                                 "
                                                 class="text-lg"
                                             ></icon-cloud>
+                                            <icon-apps
+                                                v-else-if="
+                                                    record.config?.type ===
+                                                    'comfyui'
+                                                "
+                                                class="text-lg text-blue-600"
+                                            ></icon-apps>
                                             <i-mdi-folder-outline v-else />
                                         </div>
                                     </a-tooltip>
@@ -220,15 +294,14 @@ onUnmounted(() => {
                                 <ServerActionStartStop
                                     v-if="
                                         !record.autoStart &&
-                                        record.type === EnumServerType.LOCAL_DIR
+                                        (record.type ===
+                                            EnumServerType.LOCAL_DIR ||
+                                            record.config?.type === 'comfyui')
                                     "
                                     :record="record"
                                 />
+                                <ServerActionComfyUIView :record="record" />
                                 <ServerActionLog :record="record" />
-                                <ServerActionDelete
-                                    :record="record"
-                                    @update="doRefresh"
-                                />
                                 <ServerActionInfo :record="record" />
                                 <ServerActionSetting
                                     v-if="
@@ -238,8 +311,12 @@ onUnmounted(() => {
                                     :record="record"
                                 />
                             </div>
-                            <div>
+                            <div class="flex items-center">
                                 <ServerStartTime :record="record" />
+                                <ServerActionMore
+                                    :record="record"
+                                    @update="doRefresh"
+                                />
                             </div>
                         </div>
                     </div>

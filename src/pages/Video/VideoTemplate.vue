@@ -122,7 +122,7 @@ const onUpdate = async () => {
                                 <VideoPlayer :url="r.video" />
                             </div>
                         </div>
-                        <div class="flex gap-1">
+                        <div class="flex gap-1 flex-wrap">
                             <VideoInfo
                                 :data="r.info"
                                 :label="false"

@@ -7,6 +7,8 @@ export const allFunctions = [
     { value: "asr", label: t("voice.recognition") },
     { value: "textToImage", label: t("model.txt2img") },
     { value: "imageToImage", label: t("model.img2img") },
+    { value: "textToVideo", label: t("model.txt2video") },
+    { value: "imageToVideo", label: t("model.img2video") },
     { value: "live", label: t("avatar.smartLive") },
 ];
 

@@ -94,7 +94,7 @@ const imageModeText = computed(() => {
             <div class="flex-grow">
                 <div>
                     <div class="flex-grow">
-                        <div class="flex items-center gap-1 mb-2">
+                        <div class="flex items-center gap-1 mb-2 flex-wrap">
                             <a-tag class="rounded-lg">{{
                                 imageModeText
                             }}</a-tag>

@@ -62,7 +62,7 @@ const props = defineProps<{
                         v-for="(video, index) in record.jobResult?.Prepare
                             ?.videos"
                         :key="index"
-                        class="flex gap-2 mb-2"
+                        class="flex flex-wrap gap-2 mb-2"
                     >
                         <VideoInfo :data="video" />
                     </div>

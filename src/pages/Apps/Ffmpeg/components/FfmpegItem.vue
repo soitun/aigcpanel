@@ -75,8 +75,7 @@ const props = defineProps<{
                         <pre
                             class="rounded-lg text-xs bg-gray-100 p-1 break-all whitespace-break-spaces leading-5"
                         >
-命令 ffmpeg {{ record.jobResult?.Prepare.commands.join(" ") }}</pre
-                        >
+命令 ffmpeg {{ record.jobResult?.Prepare.commands.join(" ") }}</pre>
                     </div>
                 </TaskJobResultStepView>
             </div>

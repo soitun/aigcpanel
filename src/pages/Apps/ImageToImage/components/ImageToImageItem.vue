@@ -63,7 +63,7 @@ const props = defineProps<{
                     <div class="mt-1">
                         <ImagePreviewBox :url="record.modelConfig?.image!" />
                     </div>
-                    <div class="mt-1 flex gap-1">
+                    <div class="mt-1 flex gap-1 flex-wrap">
                         <ImageToImageFormViewBody
                             :data="record.modelConfig?.imageToImage"
                         />

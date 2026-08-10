@@ -217,6 +217,20 @@ export const serverStore = defineStore("server", {
             await this.refresh();
             this.isReady = true;
         },
+        // 从 storage 重新加载 server records（CLI 安装/卸载模型后由页面事件触发），
+        // 不会重复注册任务取消监听。
+        async reloadRecords() {
+            await $mapi.storage.get("server", "records", []).then((records) => {
+                records.forEach((record: ServerRecord) => {
+                    record.status = createServerStatus(record);
+                    record.runtime = getServerRuntimeComputedValue(record);
+                });
+                this.records = records.filter((record: ServerRecord) => {
+                    return record.type !== EnumServerType.CLOUD;
+                });
+            });
+            await this.refresh();
+        },
         async refresh() {
             const dirs = await $mapi.file.list("model", {
                 isDataPath: true,
@@ -251,6 +265,7 @@ export const serverStore = defineStore("server", {
                     localPath: `model/${dir.name}`,
                     settings: json.settings || [],
                     setting: json.setting || {},
+                    config: json,
                 } as ServerRecord);
             }
             let changed = false;
@@ -266,6 +281,25 @@ export const serverStore = defineStore("server", {
                 } else {
                     if (!record.settings && lr.settings) {
                         record.settings = lr.settings;
+                        changed = true;
+                    }
+                    // 同步 functions / config / title（模型能力或配置更新后保持最新）
+                    if (
+                        JSON.stringify(record.functions) !==
+                        JSON.stringify(lr.functions)
+                    ) {
+                        record.functions = lr.functions;
+                        changed = true;
+                    }
+                    if (
+                        JSON.stringify(record.config) !==
+                        JSON.stringify(lr.config)
+                    ) {
+                        record.config = lr.config;
+                        changed = true;
+                    }
+                    if (record.title !== lr.title) {
+                        record.title = lr.title;
                         changed = true;
                     }
                 }
@@ -324,6 +358,12 @@ export const serverStore = defineStore("server", {
                 record.status === EnumServerStatus.STOPPED ||
                 record.status === EnumServerStatus.ERROR
             ) {
+            } else if (record.status === EnumServerStatus.RUNNING) {
+                // 已在运行，直接返回
+                return;
+            } else if (record.status === EnumServerStatus.STARTING) {
+                // 已在启动中，直接返回（调用方负责等待就绪）
+                return;
             } else {
                 throw "StatusError";
             }
@@ -370,9 +410,13 @@ export const serverStore = defineStore("server", {
         },
         async stop(server: ServerRecord) {
             const record = this.findRecord(server);
-            if (record?.status === EnumServerStatus.RUNNING) {
-            } else {
-                throw new Error("StatusError");
+            if (
+                record?.status !== EnumServerStatus.RUNNING &&
+                record?.status !== EnumServerStatus.STARTING &&
+                record?.status !== EnumServerStatus.STOPPING
+            ) {
+                // 未运行或已停止，直接返回（幂等）
+                return;
             }
             const serverRuntime = getOrCreateServerRuntime(server);
             serverRuntime.status = EnumServerStatus.STOPPING;
@@ -477,6 +521,35 @@ export const serverStore = defineStore("server", {
             option?: ServerCallFunctionOption,
         ): Promise<ServerCallFunctionResult> {
             await this.callStart(serverInfo);
+            // comfyui 类型服务：未运行时自动启动并等待就绪
+            const server = await this.getByNameVersion(
+                serverInfo.name,
+                serverInfo.version,
+            );
+            if (server && server.config?.type === "comfyui") {
+                const runtime = getOrCreateServerRuntime(server);
+                if (runtime.status !== EnumServerStatus.RUNNING) {
+                    await this.start(server);
+                }
+                // 等待服务就绪：优先 HTTP ping（不依赖事件通道）
+                const serverInfoForPing = await this.serverInfo(server);
+                const deadline = Date.now() + 5 * 60 * 1000;
+                while (Date.now() < deadline) {
+                    try {
+                        const ok = await $mapi.server.ping(serverInfoForPing);
+                        if (ok) {
+                            runtime.status = EnumServerStatus.RUNNING;
+                            break;
+                        }
+                    } catch (e) {
+                        // ping 失败继续等待
+                    }
+                    await wait(2000);
+                }
+                if (runtime.status !== EnumServerStatus.RUNNING) {
+                    throw new Error("comfyui server start timeout");
+                }
+            }
             const res = await $mapi.server.callFunctionWithException(
                 serverInfo,
                 method,

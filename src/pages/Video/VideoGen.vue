@@ -112,7 +112,7 @@ const doRefresh = async () => {
                                 :status-msg="r.statusMsg"
                             />
                         </div>
-                        <div class="mt-3 flex gap-1">
+                        <div class="mt-3 flex gap-1 flex-wrap">
                             <ServerNameVersion :record="r" />
                             <VideoGenFormViewBody :data="r.modelConfig" />
                             <ServerTaskResultParam :record="r as any" />

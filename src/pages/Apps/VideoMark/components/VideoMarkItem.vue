@@ -138,7 +138,7 @@ const doRenderConfirm = async () => {
                                 </div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-1">
+                        <div class="flex items-center gap-1 flex-wrap">
                             <VideoMarkParamView :data="record.modelConfig!" />
                         </div>
                         <div class="mb-1">

@@ -19,6 +19,10 @@ import TextToImage from "./TextToImage/TextToImage.vue";
 import TextToImageIcon from "~icons/mdi/image-text";
 import ImageToImage from "./ImageToImage/ImageToImage.vue";
 import ImageToImageIcon from "~icons/mdi/image-filter-none";
+import TextToVideo from "./TextToVideo/TextToVideo.vue";
+import TextToVideoIcon from "~icons/mdi/video-outline";
+import ImageToVideo from "./ImageToVideo/ImageToVideo.vue";
+import ImageToVideoIcon from "~icons/mdi/video-image";
 
 import FeedbackIcon from "./../../assets/image/feedback.svg";
 
@@ -120,6 +124,22 @@ export const ToolApps = [
         icon: ImageToImageIcon,
         color: "#06b6d4",
         component: ImageToImage,
+    },
+    {
+        name: "TextToVideo",
+        title: t("model.txt2video"),
+        description: t("desc.txt2video"),
+        icon: TextToVideoIcon,
+        color: "#8b5cf6",
+        component: TextToVideo,
+    },
+    {
+        name: "ImageToVideo",
+        title: t("model.img2video"),
+        description: t("desc.img2video"),
+        icon: ImageToVideoIcon,
+        color: "#10b981",
+        component: ImageToVideo,
     },
 ];
 

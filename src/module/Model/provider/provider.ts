@@ -1,6 +1,6 @@
+import { mapError } from "../../../lib/error";
 import { ChatParam, ProviderType } from "../types";
 import { OpenAiModelProvider } from "./driver/openai";
-import { mapError } from "../../../lib/error";
 
 const ModelProviderMap = {
     openai: OpenAiModelProvider,
@@ -22,6 +22,7 @@ export const ModelProvider = {
             url = apiHost;
         }
         if (!url) return "";
+        const path = "chat/completions";
         // console.log('ModelProvider.apiUrl', {type, apiUrl, apiHost, url});
         switch (type) {
             case "openai":
@@ -30,13 +31,11 @@ export const ModelProvider = {
                  * - 如果 以 `/` 结尾，则不加
                  * - 要加：其余情况。
                  */
+                url = url.replace(/(\/chat\/completions)$/, "/");
                 if (url.endsWith("/")) {
-                    return `${url}chat/completions`;
+                    return `${url}${path}`;
                 }
-                if (url.endsWith("/chat/completions")) {
-                    return url;
-                }
-                return `${url}/v1/chat/completions`;
+                return `${url}/v1/${path}`;
         }
         throw new Error(`Unsupported provider type: ${type}`);
     },

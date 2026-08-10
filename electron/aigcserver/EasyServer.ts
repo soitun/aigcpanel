@@ -545,4 +545,65 @@ export const EasyServer = function (config: any) {
             },
         );
     };
+    this.textToVideo = async function (data: ServerFunctionDataType) {
+        return this._callFunc(
+            data,
+            async (data: ServerFunctionDataType) => {
+                return {
+                    id: data.id,
+                    mode: "local",
+                    modelConfig: {
+                        type: "textToVideo",
+                        prompt: data.prompt,
+                        param: data.param,
+                    },
+                };
+            },
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
+                if (!("url" in launcherResult.result)) {
+                    if (launcherResult.result.error) {
+                        throw launcherResult.result.error;
+                    }
+                    throw "执行失败，请查看模型日志";
+                }
+                return {
+                    url: launcherResult.result.url,
+                };
+            },
+        );
+    };
+    this.imageToVideo = async function (data: ServerFunctionDataType) {
+        return this._callFunc(
+            data,
+            async (data: ServerFunctionDataType) => {
+                return {
+                    id: data.id,
+                    mode: "local",
+                    modelConfig: {
+                        type: "imageToVideo",
+                        images: data.images || [],
+                        prompt: data.prompt,
+                        param: data.param,
+                    },
+                };
+            },
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
+                if (!("url" in launcherResult.result)) {
+                    if (launcherResult.result.error) {
+                        throw launcherResult.result.error;
+                    }
+                    throw "执行失败，请查看模型日志";
+                }
+                return {
+                    url: launcherResult.result.url,
+                };
+            },
+        );
+    };
 };

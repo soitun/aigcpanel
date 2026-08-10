@@ -101,6 +101,31 @@ const buildModelConfig = (
                     param: param?.param || {},
                 },
             };
+        case "textToVideo":
+            return {
+                prompt: param?.prompt || "",
+                textToVideo: {
+                    serverName,
+                    serverTitle,
+                    serverVersion,
+                    type: "TextToVideo",
+                    serverKey: `${serverName}|${serverVersion}`,
+                    param: param?.param || {},
+                },
+            };
+        case "imageToVideo":
+            return {
+                images: param?.images || [],
+                prompt: param?.prompt || "",
+                imageToVideo: {
+                    serverName,
+                    serverTitle,
+                    serverVersion,
+                    type: "ImageToVideo",
+                    serverKey: `${serverName}|${serverVersion}`,
+                    param: param?.param || {},
+                },
+            };
         default:
             return param || {};
     }
@@ -133,6 +158,14 @@ const buildTaskTitle = (funcName: string, param: any): string => {
             return param?.prompt
                 ? String(param.prompt).slice(0, 20)
                 : "图生图任务";
+        case "textToVideo":
+            return param?.prompt
+                ? String(param.prompt).slice(0, 20)
+                : "文生视频任务";
+        case "imageToVideo":
+            return param?.prompt
+                ? String(param.prompt).slice(0, 20)
+                : "图生视频任务";
         default:
             return "任务";
     }

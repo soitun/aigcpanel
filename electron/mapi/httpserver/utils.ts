@@ -48,6 +48,8 @@ export const functionArgsMap: Record<string, string[]> = {
     asr: ["audio"],
     textToImage: ["prompt"],
     imageToImage: ["image", "prompt"],
+    textToVideo: ["prompt"],
+    imageToVideo: ["images", "prompt"],
     live: [],
 };
 
@@ -58,4 +60,6 @@ export const functionBizMap: Record<string, string> = {
     asr: "SoundAsr",
     textToImage: "TextToImage",
     imageToImage: "ImageToImage",
+    textToVideo: "TextToVideo",
+    imageToVideo: "ImageToVideo",
 };

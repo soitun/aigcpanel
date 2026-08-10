@@ -21,6 +21,8 @@ import {
 // Apps sub-module locales
 import imageToImageEnUS from "../pages/Apps/ImageToImage/lang/en-US.json";
 import imageToImageZhCN from "../pages/Apps/ImageToImage/lang/zh-CN.json";
+import imageToVideoEnUS from "../pages/Apps/ImageToVideo/lang/en-US.json";
+import imageToVideoZhCN from "../pages/Apps/ImageToVideo/lang/zh-CN.json";
 import longTextTtsEnUS from "../pages/Apps/LongTextTts/lang/en-US.json";
 import longTextTtsZhCN from "../pages/Apps/LongTextTts/lang/zh-CN.json";
 import soundReplaceEnUS from "../pages/Apps/SoundReplace/lang/en-US.json";
@@ -29,6 +31,8 @@ import subtitleTtsEnUS from "../pages/Apps/SubtitleTts/lang/en-US.json";
 import subtitleTtsZhCN from "../pages/Apps/SubtitleTts/lang/zh-CN.json";
 import textToImageEnUS from "../pages/Apps/TextToImage/lang/en-US.json";
 import textToImageZhCN from "../pages/Apps/TextToImage/lang/zh-CN.json";
+import textToVideoEnUS from "../pages/Apps/TextToVideo/lang/en-US.json";
+import textToVideoZhCN from "../pages/Apps/TextToVideo/lang/zh-CN.json";
 import videoGenFlowEnUS from "../pages/Apps/VideoGenFlow/lang/en-US.json";
 import videoGenFlowZhCN from "../pages/Apps/VideoGenFlow/lang/zh-CN.json";
 import videoMergeAudioEnUS from "../pages/Apps/VideoMergeAudio/lang/en-US.json";
@@ -64,10 +68,12 @@ export const messageList = [
             ...componentsEnUS,
             // Apps sub-modules
             ...imageToImageEnUS,
+            ...imageToVideoEnUS,
             ...longTextTtsEnUS,
             ...soundReplaceEnUS,
             ...subtitleTtsEnUS,
             ...textToImageEnUS,
+            ...textToVideoEnUS,
             ...videoGenFlowEnUS,
             ...videoMergeAudioEnUS,
             ...videoMergeImageEnUS,
@@ -91,10 +97,12 @@ export const messageList = [
             ...componentsZhCN,
             // Apps sub-modules
             ...imageToImageZhCN,
+            ...imageToVideoZhCN,
             ...longTextTtsZhCN,
             ...soundReplaceZhCN,
             ...subtitleTtsZhCN,
             ...textToImageZhCN,
+            ...textToVideoZhCN,
             ...videoGenFlowZhCN,
             ...videoMergeAudioZhCN,
             ...videoMergeImageZhCN,

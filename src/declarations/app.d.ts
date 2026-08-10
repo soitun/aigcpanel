@@ -72,3 +72,25 @@ declare type ImageToImageParamType = {
         [key: string]: any;
     };
 };
+
+declare type TextToVideoParamType = {
+    serverName: string;
+    serverTitle: string;
+    serverVersion: string;
+    type: "TextToVideo";
+    serverKey: string;
+    param: {
+        [key: string]: any;
+    };
+};
+
+declare type ImageToVideoParamType = {
+    serverName: string;
+    serverTitle: string;
+    serverVersion: string;
+    type: "ImageToVideo";
+    serverKey: string;
+    param: {
+        [key: string]: any;
+    };
+};

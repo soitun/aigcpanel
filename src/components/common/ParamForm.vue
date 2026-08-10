@@ -5,6 +5,14 @@ import { t } from "../../lang";
 import { Dialog } from "../../lib/dialog";
 import SpeakerSelector from "./SpeakerSelector.vue";
 import SoundPromptSelector from "../../pages/Video/components/SoundPromptSelector.vue";
+import IconShuffle from "~icons/mdi/shuffle";
+import IconCog from "~icons/mdi/cog";
+
+// param 定义中的 icon 支持 mdi:xxx 格式，映射到 unplugin-icons 组件
+const iconMap: Record<string, any> = {
+    "mdi:shuffle": IconShuffle,
+    "mdi:cog": IconCog,
+};
 
 type FieldBasicType = {
     name: string;
@@ -151,7 +159,13 @@ defineExpose({
     >
         <div class="mr-1">
             <a-popover position="bottom">
-                <i v-if="item.icon" :class="item.icon"></i>
+                <component
+                    :is="iconMap[item.icon]"
+                    v-if="item.icon && iconMap[item.icon]"
+                    class="w-4 h-4"
+                    aria-hidden="true"
+                />
+                <i v-else-if="item.icon" :class="item.icon"></i>
                 <div v-else>{{ item.title }}</div>
                 <template #content>
                     <div v-if="item.tips" class="text-sm">

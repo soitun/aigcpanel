@@ -75,7 +75,7 @@ const props = defineProps<{
                         />
                     </div>
                 </TaskJobResultStepView>
-                <div class="mt-1 flex gap-1">
+                <div class="mt-1 flex gap-1 flex-wrap">
                     <TextToImageFormViewBody
                         :data="record.modelConfig?.textToImage"
                     />

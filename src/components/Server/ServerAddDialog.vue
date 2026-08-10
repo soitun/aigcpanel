@@ -118,11 +118,21 @@ const doSubmit = async () => {
         Dialog.tipError(t("error.modelVersionExists"));
         return;
     }
-    if ($mapi.app.platformName() !== modelInfo.value.platformName && !isDev) {
+    // 平台/架构校验：开发构建或 platformName/Arch 为占位符（如 __NAME__/__ARCH__ 未打包）时跳过
+    const isPlaceholder = (v: string) => !v || v.startsWith("__");
+    if (
+        !isPlaceholder(modelInfo.value.platformName) &&
+        $mapi.app.platformName() !== modelInfo.value.platformName &&
+        !isDev
+    ) {
         Dialog.tipError(t("error.modelPlatformMismatch"));
         return;
     }
-    if ($mapi.app.platformArch() !== modelInfo.value.platformArch && !isDev) {
+    if (
+        !isPlaceholder(modelInfo.value.platformArch) &&
+        $mapi.app.platformArch() !== modelInfo.value.platformArch &&
+        !isDev
+    ) {
         Dialog.tipError(t("error.modelArchMismatch"));
         return;
     }
@@ -150,9 +160,14 @@ const doSelectLocalDir = async () => {
     if (!configPath) {
         return;
     }
+    await parseLocalDir(configPath);
+};
+
+// 解析本地服务目录 config.json，填充模型信息（供界面与测试共用）
+const parseLocalDir = async (configPath: string): Promise<boolean> => {
     if (!/^[a-zA-Z0-9\/:\-\\._]+$/.test(configPath)) {
         Dialog.tipError(t("error.modelPathInvalid"));
-        return;
+        return false;
     }
     emptyModelInfo();
     loading.value = true;
@@ -192,11 +207,14 @@ const doSelectLocalDir = async () => {
                 logStatus.value += `(${t("error.archMismatch")})`;
             }
         }
+        return true;
     } catch (e) {
         console.log("ServerImportLocalDialog.doSelectLocalDir.error", e);
         Dialog.tipError(t("error.modelDirIdentifyFailed"));
+        return false;
+    } finally {
+        loading.value = false;
     }
-    loading.value = false;
 };
 
 const doSelectCloud = async () => {
@@ -208,7 +226,12 @@ const doSelectCloud = async () => {
 };
 defineExpose({
     show,
+    parseLocalDir,
+    doSubmit,
     doSelectCloud,
+    resolveManual: () => {
+        resolvePanel.value?.doRunManual("commands");
+    },
 });
 
 const emit = defineEmits({

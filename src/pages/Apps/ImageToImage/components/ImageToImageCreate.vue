@@ -76,7 +76,7 @@ const doSubmit = async () => {
         <div class="mb-4 flex items-start">
             <div class="pt-1 w-5">
                 <a-tooltip :content="$t('hint.inputInputImage')" mini>
-                    <icon-video-camera />
+                    <icon-image />
                 </a-tooltip>
             </div>
             <div>
