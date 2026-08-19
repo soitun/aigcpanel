@@ -138,17 +138,26 @@ const list = async (path: string, option?: { isDataPath?: boolean }) => {
         return [];
     }
     const files = fs.readdirSync(fp);
-    return files.map((file) => {
-        const stat = fs.statSync(nodePath.join(fp, file));
-        let f = {
+    const result = [];
+    for (const file of files) {
+        const pathname = nodePath.join(fp, file);
+        let stat: fs.Stats;
+        try {
+            // 对损坏的软链接（目标不存在）statSync 会抛 ENOENT，
+            // 此时跳过该条目，避免整个目录列表崩溃。
+            stat = fs.statSync(pathname);
+        } catch (e) {
+            continue;
+        }
+        result.push({
             name: file,
-            pathname: nodePath.join(fp, file),
+            pathname,
             isDirectory: stat.isDirectory(),
             size: stat.size,
             lastModified: stat.mtimeMs,
-        };
-        return f;
-    });
+        });
+    }
+    return result;
 };
 
 const listAll = async (path: string, option?: { isDataPath?: boolean }) => {
@@ -169,7 +178,13 @@ const listAll = async (path: string, option?: { isDataPath?: boolean }) => {
         let files = [];
         const list = fs.readdirSync(path);
         for (let file of list) {
-            const stat = fs.statSync(nodePath.join(path, file));
+            let stat: fs.Stats | null = null;
+            try {
+                // 对损坏的软链接（目标不存在）statSync 会抛 ENOENT，跳过避免崩溃
+                stat = fs.statSync(nodePath.join(path, file));
+            } catch (e) {
+                continue;
+            }
             let fPath = nodePath.join(basePath, file);
             fPath = fPath.replace(/\\/g, "/");
             let f = {

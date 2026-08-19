@@ -43,6 +43,9 @@ import VideoMergeIcon from "~icons/mdi/merge";
 import MediaFormatConvertIcon from "~icons/mdi/transfer";
 import FfmpegIcon from "~icons/mdi/console";
 
+import GeneralModelIcon from "~icons/mdi/cube-outline";
+import GeneralComfyUIIcon from "~icons/mdi/workflow-outline";
+
 export const SoundApps: {
     name: string;
     title: string;
@@ -294,6 +297,32 @@ export const VideoProcessingApps = [
     },
 ];
 
+// 通用模型分组（小工具"通用"）：
+// - GeneralModel：调用系统无法识别的其他类型模型（config.json 声明 general 数组）
+// - GeneralComfyUI：调用 ComfyUI 服务中 biz 未归类的通用工作流
+export const GeneralApps = [
+    {
+        name: "GeneralModel",
+        title: t("general.model.title"),
+        description: t("general.model.appDesc"),
+        icon: GeneralModelIcon,
+        color: "#0d9488",
+        component: defineAsyncComponent(
+            () => import("./GeneralModel/GeneralModel.vue"),
+        ),
+    },
+    {
+        name: "GeneralComfyUI",
+        title: t("general.comfyui.title"),
+        description: t("general.comfyui.appDesc"),
+        icon: GeneralComfyUIIcon,
+        color: "#0891b2",
+        component: defineAsyncComponent(
+            () => import("./GeneralComfyUI/GeneralComfyUI.vue"),
+        ),
+    },
+];
+
 export const AllApps = [
     ...(SoundApps.map((app) => ({
         ...app,
@@ -308,6 +337,10 @@ export const AllApps = [
         url: `/tool?tab=${app.name}`,
     })) as any),
     ...(VideoProcessingApps.map((app) => ({
+        ...app,
+        url: `/tool?tab=${app.name}`,
+    })) as any),
+    ...(GeneralApps.map((app) => ({
         ...app,
         url: `/tool?tab=${app.name}`,
     })) as any),

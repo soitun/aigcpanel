@@ -5,6 +5,21 @@ import { TaskBiz } from "../store/modules/task";
 
 const serverStore = useServerStore();
 
+// Allowed audio extensions for videoGen, reject video containers like mp4
+const AUDIO_EXT_WHITELIST = ["wav", "mp3", "flac", "ogg", "aac", "m4a", "wma"];
+
+const getAudioExt = (path: string) => {
+    if (!path) return "";
+    let p = path;
+    // handle query string in URL (e.g. ?X-Amz-...=...)
+    const queryIndex = p.search(/[?#]/);
+    if (queryIndex >= 0) {
+        p = p.substring(0, queryIndex);
+    }
+    const match = p.match(/\.([A-Za-z0-9]+)$/);
+    return match ? match[1].toLowerCase() : "";
+};
+
 export const VideoGen: TaskBiz = {
     runFunc: async (bizId, bizParam) => {
         // console.log('VideoGen.runFunc', {bizId, bizParam})
@@ -28,6 +43,15 @@ export const VideoGen: TaskBiz = {
         }
         if (!audioFile) {
             throw new Error("AudioFileEmpty");
+        }
+        // Reject unsupported audio format (e.g. a video container uploaded as audio)
+        const audioExt = getAudioExt(audioFile);
+        if (audioExt && !AUDIO_EXT_WHITELIST.includes(audioExt)) {
+            throw new Error(
+                `audio format not supported: .${audioExt}, expected ${AUDIO_EXT_WHITELIST.join(
+                    "/",
+                )}`,
+            );
         }
         const res = await serverStore.call(serverInfo, "videoGen", {
             id: serverStore.generateTaskId("VideoGen", bizId),

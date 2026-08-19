@@ -457,6 +457,9 @@ export const RemoteServer = function (config: any) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
                     }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
+                    }
                     throw "执行失败，请查看模型日志";
                 }
                 return {
@@ -492,6 +495,9 @@ export const RemoteServer = function (config: any) {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
+                    }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
                     }
                     throw "执行失败，请查看模型日志";
                 }
@@ -531,6 +537,9 @@ export const RemoteServer = function (config: any) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
                     }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
+                    }
                     throw "执行失败，请查看模型日志";
                 }
                 return {
@@ -566,6 +575,9 @@ export const RemoteServer = function (config: any) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
                     }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
+                    }
                     throw "执行失败，请查看模型日志";
                 }
                 return {
@@ -596,6 +608,9 @@ export const RemoteServer = function (config: any) {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
+                    }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
                     }
                     throw "执行失败，请查看模型日志";
                 }
@@ -633,6 +648,9 @@ export const RemoteServer = function (config: any) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
                     }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
+                    }
                     throw "执行失败，请查看模型日志";
                 }
                 return {
@@ -663,6 +681,9 @@ export const RemoteServer = function (config: any) {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
+                    }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
                     }
                     throw "执行失败，请查看模型日志";
                 }
@@ -703,6 +724,9 @@ export const RemoteServer = function (config: any) {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
+                    }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
                     }
                     throw "执行失败，请查看模型日志";
                 }

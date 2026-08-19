@@ -105,16 +105,12 @@ const createEventChannel = (
             case "action":
                 switch (data.type) {
                     case "LoginRequired":
-                    case "VipRequired":
-                        const msgMap = {
-                            LoginRequired: t("common.loginRequired"),
-                            VipRequired: t("common.vipRequired"),
-                        };
-                        Dialog.tipError(data.msg || msgMap[data.type]);
+                        Dialog.tipError(data.msg || t("common.loginRequired"));
                         setTimeout(() => {
                             $mapi.user.open().then();
                         }, 2000);
                         break;
+                    
                 }
                 break;
             case "liveTalk":
@@ -261,6 +257,8 @@ export const serverStore = defineStore("server", {
                     title: json.title || dir.name,
                     version: json.version || "1.0.0",
                     type: EnumServerType.LOCAL,
+                    // EasyServer（含 ComfyUI，其 entry 亦为 __EasyServer__）默认自启动
+                    autoStart: json.entry === "__EasyServer__",
                     functions: json.functions || [],
                     localPath: `model/${dir.name}`,
                     settings: json.settings || [],
@@ -300,6 +298,11 @@ export const serverStore = defineStore("server", {
                     }
                     if (record.title !== lr.title) {
                         record.title = lr.title;
+                        changed = true;
+                    }
+                    // 存量记录自动补齐 autoStart 标记（entry 已为 __EasyServer__ 的模型）
+                    if (lr.autoStart && !record.autoStart) {
+                        record.autoStart = true;
                         changed = true;
                     }
                 }
@@ -521,43 +524,74 @@ export const serverStore = defineStore("server", {
             option?: ServerCallFunctionOption,
         ): Promise<ServerCallFunctionResult> {
             await this.callStart(serverInfo);
-            // comfyui 类型服务：未运行时自动启动并等待就绪
-            const server = await this.getByNameVersion(
-                serverInfo.name,
-                serverInfo.version,
-            );
-            if (server && server.config?.type === "comfyui") {
-                const runtime = getOrCreateServerRuntime(server);
-                if (runtime.status !== EnumServerStatus.RUNNING) {
-                    await this.start(server);
-                }
-                // 等待服务就绪：优先 HTTP ping（不依赖事件通道）
-                const serverInfoForPing = await this.serverInfo(server);
-                const deadline = Date.now() + 5 * 60 * 1000;
-                while (Date.now() < deadline) {
+            try {
+                // comfyui 类型服务：自启动（任务触发自动拉起、空闲自动退出）
+                const server = await this.getByNameVersion(
+                    serverInfo.name,
+                    serverInfo.version,
+                );
+                if (server && server.config?.type === "comfyui") {
+                    const runtime = getOrCreateServerRuntime(server);
+                    let serverInfoForPing = await this.serverInfo(server);
+                    // 以 HTTP ping 判断服务是否已在运行（不依赖 runtime.status，
+                    // 兼容 autoStart 模型初始状态恒为 RUNNING 但进程未启动的情况）
+                    let ready = false;
                     try {
-                        const ok = await $mapi.server.ping(serverInfoForPing);
+                        ready = await $mapi.server.ping(serverInfoForPing);
+                    } catch (e) {
+                        ready = false;
+                    }
+                    if (!ready) {
+                        // 直接强制拉起服务：不能走 serverStore.start()——
+                        // autoStart 模型 record.status 恒为 RUNNING，会导致
+                        // start() 的状态检查短路直接返回（服务永不启动）。
+                        runtime.status = EnumServerStatus.STARTING;
+                        runtime.startTimestampMS = TimeUtil.timestampMS();
+                        runtime.logFile = `logs/${server.name}_${server.version}_${TimeUtil.dateString()}_${runtime.startTimestampMS}.log`;
+                        runtime.eventChannelName = createEventChannel(server);
+                        // 重新获取 serverInfo（含 logFile / eventChannelName）
+                        serverInfoForPing = await this.serverInfo(server);
+                        await $mapi.server.start(serverInfoForPing);
+                    }
+                    // 等待服务就绪：优先 HTTP ping（不依赖事件通道）。
+                    // 用独立变量记录是否真正就绪——runtime.status 对 autoStart
+                    // 模型初始就是 RUNNING，不能作为就绪判断依据。
+                    let startedOk = false;
+                    const deadline = Date.now() + 5 * 60 * 1000;
+                    while (Date.now() < deadline) {
+                        let ok = false;
+                        try {
+                            ok = await $mapi.server.ping(serverInfoForPing);
+                        } catch (e) {
+                            ok = false;
+                        }
                         if (ok) {
                             runtime.status = EnumServerStatus.RUNNING;
+                            startedOk = true;
                             break;
                         }
-                    } catch (e) {
-                        // ping 失败继续等待
+                        await wait(2000);
                     }
-                    await wait(2000);
+                    if (!startedOk) {
+                        throw new Error("comfyui server start timeout");
+                    }
                 }
-                if (runtime.status !== EnumServerStatus.RUNNING) {
-                    throw new Error("comfyui server start timeout");
+                return await $mapi.server.callFunctionWithException(
+                    serverInfo,
+                    method,
+                    data,
+                    option,
+                );
+            } finally {
+                // 无论调用成功/失败都必须复位 autoStartStatus，
+                // 否则 autoStart 模型状态会一直停留在"运行中"。
+                // 此处容错避免 callEnd 异常覆盖真实调用结果。
+                try {
+                    await this.callEnd(serverInfo);
+                } catch (e) {
+                    // ignore callEnd error
                 }
             }
-            const res = await $mapi.server.callFunctionWithException(
-                serverInfo,
-                method,
-                data,
-                option,
-            );
-            await this.callEnd(serverInfo);
-            return res;
         },
         async callStart(serverInfo: ServerInfo) {
             const server = await this.getByNameVersion(

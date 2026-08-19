@@ -4,8 +4,8 @@ import { t } from "../../lang";
 import { Dialog } from "../../lib/dialog";
 import { mapError } from "../../lib/error";
 import { ObjectUtil } from "../../lib/util";
+import { LiveAvatarService } from "../../service/LiveAvatarService";
 import { StorageService } from "../../service/StorageService";
-import { VideoTemplateService } from "../../service/VideoTemplateService";
 import { LiveStatusType } from "../../types/Live";
 import { EnumServerStatus, ServerRecord } from "../../types/Server";
 import store from "../index";
@@ -351,16 +351,16 @@ export const liveStore = defineStore("live", {
         async buildData() {
             const avatars: any[] = [];
             if (this.localConfig.mode === "avatar") {
-                const videoTemplate = await VideoTemplateService.get(
+                const liveAvatar = await LiveAvatarService.get(
                     this.localConfig.avatar.avatarId,
                 );
-                if (!videoTemplate) {
+                if (!liveAvatar) {
                     throw t("live.noAvatarSelected");
                 }
                 avatars.push({
-                    id: "Avatar" + videoTemplate.id,
-                    title: videoTemplate.name,
-                    url: videoTemplate.video,
+                    id: "Avatar" + liveAvatar.id,
+                    title: liveAvatar.name,
+                    url: liveAvatar.video,
                 });
             }
             const flowVideos: any[] = [];

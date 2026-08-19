@@ -77,6 +77,14 @@ import {
     VideoSubtitleCleaner,
 } from "../pages/Apps/VideoSubtitle/task";
 import { VideoZoom, VideoZoomCleaner } from "../pages/Apps/VideoZoom/task";
+import {
+    GeneralModel,
+    GeneralModelCleaner,
+} from "../pages/Apps/GeneralModel/task";
+import {
+    GeneralComfyUI,
+    GeneralComfyUICleaner,
+} from "../pages/Apps/GeneralComfyUI/task";
 import { TaskService } from "../service/TaskService";
 
 import { useServerStore } from "../store/modules/server";
@@ -121,6 +129,9 @@ export const tasks = {
     VideoMerge,
     MediaFormatConvert,
     Ffmpeg,
+    // general apps
+    GeneralModel,
+    GeneralComfyUI,
     
 };
 
@@ -151,6 +162,9 @@ export const taskCleaners = {
     VideoMerge: VideoMergeCleaner,
     MediaFormatConvert: MediaFormatConvertCleaner,
     Ffmpeg: FfmpegCleaner,
+    // general cleaners（归档到 hub 的结果文件清理）
+    GeneralModel: GeneralModelCleaner,
+    GeneralComfyUI: GeneralComfyUICleaner,
     
 };
 

@@ -5,14 +5,14 @@ import (
 	"time"
 )
 
-// PollModelTask polls /api/model/query until the task reaches a terminal
+// PollServerTask polls /api/server/query until the task reaches a terminal
 // state (success / pause / error / fail) or the timeout elapses.
 // The final JSON response is printed; an error is returned when the task
 // fails or the timeout is reached (so the CLI exits non-zero).
-func PollModelTask(cfg *AuthConfig, taskId string, timeout time.Duration) error {
+func PollServerTask(cfg *AuthConfig, taskId string, timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
 	for time.Now().Before(deadline) {
-		queryResult, err := DoRequest(cfg, "/api/model/query", map[string]any{
+		queryResult, err := DoRequest(cfg, "/api/server/query", map[string]any{
 			"taskId": taskId,
 		})
 		if err != nil {

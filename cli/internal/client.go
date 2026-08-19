@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"strings"
 )
 
-// DoRequest sends a POST request to the local AigcPanel HTTP server.
+// DoRequest sends a POST request to the local AIGCPanel HTTP server.
 func DoRequest(cfg *AuthConfig, urlPath string, body any) (map[string]any, error) {
 	return DoRequestMethod(cfg, http.MethodPost, urlPath, body)
 }
@@ -34,7 +36,7 @@ func DoRequestMethod(cfg *AuthConfig, method, urlPath string, body any) (map[str
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("request failed: %w (is AigcPanel running?)", err)
+		return nil, fmt.Errorf("request failed: %w (is AIGCPanel running?)", err)
 	}
 	defer resp.Body.Close()
 
@@ -44,7 +46,7 @@ func DoRequestMethod(cfg *AuthConfig, method, urlPath string, body any) (map[str
 	}
 
 	if resp.StatusCode == http.StatusUnauthorized {
-		return nil, fmt.Errorf("unauthorized: token mismatch, restart AigcPanel and try again")
+		return nil, fmt.Errorf("unauthorized: token mismatch, restart AIGCPanel and try again")
 	}
 
 	var result map[string]any
@@ -62,4 +64,20 @@ func PrintJSON(v any) error {
 	}
 	fmt.Println(string(b))
 	return nil
+}
+
+// AigcPanelEnvs 返回进程环境变量中所有以 AIGCPANEL_ 开头的变量，
+// 用于随请求体透传给服务端（服务启动时合并进 launcher 进程环境）。
+func AigcPanelEnvs() map[string]string {
+	envs := map[string]string{}
+	for _, kv := range os.Environ() {
+		if !strings.HasPrefix(kv, "AIGCPANEL_") {
+			continue
+		}
+		parts := strings.SplitN(kv, "=", 2)
+		if len(parts) == 2 {
+			envs[parts[0]] = parts[1]
+		}
+	}
+	return envs
 }

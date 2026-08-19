@@ -83,6 +83,8 @@ onMounted(() => {
             status: r.status,
             configType: r.config?.type,
             localPath: r.localPath,
+            // spread 为普通数组，避免响应式代理数组经 CDP 序列化后变成对象
+            functions: [...(r.functions || [])],
         }));
     });
     // 测试专用：清空全部本地模型记录（供 UI 导入测试前置清理，避免版本已存在）
@@ -257,6 +259,9 @@ onUnmounted(() => {
                                 <div class="inline-block mr-4">
                                     {{ record.title }}
                                     <div
+                                        v-if="
+                                            record.type !== EnumServerType.CLOUD
+                                        "
                                         class="inline-block rounded-3xl bg-gray-100 px-3"
                                     >
                                         v{{ record.version }}
@@ -278,7 +283,9 @@ onUnmounted(() => {
                             </div>
                         </div>
                         <div class="h-12 pt-4">
-                            <div class="text-gray-400 text-sm">
+                            <div
+                                class="text-gray-400 text-sm overflow-hidden whitespace-nowrap text-ellipsis"
+                            >
                                 <a-tag
                                     v-for="label in functionToLabels(
                                         record.functions,

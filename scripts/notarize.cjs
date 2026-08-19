@@ -87,7 +87,7 @@ exports.default = async function notarizing(context) {
     console.log(`  • Notarization Start`);
     // THIS MUST BE THE SAME AS THE `appId` property
     // in your electron builder configuration
-    const appId = "AigcPanel";
+    const appId = "AIGCPanel";
     const appPath = `${appOutDir}/${appName}.app`;
 
     // 本地构建安装版（make build-and-install，AIGCPANEL_LOCAL_INSTALL=1）：

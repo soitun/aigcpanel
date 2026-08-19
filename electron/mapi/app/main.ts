@@ -172,8 +172,9 @@ const windowOpen = async (
     return Page.open(name, option);
 };
 
-ipcMain.handle("window:open", (event, name: string, option: any) => {
-    return windowOpen(name, option);
+ipcMain.handle("window:open", async (event, name: string, option: any) => {
+    // 窗口对象不能通过 IPC 序列化，仅创建窗口，不返回 BrowserWindow
+    await windowOpen(name, option);
 });
 
 ipcMain.handle("window:hide", (event, name: string) => {

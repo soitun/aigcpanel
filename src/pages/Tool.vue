@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { getNavTab, rememberNavTab } from "../lib/nav-memory";
+import { t } from "../lang";
 import Router from "../router";
-import { SoundToolApps, ToolApps, VideoProcessingApps } from "./Apps/all";
+import {
+    SoundToolApps,
+    ToolApps,
+    VideoProcessingApps,
+    GeneralApps,
+} from "./Apps/all";
 import { testActionSet, testActionUnset } from "../utils/test";
 
 const tab = ref("");
@@ -11,9 +17,15 @@ const groups = [
     { title: "声音处理", apps: SoundToolApps },
     { title: "图像生成", apps: ToolApps },
     { title: "视频处理", apps: VideoProcessingApps },
+    { title: t("general.model.group") || "通用", apps: GeneralApps },
 ];
 
-const allToolApps = [...SoundToolApps, ...ToolApps, ...VideoProcessingApps];
+const allToolApps = [
+    ...SoundToolApps,
+    ...ToolApps,
+    ...VideoProcessingApps,
+    ...GeneralApps,
+];
 
 const syncTab = () => {
     const next =

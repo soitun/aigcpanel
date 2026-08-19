@@ -20,37 +20,44 @@ AIGCPanel 是一款简单易用的一站式 AI 数字人桌面应用，支持 Wi
 ## 功能特性
 
 **数字人合成**
+
 - 基于多种开源口型同步模型（MuseTalk / LatentSync / Wav2Lip / Heygem），将任意音频与人物视频精准对齐
 - 支持直接输入文本由语音模型合成后驱动，或上传本地音频文件驱动
 - 支持绿幕视频形象，内置形象模板管理
 
 **语音处理**
+
 - 语音合成（TTS）：多模型支持，可调速度、音调等参数
 - 语音克隆：上传参考音频即可克隆特定音色
 - 语音识别（ASR）：输出带时间戳文字，可导出字幕文件（工具箱）
 - 声音替换：一键将视频音轨替换为合成音频（工具箱）
 
 **工具箱（25+ 工具）**
+
 - 声音处理：长文本转音频、字幕转音频、**声音识别**（ASR，含时间戳/字幕导出）、声音替换、音频规范化
 - 图像生成：文生图、图生图
 - 视频处理：背景添加、智能剪辑、片段放大、标注、字幕、全局变速、片段变速、尺寸转换、压缩、片段删除/保留、片头片尾合并、添加音频、视频合并、格式转换、FFmpeg 自定义、一键合成流程
 
 **可视化工作流**（VIP）
+
 - 拖拽式节点编排：大模型（LLM）、JS 脚本、条件分支、MCP 工具调用、文件操作、变量、随机值、正则提取、全部工具箱节点
 - 支持断点续跑、节点级状态追踪、运行历史查看
 
 **智能直播**（VIP）
+
 - 支持抖音、哔哩哔哩、虎牙、斗鱼、快手弹幕实时监控
 - 知识库配置：问答流程、视频播放流程、自定义内容
 - 违禁词检测与回复 Prompt 自定义
 - 互动事件记录与播报历史查看
 
 **AI 模型管理**
+
 - 本地模型一键导入、启动/停止、日志查看、参数配置
 - 支持远程 API 模型接入
 - 云端 AI 模型服务（无需本地显卡）（VIP）
 
 **其他**
+
 - 命令行工具 `aigcpanel`：查询模型列表、调用模型函数
 - 内置简体中文 / 英语双语界面
 - 支持暗色模式
@@ -59,30 +66,30 @@ AIGCPanel 是一款简单易用的一站式 AI 数字人桌面应用，支持 Wi
 
 ### 声音合成
 
-| 模型 | 说明 |
-|---|---|
-| [CosyVoice-300M](https://github.com/FunAudioLLM/CosyVoice) | 阿里通义实验室开源 TTS |
-| [CosyVoice-300M-Instruct](https://github.com/FunAudioLLM/CosyVoice) | 指令控制版 |
-| [CosyVoice2-0.5b](https://github.com/FunAudioLLM/CosyVoice) | 第二代轻量版 |
-| [FishSpeech](https://github.com/fishaudio/fish-speech) | 高质量零样本语音克隆 |
-| [IndexTTS](https://github.com/index-tts/index-tts) | 工业级中文 TTS |
-| [SparkTTS](https://github.com/SparkAudio/Spark-TTS) | 讯飞开源语音合成 |
-| [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS) | 少样本声音克隆 |
+| 模型                                                                | 说明                   |
+| ------------------------------------------------------------------- | ---------------------- |
+| [CosyVoice-300M](https://github.com/FunAudioLLM/CosyVoice)          | 阿里通义实验室开源 TTS |
+| [CosyVoice-300M-Instruct](https://github.com/FunAudioLLM/CosyVoice) | 指令控制版             |
+| [CosyVoice2-0.5b](https://github.com/FunAudioLLM/CosyVoice)         | 第二代轻量版           |
+| [FishSpeech](https://github.com/fishaudio/fish-speech)              | 高质量零样本语音克隆   |
+| [IndexTTS](https://github.com/index-tts/index-tts)                  | 工业级中文 TTS         |
+| [SparkTTS](https://github.com/SparkAudio/Spark-TTS)                 | 讯飞开源语音合成       |
+| [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS)                | 少样本声音克隆         |
 
 ### 声音识别
 
-| 模型 | 说明 |
-|---|---|
+| 模型                                           | 说明                                 |
+| ---------------------------------------------- | ------------------------------------ |
 | [FunASR](https://github.com/modelscope/FunASR) | 阿里达摩院开源 ASR，支持带时间戳输出 |
 
 ### 视频模型
 
-| 模型 | 说明 |
-|---|---|
-| [MuseTalk](https://github.com/TMElyralab/MuseTalk) | 腾讯音乐实时口型同步 |
+| 模型                                                  | 说明                   |
+| ----------------------------------------------------- | ---------------------- |
+| [MuseTalk](https://github.com/TMElyralab/MuseTalk)    | 腾讯音乐实时口型同步   |
 | [LatentSync](https://github.com/bytedance/LatentSync) | 字节跳动高质量口型同步 |
-| [Wav2Lip](https://github.com/Rudrabha/Wav2Lip) | 经典口型同步模型 |
-| [Heygem](https://github.com/duixcom/Duix.Heygem) | 全身数字人驱动 |
+| [Wav2Lip](https://github.com/Rudrabha/Wav2Lip)        | 经典口型同步模型       |
+| [Heygem](https://github.com/duixcom/Duix.Heygem)      | 全身数字人驱动         |
 
 ## 功能预览
 
@@ -126,16 +133,16 @@ AIGCPanel 是一款简单易用的一站式 AI 数字人桌面应用，支持 Wi
 
 拖拽式节点编排，将大模型调用、脚本处理、音视频工具串联成自动化流水线。支持断点续跑和运行历史追踪。
 
-| 节点类型 | 说明 |
-|---|---|
+| 节点类型      | 说明                       |
+| ------------- | -------------------------- |
 | 大模型（LLM） | 调用配置的 AI 模型生成文本 |
-| JS 脚本 | 执行自定义 JavaScript 逻辑 |
-| 条件分支 | 根据条件控制流程走向 |
-| MCP 工具调用 | 调用 MCP 协议工具 |
-| 文件操作 | 复制、移动、列表读取 |
-| 变量 / 随机值 | 定义变量或生成随机数据 |
-| 正则提取 | 从文本中提取结构化内容 |
-| 工具节点 | 直接调用工具箱内任意工具 |
+| JS 脚本       | 执行自定义 JavaScript 逻辑 |
+| 条件分支      | 根据条件控制流程走向       |
+| MCP 工具调用  | 调用 MCP 协议工具          |
+| 文件操作      | 复制、移动、列表读取       |
+| 变量 / 随机值 | 定义变量或生成随机数据     |
+| 正则提取      | 从文本中提取结构化内容     |
+| 工具节点      | 直接调用工具箱内任意工具   |
 
 ![](demo/image/workflow-edit.png)
 
@@ -168,21 +175,22 @@ AIGCPanel 是一款简单易用的一站式 AI 数字人桌面应用，支持 Wi
 ### Linux
 
 提供 AppImage 和 deb 两种格式：
+
 - AppImage：`chmod +x AIGCPanel.AppImage && ./AIGCPanel.AppImage`
 - deb：`sudo dpkg -i AIGCPanel.deb`
 
 ## 技术栈
 
-| 技术 | 用途 |
-|---|---|
-| [Electron](https://www.electronjs.org/) | 跨平台桌面应用框架 |
-| [Vue 3](https://vuejs.org/) | 前端 UI 框架 |
-| [TypeScript](https://www.typescriptlang.org/) | 类型安全 |
-| [Arco Design](https://arco.design/) | UI 组件库（字节跳动） |
-| [TailwindCSS](https://tailwindcss.com/) | 原子化 CSS |
-| [Vite](https://vitejs.dev/) | 构建工具 |
-| [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) | 本地数据持久化 |
-| [LogicFlow](https://site.logic-flow.cn/) | 工作流画布引擎 |
+| 技术                                                         | 用途                  |
+| ------------------------------------------------------------ | --------------------- |
+| [Electron](https://www.electronjs.org/)                      | 跨平台桌面应用框架    |
+| [Vue 3](https://vuejs.org/)                                  | 前端 UI 框架          |
+| [TypeScript](https://www.typescriptlang.org/)                | 类型安全              |
+| [Arco Design](https://arco.design/)                          | UI 组件库（字节跳动） |
+| [TailwindCSS](https://tailwindcss.com/)                      | 原子化 CSS            |
+| [Vite](https://vitejs.dev/)                                  | 构建工具              |
+| [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) | 本地数据持久化        |
+| [LogicFlow](https://site.logic-flow.cn/)                     | 工作流画布引擎        |
 
 ## 本地开发
 
@@ -211,11 +219,25 @@ npm run build
 ```shell
 aigcpanel --help
 
-# 查询可用模型
-aigcpanel model list
+# 查询可用 AI 模型服务
+aigcpanel serverList
 
-# 调用模型函数
-aigcpanel model call <modelName> <function> [args...]
+# 查看 ComfyUI 服务的工作流（VIP）
+aigcpanel serverComfyuiList --server server-ComfyUI|1.0.0
+
+# 调用模型服务函数（如文生图 / 语音合成 / ComfyUI 工作流等）
+aigcpanel serverCall --server server-demo|1.1.0 --function textToImage --prompt "风景" --param '{"width":512,"height":512}'
+aigcpanel serverCall --server server-ComfyUI|1.0.0 --function comfyui --comfyuiName demo1 --param '{"width":512,"height":512}'
+
+# 安装 / 删除模型服务、查看日志、设置参数
+aigcpanel serverInstall --dir /path/to/model-dir
+aigcpanel serverRemove --server server-demo|1.1.0
+aigcpanel serverLog --server server-demo|1.1.0
+aigcpanel serverSetting --server server-demo|1.1.0 --idleTimeout 120
+
+# 调用内置工具（如视频压缩、语音合成等），工具参数统一通过 --param JSON 传递
+aigcpanel tools --name VideoCompress --param '{"file":"/path/to/video.mp4"}'
+aigcpanel tools --name SoundGenerate --param '{"text":"你好世界"}'
 ```
 
 ## 问题反馈

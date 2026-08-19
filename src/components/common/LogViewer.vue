@@ -64,7 +64,7 @@ watch(
         class="bg-black p-3 overflow-auto"
     >
         <div v-if="!logs.length" class="text-center text-white py-10">
-            <div>
+            <div class="flex justify-center">
                 <i-mdi-inbox-outline class="text-4xl" />
             </div>
             <div class="text-xs mt-3">

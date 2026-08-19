@@ -4,14 +4,19 @@ import { DBMain } from "../../db/main";
 import { Events } from "../../event/main";
 import { Log } from "../../log/main";
 import { sendJson, asyncHandler } from "../utils";
+import ServerApi from "../../server/api";
 
 const router = Router();
 
-// ── POST /api/task/submit ────────────────────────────────────────────────
+// ── POST /api/tools/submit ───────────────────────────────────────────────
 router.post(
     "/submit",
     asyncHandler(async (req: Request, res: Response) => {
-        const { biz, modelConfig, param, title } = req.body || {};
+        const { biz, modelConfig, param, title, env } = req.body || {};
+        // 透传 AIGCPANEL_* 环境变量到服务进程（如 AIGCPANEL_SKIP_LONG 测试开关）
+        if (env && typeof env === "object") {
+            ServerApi.setExtraEnv(env);
+        }
         if (!biz) {
             sendJson(res, 400, { code: -1, msg: "Missing biz" });
             return;
@@ -46,11 +51,15 @@ router.post(
     }),
 );
 
-// ── POST /api/task/continue ──────────────────────────────────────────────
+// ── POST /api/tools/continue ─────────────────────────────────────────────
 router.post(
     "/continue",
     asyncHandler(async (req: Request, res: Response) => {
-        const { taskId, stage, data } = req.body || {};
+        const { taskId, stage, data, env } = req.body || {};
+        // 透传 AIGCPANEL_* 环境变量到服务进程（如 AIGCPANEL_SKIP_LONG 测试开关）
+        if (env && typeof env === "object") {
+            ServerApi.setExtraEnv(env);
+        }
         if (!taskId || !stage) {
             sendJson(res, 400, {
                 code: -1,

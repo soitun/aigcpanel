@@ -33,6 +33,7 @@
     "model.description": "模型说明",
     "model.download": "下载模型",
     "model.edit": "编辑模型",
+    "model.general": "通用",
     "model.editProvider": "编辑供应商",
     "model.hardwareReq": "硬件要求",
     "model.id": "模型ID",

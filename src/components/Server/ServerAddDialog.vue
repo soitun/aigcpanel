@@ -90,6 +90,7 @@ const doSubmitLocalDir = async () => {
         title: modelInfo.value.title,
         version: modelInfo.value.version,
         type: modelInfo.value.type,
+        // EasyServer（含 ComfyUI，其 entry 亦为 __EasyServer__）默认自启动
         autoStart: modelInfo.value.entry === "__EasyServer__",
         functions: modelInfo.value.functions,
         localPath: modelInfo.value.path,
@@ -166,7 +167,16 @@ const doSelectLocalDir = async () => {
 // 解析本地服务目录 config.json，填充模型信息（供界面与测试共用）
 const parseLocalDir = async (configPath: string): Promise<boolean> => {
     if (!/^[a-zA-Z0-9\/:\-\\._]+$/.test(configPath)) {
-        Dialog.tipError(t("error.modelPathInvalid"));
+        // Detect the current OS and show a suitable example path (avoid mixing platforms)
+        const examplePath = $mapi.app.isPlatform("win")
+            ? "D:\\aigcpanel\\models"
+            : "/aigcpanel/models";
+        Dialog.tipError(
+            t("error.modelPathInvalid", {
+                path: configPath,
+                example: examplePath,
+            }),
+        );
         return false;
     }
     emptyModelInfo();

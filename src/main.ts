@@ -17,6 +17,8 @@ import "./style.less";
 
 import { CommonComponents } from "./components/common";
 import { useSettingStore } from "./store/modules/setting";
+import { useServerStore } from "./store/modules/server";
+import { useModelStore } from "./module/Model/store/model";
 import { TaskManager } from "./task";
 
 import { reportErrorRender } from "../electron/mapi/log/beacon-render";
@@ -95,6 +97,17 @@ app.mount("#app").$nextTick(() => {
 
     initTestRegistry();
     window.__test = testRegistry;
+    // 供测试种子脚本（test/dev-seed.ts）在写入 storage 后重新加载内存 store
+    window["__debug"] = {
+        reloadServerStore: () => useServerStore().reloadRecords(),
+        reloadModelStore: () => useModelStore().init(),
+        getServerRecords: () =>
+            useServerStore().records.map((r) => ({
+                name: r.name,
+                version: r.version,
+                functions: r.functions,
+            })),
+    };
     registerNavigate(async (path) => {
         await router.push(path);
     });

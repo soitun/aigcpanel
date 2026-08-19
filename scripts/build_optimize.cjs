@@ -44,7 +44,7 @@ exports.default = async function (context) {
         if (hasCert) {
             console.log("  [sign] 钥匙串已检测到 Developer ID 证书，跳过 adhoc 重新签名");
         } else {
-            const appId = context.packager.appInfo.appId || "AigcPanel";
+            const appId = context.packager.appInfo.appId || "AIGCPanel";
             const entitlementsPath = require("node:path").resolve(__dirname, "..", "entitlements.mac.plist");
             const exec = require("node:child_process").execSync;
             try {
@@ -98,7 +98,7 @@ exports.default = async function (context) {
     // common.listFiles(context.appOutDir, true).forEach((p) => {
     // console.log('BuildOptimize.path', (p.isDir ? 'D:' : 'F:') + p.path);
     // })
-    // const localeDir = context.appOutDir + "/AigcPanel.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/";
+    // const localeDir = context.appOutDir + "/AIGCPanel.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/";
     // console.log(`localeDir: ${localeDir}`);
     // fs.readdir(localeDir, function (err, files) {
     //     if (!(files && files.length)) {

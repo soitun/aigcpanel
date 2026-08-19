@@ -101,7 +101,7 @@ const onUpdate = async () => {
                                         @change="onChangeTitle(r, $event)"
                                     >
                                         <a
-                                            class="ml-1 text-gray-400"
+                                            class="ml-1 text-gray-400 block"
                                             href="javascript:;"
                                         >
                                             <i-mdi-pencil />

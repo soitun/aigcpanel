@@ -1,4 +1,4 @@
-// Unified build script for AigcPanel.
+// Unified build script for AIGCPanel.
 // Ported from focusany-pro scripts/build.mjs.
 //   npm run build                  -> native arch
 //   TARGET_ARCH=x64 npm run build  -> cross-compile x64 on arm64

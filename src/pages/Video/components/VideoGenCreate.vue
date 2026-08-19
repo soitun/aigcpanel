@@ -6,6 +6,7 @@ import { t } from "../../../lang";
 import { Dialog } from "../../../lib/dialog";
 import { StorageUtil } from "../../../lib/storage";
 import { TimeUtil } from "../../../lib/util";
+import { FileUtil } from "../../../lib/file";
 import { PermissionService } from "../../../service/PermissionService";
 import { TaskRecord, TaskService } from "../../../service/TaskService";
 import {
@@ -117,6 +118,17 @@ const doSoundCustomSelect = async () => {
         ],
     });
     if (!path) {
+        return;
+    }
+    // Validate extension again to prevent selecting unsupported formats
+    // via "All Files" in the system file dialog
+    const ext = FileUtil.getExt(path);
+    if (!["wav", "mp3"].includes(ext)) {
+        Dialog.tipError(
+            t("hint.selectFileFormat", {
+                extensions: "wav,mp3",
+            }),
+        );
         return;
     }
     formData.value.soundCustomFile = path;

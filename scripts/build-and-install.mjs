@@ -1,12 +1,12 @@
 /**
- * build-and-install.mjs — Build and install AigcPanel on the current system.
+ * build-and-install.mjs — Build and install AIGCPanel on the current system.
  *
  * Ported from focusany-pro scripts/build-and-install.mjs.
  *
  * Usage: node scripts/build-and-install.mjs
  *
  * Flow:
- *   1. Kill running AigcPanel processes
+ *   1. Kill running AIGCPanel processes
  *   2. Run a full local build without code signing (electron-builder auto-discovers
  *      the Developer ID certificate from the keychain; when absent, afterPack
  *      hook build_optimize.cjs downgrades to an adhoc re-sign)
@@ -27,7 +27,7 @@ import {arch as osArch, platform as osPlatform, homedir} from 'node:os';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
-const APP_NAME = 'AigcPanel';
+const APP_NAME = 'AIGCPanel';
 
 // ── Utilities ─────────────────────────────────────────────────────
 
@@ -68,7 +68,7 @@ function killRunningInstances() {
   step('清理残留进程');
 
   if (osPlatform() === 'darwin') {
-    // Kill AigcPanel.app and related local processes.
+    // Kill AIGCPanel.app and related local processes.
     try { execSync(`pkill -9 -f "${APP_NAME}.app" 2>/dev/null || true`, {stdio: 'ignore'}); } catch {}
     try { execSync('pkill -9 -f "aigcpanel" 2>/dev/null || true', {stdio: 'ignore'}); } catch {}
     // Wait until processes exit, up to 10 seconds.
@@ -208,7 +208,7 @@ function installOnWin(distReleaseDir) {
     return;
   }
 
-  // Try portable package: find a directory that contains AigcPanel.exe.
+  // Try portable package: find a directory that contains AIGCPanel.exe.
   const archLabel = osArch() === 'arm64' ? 'arm64' : 'x64';
   for (const sub of [`win-${archLabel}`, 'win', '']) {
     const dir = sub ? join(distReleaseDir, sub) : distReleaseDir;
@@ -258,7 +258,7 @@ function installOnLinux(distReleaseDir) {
 
 function main() {
   console.log('╔══════════════════════════════════════╗');
-  console.log('║   AigcPanel 构建 & 安装              ║');
+  console.log('║   AIGCPanel 构建 & 安装              ║');
   console.log('╚══════════════════════════════════════╝');
   console.log(`  平台: ${osPlatform()} (${osArch()})`);
   console.log(`  目录: ${ROOT}`);

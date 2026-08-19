@@ -37,6 +37,9 @@ export type TaskBiz =
     | "VideoMerge"
     | "MediaFormatConvert"
     | "Ffmpeg"
+    // general apps
+    | "GeneralModel"
+    | "GeneralComfyUI"
     // workflow
     | "Workflow";
 

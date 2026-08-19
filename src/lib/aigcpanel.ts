@@ -1,6 +1,7 @@
 import { t } from "../lang";
 
 export const allFunctions = [
+    { value: "comfyui", label: "ComfyUI" },
     { value: "soundTts", label: t("voice.synthesis") },
     { value: "soundClone", label: t("voice.clone") },
     { value: "videoGen", label: t("avatar.digitalHuman") },
@@ -10,6 +11,7 @@ export const allFunctions = [
     { value: "textToVideo", label: t("model.txt2video") },
     { value: "imageToVideo", label: t("model.img2video") },
     { value: "live", label: t("avatar.smartLive") },
+    { value: "general", label: t("model.general") },
 ];
 
 export function functionToLabels(functions: string[]) {

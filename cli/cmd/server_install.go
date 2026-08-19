@@ -13,22 +13,22 @@ import (
 )
 
 var serverInstallCmd = &cobra.Command{
-	Use:   "server_install",
+	Use:   "serverInstall",
 	Short: "Install a model server from a local directory",
-	Long: `Install a model server from a local directory into AigcPanel.
+	Long: `Install a model server from a local directory into AIGCPanel.
 
 Usage:
-  aigcpanel server_install --dir /path/to/model-dir
+  aigcpanel serverInstall --dir /path/to/model-dir
 
 Flags:
   --dir   Required. Local directory containing config.json
 
 The directory's config.json is read to register the model (name/version/
-functions/settings), then the server record is stored in AigcPanel so the
+functions/settings), then the server record is stored in AIGCPanel so the
 model appears in the installed model list. Same name+version is upserted.
 
 Examples:
-  aigcpanel server_install --dir ../aigcpanel-server-demo`,
+  aigcpanel serverInstall --dir ../aigcpanel-server-demo`,
 	DisableFlagParsing: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dir, helpRequested, err := parseServerInstallArgs(args)

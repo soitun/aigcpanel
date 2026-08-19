@@ -92,7 +92,7 @@ onMounted(() => {
                     >
                         <div class="flex items-center gap-1">
                             <div
-                                class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2"
+                                class="inline-flex items-center bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2"
                             >
                                 <div class="mr-2 h-8 pt-0.5">
                                     <a-checkbox v-model="r['_check']" />

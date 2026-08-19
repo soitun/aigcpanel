@@ -33,6 +33,7 @@
     "model.description": "Model Description",
     "model.download": "Download Model",
     "model.edit": "Edit Model",
+    "model.general": "General",
     "model.editProvider": "Edit Provider",
     "model.hardwareReq": "Hardware Requirements",
     "model.id": "Model ID",

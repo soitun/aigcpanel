@@ -53,6 +53,7 @@ defineExpose({
                     <div class="flex flex-wrap items-center">
                         <div class="mr-2 mb-1">{{ props.record.title }}</div>
                         <div
+                            v-if="props.record.type !== EnumServerType.CLOUD"
                             class="mr-2 text-sm bg-gray-100 px-2 leading-6 inline-block rounded-lg mb-1"
                         >
                             v{{ props.record.version }}

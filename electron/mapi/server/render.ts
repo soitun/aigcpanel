@@ -59,7 +59,7 @@ const callFunctionWithException = async (
     option: any,
 ) => {
     try {
-        return ipcRenderer.invoke(
+        return await ipcRenderer.invoke(
             "server:callFunction",
             serverInfo,
             method,

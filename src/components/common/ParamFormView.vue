@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from "vue";
+
 const props = defineProps<{
     param: {
         [key: string]: any;
@@ -13,12 +15,26 @@ const formatValue = (v: any) => {
     if ("object" === typeof v) return JSON.stringify(v);
     return v;
 };
+// 长文本参数（textarea 类型，如负面提示词）历史展示时独占一行
+const isLongText = (v: any) =>
+    typeof v === "string" && (v.length > 20 || v.includes("\n"));
+
+// 过滤掉以 _ 开头的辅助键（_key 用于展示名，__key 用于展示值），只保留实际参数
+const visibleParam = computed(() =>
+    Object.fromEntries(
+        Object.entries(props.param).filter(([k]) => !k.startsWith("_")),
+    ),
+);
 </script>
 
 <template>
     <div class="flex flex-wrap gap-1">
-        <div v-for="(v, k) in param" class="flex-shrink-0">
-            <a-tag v-if="!(k as string).startsWith('_')" class="rounded-lg">
+        <div
+            v-for="(v, k) in visibleParam"
+            class="flex-shrink-0"
+            :class="isLongText(v) ? 'w-full' : ''"
+        >
+            <a-tag class="rounded-lg">
                 <div class="w-5">
                     <svg
                         class="w-4 h-4"

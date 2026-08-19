@@ -5,6 +5,7 @@ import { t } from "../../lang";
 import { Dialog } from "../../lib/dialog";
 import SpeakerSelector from "./SpeakerSelector.vue";
 import SoundPromptSelector from "../../pages/Video/components/SoundPromptSelector.vue";
+import FileSelector from "./FileSelector.vue";
 import IconShuffle from "~icons/mdi/shuffle";
 import IconCog from "~icons/mdi/cog";
 
@@ -18,7 +19,15 @@ type FieldBasicType = {
     name: string;
     title: string;
     icon: string;
-    type: "select" | "input" | "inputNumber" | "switch" | "slider" | "speaker";
+    type:
+        | "select"
+        | "input"
+        | "textarea"
+        | "inputNumber"
+        | "switch"
+        | "slider"
+        | "speaker"
+        | "file";
     defaultValue: any;
     placeholder: string;
     required: boolean;
@@ -31,6 +40,8 @@ type FieldBasicType = {
         value: string;
         label: string;
     }>;
+    // file 类型：允许选择的文件扩展名（如 ["png","jpg"]），空数组不限
+    extensions?: string[];
     opt?: ("randomValue" | "seed")[];
 };
 
@@ -152,116 +163,142 @@ defineExpose({
 </script>
 
 <template>
-    <div
-        v-for="item in formData"
-        :key="item.name"
-        class="mr-2 mb-2 inline-flex items-center"
-    >
-        <div class="mr-1">
-            <a-popover position="bottom">
-                <component
-                    :is="iconMap[item.icon]"
-                    v-if="item.icon && iconMap[item.icon]"
-                    class="w-4 h-4"
-                    aria-hidden="true"
-                />
-                <i v-else-if="item.icon" :class="item.icon"></i>
-                <div v-else>{{ item.title }}</div>
-                <template #content>
-                    <div v-if="item.tips" class="text-sm">
-                        <div class="font-bold mb-2">{{ item.title }}</div>
-                        <div class="w-48">{{ item.tips }}</div>
-                    </div>
-                    <div v-else class="text-sm -my-2">
-                        <div class="font-bold mb-2">{{ item.title }}</div>
-                    </div>
-                </template>
-            </a-popover>
-        </div>
-        <div v-if="item.type === 'input'" class="w-48 mr-3">
-            <a-input
-                :placeholder="item.placeholder"
-                allow-clear
-                size="small"
-                :disabled="props.disabled"
-                v-model="item.value"
+    <div class="flex flex-wrap items-center gap-2 w-full">
+        <div
+            v-for="item in formData"
+            :key="item.name"
+            :class="
+                item.type === 'textarea'
+                    ? 'flex flex-col w-full items-stretch'
+                    : 'inline-flex items-center'
+            "
+        >
+            <div :class="item.type === 'textarea' ? 'mb-1' : 'mr-1'">
+                <a-popover position="bottom">
+                    <component
+                        :is="iconMap[item.icon]"
+                        v-if="item.icon && iconMap[item.icon]"
+                        class="w-4 h-4"
+                        aria-hidden="true"
+                    />
+                    <i v-else-if="item.icon" :class="item.icon"></i>
+                    <div v-else>{{ item.title }}</div>
+                    <template #content>
+                        <div v-if="item.tips" class="text-sm">
+                            <div class="font-bold mb-2">{{ item.title }}</div>
+                            <div class="w-48">{{ item.tips }}</div>
+                        </div>
+                        <div v-else class="text-sm -my-2">
+                            <div class="font-bold mb-2">{{ item.title }}</div>
+                        </div>
+                    </template>
+                </a-popover>
+            </div>
+            <div v-if="item.type === 'input'" class="w-48 mr-3">
+                <a-input
+                    :placeholder="item.placeholder"
+                    allow-clear
+                    size="small"
+                    :disabled="props.disabled"
+                    v-model="item.value"
+                >
+                </a-input>
+            </div>
+            <div
+                v-else-if="item.type === 'textarea'"
+                :class="item.type === 'textarea' ? 'w-full' : 'flex-grow mr-3'"
             >
-            </a-input>
-        </div>
-        <div v-else-if="item.type === 'inputNumber'" class="w-32 mr-3">
-            <div class="flex items-center gap-1">
-                <a-input-number
+                <a-textarea
+                    :placeholder="item.placeholder"
+                    :auto-size="{ minRows: 2, maxRows: 6 }"
+                    allow-clear
+                    size="small"
+                    style="width: 100%"
+                    :disabled="props.disabled"
+                    v-model="item.value"
+                >
+                </a-textarea>
+            </div>
+            <div v-else-if="item.type === 'inputNumber'" class="w-32 mr-3">
+                <div class="flex items-center gap-1">
+                    <a-input-number
+                        :placeholder="item.placeholder"
+                        size="small"
+                        v-model="item.value"
+                        :disabled="props.disabled"
+                        :min="item.min"
+                        :max="item.max"
+                    >
+                    </a-input-number>
+                    <a-tooltip
+                        v-if="item.opt && item.opt.includes('seed')"
+                        :content="$t('model.seedTip')"
+                    >
+                        <icon-refresh
+                            @click="
+                                item.value = Math.floor(Math.random() * 1000000)
+                            "
+                            class="cursor-pointer text-gray-400 w-4 h-4"
+                        />
+                    </a-tooltip>
+                </div>
+            </div>
+            <div v-else-if="item.type === 'select'" class="mr-3">
+                <a-select
                     :placeholder="item.placeholder"
                     size="small"
+                    style="width: auto"
+                    :disabled="props.disabled"
+                    v-model="item.value"
+                >
+                    <a-option
+                        v-for="option in item.options"
+                        :key="option.value"
+                        :value="option.value"
+                    >
+                        {{ option.label }}
+                    </a-option>
+                </a-select>
+            </div>
+            <div v-else-if="item.type === 'switch'" class="mr-3">
+                <a-switch
                     v-model="item.value"
                     :disabled="props.disabled"
+                    size="small"
+                />
+            </div>
+            <div v-else-if="item.type === 'slider'" class="w-48 mr-3">
+                <a-slider
+                    v-model="item.value"
+                    :marks="item.sliderMarks"
+                    show-tooltip
                     :min="item.min"
                     :max="item.max"
-                >
-                </a-input-number>
-                <a-tooltip
-                    v-if="item.opt && item.opt.includes('seed')"
-                    :content="$t('model.seedTip')"
-                >
-                    <icon-refresh
-                        @click="
-                            item.value = Math.floor(Math.random() * 1000000)
-                        "
-                        class="cursor-pointer text-gray-400 w-4 h-4"
-                    />
-                </a-tooltip>
+                    :disabled="props.disabled"
+                    :step="item.step"
+                />
             </div>
-        </div>
-        <div v-else-if="item.type === 'select'" class="mr-3">
-            <a-select
-                :placeholder="item.placeholder"
-                size="small"
-                style="width: auto"
-                :disabled="props.disabled"
-                v-model="item.value"
-            >
-                <a-option
-                    v-for="option in item.options"
-                    :key="option.value"
-                    :value="option.value"
-                >
-                    {{ option.label }}
-                </a-option>
-            </a-select>
-        </div>
-        <div v-else-if="item.type === 'switch'" class="mr-3">
-            <a-switch
-                v-model="item.value"
-                :disabled="props.disabled"
-                size="small"
-            />
-        </div>
-        <div v-else-if="item.type === 'slider'" class="w-48 mr-3">
-            <a-slider
-                v-model="item.value"
-                :marks="item.sliderMarks"
-                show-tooltip
-                :min="item.min"
-                :max="item.max"
-                :disabled="props.disabled"
-                :step="item.step"
-            />
-        </div>
-        <div v-else-if="item.type === 'speaker'" class="mr-3">
-            <SpeakerSelector
-                v-model="item.value"
-                :speakers="item['speakers']"
-                :disabled="props.disabled"
-            />
-            <!-- @on-data-update="onSpeakerDataUpdate(item.name, $event)" -->
-        </div>
-        <div v-else-if="item.type === 'soundPromptId'">
-            <SoundPromptSelector
-                v-model="item.value"
-                :disabled="props.disabled"
-            />
-        </div>
-        <!--
+            <div v-else-if="item.type === 'speaker'" class="mr-3">
+                <SpeakerSelector
+                    v-model="item.value"
+                    :speakers="item['speakers']"
+                    :disabled="props.disabled"
+                />
+                <!-- @on-data-update="onSpeakerDataUpdate(item.name, $event)" -->
+            </div>
+            <div v-else-if="item.type === 'soundPromptId'">
+                <SoundPromptSelector
+                    v-model="item.value"
+                    :disabled="props.disabled"
+                />
+            </div>
+            <div v-else-if="item.type === 'file'" class="mr-3">
+                <FileSelector
+                    v-model="item.value"
+                    :extensions="item.extensions || []"
+                />
+            </div>
+            <!--
         <div v-for="speakerParam in item['speakerParam']">
             <div v-if="!speakerParam.type || speakerParam.type === 'select'" class="mr-3">
                 <a-select size="small" :disabled="props.disabled"
@@ -272,7 +309,7 @@ defineExpose({
                 </a-select>
             </div>
         </div>
-        -->
+        --></div>
     </div>
 </template>
 

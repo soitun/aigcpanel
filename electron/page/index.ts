@@ -77,7 +77,13 @@ export const Page = {
         if (!option.parent) {
             option.parent = AppRuntime.mainWindow;
         }
-        if (option.singleton && AppRuntime.windows[name]) {
+        // comfyui-view 由 PageComfyUIView 自己管理"已打开则关闭重建"（每次打开都加载最新工作流），
+        // 因此不走 singleton 拦截
+        if (
+            option.singleton &&
+            name !== PageComfyUIView.NAME &&
+            AppRuntime.windows[name]
+        ) {
             AppRuntime.windows[name].show();
             AppRuntime.windows[name].focus();
             AppRuntime.windows[name].setParentWindow(option.parent);

@@ -51,6 +51,10 @@ import videoSubtitleEnUS from "../pages/Apps/VideoSubtitle/lang/en-US.json";
 import videoSubtitleZhCN from "../pages/Apps/VideoSubtitle/lang/zh-CN.json";
 import videoZoomEnUS from "../pages/Apps/VideoZoom/lang/en-US.json";
 import videoZoomZhCN from "../pages/Apps/VideoZoom/lang/zh-CN.json";
+import generalModelEnUS from "../pages/Apps/GeneralModel/lang/en-US.json";
+import generalModelZhCN from "../pages/Apps/GeneralModel/lang/zh-CN.json";
+import generalComfyUIEnUS from "../pages/Apps/GeneralComfyUI/lang/en-US.json";
+import generalComfyUIZhCN from "../pages/Apps/GeneralComfyUI/lang/zh-CN.json";
 
 let localeInit = false;
 export const defaultLocale = "zh-CN";
@@ -83,6 +87,8 @@ export const messageList = [
             ...videoSpeedPartEnUS,
             ...videoSubtitleEnUS,
             ...videoZoomEnUS,
+            ...generalModelEnUS,
+            ...generalComfyUIEnUS,
         },
     },
     {
@@ -112,6 +118,8 @@ export const messageList = [
             ...videoSpeedPartZhCN,
             ...videoSubtitleZhCN,
             ...videoZoomZhCN,
+            ...generalModelZhCN,
+            ...generalComfyUIZhCN,
         },
     },
 ];

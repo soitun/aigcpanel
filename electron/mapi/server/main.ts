@@ -92,10 +92,13 @@ const getModule = async (
                     try {
                         const config = JSON.parse(configContent);
                         if (config.type === "comfyui") {
-                            // ComfyUI 类型：使用 ComfyUIServer 模块
-                            server = AigcServer["ComfyUI"] as ServerContext;
+                            // ComfyUI 类型：每实例独立创建（避免多实例共享状态污染：
+                            // port 残留导致 ping 误判、任务结果串号等）
+                            // 注意：不能 server.config = config（会覆盖 config 方法）
+                            server = AigcServer["ComfyUI"](
+                                config,
+                            ) as ServerContext;
                             server.type = "custom";
-                            server.config = config;
                         } else if (config.entry === "__EasyServer__") {
                             server = new AigcServer["EasyServer"](config);
                         } else {
@@ -258,6 +261,20 @@ export default {
 
 export const ServerMain = {
     getRunningServerCount,
+    getModule,
+    // 停止运行中的服务并清理模块缓存（HTTP 路由删除模型时使用，
+    // 避免删除记录后服务进程残留）
+    stopServer: async (serverInfo: ServerInfo) => {
+        const module = await getModule(serverInfo, {
+            throwException: false,
+        });
+        if (module && module.stop) {
+            await module.stop();
+        }
+        if (serverModule[serverInfo.localPath]) {
+            delete serverModule[serverInfo.localPath];
+        }
+    },
     callFunction: async (
         serverInfo: ServerInfo,
         method: string,

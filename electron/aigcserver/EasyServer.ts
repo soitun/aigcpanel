@@ -60,6 +60,10 @@ export const EasyServer = function (config: any) {
                 httpUrl: null,
                 content: this.serverConfig.easyServer.content || "",
                 functions: this.serverConfig.easyServer.functions || {},
+                // 通用模型定义（config.json 的 general 数组）：
+                // 每项 { name, title, description, param, result }，供小工具
+                // "通用模型"渲染表单与展示结果（result 从 stdout 结果按 name 解析）
+                general: this.serverConfig.general || [],
             },
         };
     };
@@ -69,8 +73,9 @@ export const EasyServer = function (config: any) {
         this.send("starting", this.ServerInfo);
     };
     this.ping = async function (): Promise<boolean> {
-        // console.log('ping', this.ServerInfo)
-        return this.serverRuntime.startTime > 0;
+        // 只有存在正在运行的 launcher 进程才算服务在运行，
+        // 不能仅凭 startTime（模型启动后进程可能已失败退出）
+        return !!controller;
     };
     this.stop = async function () {
         // console.log('stop', this.ServerInfo)
@@ -378,6 +383,9 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
                     }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
+                    }
                     throw "执行失败，请查看模型日志";
                 }
                 return {
@@ -411,6 +419,9 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
                     }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
+                    }
                     throw "执行失败，请查看模型日志";
                 }
                 return {
@@ -443,6 +454,9 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
                     }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
+                    }
                     throw "执行失败，请查看模型日志";
                 }
                 return {
@@ -474,6 +488,9 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
                     }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
+                    }
                     throw "执行失败，请查看模型日志";
                 }
                 return {
@@ -504,6 +521,9 @@ export const EasyServer = function (config: any) {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
+                    }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
                     }
                     throw "执行失败，请查看模型日志";
                 }
@@ -537,6 +557,9 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
                     }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
+                    }
                     throw "执行失败，请查看模型日志";
                 }
                 return {
@@ -566,6 +589,9 @@ export const EasyServer = function (config: any) {
                 if (!("url" in launcherResult.result)) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
+                    }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
                     }
                     throw "执行失败，请查看模型日志";
                 }
@@ -598,11 +624,42 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.error) {
                         throw launcherResult.result.error;
                     }
+                    if (launcherResult.result.msg) {
+                        throw launcherResult.result.msg;
+                    }
                     throw "执行失败，请查看模型日志";
                 }
                 return {
                     url: launcherResult.result.url,
                 };
+            },
+        );
+    };
+
+    // 通用模型调用（小工具"通用模型"）：
+    // 系统无法识别的模型在 config.json 声明 general 数组（param + result），
+    // 平台按其 param 渲染表单提交，此处把参数透传给服务端；结果直接透传
+    // stdout 返回的 json（字段名与 config.json general[].result 的 name 对应，
+    // 前端按 result 定义解析展示，输出类型仅 file / files / text 三种）。
+    this.general = async function (data: ServerFunctionDataType) {
+        return this._callFunc(
+            data,
+            async (data: ServerFunctionDataType) => {
+                return {
+                    id: data.id,
+                    mode: "local",
+                    modelConfig: {
+                        type: data.funcName || "general",
+                        param: data.param,
+                    },
+                };
+            },
+            async (
+                data: ServerFunctionDataType,
+                launcherResult: LauncherResultType,
+            ) => {
+                // 透传服务端结果 json（含 url/images/files/text/records 等字段）
+                return launcherResult.result;
             },
         );
     };

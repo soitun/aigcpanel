@@ -57,6 +57,7 @@ declare type TextToImageParamType = {
     serverVersion: string;
     type: "TextToImage";
     serverKey: string;
+    comfyuiName: string;
     param: {
         [key: string]: any;
     };
@@ -68,6 +69,7 @@ declare type ImageToImageParamType = {
     serverVersion: string;
     type: "ImageToImage";
     serverKey: string;
+    comfyuiName: string;
     param: {
         [key: string]: any;
     };
@@ -79,6 +81,7 @@ declare type TextToVideoParamType = {
     serverVersion: string;
     type: "TextToVideo";
     serverKey: string;
+    comfyuiName: string;
     param: {
         [key: string]: any;
     };
@@ -90,6 +93,7 @@ declare type ImageToVideoParamType = {
     serverVersion: string;
     type: "ImageToVideo";
     serverKey: string;
+    comfyuiName: string;
     param: {
         [key: string]: any;
     };

@@ -144,7 +144,6 @@ watch(
                     ></div>
                     <div class="text-xs flex-grow">
                         {{ server.title }}
-                        v{{ server.version }}
                     </div>
                 </div>
             </a-option>

@@ -60,11 +60,7 @@ const doUser = async () => {
                         :src="user.user.avatar as string"
                         class="rounded-full border border-solid border-gray-200 w-10 h-10 shadow-lg"
                     />
-                    <img
-                        v-if="user.data?.vip?.icon"
-                        :src="user.data.vip.icon as string"
-                        class="absolute -top-1 -right-1 w-6 h-6"
-                    />
+                    
                 </div>
             </a-tooltip>
             <div v-else>
@@ -79,11 +75,7 @@ const doUser = async () => {
                         :src="user.user.avatar as string"
                         class="rounded-full border border-solid border-gray-200 w-10 h-10 shadow-lg"
                     />
-                    <img
-                        v-if="user.data?.vip?.icon"
-                        :src="user.data.vip.icon as string"
-                        class="absolute -top-1 -right-1 w-4 h-4"
-                    />
+                    
                 </div>
             </div>
         </div>
