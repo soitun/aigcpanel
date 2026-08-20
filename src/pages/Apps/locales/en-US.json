@@ -1,1 +1,5 @@
-{}
+{
+    "tool.soundProcessing": "Sound Processing",
+    "tool.imageGeneration": "Image Generation",
+    "tool.videoProcessing": "Video Processing"
+}

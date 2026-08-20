@@ -15,9 +15,9 @@ const tab = ref("");
 
 const groups = [
     { title: t("general.model.group") || "通用", apps: GeneralApps },
-    { title: "声音处理", apps: SoundToolApps },
-    { title: "图像生成", apps: ToolApps },
-    { title: "视频处理", apps: VideoProcessingApps },
+    { title: t("tool.soundProcessing"), apps: SoundToolApps },
+    { title: t("tool.imageGeneration"), apps: ToolApps },
+    { title: t("tool.videoProcessing"), apps: VideoProcessingApps },
 ];
 
 const allToolApps = [
