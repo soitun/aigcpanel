@@ -149,46 +149,47 @@ defineExpose({
 
 <template>
     <div class="rounded-xl shadow border p-4">
-        <VideoGenForm ref="videoGenForm" />
-        <div class="font-bold mb-2">
-            <icon-settings />
-            {{ $t("voice.config") }}
-        </div>
-        <div class="flex items-center flex-wrap gap-2">
-            <div class="flex items-center gap-1 flex-shrink-0">
-                <i-mdi-volume-high class="w-4 h-4" />
-                <span>{{ $t("voice.voice") }}</span>
+        <VideoGenForm ref="videoGenForm">
+            <div class="font-bold mb-2">
+                <icon-settings />
+                {{ $t("voice.config") }}
             </div>
-            <a-radio-group v-model="formData.soundType" class="flex-shrink-0">
-                <a-radio value="soundGenerate">
-                    <i-mdi-text-to-speech
-                        class="w-4 h-4 inline-block align-middle"
-                    />
-                    {{ $t("voice.synthesis") }}
-                </a-radio>
-                <a-radio value="soundCustom">
-                    <icon-file />
-                    {{ $t("common.localFile") }}
-                </a-radio>
-            </a-radio-group>
-            <div
-                class="flex-shrink-0 min-w-64"
-                v-if="formData.soundType === 'soundGenerate'"
-            >
-                <SoundGenerateSelector v-model="formData.soundGenerateId" />
+            <div class="flex items-center flex-wrap gap-2">
+                <div class="flex items-center gap-1 flex-shrink-0">
+                    <i-mdi-volume-high class="w-4 h-4" />
+                    <span>{{ $t("voice.voice") }}</span>
+                </div>
+                <a-radio-group v-model="formData.soundType" class="flex-shrink-0">
+                    <a-radio value="soundGenerate">
+                        <i-mdi-text-to-speech
+                            class="w-4 h-4 inline-block align-middle"
+                        />
+                        {{ $t("voice.synthesis") }}
+                    </a-radio>
+                    <a-radio value="soundCustom">
+                        <icon-file />
+                        {{ $t("common.localFile") }}
+                    </a-radio>
+                </a-radio-group>
+                <div
+                    class="flex-shrink-0 min-w-64"
+                    v-if="formData.soundType === 'soundGenerate'"
+                >
+                    <SoundGenerateSelector v-model="formData.soundGenerateId" />
+                </div>
+                <div
+                    class="flex-shrink-0"
+                    v-if="formData.soundType === 'soundCustom'"
+                >
+                    <a-button @click="doSoundCustomSelect">
+                        <div v-if="formData.soundCustomFile">
+                            {{ fileName(formData.soundCustomFile) }}
+                        </div>
+                        <div v-else>{{ $t("common.selectLocalFile") }}</div>
+                    </a-button>
+                </div>
             </div>
-            <div
-                class="flex-shrink-0"
-                v-if="formData.soundType === 'soundCustom'"
-            >
-                <a-button @click="doSoundCustomSelect">
-                    <div v-if="formData.soundCustomFile">
-                        {{ fileName(formData.soundCustomFile) }}
-                    </div>
-                    <div v-else>{{ $t("common.selectLocalFile") }}</div>
-                </a-button>
-            </div>
-        </div>
+        </VideoGenForm>
         <div class="pt-4">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 {{ $t("task.startVideoGen") }}

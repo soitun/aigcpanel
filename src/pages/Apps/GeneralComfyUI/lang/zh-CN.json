@@ -1,5 +1,5 @@
 {
-    "general.comfyui.title": "通用 ComfyUI",
+    "general.comfyui.title": "通用ComfyUI",
     "general.comfyui.desc": "调用 ComfyUI 服务通用工作流",
     "general.comfyui.appDesc": "调用 ComfyUI 服务中的通用工作流（未归类业务功能）。",
     "general.comfyui.call": "通用 ComfyUI 工作流调用",

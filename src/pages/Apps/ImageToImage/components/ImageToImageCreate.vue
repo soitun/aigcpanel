@@ -73,32 +73,33 @@ const doSubmit = async () => {
 
 <template>
     <div class="rounded-xl shadow border p-4">
-        <div class="mb-4 flex items-start">
-            <div class="pt-1 w-5">
-                <a-tooltip :content="$t('hint.inputInputImage')" mini>
-                    <icon-image />
-                </a-tooltip>
-            </div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <FileSelector
-                        :extensions="['png', 'jpg', 'jpeg']"
-                        v-model="formData.image"
-                    />
+        <ImageToImageForm ref="imageToImageForm">
+            <div class="mb-2 flex items-start w-full">
+                <div class="pt-1 w-5">
+                    <a-tooltip :content="$t('hint.inputInputImage')" mini>
+                        <icon-image />
+                    </a-tooltip>
                 </div>
-                <div v-if="formData.image" class="mt-2">
-                    <ImagePreviewBox :url="formData.image" />
+                <div>
+                    <div class="flex items-center gap-2">
+                        <FileSelector
+                            :extensions="['png', 'jpg', 'jpeg']"
+                            v-model="formData.image"
+                        />
+                    </div>
+                    <div v-if="formData.image" class="mt-2">
+                        <ImagePreviewBox :url="formData.image" />
+                    </div>
                 </div>
             </div>
-        </div>
-        <ImageToImageForm ref="imageToImageForm" />
-        <div class="mb-4">
-            <a-textarea
-                v-model="formData.prompt"
-                :placeholder="$t('hint.inputPrompt')"
-                :auto-size="{ minRows: 2, maxRows: 10 }"
-            />
-        </div>
+            <div class="w-full">
+                <a-textarea
+                    v-model="formData.prompt"
+                    :placeholder="$t('hint.inputPrompt')"
+                    :auto-size="{ minRows: 2, maxRows: 10 }"
+                />
+            </div>
+        </ImageToImageForm>
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 <i-mdi-send class="mr-2" />

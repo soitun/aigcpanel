@@ -159,7 +159,7 @@ onUnmounted(() => {
                     <div
                         class="font-bold text-gray-800 dark:text-gray-200 text-base mb-1"
                     >
-                        小工具
+                        工具
                     </div>
                     <div class="text-gray-500 text-xs truncate pr-2">
                         视频音频处理工具集
@@ -285,7 +285,7 @@ onUnmounted(() => {
                         </div>
                     </div>
                 </div>
-                <!-- 小工具 -->
+                <!-- 工具 -->
                 <div
                     class="flex flex-col gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20"
                 >
@@ -295,7 +295,7 @@ onUnmounted(() => {
                         ></span>
                         <span
                             class="text-xs font-medium text-gray-600 dark:text-gray-400"
-                            >小工具</span
+                            >工具</span
                         >
                     </div>
                     <div class="flex items-end gap-4">
@@ -409,7 +409,7 @@ onUnmounted(() => {
             </div>
         </div>
 
-        <!-- 小工具功能卡片 -->
+        <!-- 工具功能卡片 -->
         <div
             class="bg-white dark:bg-gray-800 rounded-xl p-5 mb-5 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow"
         >
@@ -417,7 +417,7 @@ onUnmounted(() => {
                 class="text-base font-bold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-200"
             >
                 <icon-tool />
-                小工具
+                工具
             </div>
             <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 <div

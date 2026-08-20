@@ -7,7 +7,7 @@ import { collectHubResultFiles, hubSaveResultFiles } from "../common/lib";
 const serverStore = useServerStore();
 
 /**
- * 通用 ComfyUI 任务（小工具"通用ComfyUI"）。
+ * 通用 ComfyUI 任务（工具"通用ComfyUI"）。
  * 调用平台端 ComfyUIServer.general：选择 biz=general 的通用工作流，
  * 按工作流 meta.json 的 param 渲染表单后调用，结果返回 {url, files}。
  */

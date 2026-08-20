@@ -156,6 +156,10 @@ defineExpose({
                 </a-option>
             </a-select>
         </div>
+        <!-- 用户输入信息（提示词等）插入 Server 选择与自定义参数之间 -->
+        <div class="flex items-center mt-2">
+            <slot />
+        </div>
         <div class="flex items-center mt-2" v-if="param && param.length > 0">
             <ParamForm ref="paramForm" :param="param" />
         </div>

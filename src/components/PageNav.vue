@@ -122,7 +122,7 @@ const doUser = async () => {
                 <div class="flex justify-center">
                     <icon-tool class="text-xl" />
                 </div>
-                <div class="text-sm">小工具</div>
+                <div class="text-sm">工具</div>
             </a>
             <a
                 class="page-nav-item block text-center py-3"

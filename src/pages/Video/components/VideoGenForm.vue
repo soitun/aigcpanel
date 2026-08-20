@@ -138,8 +138,11 @@ defineExpose({
                 <VideoTemplateSelector v-model="formData.videoTemplateId" />
             </div>
         </div>
+        <!-- 用户输入信息（声音等）插入 Server 选择与自定义参数之间 -->
+        <div class="mb-2">
+            <slot />
+        </div>
         <div class="flex items-center">
             <ParamForm ref="paramForm" :param="param" />
         </div>
-    </div>
-</template>
+    </div></template>

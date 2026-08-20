@@ -61,7 +61,7 @@ export const EasyServer = function (config: any) {
                 content: this.serverConfig.easyServer.content || "",
                 functions: this.serverConfig.easyServer.functions || {},
                 // 通用模型定义（config.json 的 general 数组）：
-                // 每项 { name, title, description, param, result }，供小工具
+                // 每项 { name, title, description, param, result }，供工具
                 // "通用模型"渲染表单与展示结果（result 从 stdout 结果按 name 解析）
                 general: this.serverConfig.general || [],
             },
@@ -636,7 +636,7 @@ export const EasyServer = function (config: any) {
         );
     };
 
-    // 通用模型调用（小工具"通用模型"）：
+    // 通用模型调用（工具"通用模型"）：
     // 系统无法识别的模型在 config.json 声明 general 数组（param + result），
     // 平台按其 param 渲染表单提交，此处把参数透传给服务端；结果直接透传
     // stdout 返回的 json（字段名与 config.json general[].result 的 name 对应，

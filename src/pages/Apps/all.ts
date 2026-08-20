@@ -297,7 +297,7 @@ export const VideoProcessingApps = [
     },
 ];
 
-// 通用模型分组（小工具"通用"）：
+// 通用模型分组（工具"通用"）：
 // - GeneralModel：调用系统无法识别的其他类型模型（config.json 声明 general 数组）
 // - GeneralComfyUI：调用 ComfyUI 服务中 biz 未归类的通用工作流
 export const GeneralApps = [

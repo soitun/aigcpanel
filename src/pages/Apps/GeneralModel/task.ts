@@ -7,7 +7,7 @@ import { collectHubResultFiles, hubSaveResultFiles } from "../common/lib";
 const serverStore = useServerStore();
 
 /**
- * 通用模型任务（小工具"通用模型"）。
+ * 通用模型任务（工具"通用模型"）。
  * 调用平台端 EasyServer.general：把表单参数（param）与能力名（funcName）
  * 透传给服务端，结果直接透传 stdout 返回的 json（字段名与 config.json
  * general[].result 的 name 对应，前端按 resultDef 解析展示）。

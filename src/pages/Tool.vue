@@ -14,10 +14,10 @@ import { testActionSet, testActionUnset } from "../utils/test";
 const tab = ref("");
 
 const groups = [
+    { title: t("general.model.group") || "通用", apps: GeneralApps },
     { title: "声音处理", apps: SoundToolApps },
     { title: "图像生成", apps: ToolApps },
     { title: "视频处理", apps: VideoProcessingApps },
-    { title: t("general.model.group") || "通用", apps: GeneralApps },
 ];
 
 const allToolApps = [

@@ -257,7 +257,7 @@ const buildModelConfig = (
             };
         }
         case "general": {
-            // 通用模型（与前端"通用模型"小工具一致的 modelConfig 结构）：
+            // 通用模型（与前端"通用模型"工具一致的 modelConfig 结构）：
             // --function general 表示调用平台通用模型方法，具体能力名通过
             // param.generalName 传入（如 generalImage），param 其余字段原样透传；
             // result 定义从 serverRecord.config.general 中按 generalName 查找。

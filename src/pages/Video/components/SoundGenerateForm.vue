@@ -252,6 +252,10 @@ defineExpose({
                 <SoundPromptSelector v-model="formData.promptId" />
             </div>
         </div>
+        <!-- 用户输入信息（文本、图片等）插入 Server 选择与自定义参数之间 -->
+        <div class="mt-2">
+            <slot />
+        </div>
         <div
             class="flex flex-wrap items-center mt-2"
             v-if="

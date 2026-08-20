@@ -60,15 +60,15 @@ const doSubmit = async () => {
 
 <template>
     <div class="rounded-xl shadow border p-4">
-        <div class="mb-4">
-            <div class="mb-2 font-bold">{{ $t("app.promptLabel") }}</div>
-            <a-textarea
-                v-model="formData.prompt"
-                :placeholder="$t('hint.inputPrompt')"
-                :auto-size="{ minRows: 2, maxRows: 10 }"
-            />
-        </div>
-        <TextToVideoForm ref="textToVideoForm" />
+        <TextToVideoForm ref="textToVideoForm">
+            <div class="mb-1 w-full">
+                <a-textarea
+                    v-model="formData.prompt"
+                    :placeholder="$t('hint.inputPrompt')"
+                    :auto-size="{ minRows: 2, maxRows: 10 }"
+                />
+            </div>
+        </TextToVideoForm>
         <div class="flex">
             <a-button class="mr-2" type="primary" @click="doSubmit">
                 <i-mdi-send class="mr-2" />

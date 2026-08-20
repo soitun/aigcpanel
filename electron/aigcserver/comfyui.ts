@@ -697,7 +697,7 @@ export const ComfyUIServer = function (config: any = null): ServerContext {
             );
         },
 
-        // 通用工作流（小工具"通用ComfyUI"）：选择 biz 未识别的任意工作流，
+        // 通用工作流（工具"通用ComfyUI"）：选择 biz 未识别的任意工作流，
         // 按该工作流 meta.json 的 param 定义渲染表单后调用。
         // 结果返回 {url, files}，前端按输出类型展示（file 单文件 / files 多文件 / text 文本）。
         general: async function (data: any) {
