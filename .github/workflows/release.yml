@@ -305,9 +305,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Download All Artifacts
+      - name: Download Build Artifacts
         uses: actions/download-artifact@v4
         with:
+          pattern: aigcpanel-*
           path: _artifacts
           merge-multiple: false
       - name: Create Release and Upload Assets
