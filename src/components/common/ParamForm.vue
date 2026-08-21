@@ -173,7 +173,11 @@ defineExpose({
                     : 'inline-flex items-center min-w-64'
             "
         >
-            <div :class="item.type === 'textarea' ? 'min-w-10 mb-1' : 'min-w-16 mr-1'">
+            <div
+                :class="
+                    item.type === 'textarea' ? 'min-w-10 mb-1' : 'min-w-16 mr-1'
+                "
+            >
                 <a-popover position="bottom">
                     <component
                         :is="iconMap[item.icon]"

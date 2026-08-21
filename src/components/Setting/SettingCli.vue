@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { t } from "../../lang";
+import { testActionSet, testActionUnset } from "../../utils/test";
 
 const platform = window.$mapi.app.platformName() as "win" | "osx" | "linux";
 
@@ -150,6 +151,16 @@ onMounted(async () => {
         cliBinPath.value =
             await window.$mapi.app.resourcePathResolve("bin/aigcpanel.exe");
     }
+    testActionSet("Setting.setCliPathDemo", (arg?: any) => {
+        const home = arg?.home || "/Users/demo";
+        cliBinPath.value =
+            platform === "win"
+                ? `C:\\demo\\aigcpanel\\resources\\bin\\aigcpanel.exe`
+                : `${home}/aigcpanel/resources/bin/aigcpanel`;
+    });
+});
+onBeforeUnmount(() => {
+    testActionUnset("Setting.setCliPathDemo");
 });
 
 async function checkInstalled() {

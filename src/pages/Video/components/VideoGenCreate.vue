@@ -159,7 +159,10 @@ defineExpose({
                     <i-mdi-volume-high class="w-4 h-4" />
                     <span>{{ $t("voice.voice") }}</span>
                 </div>
-                <a-radio-group v-model="formData.soundType" class="flex-shrink-0">
+                <a-radio-group
+                    v-model="formData.soundType"
+                    class="flex-shrink-0"
+                >
                     <a-radio value="soundGenerate">
                         <i-mdi-text-to-speech
                             class="w-4 h-4 inline-block align-middle"
