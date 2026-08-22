@@ -48,7 +48,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-command />
-                    准备文件
+                    {{ $t("app.prepareFiles") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -60,7 +60,12 @@ const props = defineProps<{
                             :key="k"
                             class="rounded-lg"
                         >
-                            输入{{ k.replace(/[{}(input)]/g, "") }} {{ v }}
+                            {{
+                                $t("app.inputFileLabel", {
+                                    i: k.replace(/[{}(input)]/g, ""),
+                                })
+                            }}
+                            {{ v }}
                         </a-tag>
                         <a-tag
                             v-for="(v, k) in record.jobResult?.Prepare
@@ -68,14 +73,20 @@ const props = defineProps<{
                             :key="k"
                             class="rounded-lg"
                         >
-                            输出{{ k.replace(/[{}(output)]/g, "") }} {{ v }}
+                            {{
+                                $t("app.outputFileLabel", {
+                                    i: k.replace(/[{}(output)]/g, ""),
+                                })
+                            }}
+                            {{ v }}
                         </a-tag>
                     </div>
                     <div class="mb-2">
                         <pre
                             class="rounded-lg text-xs bg-gray-100 p-1 break-all whitespace-break-spaces leading-5"
-                        >
-命令 ffmpeg {{ record.jobResult?.Prepare.commands.join(" ") }}</pre>
+                            >{{ $t("app.commandPrefix") }} {{
+                                record.jobResult?.Prepare.commands.join(" ")
+                            }}</pre>
                     </div>
                 </TaskJobResultStepView>
             </div>
@@ -84,7 +95,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-command />
-                    执行处理
+                    {{ $t("app.stepExecute") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Execute">

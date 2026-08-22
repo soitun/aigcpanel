@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { t } from "../../../../lang";
 import TaskBizStatus from "../../../../components/common/TaskBizStatus.vue";
 import TaskJobResultStepView from "../../../../components/common/TaskJobResultStepView.vue";
 import TaskCancelAction from "../../../../components/Server/TaskCancelAction.vue";
@@ -27,13 +28,13 @@ const props = defineProps<{
 }>();
 
 const imageModeMap = {
-    cover: "覆盖",
-    contain: "包含",
+    cover: "app.modeCover",
+    contain: "app.modeContainItem",
 };
 
 const imageModeText = computed(() => {
     const mode = props.record.modelConfig?.imageMode;
-    return imageModeMap[mode as keyof typeof imageModeMap] || mode;
+    return t(imageModeMap[mode as keyof typeof imageModeMap] || mode || "");
 });
 </script>
 
@@ -70,7 +71,7 @@ const imageModeText = computed(() => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    解析视频
+                    {{ $t("app.parseVideo") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -88,7 +89,7 @@ const imageModeText = computed(() => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-settings />
-                    背景配置
+                    {{ $t("app.backgroundConfig") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -112,7 +113,7 @@ const imageModeText = computed(() => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    视频渲染
+                    {{ $t("app.videoRender") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Render">

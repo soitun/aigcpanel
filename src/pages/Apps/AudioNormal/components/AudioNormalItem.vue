@@ -54,7 +54,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file />
-                    解析文件
+                    {{ $t("app.parseFile") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -75,14 +75,14 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-sound />
-                    归一化配置
+                    {{ $t("app.normalizationConfig") }}
                 </div>
             </div>
             <div class="flex-grow">
                 <TaskJobResultStepView :record="record" step="Config">
                     <div class="flex items-center gap-1 mb-2">
                         <a-tag class="rounded-lg"
-                            >归一化程度:
+                            >{{ $t("app.normalizationLevel") }}:
                             {{
                                 record.modelConfig?.normalizationPercentage
                             }}%</a-tag
@@ -95,7 +95,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file />
-                    文件渲染
+                    {{ $t("app.fileRender") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Render">

@@ -69,5 +69,8 @@
     "sound.synthesisReplaceDesc": "声音合成时会自动把文本中的\"键\"替换为\"值\"，可用于修正发音",
     "sound.timbreAudioNotFound": "音色参考音频文件不存在，请重新设置音色",
     "sound.topic": "主题",
-    "soundAsrEdit.mergeToPrev": "合并到前一条"
+    "soundAsrEdit.mergeToPrev": "合并到前一条",
+    "sound.exportSuccess": "导出成功",
+    "sound.exportFailed": "导出失败: {error}",
+    "sound.copywritingGenerate": "文案生成"
 }

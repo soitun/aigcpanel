@@ -109,7 +109,9 @@ defineExpose({
                     :on-refresh="doLoad"
                 />
             </div>
-            <div v-else class="text-center p-8 text-gray-400">未找到记录</div>
+            <div v-else class="text-center p-8 text-gray-400">
+                {{ t("error.recordNotFound") }}
+            </div>
         </div>
     </a-modal>
 </template>

@@ -61,25 +61,25 @@ onUnmounted(() => {
                 data-section="basic"
                 class="p-2 rounded-lg mb-4 cursor-pointer menu-active"
             >
-                <div class="text-base">
+                <div class="text-base truncate">
                     <icon-settings />
                     {{ t("setting.basic") }}
                 </div>
             </div>
             <div data-section="data" class="p-2 rounded-lg mb-4 cursor-pointer">
-                <div class="text-base">
+                <div class="text-base truncate">
                     <icon-tool />
                     {{ t("setting.dataConfig") }}
                 </div>
             </div>
             <div data-section="env" class="p-2 rounded-lg mb-4 cursor-pointer">
-                <div class="text-base">
+                <div class="text-base truncate">
                     <icon-code />
                     {{ t("setting.env") }}
                 </div>
             </div>
             <div data-section="cli" class="p-2 rounded-lg mb-4 cursor-pointer">
-                <div class="text-base">
+                <div class="text-base truncate">
                     <icon-computer />
                     {{ t("setting.cli") }}
                 </div>
@@ -89,7 +89,7 @@ onUnmounted(() => {
                 data-section="about"
                 class="p-2 rounded-lg mb-4 cursor-pointer"
             >
-                <div class="text-base">
+                <div class="text-base truncate">
                     <icon-user />
                     {{ t("about.software") }}
                 </div>
@@ -115,7 +115,7 @@ onUnmounted(() => {
                         {{ t("setting.dataConfig") }}
                     </div>
                     <div>
-                        <div class="flex gap-1">
+                        <div class="flex flex-wrap gap-1">
                             
                             <ModelPromptDataConfigButton
                                 :title="t('sound.asrOptimizePrompt')"

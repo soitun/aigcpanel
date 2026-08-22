@@ -69,5 +69,8 @@
     "sound.synthesisReplaceDesc": "During synthesis, \"keys\" in text will be automatically replaced with \"values\" to correct pronunciation",
     "sound.timbreAudioNotFound": "Timbre reference audio file does not exist, please reset the timbre",
     "sound.topic": "Topic",
-    "soundAsrEdit.mergeToPrev": "Merge to Previous"
+    "soundAsrEdit.mergeToPrev": "Merge to Previous",
+    "sound.exportSuccess": "Export successful",
+    "sound.exportFailed": "Export failed: {error}",
+    "sound.copywritingGenerate": "Copywriting Generation"
 }

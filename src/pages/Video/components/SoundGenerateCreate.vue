@@ -118,7 +118,7 @@ const emit = defineEmits({
                 <div class="absolute z-50 bottom-3 right-1">
                     <ModelAgentButton
                         biz="SoundGenerateTextPrompt"
-                        title="文案生成"
+                        :title="t('sound.copywritingGenerate')"
                         @result="formData.text = $event"
                         :form-items="SoundGenerateTextFormItems"
                         :prompt-default="SoundGenerateTextPrompt"

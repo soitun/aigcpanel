@@ -53,7 +53,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    解析文件
+                    {{ $t("app.parseFile") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -73,14 +73,14 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-settings />
-                    合并配置
+                    {{ $t("app.mergeConfig") }}
                 </div>
             </div>
             <div class="flex-grow">
                 <TaskJobResultStepView :record="record" step="Config">
                     <div class="flex items-center gap-1 mb-2">
                         <a-tag class="rounded-lg"
-                            >视频数量
+                            >{{ $t("app.videoCount") }}
                             {{ record.modelConfig?.videos?.length || 0 }}</a-tag
                         >
                     </div>
@@ -92,7 +92,7 @@ const props = defineProps<{
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    视频渲染
+                    {{ $t("app.videoRender") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Render">

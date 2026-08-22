@@ -94,7 +94,7 @@ const doRenderConfirm = async () => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-sound />
-                    解析视频
+                    {{ $t("app.parseVideo") }}
                 </div>
             </div>
             <div class="flex-grow pt-1">
@@ -109,7 +109,7 @@ const doRenderConfirm = async () => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-tag />
-                    标注标识
+                    {{ $t("app.markConfig") }}
                 </div>
             </div>
             <div class="flex-grow pt-1">
@@ -131,9 +131,14 @@ const doRenderConfirm = async () => {
                                         {{ TimeUtil.msToTime(time.endMs) }}
                                     </div>
                                     <div class="text-xs text-gray-500">
-                                        位置：X: {{ time.x }} Y:
-                                        {{ time.y }} 宽度:
-                                        {{ time.width }} 高度: {{ time.height }}
+                                        {{
+                                            $t("app.positionInfo", {
+                                                x: time.x,
+                                                y: time.y,
+                                                width: time.width,
+                                                height: time.height,
+                                            })
+                                        }}
                                     </div>
                                 </div>
                             </div>
@@ -154,7 +159,7 @@ const doRenderConfirm = async () => {
                                 <template #icon>
                                     <icon-pen />
                                 </template>
-                                手动设置标注点
+                                {{ $t("app.manualSetMark") }}
                             </a-button>
                         </div>
                     </template>
@@ -165,7 +170,7 @@ const doRenderConfirm = async () => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-video-camera />
-                    视频合成
+                    {{ $t("app.videoSynthesis") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Render">
@@ -184,7 +189,7 @@ const doRenderConfirm = async () => {
                         <template #icon>
                             <icon-check />
                         </template>
-                        确认无误完成
+                        {{ $t("app.confirmComplete") }}
                     </a-button>
                 </div>
             </TaskJobResultStepView>
@@ -208,7 +213,7 @@ const doRenderConfirm = async () => {
     </div>
     <VideoEditorRectListSelectorDialog
         ref="videoEditorRectListSelectorDialog"
-        :save-title="'保存并继续'"
+        :save-title="$t('app.saveAndContinue')"
         :default-duration="1"
         @save="onSave"
     />

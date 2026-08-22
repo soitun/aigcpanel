@@ -43,9 +43,13 @@ const doExport = async (record: StorageRecord) => {
         await window.$mapi.file.copy(record.content.url, savePath, {
             isDataPath: false,
         });
-        Dialog.tipSuccess("导出成功");
+        Dialog.tipSuccess(t("sound.exportSuccess"));
     } catch (error) {
-        Dialog.tipError(`导出失败: ${(error as Error).message || error}`);
+        Dialog.tipError(
+            t("sound.exportFailed", {
+                error: (error as Error).message || error,
+            }),
+        );
     }
 };
 const doSelect = (record: StorageRecord) => {

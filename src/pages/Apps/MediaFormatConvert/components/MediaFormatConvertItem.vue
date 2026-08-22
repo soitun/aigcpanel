@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { t } from "../../../../lang";
 import TaskCancelAction from "../../../../components/Server/TaskCancelAction.vue";
 import TaskContinueAction from "../../../../components/Server/TaskContinueAction.vue";
 import TaskDeleteAction from "../../../../components/Server/TaskDeleteAction.vue";
@@ -32,13 +33,13 @@ const getFormatInfo = (): { label: string; value: string }[] => {
 
     const info: { label: string; value: string }[] = [];
 
-    // 目标格式
+    // target format
     info.push({
-        label: "目标格式",
+        label: t("app.targetFormat"),
         value: config.targetFormat.toUpperCase(),
     });
 
-    // 视频编码
+    // video codec
     if (config.videoCodec && !config.lossless) {
         let codecName = config.videoCodec;
         if (codecName === "libx264") codecName = "H.264";
@@ -46,20 +47,20 @@ const getFormatInfo = (): { label: string; value: string }[] => {
         if (codecName === "libvpx-vp9") codecName = "VP9";
 
         info.push({
-            label: "视频编码",
+            label: t("app.videoCodec"),
             value: codecName,
         });
 
-        // 视频比特率
+        // video bitrate
         if (config.videoBitrate > 0) {
             info.push({
-                label: "视频比特率",
+                label: t("app.videoBitrate"),
                 value: `${config.videoBitrate} kbps`,
             });
         }
     }
 
-    // 音频编码
+    // audio codec
     if (config.audioCodec && !config.lossless) {
         let codecName = config.audioCodec;
         if (codecName === "aac") codecName = "AAC";
@@ -69,23 +70,25 @@ const getFormatInfo = (): { label: string; value: string }[] => {
         if (codecName === "flac") codecName = "FLAC";
 
         info.push({
-            label: "音频编码",
+            label: t("app.audioCodec"),
             value: codecName,
         });
 
-        // 音频比特率
+        // audio bitrate
         if (config.audioBitrate > 0) {
             info.push({
-                label: "音频比特率",
+                label: t("app.audioBitrate"),
                 value: `${config.audioBitrate} kbps`,
             });
         }
     }
 
-    // 无损转换
+    // lossless mode
     info.push({
-        label: "转换模式",
-        value: config.lossless ? "无损转换" : "有损转换",
+        label: t("app.convertMode"),
+        value: config.lossless
+            ? t("app.losslessConvert")
+            : t("app.lossyConvert"),
     });
 
     return info;
@@ -125,7 +128,7 @@ const getFormatInfo = (): { label: string; value: string }[] => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-file />
-                    解析媒体
+                    {{ $t("app.parseMedia") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -135,24 +138,23 @@ const getFormatInfo = (): { label: string; value: string }[] => {
                             <VideoInfo :data="record.jobResult?.Prepare" />
                         </template>
                         <template v-else>
-                            <a-tag class="rounded-lg"
-                                >时长
-                                {{
-                                    record.jobResult?.Prepare.duration?.toFixed(
+                            <a-tag class="rounded-lg">{{
+                                t("app.durationSeconds", {
+                                    value: record.jobResult?.Prepare.duration?.toFixed(
                                         1,
-                                    )
-                                }}秒
-                            </a-tag>
+                                    ),
+                                })
+                            }}</a-tag>
                             <a-tag
                                 v-if="record.jobResult?.Prepare.audioChannels"
                                 class="rounded-lg"
-                                >声道数
+                                >{{ t("app.channels") }}
                                 {{ record.jobResult?.Prepare.audioChannels }}
                             </a-tag>
                             <a-tag
                                 v-if="record.jobResult?.Prepare.audioSampleRate"
                                 class="rounded-lg"
-                                >采样率
+                                >{{ t("app.sampleRate") }}
                                 {{ record.jobResult?.Prepare.audioSampleRate }}
                                 Hz
                             </a-tag>
@@ -165,7 +167,7 @@ const getFormatInfo = (): { label: string; value: string }[] => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-settings />
-                    格式配置
+                    {{ $t("app.formatConfig") }}
                 </div>
             </div>
             <div class="flex-grow">
@@ -182,7 +184,7 @@ const getFormatInfo = (): { label: string; value: string }[] => {
             <div class="w-24 flex-shrink-0">
                 <div class="inline-block text-center">
                     <icon-swap />
-                    格式转换
+                    {{ $t("app.formatConvert") }}
                 </div>
             </div>
             <TaskJobResultStepView :record="record" step="Convert">
@@ -195,7 +197,7 @@ const getFormatInfo = (): { label: string; value: string }[] => {
                     <template v-else>
                         <div class="flex items-center">
                             <icon-sound class="text-2xl mr-2" />
-                            <span>音频文件已转换完成</span>
+                            <span>{{ $t("app.audioConverted") }}</span>
                         </div>
                     </template>
                 </div>

@@ -13,12 +13,12 @@ import { testActionSet, testActionUnset } from "../utils/test";
 
 const tab = ref("");
 
-const groups = [
+const groups = computed(() => [
     { title: t("general.model.group") || "通用", apps: GeneralApps },
     { title: t("tool.soundProcessing"), apps: SoundToolApps },
     { title: t("tool.imageGeneration"), apps: ToolApps },
     { title: t("tool.videoProcessing"), apps: VideoProcessingApps },
-];
+]);
 
 const allToolApps = [
     ...SoundToolApps,
@@ -99,7 +99,7 @@ const dynamicComponent = computed(() => {
                                         : { color: s.color }
                                 "
                             />
-                            {{ s.title }}
+                            {{ t(s.titleKey) }}
                         </div>
                     </div>
                 </div>

@@ -58,7 +58,9 @@ export const SoundApps: {
 export const SoundToolApps = [
     {
         name: "SoundAsr",
+        titleKey: "voice.recognition",
         title: t("voice.recognition"),
+        descriptionKey: "desc.recognitionEdit",
         description: t("desc.recognitionEdit"),
         icon: SoundAsrIcon,
         color: "#f59e0b",
@@ -66,7 +68,9 @@ export const SoundToolApps = [
     },
     {
         name: "LongTextTts",
+        titleKey: "task.longTextToAudio",
         title: t("task.longTextToAudio"),
+        descriptionKey: "desc.longTextToAudio",
         description: t("desc.longTextToAudio"),
         icon: LongTextTtsIcon,
         color: "#6366f1",
@@ -74,7 +78,9 @@ export const SoundToolApps = [
     },
     {
         name: "SubtitleTts",
+        titleKey: "task.subtitleToAudio",
         title: t("task.subtitleToAudio"),
+        descriptionKey: "desc.subtitleToAudio",
         description: t("desc.subtitleToAudio"),
         icon: SubtitleTtsIcon,
         color: "#8b5cf6",
@@ -82,7 +88,9 @@ export const SoundToolApps = [
     },
     {
         name: "SoundReplace",
+        titleKey: "voice.replace",
         title: t("voice.replace"),
+        descriptionKey: "desc.videoVoiceReplace",
         description: t("desc.videoVoiceReplace"),
         icon: SoundReplaceIcon,
         color: "#ec4899",
@@ -90,8 +98,10 @@ export const SoundToolApps = [
     },
     {
         name: "AudioNormal",
-        title: "音频规范化",
-        description: "对音频进行规范化处理，调整音量至标准水平。",
+        titleKey: "app.audioNormal",
+        title: t("app.audioNormal"),
+        descriptionKey: "app.audioNormalDesc",
+        description: t("app.audioNormalDesc"),
         icon: AudioNormalIcon,
         color: "#14b8a6",
         component: defineAsyncComponent(
@@ -103,7 +113,9 @@ export const SoundToolApps = [
 export const VideoApps = [
     {
         name: "VideoGenFlow",
+        titleKey: "avatar.oneClickSynthesis",
         title: t("avatar.oneClickSynthesis"),
+        descriptionKey: "intro.textToVideo",
         description: t("intro.textToVideo"),
         icon: VideoGenFlowIcon,
         color: "#f59e0b",
@@ -114,7 +126,9 @@ export const VideoApps = [
 export const ToolApps = [
     {
         name: "TextToImage",
+        titleKey: "model.txt2img",
         title: t("model.txt2img"),
+        descriptionKey: "desc.txt2img",
         description: t("desc.txt2img"),
         icon: TextToImageIcon,
         color: "#3b82f6",
@@ -122,7 +136,9 @@ export const ToolApps = [
     },
     {
         name: "ImageToImage",
+        titleKey: "model.img2img",
         title: t("model.img2img"),
+        descriptionKey: "desc.img2img",
         description: t("desc.img2img"),
         icon: ImageToImageIcon,
         color: "#06b6d4",
@@ -130,7 +146,9 @@ export const ToolApps = [
     },
     {
         name: "TextToVideo",
+        titleKey: "model.txt2video",
         title: t("model.txt2video"),
+        descriptionKey: "desc.txt2video",
         description: t("desc.txt2video"),
         icon: TextToVideoIcon,
         color: "#8b5cf6",
@@ -138,7 +156,9 @@ export const ToolApps = [
     },
     {
         name: "ImageToVideo",
+        titleKey: "model.img2video",
         title: t("model.img2video"),
+        descriptionKey: "desc.img2video",
         description: t("desc.img2video"),
         icon: ImageToVideoIcon,
         color: "#10b981",
@@ -149,8 +169,10 @@ export const ToolApps = [
 export const VideoProcessingApps = [
     {
         name: "VideoBackground",
-        title: "视频背景添加",
-        description: "为视频添加纯色或图片背景，提升视觉效果。",
+        titleKey: "app.videoBackground",
+        title: t("app.videoBackground"),
+        descriptionKey: "app.videoBackgroundDesc",
+        description: t("app.videoBackgroundDesc"),
         icon: VideoBackgroundIcon,
         color: "#22c55e",
         component: defineAsyncComponent(
@@ -159,8 +181,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "VideoQuickCut",
-        title: "智能剪辑",
-        description: "通过语音识别快速剪辑视频，支持片段自定义保留或移除。",
+        titleKey: "app.videoQuickCut",
+        title: t("app.videoQuickCut"),
+        descriptionKey: "app.videoQuickCutDesc",
+        description: t("app.videoQuickCutDesc"),
         icon: VideoQuickCutIcon,
         color: "#ef4444",
         component: defineAsyncComponent(
@@ -169,8 +193,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "VideoZoom",
-        title: "视频片段放大",
-        description: "放大视频片段，便于查看细节，支持快速操作。",
+        titleKey: "app.videoZoom",
+        title: t("app.videoZoom"),
+        descriptionKey: "app.videoZoomDesc",
+        description: t("app.videoZoomDesc"),
         icon: VideoZoomIcon,
         color: "#f97316",
         component: defineAsyncComponent(
@@ -179,8 +205,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "VideoMark",
-        title: "视频标注",
-        description: "在视频中标注指定区域，突出显示重要内容。",
+        titleKey: "app.videoMark",
+        title: t("app.videoMark"),
+        descriptionKey: "app.videoMarkDesc",
+        description: t("app.videoMarkDesc"),
         icon: VideoMarkIcon,
         color: "#a855f7",
         component: defineAsyncComponent(
@@ -189,8 +217,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "VideoSubtitle",
-        title: "视频添加字幕",
-        description: "为视频添加字幕，支持多种样式和位置调整。",
+        titleKey: "app.videoSubtitle",
+        title: t("app.videoSubtitle"),
+        descriptionKey: "app.videoSubtitleDesc",
+        description: t("app.videoSubtitleDesc"),
         icon: VideoSubtitleIcon,
         color: "#0ea5e9",
         component: defineAsyncComponent(
@@ -199,8 +229,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "VideoSpeed",
-        title: "视频全局变速",
-        description: "调整视频播放速度，实现快进或慢动作效果。",
+        titleKey: "app.videoSpeed",
+        title: t("app.videoSpeed"),
+        descriptionKey: "app.videoSpeedDesc",
+        description: t("app.videoSpeedDesc"),
         icon: VideoSpeedIcon,
         color: "#84cc16",
         component: defineAsyncComponent(
@@ -209,8 +241,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "VideoSizeConvert",
-        title: "视频尺寸转换",
-        description: "调整视频尺寸，支持横屏、竖屏预设和多种填充方式。",
+        titleKey: "app.videoSizeConvert",
+        title: t("app.videoSizeConvert"),
+        descriptionKey: "app.videoSizeConvertDesc",
+        description: t("app.videoSizeConvertDesc"),
         icon: VideoSizeConvertIcon,
         color: "#f43f5e",
         component: defineAsyncComponent(
@@ -219,8 +253,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "VideoCompress",
-        title: "视频压缩",
-        description: "对视频进行压缩处理，调整编码、分辨率和压缩程度。",
+        titleKey: "app.videoCompress",
+        title: t("app.videoCompress"),
+        descriptionKey: "app.videoCompressDesc",
+        description: t("app.videoCompressDesc"),
         icon: VideoCompressIcon,
         color: "#78716c",
         component: defineAsyncComponent(
@@ -229,8 +265,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "VideoSpeedPart",
-        title: "视频片段变速",
-        description: "标记视频片段并加速，支持局部速度调整。",
+        titleKey: "app.videoSpeedPart",
+        title: t("app.videoSpeedPart"),
+        descriptionKey: "app.videoSpeedPartDesc",
+        description: t("app.videoSpeedPartDesc"),
         icon: VideoSpeedPartIcon,
         color: "#d946ef",
         component: defineAsyncComponent(
@@ -239,8 +277,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "VideoKeepPart",
-        title: "视频片段删除/保留",
-        description: "选择视频片段，支持保留或移除指定内容。",
+        titleKey: "app.videoKeepPart",
+        title: t("app.videoKeepPart"),
+        descriptionKey: "app.videoKeepPartDesc",
+        description: t("app.videoKeepPartDesc"),
         icon: VideoKeepPartIcon,
         color: "#64748b",
         component: defineAsyncComponent(
@@ -249,8 +289,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "VideoMergeImage",
-        title: "片头片尾图片",
-        description: "将图片合并到视频开头或结尾，支持时长设置。",
+        titleKey: "app.videoMergeImage",
+        title: t("app.videoMergeImage"),
+        descriptionKey: "app.videoMergeImageDesc",
+        description: t("app.videoMergeImageDesc"),
         icon: VideoMergeImageIcon,
         color: "#10b981",
         component: defineAsyncComponent(
@@ -259,8 +301,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "VideoMergeAudio",
-        title: "视频添加音频",
-        description: "将音频文件合并到视频中，支持音量调节。",
+        titleKey: "app.videoMergeAudio",
+        title: t("app.videoMergeAudio"),
+        descriptionKey: "app.videoMergeAudioDesc",
+        description: t("app.videoMergeAudioDesc"),
         icon: VideoMergeAudioIcon,
         color: "#7c3aed",
         component: defineAsyncComponent(
@@ -269,8 +313,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "VideoMerge",
-        title: "视频合并",
-        description: "将多个视频文件合并为一个视频，支持拼接和叠加。",
+        titleKey: "app.videoMerge",
+        title: t("app.videoMerge"),
+        descriptionKey: "app.videoMergeDesc",
+        description: t("app.videoMergeDesc"),
         icon: VideoMergeIcon,
         color: "#dc2626",
         component: defineAsyncComponent(
@@ -279,8 +325,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "MediaFormatConvert",
-        title: "媒体格式转换",
-        description: "转换视频和音频格式，支持多种编码和比特率设置。",
+        titleKey: "app.mediaFormatConvert",
+        title: t("app.mediaFormatConvert"),
+        descriptionKey: "app.mediaFormatConvertDesc",
+        description: t("app.mediaFormatConvertDesc"),
         icon: MediaFormatConvertIcon,
         color: "#2563eb",
         component: defineAsyncComponent(
@@ -289,8 +337,10 @@ export const VideoProcessingApps = [
     },
     {
         name: "Ffmpeg",
-        title: "FFmpeg 处理",
-        description: "执行自定义 FFmpeg 命令，支持多文件输入输出。",
+        titleKey: "app.ffmpeg",
+        title: t("app.ffmpeg"),
+        descriptionKey: "app.ffmpegDesc",
+        description: t("app.ffmpegDesc"),
         icon: FfmpegIcon,
         color: "#374151",
         component: defineAsyncComponent(() => import("./Ffmpeg/Ffmpeg.vue")),
@@ -303,7 +353,9 @@ export const VideoProcessingApps = [
 export const GeneralApps = [
     {
         name: "GeneralModel",
+        titleKey: "general.model.title",
         title: t("general.model.title"),
+        descriptionKey: "general.model.appDesc",
         description: t("general.model.appDesc"),
         icon: GeneralModelIcon,
         color: "#0d9488",
@@ -313,7 +365,9 @@ export const GeneralApps = [
     },
     {
         name: "GeneralComfyUI",
+        titleKey: "general.comfyui.title",
         title: t("general.comfyui.title"),
+        descriptionKey: "general.comfyui.appDesc",
         description: t("general.comfyui.appDesc"),
         icon: GeneralComfyUIIcon,
         color: "#0891b2",
@@ -345,7 +399,9 @@ export const AllApps = [
         url: `/tool?tab=${app.name}`,
     })) as any),
     {
+        titleKey: "feedback.toolRequest",
         title: t("feedback.toolRequest"),
+        descriptionKey: "msg.moreTools",
         description: t("msg.moreTools"),
         icon: FeedbackIcon,
         url: "https://aigcpanel.com/wish",

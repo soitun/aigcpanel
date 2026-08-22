@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref } from "vue";
+import { t } from "../../../../lang";
 import MediaFormatConvertParamForm from "./MediaFormatConvertParamForm.vue";
 
 const paramForm = ref<InstanceType<typeof MediaFormatConvertParamForm>>();
@@ -51,14 +52,14 @@ defineExpose({
     <a-modal
         v-model:visible="visible"
         title-align="start"
-        :title="'媒体格式转换设置'"
+        :title="t('app.mediaFormatTitle')"
         width="600px"
         :destroyOnClose="true"
     >
         <template #footer>
             <div class="flex justify-end space-x-2">
                 <a-button type="primary" @click="doSubmit">{{
-                    "保存"
+                    $t("common.save")
                 }}</a-button>
             </div>
         </template>
