@@ -46,7 +46,7 @@ export const VideoGenFlow: TaskBiz = {
         // const videoServerInfo = await serverStore.serverInfo(server)
         // console.log('VideoGenFlow.runFunc.serverInfoc', serverInfo)
         await TaskService.update(bizId as any, {
-            status: "wait",
+            status: "running",
         });
         let audioFilePath: string | null = null;
         if (modelConfig.soundGenerate.type === "SoundTts") {

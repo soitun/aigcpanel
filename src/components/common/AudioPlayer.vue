@@ -13,6 +13,7 @@ import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
 import { AudioUtil } from "../../lib/audio";
 import { Dialog } from "../../lib/dialog";
 import { TimeUtil } from "../../lib/util";
+import { t } from "../../lang";
 
 const props = withDefaults(
     defineProps<{
@@ -103,6 +104,7 @@ onMounted(() => {
     );
     waveRecord.value.on("record-end", (blob) => {
         recordUrl.value = URL.createObjectURL(blob);
+        checkRecordSilent(blob);
     });
     wave.value.on("play", () => {
         isPlaying.value = true;
@@ -295,7 +297,43 @@ const doRecordStart = async () => {
         isRecording.value = true;
         waveVisible.value = true;
     } catch (e) {
-        Dialog.tipError(`${e}`);
+        Dialog.tipError(`${t("voice.recordStartFail")}: ${e}`);
+    }
+};
+
+// Detect silent recording: if the decoded peak level is too low,
+// the microphone is likely muted, blocked or receiving no signal.
+const SILENT_PEAK_THRESHOLD = 0.005;
+const checkRecordSilent = async (blob: Blob) => {
+    try {
+        const arrayBuffer = await blob.arrayBuffer();
+        const audioContext = new AudioContext();
+        try {
+            const audioBuffer = await audioContext.decodeAudioData(
+                arrayBuffer.slice(0),
+            );
+            let peak = 0;
+            for (
+                let channel = 0;
+                channel < audioBuffer.numberOfChannels;
+                channel++
+            ) {
+                const data = audioBuffer.getChannelData(channel);
+                for (let i = 0; i < data.length; i++) {
+                    const v = Math.abs(data[i]);
+                    if (v > peak) peak = v;
+                }
+            }
+            if (peak < SILENT_PEAK_THRESHOLD) {
+                Dialog.tipError(t("voice.recordSilent"));
+            }
+        } finally {
+            if (audioContext.state !== "closed") {
+                await audioContext.close().catch(() => {});
+            }
+        }
+    } catch (e) {
+        // ignore decode errors (e.g. blob format unsupported)
     }
 };
 

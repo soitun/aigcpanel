@@ -19,7 +19,7 @@ export const GeneralModel: TaskBiz = {
             bizParam,
         );
         await TaskService.update(bizId, {
-            status: "wait",
+            status: "running",
         });
         const res = await serverStore.call(serverInfo, "general", {
             id: serverStore.generateTaskId("GeneralModel", bizId),

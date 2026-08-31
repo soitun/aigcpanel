@@ -18,7 +18,7 @@ export const GeneralComfyUI: TaskBiz = {
             bizParam,
         );
         await TaskService.update(bizId, {
-            status: "wait",
+            status: "running",
         });
         const res = await serverStore.call(serverInfo, "general", {
             id: serverStore.generateTaskId("GeneralComfyUI", bizId),

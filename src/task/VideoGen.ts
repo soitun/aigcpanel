@@ -30,7 +30,7 @@ export const VideoGen: TaskBiz = {
         const modelConfig: VideoGenModelConfigType = record.modelConfig;
         // console.log('VideoGen.runFunc.serverInfo', serverInfo)
         await TaskService.update(bizId, {
-            status: "wait",
+            status: "running",
         });
         let audioFile: string | null = null;
         if (modelConfig.soundType === "soundGenerate") {

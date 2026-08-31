@@ -50,6 +50,8 @@
     "voice.replace": "Voice Replace",
     "voice.replaceConfig": "Voice Replace Config",
     "voice.rerecord": "Re-record",
+    "voice.recordSilent": "No valid audio detected. Please check microphone permissions / input volume, or upload an audio file instead",
+    "voice.recordStartFail": "Failed to start recording",
     "voice.select": "Select Voice",
     "voice.selectFile": "Select Voice File",
     "voice.selectTimbre": "Select Timbre",

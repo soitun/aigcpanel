@@ -50,6 +50,8 @@
     "voice.replace": "声音替换",
     "voice.replaceConfig": "声音替换设置",
     "voice.rerecord": "重新录制",
+    "voice.recordSilent": "未检测到有效声音，请检查麦克风权限/输入音量或改用上传音频文件",
+    "voice.recordStartFail": "无法开始录制",
     "voice.select": "选择声音",
     "voice.selectFile": "选择声音文件",
     "voice.selectTimbre": "选择音色",
