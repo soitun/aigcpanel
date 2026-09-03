@@ -6,6 +6,7 @@ import { Dialog } from "../../lib/dialog";
 import SpeakerSelector from "./SpeakerSelector.vue";
 import SoundPromptSelector from "../../pages/Video/components/SoundPromptSelector.vue";
 import FileSelector from "./FileSelector.vue";
+import AudioSelector from "./AudioSelector.vue";
 import IconShuffle from "~icons/mdi/shuffle";
 import IconCog from "~icons/mdi/cog";
 
@@ -27,7 +28,8 @@ type FieldBasicType = {
         | "switch"
         | "slider"
         | "speaker"
-        | "file";
+        | "file"
+        | "audio";
     defaultValue: any;
     placeholder: string;
     required: boolean;
@@ -298,6 +300,12 @@ defineExpose({
             </div>
             <div v-else-if="item.type === 'file'" class="mr-3">
                 <FileSelector
+                    v-model="item.value"
+                    :extensions="item.extensions || []"
+                />
+            </div>
+            <div v-else-if="item.type === 'audio'" class="mr-3">
+                <AudioSelector
                     v-model="item.value"
                     :extensions="item.extensions || []"
                 />

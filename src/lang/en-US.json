@@ -93,6 +93,7 @@
     "common.select": "Select",
     "common.selectAll": "Select All",
     "common.selectFile": "Select File",
+    "common.selectAudio": "Select Audio",
     "common.selectLocalFile": "Select Local File",
     "common.selectPath": "Select Path",
     "common.sendFailed": "Send Failed",

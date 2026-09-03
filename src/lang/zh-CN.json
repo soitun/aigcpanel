@@ -93,6 +93,7 @@
     "common.select": "选择",
     "common.selectAll": "全选",
     "common.selectFile": "选择文件",
+    "common.selectAudio": "选择音频",
     "common.selectLocalFile": "选择本地文件",
     "common.selectPath": "选择路径",
     "common.sendFailed": "发送失败",
