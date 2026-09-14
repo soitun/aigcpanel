@@ -350,8 +350,9 @@ export const taskStore = defineStore("task", {
                 clearTimeout(runNextTimer);
                 runNextTimer = null;
             }
-            setTimeout(
+            runNextTimer = setTimeout(
                 () => {
+                    runNextTimer = null;
                     this._runExecute();
                 },
                 immediate ? 0 : 1000,
