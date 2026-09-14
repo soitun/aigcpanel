@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
 import ParamForm from "../../../components/common/ParamForm.vue";
+import { filterCustomParams } from "../../../components/common/util";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
 import ServerSelector from "../../../components/Server/ServerSelector.vue";
 import { t } from "../../../lang";
@@ -114,8 +115,18 @@ defineExpose({
         <div class="mt-2">
             <slot />
         </div>
-        <div class="flex items-center mt-2" v-if="param && param.length > 0">
-            <ParamForm ref="paramForm" :param="param" />
+        <div
+            class="flex items-start mt-2"
+            v-if="filterCustomParams(param).length > 0"
+        >
+            <div class="pt-3 w-5 flex-shrink-0">
+                <a-tooltip :content="$t('model.customParam')" mini>
+                    <i-mdi-tune-variant class="w-4 h-4" />
+                </a-tooltip>
+            </div>
+            <div class="flex-grow min-w-0">
+                <ParamForm ref="paramForm" :param="param" />
+            </div>
         </div>
     </div>
 </template>

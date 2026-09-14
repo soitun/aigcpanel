@@ -459,6 +459,7 @@
     "error.missingVideoFile": "参数错误：缺少视频文件",
     "msg.taskNotCompleteConfirm": "任务未完成，需要手动确认",
     "model.comfyuiView": "查看 ComfyUI",
+    "model.customParam": "自定义参数",
     "app.comfyuiWorkflowManager": "ComfyUI 流程管理",
     "app.workflowTitle": "工作流",
     "app.workflowStatus": "状态",

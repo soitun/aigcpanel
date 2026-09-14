@@ -3,6 +3,7 @@ import { cloneDeep } from "lodash-es";
 import { nextTick, ref, watch } from "vue";
 import { t } from "../../lang";
 import { Dialog } from "../../lib/dialog";
+import { filterCustomParams } from "./util";
 import SpeakerSelector from "./SpeakerSelector.vue";
 import SoundPromptSelector from "../../pages/Video/components/SoundPromptSelector.vue";
 import FileSelector from "./FileSelector.vue";
@@ -62,7 +63,7 @@ const formData = ref<Array<FieldBasicModelType>>([]);
 watch(
     () => props.param,
     (value) => {
-        formData.value = (value?.map((item) => {
+        formData.value = filterCustomParams(value).map((item) => {
             const itemClone = cloneDeep(item);
             // if (itemClone.type === "speaker") {
             //     itemClone["speakerParam"] = [];
@@ -86,7 +87,7 @@ watch(
                 ...itemClone,
                 value: value,
             };
-        }) || []) as any;
+        }) as any;
     },
     {
         immediate: true,
@@ -165,55 +166,53 @@ defineExpose({
 </script>
 
 <template>
-    <div class="flex flex-wrap items-center gap-2 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 w-full">
         <div
             v-for="item in formData"
             :key="item.name"
-            :class="
-                item.type === 'textarea'
-                    ? 'flex flex-col w-full items-stretch'
-                    : 'inline-flex items-center min-w-64'
-            "
+            class="flex flex-col gap-1.5 min-w-0 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-3 transition-colors hover:border-gray-300 dark:hover:border-gray-600"
+            :class="item.type === 'textarea' ? 'col-span-full' : ''"
         >
+            <!-- Label row: required mark + icon + title + tips help icon -->
             <div
-                :class="
-                    item.type === 'textarea' ? 'min-w-10 mb-1' : 'min-w-16 mr-1'
-                "
+                class="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 leading-5 min-w-0"
             >
-                <a-popover position="bottom">
-                    <component
-                        :is="iconMap[item.icon]"
-                        v-if="item.icon && iconMap[item.icon]"
-                        class="w-4 h-4"
-                        aria-hidden="true"
+                <span
+                    v-if="item.required"
+                    class="text-red-500 flex-shrink-0"
+                    aria-hidden="true"
+                    >*</span
+                >
+                <component
+                    :is="iconMap[item.icon]"
+                    v-if="item.icon && iconMap[item.icon]"
+                    class="w-4 h-4 flex-shrink-0"
+                    aria-hidden="true"
+                />
+                <i
+                    v-else-if="item.icon"
+                    :class="item.icon"
+                    class="flex-shrink-0"
+                ></i>
+                <span class="truncate">{{ item.title }}</span>
+                <a-tooltip v-if="item.tips" :content="item.tips" mini>
+                    <i-mdi-help-circle-outline
+                        class="w-3.5 h-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex-shrink-0 cursor-help"
                     />
-                    <i v-else-if="item.icon" :class="item.icon"></i>
-                    <div v-else>{{ item.title }}</div>
-                    <template #content>
-                        <div v-if="item.tips" class="text-sm">
-                            <div class="font-bold mb-2">{{ item.title }}</div>
-                            <div class="w-48">{{ item.tips }}</div>
-                        </div>
-                        <div v-else class="text-sm -my-2">
-                            <div class="font-bold mb-2">{{ item.title }}</div>
-                        </div>
-                    </template>
-                </a-popover>
+                </a-tooltip>
             </div>
-            <div v-if="item.type === 'input'" class="w-48 mr-3">
+            <div v-if="item.type === 'input'" class="w-full">
                 <a-input
                     :placeholder="item.placeholder"
                     allow-clear
                     size="small"
                     :disabled="props.disabled"
                     v-model="item.value"
+                    style="width: 100%"
                 >
                 </a-input>
             </div>
-            <div
-                v-else-if="item.type === 'textarea'"
-                :class="item.type === 'textarea' ? 'w-full' : 'flex-grow mr-3'"
-            >
+            <div v-else-if="item.type === 'textarea'" class="w-full">
                 <a-textarea
                     :placeholder="item.placeholder"
                     :auto-size="{ minRows: 2, maxRows: 6 }"
@@ -225,8 +224,8 @@ defineExpose({
                 >
                 </a-textarea>
             </div>
-            <div v-else-if="item.type === 'inputNumber'" class="w-32 mr-3">
-                <div class="flex items-center gap-1">
+            <div v-else-if="item.type === 'inputNumber'" class="w-full">
+                <div class="flex items-center gap-1 w-full">
                     <a-input-number
                         :placeholder="item.placeholder"
                         size="small"
@@ -234,6 +233,7 @@ defineExpose({
                         :disabled="props.disabled"
                         :min="item.min"
                         :max="item.max"
+                        style="width: 100%"
                     >
                     </a-input-number>
                     <a-tooltip
@@ -244,16 +244,16 @@ defineExpose({
                             @click="
                                 item.value = Math.floor(Math.random() * 1000000)
                             "
-                            class="cursor-pointer text-gray-400 w-4 h-4"
+                            class="cursor-pointer text-gray-400 w-4 h-4 flex-shrink-0"
                         />
                     </a-tooltip>
                 </div>
             </div>
-            <div v-else-if="item.type === 'select'" class="mr-3">
+            <div v-else-if="item.type === 'select'" class="w-full">
                 <a-select
                     :placeholder="item.placeholder"
                     size="small"
-                    style="width: auto"
+                    style="width: 100%"
                     :disabled="props.disabled"
                     v-model="item.value"
                 >
@@ -266,14 +266,17 @@ defineExpose({
                     </a-option>
                 </a-select>
             </div>
-            <div v-else-if="item.type === 'switch'" class="mr-3">
+            <div
+                v-else-if="item.type === 'switch'"
+                class="w-full flex items-center"
+            >
                 <a-switch
                     v-model="item.value"
                     :disabled="props.disabled"
                     size="small"
                 />
             </div>
-            <div v-else-if="item.type === 'slider'" class="w-48 mr-3">
+            <div v-else-if="item.type === 'slider'" class="w-full">
                 <a-slider
                     v-model="item.value"
                     :marks="item.sliderMarks"
@@ -284,7 +287,7 @@ defineExpose({
                     :step="item.step"
                 />
             </div>
-            <div v-else-if="item.type === 'speaker'" class="mr-3">
+            <div v-else-if="item.type === 'speaker'" class="w-full">
                 <SpeakerSelector
                     v-model="item.value"
                     :speakers="item['speakers']"
@@ -292,19 +295,19 @@ defineExpose({
                 />
                 <!-- @on-data-update="onSpeakerDataUpdate(item.name, $event)" -->
             </div>
-            <div v-else-if="item.type === 'soundPromptId'">
+            <div v-else-if="item.type === 'soundPromptId'" class="w-full">
                 <SoundPromptSelector
                     v-model="item.value"
                     :disabled="props.disabled"
                 />
             </div>
-            <div v-else-if="item.type === 'file'" class="mr-3">
+            <div v-else-if="item.type === 'file'" class="w-full">
                 <FileSelector
                     v-model="item.value"
                     :extensions="item.extensions || []"
                 />
             </div>
-            <div v-else-if="item.type === 'audio'" class="mr-3">
+            <div v-else-if="item.type === 'audio'" class="w-full">
                 <AudioSelector
                     v-model="item.value"
                     :extensions="item.extensions || []"
@@ -335,11 +338,10 @@ defineExpose({
 }
 
 :deep(.arco-input-number) {
-    padding-left: 0;
-    padding-right: 0;
+    width: 100%;
 
     .arco-input {
-        text-align: center;
+        text-align: left;
     }
 }
 </style>

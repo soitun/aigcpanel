@@ -459,6 +459,7 @@
     "error.missingVideoFile": "Parameter error: missing video file",
     "msg.taskNotCompleteConfirm": "Task incomplete, manual confirmation required",
     "model.comfyuiView": "View ComfyUI",
+    "model.customParam": "Custom Parameters",
     "app.comfyuiWorkflowManager": "ComfyUI Workflow Manager",
     "app.workflowTitle": "Workflow",
     "app.workflowStatus": "Status",

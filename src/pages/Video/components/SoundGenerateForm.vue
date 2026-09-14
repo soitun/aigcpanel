@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
 import ParamForm from "../../../components/common/ParamForm.vue";
+import { filterCustomParams } from "../../../components/common/util";
 import ServerContentInfoAction from "../../../components/Server/ServerContentInfoAction.vue";
 import ServerSelector from "../../../components/Server/ServerSelector.vue";
 import { t } from "../../../lang";
@@ -257,22 +258,36 @@ defineExpose({
             <slot />
         </div>
         <div
-            class="flex flex-wrap items-center mt-2"
+            class="flex items-start mt-2"
             v-if="
-                formData.type === 'SoundTts' && ttsParam && ttsParam.length > 0
+                formData.type === 'SoundTts' &&
+                filterCustomParams(ttsParam).length > 0
             "
         >
-            <ParamForm ref="ttsParamForm" :param="ttsParam" />
+            <div class="pt-3 w-5 flex-shrink-0">
+                <a-tooltip :content="$t('model.customParam')" mini>
+                    <i-mdi-tune-variant class="w-4 h-4" />
+                </a-tooltip>
+            </div>
+            <div class="flex-grow min-w-0">
+                <ParamForm ref="ttsParamForm" :param="ttsParam" />
+            </div>
         </div>
         <div
-            class="flex flex-wrap items-center mt-2"
+            class="flex items-start mt-2"
             v-else-if="
                 formData.type === 'SoundClone' &&
-                cloneParam &&
-                cloneParam.length > 0
+                filterCustomParams(cloneParam).length > 0
             "
         >
-            <ParamForm ref="cloneParamForm" :param="cloneParam" />
+            <div class="pt-3 w-5 flex-shrink-0">
+                <a-tooltip :content="$t('model.customParam')" mini>
+                    <i-mdi-tune-variant class="w-4 h-4" />
+                </a-tooltip>
+            </div>
+            <div class="flex-grow min-w-0">
+                <ParamForm ref="cloneParamForm" :param="cloneParam" />
+            </div>
         </div>
     </div>
     <SoundPromptDialog />
