@@ -75,20 +75,31 @@ const doSubmit = async () => {
 <template>
     <div class="rounded-xl shadow border p-4">
         <ImageToVideoForm ref="imageToVideoForm">
-            <div class="mb-2 flex items-start w-full">
-                <div class="pt-1 w-5">
-                    <a-tooltip :content="$t('hint.inputInputImage')" mini>
-                        <icon-image />
-                    </a-tooltip>
+            <div class="w-full flex flex-col gap-2">
+                <div class="flex items-start w-full">
+                    <div class="pt-1 w-5 flex-shrink-0">
+                        <a-tooltip :content="$t('hint.inputInputImage')" mini>
+                            <icon-image />
+                        </a-tooltip>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <ImagesSelector v-model="formData.images" />
+                    </div>
                 </div>
-                <ImagesSelector v-model="formData.images" />
-            </div>
-            <div class="w-full">
-                <a-textarea
-                    v-model="formData.prompt"
-                    :placeholder="$t('hint.inputPrompt')"
-                    :auto-size="{ minRows: 2, maxRows: 10 }"
-                />
+                <div class="flex items-start w-full">
+                    <div class="pt-1 w-5 flex-shrink-0">
+                        <a-tooltip :content="$t('hint.inputPrompt')" mini>
+                            <i-mdi-text-box-outline class="w-4 h-4" />
+                        </a-tooltip>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <a-textarea
+                            v-model="formData.prompt"
+                            :placeholder="$t('hint.inputPrompt')"
+                            :auto-size="{ minRows: 2, maxRows: 10 }"
+                        />
+                    </div>
+                </div>
             </div>
         </ImageToVideoForm>
         <div class="flex">

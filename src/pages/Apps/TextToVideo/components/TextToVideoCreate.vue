@@ -61,12 +61,19 @@ const doSubmit = async () => {
 <template>
     <div class="rounded-xl shadow border p-4">
         <TextToVideoForm ref="textToVideoForm">
-            <div class="mb-1 w-full">
-                <a-textarea
-                    v-model="formData.prompt"
-                    :placeholder="$t('hint.inputPrompt')"
-                    :auto-size="{ minRows: 2, maxRows: 10 }"
-                />
+            <div class="mb-1 flex items-start w-full">
+                <div class="pt-1 w-5 flex-shrink-0">
+                    <a-tooltip :content="$t('hint.inputPrompt')" mini>
+                        <i-mdi-text-box-outline class="w-4 h-4" />
+                    </a-tooltip>
+                </div>
+                <div class="flex-grow min-w-0">
+                    <a-textarea
+                        v-model="formData.prompt"
+                        :placeholder="$t('hint.inputPrompt')"
+                        :auto-size="{ minRows: 2, maxRows: 10 }"
+                    />
+                </div>
             </div>
         </TextToVideoForm>
         <div class="flex">

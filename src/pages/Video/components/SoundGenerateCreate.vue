@@ -109,20 +109,27 @@ const emit = defineEmits({
 <template>
     <div class="rounded-xl shadow border p-4">
         <SoundGenerateForm ref="soundGenerateForm">
-            <div class="mb-1 relative">
-                <a-textarea
-                    v-model="formData.text"
-                    :auto-size="{ minRows: 2 }"
-                    :placeholder="$t('hint.inputVoiceSynthesis')"
-                ></a-textarea>
-                <div class="absolute z-50 bottom-3 right-1">
-                    <ModelAgentButton
-                        biz="SoundGenerateTextPrompt"
-                        :title="t('sound.copywritingGenerate')"
-                        @result="formData.text = $event"
-                        :form-items="SoundGenerateTextFormItems"
-                        :prompt-default="SoundGenerateTextPrompt"
-                    />
+            <div class="mb-1 flex items-start w-full">
+                <div class="pt-1 w-5 flex-shrink-0">
+                    <a-tooltip :content="$t('hint.inputSynthesisContent')" mini>
+                        <i-mdi-text-to-speech class="w-4 h-4" />
+                    </a-tooltip>
+                </div>
+                <div class="flex-grow min-w-0 relative">
+                    <a-textarea
+                        v-model="formData.text"
+                        :auto-size="{ minRows: 2 }"
+                        :placeholder="$t('hint.inputVoiceSynthesis')"
+                    ></a-textarea>
+                    <div class="absolute z-50 bottom-3 right-1">
+                        <ModelAgentButton
+                            biz="SoundGenerateTextPrompt"
+                            :title="t('sound.copywritingGenerate')"
+                            @result="formData.text = $event"
+                            :form-items="SoundGenerateTextFormItems"
+                            :prompt-default="SoundGenerateTextPrompt"
+                        />
+                    </div>
                 </div>
             </div>
         </SoundGenerateForm>
