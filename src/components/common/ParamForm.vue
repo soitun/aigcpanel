@@ -3,7 +3,6 @@ import { cloneDeep } from "lodash-es";
 import { nextTick, ref, watch } from "vue";
 import { t } from "../../lang";
 import { Dialog } from "../../lib/dialog";
-import { filterCustomParams } from "./util";
 import SpeakerSelector from "./SpeakerSelector.vue";
 import SoundPromptSelector from "../../pages/Video/components/SoundPromptSelector.vue";
 import FileSelector from "./FileSelector.vue";
@@ -63,7 +62,7 @@ const formData = ref<Array<FieldBasicModelType>>([]);
 watch(
     () => props.param,
     (value) => {
-        formData.value = filterCustomParams(value).map((item) => {
+        formData.value = (value?.map((item) => {
             const itemClone = cloneDeep(item);
             // if (itemClone.type === "speaker") {
             //     itemClone["speakerParam"] = [];
@@ -87,7 +86,7 @@ watch(
                 ...itemClone,
                 value: value,
             };
-        }) as any;
+        }) || []) as any;
     },
     {
         immediate: true,

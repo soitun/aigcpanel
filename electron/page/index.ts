@@ -23,7 +23,27 @@ const Pages = {
     "comfyui-view": PageComfyUIView,
 };
 
+/**
+ * Position a window so that it is centered relative to its parent window.
+ * Falls back to the center of the current screen when there is no parent.
+ */
+const centerInParent = (win: BrowserWindow, parent?: BrowserWindow | null) => {
+    if (!parent || parent.isDestroyed()) {
+        win.center();
+        return;
+    }
+    const parentBounds = parent.getBounds();
+    const winBounds = win.getBounds();
+    win.setPosition(
+        Math.round(parentBounds.x + (parentBounds.width - winBounds.width) / 2),
+        Math.round(
+            parentBounds.y + (parentBounds.height - winBounds.height) / 2,
+        ),
+    );
+};
+
 export const Page = {
+    centerInParent,
     ready(name: string) {
         Events.send(name, "APP_READY", {
             name,
@@ -84,9 +104,14 @@ export const Page = {
             name !== PageComfyUIView.NAME &&
             AppRuntime.windows[name]
         ) {
-            AppRuntime.windows[name].show();
-            AppRuntime.windows[name].focus();
-            AppRuntime.windows[name].setParentWindow(option.parent);
+            const win = AppRuntime.windows[name];
+            win.show();
+            win.focus();
+            win.setParentWindow(option.parent);
+            // Re-center the window relative to its parent (e.g. the user dialog)
+            if ((Pages[name] as any).centerOnParent) {
+                Page.centerInParent(win, option.parent);
+            }
             return;
         }
         return Pages[name].open(option);

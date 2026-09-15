@@ -217,14 +217,3 @@ export const dataAutoSaveDraft = (
         load,
     };
 };
-
-// Params whose name starts with "config." are default base params defined by the
-// model config, they should not be shown as user editable custom params.
-export const isCustomParamVisible = (
-    item: { name?: string } | null | undefined,
-): boolean => !!item && !(item.name || "").startsWith("config.");
-
-// Filter out default base params (name starts with "config.") from a param list.
-export const filterCustomParams = <T extends { name?: string }>(
-    param?: T[] | null,
-): T[] => (param || []).filter((item) => isCustomParamVisible(item));

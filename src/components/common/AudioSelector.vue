@@ -14,8 +14,16 @@ const emit = defineEmits<{
 }>();
 
 const AUDIO_EXTS = [
-    "mp3", "wav", "flac", "ogg", "aac",
-    "m4a", "wma", "opus", "wv", "aiff",
+    "mp3",
+    "wav",
+    "flac",
+    "ogg",
+    "aac",
+    "m4a",
+    "wma",
+    "opus",
+    "wv",
+    "aiff",
 ];
 
 const effectiveExts = computed(() => {

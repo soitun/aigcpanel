@@ -19,12 +19,10 @@ const formatValue = (v: any) => {
 const isLongText = (v: any) =>
     typeof v === "string" && (v.length > 20 || v.includes("\n"));
 
-// 过滤掉以 _ 开头的辅助键（_key 用于展示名，__key 用于展示值）以及 config. 开头的默认基础参数，只保留实际参数
+// 仅过滤掉以 _ 开头的辅助键（_key 用于展示名，__key 用于展示值），其余参数（含 config. 开头的默认基础参数）按原样展示
 const visibleParam = computed(() =>
     Object.fromEntries(
-        Object.entries(props.param).filter(
-            ([k]) => !k.startsWith("_") && !k.startsWith("config."),
-        ),
+        Object.entries(props.param).filter(([k]) => !k.startsWith("_")),
     ),
 );
 </script>

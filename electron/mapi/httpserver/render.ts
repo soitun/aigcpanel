@@ -4,7 +4,9 @@ const status = async (): Promise<{
     running: boolean;
     port: number;
     bindAddr: string;
-    publicEnabled: boolean;
+    localAddr: string;
+    lanEnabled: boolean;
+    lanAddr: string;
 }> => {
     return ipcRenderer.invoke("httpserver:status");
 };
@@ -21,32 +23,10 @@ const restart = async (): Promise<{ code: number; msg?: string }> => {
     return ipcRenderer.invoke("httpserver:restart");
 };
 
-const getPort = async (): Promise<number> => {
-    return ipcRenderer.invoke("httpserver:getPort");
-};
-
-const setPort = async (
-    port: number,
-): Promise<{ code: number; msg?: string }> => {
-    return ipcRenderer.invoke("httpserver:setPort", port);
-};
-
-const getEnabled = async (): Promise<boolean> => {
-    return ipcRenderer.invoke("httpserver:getEnabled");
-};
-
-const setEnabled = async (
-    enabled: boolean,
-): Promise<{ code: number; msg?: string }> => {
-    return ipcRenderer.invoke("httpserver:setEnabled", enabled);
-};
-
 const getConfig = async (): Promise<{
+    lanEnabled: boolean;
     port: number;
-    enabled: boolean;
-    publicEnabled: boolean;
-    publicToken: string;
-    internalToken: string;
+    token: string;
 }> => {
     return ipcRenderer.invoke("httpserver:getConfig");
 };
@@ -62,10 +42,6 @@ export default {
     start,
     stop,
     restart,
-    getPort,
-    setPort,
-    getEnabled,
-    setEnabled,
     getConfig,
     setConfig,
 };

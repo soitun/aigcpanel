@@ -6,7 +6,7 @@ AIGCPanel has a built-in HTTP API service that supports remote invocation of mod
 
 ## Service Address
 
-The specific listen address is displayed in the settings after the service starts. Default is `127.0.0.1` (local only), changes to `0.0.0.0` when public access is enabled.
+The API service always listens on `127.0.0.1` (local only). Enable "LAN Access" in "Settings - API Service" to also allow devices on the same LAN to access it via the machine's LAN IP; the LAN service address and port are then shown in the settings.
 
 ---
 
@@ -18,10 +18,7 @@ All endpoints (except `/doc`) require Bearer Token authentication via the `Autho
 Authorization: Bearer <YourToken>
 ```
 
-Two types of tokens:
-
-- **Internal Token**: Automatically read by CLI tools, no manual configuration needed
-- **Public Token**: Can be configured in settings after enabling public access, for external calls
+The token is configured under "Settings - API Service - Access Token". CLI tools read this token automatically, so no manual configuration is needed.
 
 ---
 

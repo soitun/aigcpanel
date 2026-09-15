@@ -15,34 +15,52 @@ interface NavItem {
 }
 
 // Parse headings from markdown for navigation
+const slugify = (text: string) =>
+    String(text)
+        .toLowerCase()
+        .replace(/[^\w\u4e00-\u9fff]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+const escapeHtml = (text: string) =>
+    String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
 const navItems = computed<NavItem[]>(() => {
     const items: NavItem[] = [];
     const regex = /^##\s+(.+)$/gm;
     let match;
     while ((match = regex.exec(props.content)) !== null) {
         const title = match[1].trim();
-        const id = title
-            .toLowerCase()
-            .replace(/[^\w\u4e00-\u9fff]+/g, "-")
-            .replace(/^-+|-+$/g, "");
+        const id = slugify(title);
         items.push({ id, title });
     }
     return items;
 });
 
 // Render markdown to HTML with heading IDs
+// NOTE: marked >= 13 passes a single token object to renderer callbacks,
+// older versions pass positional args. Handle both shapes.
 const renderedHtml = computed(() => {
     const renderer = new marked.Renderer();
-    renderer.heading = function (text: string, level: number) {
-        const id = text
-            .toLowerCase()
-            .replace(/[^\w\u4e00-\u9fff]+/g, "-")
-            .replace(/^-+|-+$/g, "");
-        return `<h${level} id="${id}">${text}</h${level}>`;
+    renderer.heading = function (token: any, level?: number) {
+        const isToken = token && typeof token === "object";
+        const text = isToken ? (token.text ?? "") : String(token ?? "");
+        const depth = isToken ? (token.depth ?? 2) : (level ?? 2);
+        const inner =
+            isToken && (this as any).parser && token.tokens
+                ? (this as any).parser.parseInline(token.tokens)
+                : text;
+        return `<h${depth} id="${slugify(text)}">${inner}</h${depth}>`;
     };
-    renderer.code = function (code: string, language?: string) {
-        const lang = language || "";
-        return `<pre><code class="language-${lang}">${code}</code></pre>`;
+    renderer.code = function (token: any, language?: string) {
+        const isToken = token && typeof token === "object";
+        const code = isToken ? (token.text ?? "") : String(token ?? "");
+        const lang = isToken ? (token.lang ?? "") : (language ?? "");
+        const escaped = isToken ? token.escaped : false;
+        const body = escaped ? code : escapeHtml(code);
+        return `<pre><code class="language-${lang}">${body}</code></pre>`;
     };
 
     const html = marked(props.content, {

@@ -20,7 +20,8 @@ const router = Router();
  * 使用函数确保只在真正处理上传请求时才访问 AppEnv.dataRoot，此时 dataRoot
  * 已经初始化完毕。
  */
-const getUploadDir = (): string => path.join(AppEnv.dataRoot, "temp", "uploads");
+const getUploadDir = (): string =>
+    path.join(AppEnv.dataRoot, "temp", "uploads");
 
 const ensureUploadDir = () => {
     const dir = getUploadDir();
@@ -122,7 +123,8 @@ router.post(
 
         ensureUploadDir();
         const fileName =
-            name || `${Date.now()}_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}${ext}`;
+            name ||
+            `${Date.now()}_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}${ext}`;
         const filePath = path.join(getUploadDir(), fileName);
         await fs.promises.writeFile(filePath, buffer);
 

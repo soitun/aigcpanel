@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, computed } from "vue";
-import { Modal } from "@arco-design/web-vue";
 import { t, getLocale } from "../../lang";
 import MarkdownDocViewer from "../common/MarkdownDocViewer.vue";
 import apiDocContent from "../../docs/api-doc.md?raw";
@@ -13,26 +12,37 @@ const currentLocale = ref("zh-CN");
 
 // 根据当前语言选择文档内容
 const docContent = computed(() => {
-    return currentLocale.value.startsWith("en") ? apiDocContentEn : apiDocContent;
+    return currentLocale.value.startsWith("en")
+        ? apiDocContentEn
+        : apiDocContent;
 });
 
 // Server status
 const running = ref(false);
 const port = ref(0);
-const bindAddr = ref("127.0.0.1");
-const publicEnabled = ref(false);
+const localAddr = ref("127.0.0.1");
+const lanAddr = ref("");
 
 // Config
-const enabled = ref(true);
-const configPort = ref(0);
-const configPublicEnabled = ref(false);
-const configPublicToken = ref("");
-const editingPort = ref("");
-const editingPublicToken = ref("");
+const lanEnabled = ref(false);
+const editingToken = ref("");
+const savedToken = ref("");
 
-const listenAddr = computed(() => {
-    if (!running.value) return "-";
-    return `${bindAddr.value}:${port.value}`;
+// LAN service address shown when LAN access is enabled
+const lanServiceAddr = computed(() => {
+    return lanAddr.value && port.value ? `${lanAddr.value}:${port.value}` : "";
+});
+
+// Local (loopback) service address
+const localServiceAddr = computed(() => {
+    return `${localAddr.value}:${port.value || "-"}`;
+});
+
+// Effective listen address: LAN IP when enabled, otherwise loopback
+const effectiveServiceAddr = computed(() => {
+    return lanEnabled.value
+        ? lanServiceAddr.value || "-"
+        : localServiceAddr.value;
 });
 
 // ── Lifecycle ────────────────────────────────────────────────────────────
@@ -57,223 +67,100 @@ onBeforeUnmount(() => {
 
 async function loadConfig() {
     const c = await window.$mapi.httpserver.getConfig();
-    enabled.value = c.enabled;
-    configPort.value = c.port;
-    configPublicEnabled.value = c.publicEnabled;
-    configPublicToken.value = c.publicToken;
-    editingPort.value = c.port ? String(c.port) : "";
-    editingPublicToken.value = c.publicToken || "";
+    lanEnabled.value = c.lanEnabled;
+    savedToken.value = c.token || "";
+    editingToken.value = savedToken.value;
 }
 
 async function loadStatus() {
     const s = await window.$mapi.httpserver.status();
     running.value = s.running;
     port.value = s.port;
-    bindAddr.value = s.bindAddr;
-    publicEnabled.value = s.publicEnabled;
+    localAddr.value = s.localAddr;
+    lanAddr.value = s.lanAddr;
 }
 
 // ── Actions ──────────────────────────────────────────────────────────────
 
-async function toggleEnabled() {
-    const newVal = !enabled.value;
-    const res = await window.$mapi.httpserver.setEnabled(newVal);
-    if (res.code === 0) {
-        enabled.value = newVal;
-        await loadStatus();
-    } else {
-        window.$mapi.app.toast(res.msg || t("common.failed"), { status: "error" });
-    }
-}
-
-async function togglePublic() {
-    if (!configPublicEnabled.value) {
-        const ok = await new Promise<boolean>((resolve) => {
-            Modal.confirm({
-                title: t("api.publicConfirmTitle"),
-                content: t("api.publicConfirmContent"),
-                okText: t("api.publicConfirmOk"),
-                cancelText: t("common.cancel"),
-                onOk: () => resolve(true),
-                onCancel: () => resolve(false),
-            });
-        });
-        if (!ok) return;
-    }
-
-    const newVal = !configPublicEnabled.value;
+async function toggleLan() {
+    const newVal = !lanEnabled.value;
     const res = await window.$mapi.httpserver.setConfig({
-        publicEnabled: newVal,
+        lanEnabled: newVal,
     });
     if (res.code === 0) {
-        configPublicEnabled.value = newVal;
+        lanEnabled.value = newVal;
         await loadStatus();
         window.$mapi.app.toast(
-            newVal ? t("api.publicOnMsg") : t("api.publicOffMsg"),
+            newVal ? t("api.lanOnMsg") : t("api.lanOffMsg"),
             { status: "success" },
         );
     } else {
-        window.$mapi.app.toast(res.msg || t("common.failed"), { status: "error" });
+        window.$mapi.app.toast(res.msg || t("common.failed"), {
+            status: "error",
+        });
     }
 }
 
-function choosePort() {
-    editingPort.value = String(port.value || configPort.value || 0);
-}
-
-async function savePort() {
-    const p = parseInt(editingPort.value, 10);
-    if (isNaN(p) || p < 1 || p > 65535) {
-        window.$mapi.app.toast(t("api.portInvalid"), { status: "error" });
+async function saveToken() {
+    const v = editingToken.value.trim();
+    if (!v) {
+        window.$mapi.app.toast(t("api.tokenRequired"), { status: "error" });
+        editingToken.value = savedToken.value;
         return;
     }
-    const res = await window.$mapi.httpserver.setPort(p);
+    if (v === savedToken.value) return;
+    const res = await window.$mapi.httpserver.setConfig({ token: v });
     if (res.code === 0) {
-        configPort.value = p;
+        savedToken.value = v;
+        editingToken.value = v;
         await loadStatus();
-        window.$mapi.app.toast(t("api.portSaved"), { status: "success" });
-    } else {
-        window.$mapi.app.toast(res.msg || t("common.failed"), { status: "error" });
-    }
-}
-
-async function savePublicToken() {
-    const res = await window.$mapi.httpserver.setConfig({
-        publicToken: editingPublicToken.value,
-    });
-    if (res.code === 0) {
-        configPublicToken.value = editingPublicToken.value;
         window.$mapi.app.toast(t("api.tokenSaved"), { status: "success" });
     } else {
-        window.$mapi.app.toast(res.msg || t("common.failed"), { status: "error" });
+        window.$mapi.app.toast(res.msg || t("common.failed"), {
+            status: "error",
+        });
+        editingToken.value = savedToken.value;
     }
 }
 </script>
 
 <template>
     <div>
-        <!-- 服务开关 -->
-        <div class="flex items-center mb-3">
-            <div class="w-24 flex-shrink-0">{{ t("api.service") }}</div>
-            <div class="flex items-center gap-3">
-                <a-switch
-                    :model-value="enabled"
-                    @change="toggleEnabled"
-                    :disabled="false"
-                />
-                <span
-                    v-if="running"
-                    class="text-green-600 text-sm flex items-center gap-1"
-                >
-                    <span
-                        class="inline-block w-2 h-2 rounded-full bg-green-500"
-                    ></span>
-                    {{ t("api.running") }}
-                </span>
-                <span v-else class="text-gray-400 text-sm">{{ t("api.stopped") }}</span>
-            </div>
-        </div>
-
-        <!-- 监听地址 -->
-        <div class="flex mb-3">
-            <div class="w-24 flex-shrink-0">{{ t("api.listenAddr") }}</div>
-            <div class="flex-grow">
-                <div
-                    class="bg-gray-100 dark:bg-gray-800 rounded px-3 py-2 text-sm font-mono inline-block"
-                >
-                    <template v-if="running">
-                        {{ listenAddr }}
-                    </template>
-                    <template v-else>
-                        <span class="text-gray-400">{{ t("api.notStarted") }}</span>
-                    </template>
-                </div>
-            </div>
-        </div>
-
-        <!-- 端口设置 -->
+        <!-- 局域网访问 -->
         <div class="flex mb-3 items-center">
-            <div class="w-24 flex-shrink-0">{{ t("api.listenPort") }}</div>
-            <div class="flex items-center gap-2">
-                <a-input
-                    v-model="editingPort"
-                    :placeholder="t('api.listenPort')"
-                    style="width: 120px"
-                    :disabled="running"
-                />
-                <a-button
-                    size="small"
-                    @click="choosePort"
-                    :disabled="running"
-                >
-                    {{ t("api.useCurrentPort") }}
-                </a-button>
-                <a-button
-                    size="small"
-                    type="primary"
-                    @click="savePort"
-                    :disabled="running"
-                >
-                    {{ t("api.savePort") }}
-                </a-button>
-                <span v-if="running" class="text-xs text-gray-400">
-                    {{ t("api.stopFirstHint") }}
-                </span>
-            </div>
-        </div>
-
-        <!-- 公网访问开关 -->
-        <div class="flex mb-3 items-center">
-            <div class="w-24 flex-shrink-0">{{ t("api.publicAccess") }}</div>
+            <div class="w-24 flex-shrink-0">{{ t("api.lanAccess") }}</div>
             <div class="flex items-center gap-3">
-                <a-switch
-                    :model-value="configPublicEnabled"
-                    @change="togglePublic"
-                />
-                <span
-                    v-if="configPublicEnabled"
-                    class="text-orange-500 text-sm"
-                >
-                    {{ t("api.publicOn") }}
+                <a-switch :model-value="lanEnabled" @change="toggleLan" />
+                <span v-if="lanEnabled" class="text-green-600 text-sm">
+                    {{ t("api.lanOn") }}
                 </span>
                 <span v-else class="text-gray-400 text-sm">
-                    {{ t("api.publicOff") }}
+                    {{ t("api.lanOff") }}
+                </span>
+                <span class="text-xs text-gray-400">
+                    {{ t("api.lanHint") }}
                 </span>
             </div>
         </div>
 
-        <!-- 公网 Token -->
-        <template v-if="configPublicEnabled">
-            <div class="flex mb-3 items-center">
-                <div class="w-24 flex-shrink-0">{{ t("api.authToken") }}</div>
-                <div class="flex items-center gap-2">
-                    <a-input-password
-                        v-model="editingPublicToken"
-                        :placeholder="t('api.authTokenPlaceholder')"
-                        style="width: 280px"
-                        allow-clear
-                    />
-                    <a-button
-                        size="small"
-                        type="primary"
-                        @click="savePublicToken"
-                    >
-                        {{ t("api.save") }}
-                    </a-button>
-                    <span
-                        v-if="configPublicToken"
-                        class="text-xs text-green-600"
-                    >
-                        {{ t("api.tokenSet") }}
-                    </span>
-                    <span v-else class="text-xs text-orange-500">
-                        {{ t("api.tokenNotSet") }}
-                    </span>
-                </div>
+        <!-- 访问 Token -->
+        <div class="flex mb-3 items-center">
+            <div class="w-24 flex-shrink-0">{{ t("api.accessToken") }}</div>
+            <div class="flex items-center gap-2">
+                <a-input-password
+                    v-model="editingToken"
+                    :placeholder="t('api.accessTokenPlaceholder')"
+                    style="width: 320px"
+                    @blur="saveToken"
+                    @press-enter="saveToken"
+                />
+                <span class="text-xs text-gray-400">
+                    {{ t("api.tokenHint") }}
+                </span>
             </div>
-        </template>
+        </div>
 
-        <!-- 查看完整文档 -->
+        <!-- 文档 -->
         <div class="flex mb-3">
             <div class="w-24 flex-shrink-0">{{ $t("common.docs") }}</div>
             <div class="flex-grow">
@@ -281,6 +168,36 @@ async function savePublicToken() {
                     <template #icon><icon-file /></template>
                     {{ t("api.viewDoc") }}
                 </a-button>
+            </div>
+        </div>
+
+        <!-- 服务地址 -->
+        <div class="flex mb-3 items-start">
+            <div class="w-24 flex-shrink-0">{{ t("api.serviceAddr") }}</div>
+            <div class="flex flex-col gap-1 text-sm">
+                <div class="flex items-center gap-2">
+                    <span
+                        class="inline-block w-2 h-2 rounded-full"
+                        :class="running ? 'bg-green-500' : 'bg-gray-300'"
+                    ></span>
+                    <span class="font-mono text-gray-700 dark:text-gray-300">
+                        {{ effectiveServiceAddr }}
+                    </span>
+                    <span v-if="running" class="text-xs text-green-600">
+                        {{ t("api.running") }}
+                    </span>
+                    <span v-else class="text-xs text-gray-400">
+                        {{ t("api.stopped") }}
+                    </span>
+                </div>
+                <div v-if="lanEnabled" class="flex items-center gap-2">
+                    <span class="text-xs text-gray-400">
+                        {{ t("api.localAddrLabel") }}
+                    </span>
+                    <span class="font-mono text-gray-700 dark:text-gray-300">
+                        {{ localServiceAddr }}
+                    </span>
+                </div>
             </div>
         </div>
 

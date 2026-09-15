@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import ParamForm from "../../../../components/common/ParamForm.vue";
-import { filterCustomParams } from "../../../../components/common/util";
 import ServerSelector from "../../../../components/Server/ServerSelector.vue";
 import { t } from "../../../../lang";
 import { Dialog } from "../../../../lib/dialog";
@@ -152,10 +151,7 @@ defineExpose({
         >
             {{ currentFunc.description }}
         </div>
-        <div
-            class="flex items-start mt-2"
-            v-if="filterCustomParams(param).length > 0"
-        >
+        <div class="flex items-start mt-2" v-if="param.length > 0">
             <div class="pt-3 w-5 flex-shrink-0">
                 <a-tooltip :content="$t('model.customParam')" mini>
                     <i-mdi-tune-variant class="w-4 h-4" />
