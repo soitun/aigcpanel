@@ -145,7 +145,11 @@ export const EasyServer = function (config: any) {
                     this.ServerInfo.localPath,
                 );
             }
-            const hasMoreQueue = async () => {
+            // 取出 aigcpanel-queue 中遗留的排队任务并重新拉起执行。
+            // 返回是否确实重新拉起了任务：进程退出时若存在排队任务，说明当前等待中
+            // 的任务尚未真正执行（见下方 success / error 回调），需要继续等待，
+            // 不能以空结果结束当前任务。
+            const hasMoreQueue = async (): Promise<boolean> => {
                 const queueRoot =
                     this.ServerInfo.localPath + `/aigcpanel-queue/`;
                 const files = await Files.list(queueRoot);
@@ -157,7 +161,9 @@ export const EasyServer = function (config: any) {
                     await Files.copy(validQueueFiles[0].pathname, configJson);
                     await Files.deletes(validQueueFiles[0].pathname);
                     this._controllerRunIfNeeded(configJson, option);
+                    return true;
                 }
+                return false;
             };
             let timer = null;
             if (option.timeout > 0) {
@@ -248,14 +254,33 @@ export const EasyServer = function (config: any) {
                     // console.log('easyServer.success', _data)
                     clearTimeout(timer);
                     controller = null;
-                    hasMoreQueue();
-                    if (
-                        controllerWatching.resolve &&
-                        !controllerWatching.promiseResolved
-                    ) {
-                        controllerWatching.promiseResolved = true;
-                        controllerWatching.resolve(undefined);
-                    }
+                    // 模型进程退出前若有任务被写入 aigcpanel-queue，说明当前等待中的
+                    // 任务尚未真正执行（进程已进入退出窗口），需要重新拉起并继续等待
+                    // 其结果；若此处直接以空结果 resolve，会误报「执行失败」，任务还会
+                    // 被重新拉起执行，导致界面失败但实际已生成、且任务重复执行。
+                    hasMoreQueue()
+                        .then((redispatched) => {
+                            if (redispatched) {
+                                return;
+                            }
+                            if (
+                                controllerWatching.resolve &&
+                                !controllerWatching.promiseResolved
+                            ) {
+                                controllerWatching.promiseResolved = true;
+                                controllerWatching.resolve(undefined);
+                            }
+                        })
+                        .catch((e) => {
+                            Log.error("easyServer.hasMoreQueue.error", e);
+                            if (
+                                controllerWatching.resolve &&
+                                !controllerWatching.promiseResolved
+                            ) {
+                                controllerWatching.promiseResolved = true;
+                                controllerWatching.resolve(undefined);
+                            }
+                        });
                 },
                 error: (_data, code) => {
                     // console.log('easyServer.error', {_data, controllerWatching})
@@ -266,14 +291,31 @@ export const EasyServer = function (config: any) {
                     );
                     clearTimeout(timer);
                     controller = null;
-                    hasMoreQueue();
-                    if (
-                        controllerWatching.reject &&
-                        !controllerWatching.promiseResolved
-                    ) {
-                        controllerWatching.promiseResolved = true;
-                        controllerWatching.reject(undefined);
-                    }
+                    // 与 success 同理：进程异常退出时若队列中仍有任务，先重新拉起该
+                    // 任务并继续等待其结果，避免把未执行的任务直接判为失败。
+                    hasMoreQueue()
+                        .then((redispatched) => {
+                            if (redispatched) {
+                                return;
+                            }
+                            if (
+                                controllerWatching.reject &&
+                                !controllerWatching.promiseResolved
+                            ) {
+                                controllerWatching.promiseResolved = true;
+                                controllerWatching.reject(undefined);
+                            }
+                        })
+                        .catch((e) => {
+                            Log.error("easyServer.hasMoreQueue.error", e);
+                            if (
+                                controllerWatching.reject &&
+                                !controllerWatching.promiseResolved
+                            ) {
+                                controllerWatching.promiseResolved = true;
+                                controllerWatching.reject(undefined);
+                            }
+                        });
                 },
             });
         } else if (configJsonPath) {
