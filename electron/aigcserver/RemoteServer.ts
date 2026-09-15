@@ -4,7 +4,7 @@ import {
     ServerFunctionDataType,
     ServerInfo,
 } from "../mapi/server/type";
-import { AigcServerUtil } from "./util";
+import { AigcServerUtil, replaceDeepStrings } from "./util";
 import { Files } from "../mapi/file/main";
 import axios from "axios";
 import { Base64 } from "js-base64";
@@ -398,6 +398,18 @@ export const RemoteServer = function (config: any) {
             this.send("taskRunning", { id: data.id });
             const configData = await configCalculator(data);
             configData.setting = this.ServerInfo.setting;
+            // 上传 modelConfig 中嵌套的本地文件（如 param 内的 file/audio/image
+            // 字段）：远程模型无法访问本地路径，这里递归替换为远端地址
+            configData.modelConfig = await replaceDeepStrings(
+                configData.modelConfig,
+                async (text) => {
+                    if (!text || /^https?:\/\//i.test(text)) {
+                        return null;
+                    }
+                    const uploaded = await this._uploadIfNeeded(text);
+                    return uploaded !== text ? uploaded : null;
+                },
+            );
             const configJsonPath =
                 await this.ServerApi.launcherPrepareConfigJson(configData);
             const remoteConfigPath = await this._uploadIfNeeded(configJsonPath);
