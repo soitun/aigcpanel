@@ -54,6 +54,23 @@ export const FileUtil = {
         }
         return "";
     },
+    // Convert a local file:// url to a filesystem path (plain paths stay unchanged)
+    urlToPath(url: string): string {
+        let p = url + "";
+        if (/^file:\/\//i.test(p)) {
+            p = p.replace(/^file:\/\//i, "");
+            try {
+                p = decodeURIComponent(p);
+            } catch {
+                // keep the raw path when it cannot be decoded
+            }
+            // windows drive path: /C:/xxx -> C:/xxx
+            if (/^\/[a-zA-Z]:[\\/]/.test(p)) {
+                p = p.substring(1);
+            }
+        }
+        return p;
+    },
     getBaseName(path: string, withExt: boolean = false) {
         // windows
         if (path.includes("\\")) {

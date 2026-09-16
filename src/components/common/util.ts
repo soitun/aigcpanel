@@ -3,6 +3,7 @@ import { AppConfig } from "../../config";
 import { t } from "../../lang";
 import { defaultResponseProcessor } from "../../lib/api";
 import { Dialog } from "../../lib/dialog";
+import { FileUtil } from "../../lib/file";
 import { StorageUtil } from "../../lib/storage";
 import { VersionUtil } from "../../lib/util";
 
@@ -16,14 +17,17 @@ export const doCopy = async (
     Dialog.tipSuccess(successTip);
 };
 
-export const doSaveFile = async (filePath: string) => {
+export const doSaveFile = async (filePath: string, defaultName?: string) => {
     try {
+        // stored file path may be a file:// url, convert it to a local path
+        const fromPath = FileUtil.urlToPath(filePath);
         const options: any = {
-            defaultPath: window.$mapi.file.pathToName(filePath, true, -1),
+            defaultPath:
+                defaultName || window.$mapi.file.pathToName(fromPath, true, -1),
         };
         const savePath = await window.$mapi.file.openSave(options);
         if (savePath) {
-            await window.$mapi.file.copy(filePath, savePath, {
+            await window.$mapi.file.copy(fromPath, savePath, {
                 isDataPath: false,
             });
             Dialog.tipSuccess(t("msg.fileSavedTo", { path: savePath }));

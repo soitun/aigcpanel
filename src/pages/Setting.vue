@@ -16,7 +16,7 @@ import {
     SoundGenerateTextPrompt,
 } from "./Video/components/config/prompt";
 import { SoundGenerateReplaceContent } from "./Video/components/config/replaceContent";
-import { testActionSet, testActionUnset } from "../utils/test";
+import { testActionSet, testActionUnset, testRegistry } from "../utils/test";
 
 let tabContentScroller: TabContentScroller | null = null;
 const contentContainer = ref<HTMLElement | null>(null);
@@ -30,12 +30,24 @@ onMounted(() => {
         },
     );
     testActionSet("page.ready", () => {});
+    // 截图钩子：对本地路径等隐私信息脱敏（截图脚本按截图名 setting.prepare 调用）
+    testActionSet("setting.prepare", async () => {
+        const demoHome = "/Users/demo";
+        const actions = ["Setting.setHubRootDemo", "Setting.setCliPathDemo"];
+        for (const action of actions) {
+            try {
+                await testRegistry.callAction(action, { home: demoHome });
+            } catch {
+                // 子组件未挂载时忽略
+            }
+        }
+    });
 });
 onBeforeUnmount(() => {
     tabContentScroller?.destroy();
 });
 onUnmounted(() => {
-    testActionUnset("page.ready");
+    testActionUnset(["page.ready", "setting.prepare"]);
 });
 </script>
 

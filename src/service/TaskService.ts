@@ -23,6 +23,7 @@ export type TaskBiz =
     | "VideoGenFlow"
     // video processing apps
     | "VideoBackground"
+    | "VideoBackgroundReplace"
     | "VideoQuickCut"
     | "VideoZoom"
     | "VideoMark"

@@ -28,6 +28,7 @@ import FeedbackIcon from "./../../assets/image/feedback.svg";
 
 import AudioNormalIcon from "~icons/mdi/volume-high";
 import VideoBackgroundIcon from "~icons/mdi/image-filter-hdr";
+import VideoBackgroundReplaceIcon from "~icons/mdi/wallpaper";
 import VideoQuickCutIcon from "~icons/mdi/content-cut";
 import VideoZoomIcon from "~icons/mdi/magnify";
 import VideoMarkIcon from "~icons/mdi/watermark";
@@ -177,6 +178,18 @@ export const VideoProcessingApps = [
         color: "#22c55e",
         component: defineAsyncComponent(
             () => import("./VideoBackground/VideoBackground.vue"),
+        ),
+    },
+    {
+        name: "VideoBackgroundReplace",
+        titleKey: "app.videoBackgroundReplace",
+        title: t("app.videoBackgroundReplace"),
+        descriptionKey: "app.videoBackgroundReplaceDesc",
+        description: t("app.videoBackgroundReplaceDesc"),
+        icon: VideoBackgroundReplaceIcon,
+        color: "#6d28d9",
+        component: defineAsyncComponent(
+            () => import("./VideoBackgroundReplace/VideoBackgroundReplace.vue"),
         ),
     },
     {

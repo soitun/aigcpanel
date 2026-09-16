@@ -182,6 +182,9 @@ aigcpanel tools --name VideoSpeedPart --param '{"file":"/path/to/video.mp4"}'
 # 视频背景替换
 aigcpanel tools --name VideoBackground --param '{"file":"/path/to/video.mp4","image":"/path/to/bg.png"}'
 
+# 更换视频背景（绿幕抠像）
+aigcpanel tools --name VideoBackgroundReplace --param '{"video":"/path/to/green.mp4","image":"/path/to/bg.png","keyColor":"#00FF00","similarity":0.3,"blend":0.1}'
+
 # 视频合并
 aigcpanel tools --name VideoMerge --param '{"file":"/path/to/video1.mp4","file2":"/path/to/video2.mp4"}'
 

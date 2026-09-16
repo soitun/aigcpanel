@@ -159,6 +159,12 @@ aigcpanel tools --name MediaFormatConvert --param '{"file":"/path/to/video.mp4",
 aigcpanel tools --name VideoBackground --param '{"file":"/path/to/video.mp4","image":"/path/to/bg.png"}'
 ```
 
+### 更换视频背景
+
+```bash
+aigcpanel tools --name VideoBackgroundReplace --param '{"video":"/path/to/green.mp4","image":"/path/to/bg.png","keyColor":"#00FF00","similarity":0.3,"blend":0.1}'
+```
+
 ### 视频压缩
 
 ```bash

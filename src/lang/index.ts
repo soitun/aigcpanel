@@ -63,6 +63,8 @@ import mediaFormatConvertEnUS from "../pages/Apps/MediaFormatConvert/lang/en-US.
 import mediaFormatConvertZhCN from "../pages/Apps/MediaFormatConvert/lang/zh-CN.json";
 import videoBackgroundEnUS from "../pages/Apps/VideoBackground/lang/en-US.json";
 import videoBackgroundZhCN from "../pages/Apps/VideoBackground/lang/zh-CN.json";
+import videoBackgroundReplaceEnUS from "../pages/Apps/VideoBackgroundReplace/lang/en-US.json";
+import videoBackgroundReplaceZhCN from "../pages/Apps/VideoBackgroundReplace/lang/zh-CN.json";
 import videoCompressEnUS from "../pages/Apps/VideoCompress/lang/en-US.json";
 import videoCompressZhCN from "../pages/Apps/VideoCompress/lang/zh-CN.json";
 import videoKeepPartEnUS from "../pages/Apps/VideoKeepPart/lang/en-US.json";
@@ -109,6 +111,7 @@ export const messageList = [
             ...ffmpegEnUS,
             ...mediaFormatConvertEnUS,
             ...videoBackgroundEnUS,
+            ...videoBackgroundReplaceEnUS,
             ...videoCompressEnUS,
             ...videoKeepPartEnUS,
             ...videoMarkEnUS,
@@ -148,6 +151,7 @@ export const messageList = [
             ...ffmpegZhCN,
             ...mediaFormatConvertZhCN,
             ...videoBackgroundZhCN,
+            ...videoBackgroundReplaceZhCN,
             ...videoCompressZhCN,
             ...videoKeepPartZhCN,
             ...videoMarkZhCN,

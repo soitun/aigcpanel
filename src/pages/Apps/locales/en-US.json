@@ -6,6 +6,8 @@
     "app.audioNormalDesc": "Normalize audio and adjust the volume to a standard level.",
     "app.videoBackground": "Video Background",
     "app.videoBackgroundDesc": "Add a solid color or image background to the video for a better visual effect.",
+    "app.videoBackgroundReplace": "Replace Video Background",
+    "app.videoBackgroundReplaceDesc": "Use chroma key to remove the green screen background of a video and replace it with a chosen image.",
     "app.videoQuickCut": "Smart Editing",
     "app.videoQuickCutDesc": "Quickly edit videos with speech recognition, keeping or removing segments as you like.",
     "app.videoZoom": "Video Segment Zoom",

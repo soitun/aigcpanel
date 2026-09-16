@@ -4,6 +4,8 @@ import InputInlineEditor from "../../components/common/InputInlineEditor.vue";
 import VideoPlayer from "../../components/common/VideoPlayer.vue";
 import { t } from "../../lang";
 import { Dialog } from "../../lib/dialog";
+import { FileUtil } from "../../lib/file";
+import { doSaveFile } from "../../components/common/util";
 import {
     VideoTemplateRecord,
     VideoTemplateService,
@@ -46,6 +48,18 @@ const doDelete = async (record: VideoTemplateRecord) => {
 const onChangeTitle = async (record: VideoTemplateRecord, value: string) => {
     await VideoTemplateService.update(record.id!, { name: value });
     await doRefresh();
+};
+
+// 导出形象视频，默认文件名为形象标题
+const doExportVideo = async (record: VideoTemplateRecord) => {
+    if (!record.video) {
+        return;
+    }
+    const ext = FileUtil.getExt(record.video) || "mp4";
+    await doSaveFile(
+        record.video,
+        window.$mapi.file.textToName(record.name, ext),
+    );
 };
 
 const onUpdate = async () => {
@@ -109,7 +123,17 @@ const onUpdate = async () => {
                                     </InputInlineEditor>
                                 </div>
                             </div>
-                            <div>
+                            <div class="flex items-center gap-1">
+                                <a-tooltip
+                                    :content="$t('common.exportVideo')"
+                                    mini
+                                >
+                                    <a-button @click="doExportVideo(r)">
+                                        <template #icon>
+                                            <i-mdi-download />
+                                        </template>
+                                    </a-button>
+                                </a-tooltip>
                                 <a-button @click="doDelete(r)">
                                     <template #icon>
                                         <i-mdi-delete />

@@ -83,6 +83,11 @@ const cliToolsDocs: Array<{ biz: string; title: string; example: string }> = [
         example: `aigcpanel tools --name VideoBackground --param '{"file":"/path/to/video.mp4","image":"/path/to/bg.png"}'`,
     },
     {
+        biz: "VideoBackgroundReplace",
+        title: "更换视频背景",
+        example: `aigcpanel tools --name VideoBackgroundReplace --param '{"video":"/path/to/green.mp4","image":"/path/to/bg.png","keyColor":"#00FF00","similarity":0.3,"blend":0.1}'`,
+    },
+    {
         biz: "VideoCompress",
         title: "视频压缩",
         example: `aigcpanel tools --name VideoCompress --param '{"file":"/path/to/video.mp4"}'`,

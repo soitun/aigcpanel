@@ -41,6 +41,10 @@ import {
     VideoBackgroundCleaner,
 } from "../pages/Apps/VideoBackground/task";
 import {
+    VideoBackgroundReplace,
+    VideoBackgroundReplaceCleaner,
+} from "../pages/Apps/VideoBackgroundReplace/task";
+import {
     VideoCompress,
     VideoCompressCleaner,
 } from "../pages/Apps/VideoCompress/task";
@@ -115,6 +119,7 @@ export const tasks = {
     ImageToVideo,
     // video processing apps
     VideoBackground,
+    VideoBackgroundReplace,
     VideoQuickCut,
     VideoZoom,
     VideoMark,
@@ -148,6 +153,7 @@ export const taskCleaners = {
     ImageToVideo: ImageToVideoCleaner,
     // video processing cleaners
     VideoBackground: VideoBackgroundCleaner,
+    VideoBackgroundReplace: VideoBackgroundReplaceCleaner,
     VideoQuickCut: VideoQuickCutCleaner,
     VideoZoom: VideoZoomCleaner,
     VideoMark: VideoMarkCleaner,

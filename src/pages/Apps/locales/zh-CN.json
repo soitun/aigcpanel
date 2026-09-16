@@ -6,6 +6,8 @@
     "app.audioNormalDesc": "对音频进行规范化处理，调整音量至标准水平。",
     "app.videoBackground": "视频背景添加",
     "app.videoBackgroundDesc": "为视频添加纯色或图片背景，提升视觉效果。",
+    "app.videoBackgroundReplace": "更换视频背景",
+    "app.videoBackgroundReplaceDesc": "使用绿幕抠像，将绿幕视频的背景替换为指定图片。",
     "app.videoQuickCut": "智能剪辑",
     "app.videoQuickCutDesc": "通过语音识别快速剪辑视频，支持片段自定义保留或移除。",
     "app.videoZoom": "视频片段放大",
