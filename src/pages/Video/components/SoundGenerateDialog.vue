@@ -70,7 +70,7 @@ defineExpose({
 <template>
     <a-modal
         v-model:visible="visible"
-        width="900px"
+        width="min(900px, 95vw)"
         :footer="false"
         title-align="start"
     >

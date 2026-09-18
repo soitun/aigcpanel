@@ -26,7 +26,7 @@ onMounted(() => {
         tabContainer.value as HTMLElement,
         contentContainer.value as HTMLElement,
         {
-            activeClass: "menu-active",
+            activeClass: "menu-item-active",
         },
     );
     testActionSet("page.ready", () => {});
@@ -51,19 +51,6 @@ onUnmounted(() => {
 });
 </script>
 
-<style lang="less" scoped>
-.menu-active {
-    --tw-bg-opacity: 1;
-    background-color: rgb(243 244 246 / var(--tw-bg-opacity));
-}
-
-[data-theme="dark"] {
-    .menu-active {
-        background-color: var(--color-bg-page-nav-active);
-    }
-}
-</style>
-
 <template>
     <div class="flex select-none bg-white">
         <div
@@ -72,7 +59,7 @@ onUnmounted(() => {
         >
             <div
                 data-section="basic"
-                class="p-2 rounded-lg mb-4 cursor-pointer menu-active"
+                class="p-2 rounded-lg mb-4 cursor-pointer menu-item-active"
             >
                 <div class="text-base truncate">
                     <icon-settings />

@@ -78,7 +78,9 @@ const dynamicComponent = computed(() => {
                         :key="s.name"
                         class="p-2 rounded-lg mb-1 cursor-pointer"
                         :class="
-                            tab === s.name ? 'bg-gray-200' : 'hover:bg-gray-100'
+                            tab === s.name
+                                ? 'menu-item-active'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                         "
                         @click="tab = s.name"
                     >

@@ -48,7 +48,7 @@ defineExpose({
             $t('common.positionEnd') +
             $t('common.setting')
         "
-        width="800px"
+        width="min(800px, 95vw)"
         :destroyOnClose="true"
     >
         <template #footer>

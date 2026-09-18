@@ -193,6 +193,7 @@
     "error.requestFailed": "请求失败",
     "error.responseEmpty": "返回数据为空",
     "error.resumeFailed": "继续失败",
+    "error.runtimeVramOverflow": "运行时显存溢出",
     "error.saveFileFailed": "保存文件失败: {error}",
     "error.selectFileFailed": "选择文件失败:{error}",
     "error.softwareVersionMismatch": "软件不满足模型版本要求",

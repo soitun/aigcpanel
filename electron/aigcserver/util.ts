@@ -37,8 +37,15 @@ export const replaceDeepStrings = async (
 
 export const AigcServerUtil = {
     errorDetect: (data: string): string | null => {
+        const runtimeVramOverflow = t("error.runtimeVramOverflow");
+        // Match the various ways PyTorch reports CUDA VRAM exhaustion:
+        // - torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate ...
+        // - torch.AcceleratorError: CUDA error: out of memory
+        // Keep the keyword list narrow enough to avoid false positives.
         const errorMap = {
-            "torch.cuda.OutOfMemoryError": t("CUDA内存不足"),
+            "torch.cuda.OutOfMemoryError": runtimeVramOverflow,
+            "CUDA error: out of memory": runtimeVramOverflow,
+            "CUDA out of memory": runtimeVramOverflow,
         };
         for (const [key, value] of Object.entries(errorMap)) {
             if (data.includes(key)) {

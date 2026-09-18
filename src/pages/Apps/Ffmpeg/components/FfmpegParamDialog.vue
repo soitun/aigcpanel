@@ -43,7 +43,7 @@ defineExpose({
         v-model:visible="visible"
         title-align="start"
         :title="t('app.ffmpegSettings')"
-        width="800px"
+        width="min(800px, 95vw)"
         :destroyOnClose="true"
     >
         <template #footer>

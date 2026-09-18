@@ -193,6 +193,7 @@
     "error.requestFailed": "Request Failed",
     "error.responseEmpty": "Response data is empty",
     "error.resumeFailed": "Resume failed",
+    "error.runtimeVramOverflow": "Runtime VRAM out of memory",
     "error.saveFileFailed": "Save file failed: {error}",
     "error.selectFileFailed": "Select file failed: {error}",
     "error.softwareVersionMismatch": "Software does not meet model version requirements",

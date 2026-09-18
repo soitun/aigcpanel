@@ -122,7 +122,7 @@ const emit = defineEmits({
 <template>
     <a-modal
         v-model:visible="visible"
-        width="800px"
+        width="min(800px, 95vw)"
         title-align="start"
         @update:visible="onVisibleChange"
     >

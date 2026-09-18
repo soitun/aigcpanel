@@ -42,7 +42,7 @@ defineExpose({
         v-model:visible="visible"
         title-align="start"
         :title="$t('app.textToVideoSettings')"
-        width="600px"
+        width="min(600px, 95vw)"
         :destroyOnClose="true"
     >
         <template #footer>

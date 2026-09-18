@@ -54,7 +54,7 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
             </div>
             <div
                 class="p-2 rounded-lg mb-2 cursor-pointer"
-                :class="tab === 'soundGenerate' ? 'bg-gray-200' : ''"
+                :class="tab === 'soundGenerate' ? 'menu-item-active' : ''"
                 @click="tab = 'soundGenerate'"
             >
                 <div class="text-base truncate flex items-center">
@@ -69,7 +69,7 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
             </div>
             <div
                 class="p-2 rounded-lg mb-2 cursor-pointer"
-                :class="tab === 'videoTemplate' ? 'bg-gray-200' : ''"
+                :class="tab === 'videoTemplate' ? 'menu-item-active' : ''"
                 @click="tab = 'videoTemplate'"
             >
                 <div class="text-base truncate flex items-center">
@@ -81,7 +81,7 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
             </div>
             <div
                 class="p-2 rounded-lg mb-2 cursor-pointer"
-                :class="tab === 'videoGen' ? 'bg-gray-200' : ''"
+                :class="tab === 'videoGen' ? 'menu-item-active' : ''"
                 @click="tab = 'videoGen'"
             >
                 <div class="text-base truncate flex items-center">
@@ -93,7 +93,7 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
             </div>
             <div
                 class="p-2 rounded-lg mb-2 cursor-pointer"
-                :class="tab === 'VideoGenFlow' ? 'bg-gray-200' : ''"
+                :class="tab === 'VideoGenFlow' ? 'menu-item-active' : ''"
                 @click="tab = 'VideoGenFlow'"
             >
                 <div class="text-base truncate flex items-center">
