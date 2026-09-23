@@ -7,6 +7,7 @@ import {
 import { Files } from "../mapi/file/main";
 import { Log } from "../mapi/log/main";
 import { EncodeUtil } from "../lib/util";
+import { t } from "../config/lang";
 
 
 /**
@@ -390,7 +391,7 @@ export const ComfyUIServer = function (config: any = null): ServerContext {
                 if (launcherResult.result.msg) {
                     throw launcherResult.result.msg;
                 }
-                throw "执行失败，请查看模型日志";
+                throw t("error.runFailedCheckLog");
             }
             return { url: launcherResult.result.url };
         },
@@ -470,12 +471,12 @@ export const ComfyUIServer = function (config: any = null): ServerContext {
                             "ComfyUI process exited before task result, task aborted\n",
                             { isDataPath: true },
                         );
-                        throw "服务已退出，任务未执行完成，请重试";
+                        throw t("error.comfyuiServiceExited");
                     }
                     await new Promise((r) => setTimeout(r, 1000));
                 }
                 if (!launcherResult.endTime) {
-                    throw "任务超时或未在 stdout 中产生结果";
+                    throw t("error.comfyuiTaskNoResult");
                 }
                 resultData.end = Date.now();
                 resultData.data = await resultDataCalculator(
@@ -620,7 +621,7 @@ export const ComfyUIServer = function (config: any = null): ServerContext {
                 async (data: any) => {
                     const param = data.param || {};
                     if (!param.comfyuiName) {
-                        throw "ComfyUI 服务未内置语音识别工作流";
+                        throw t("error.comfyuiNoAsrWorkflow");
                     }
                     const modelConfig: any = {
                         type: "comfyuiWorkflow",
@@ -644,7 +645,7 @@ export const ComfyUIServer = function (config: any = null): ServerContext {
                         if (launcherResult.result.msg) {
                             throw launcherResult.result.msg;
                         }
-                        throw "执行失败，请查看模型日志";
+                        throw t("error.runFailedCheckLog");
                     }
                     return { records: launcherResult.result.records || [] };
                 },
@@ -658,7 +659,7 @@ export const ComfyUIServer = function (config: any = null): ServerContext {
                 async (data: any) => {
                     const param = data.param || {};
                     if (!param.comfyuiName) {
-                        throw "ComfyUI 服务未内置声音合成工作流";
+                        throw t("error.comfyuiNoSoundTtsWorkflow");
                     }
                     return {
                         id: data.id,
@@ -681,7 +682,7 @@ export const ComfyUIServer = function (config: any = null): ServerContext {
                 async (data: any) => {
                     const param = data.param || {};
                     if (!param.comfyuiName) {
-                        throw "ComfyUI 服务未内置声音克隆工作流";
+                        throw t("error.comfyuiNoSoundCloneWorkflow");
                     }
                     return {
                         id: data.id,
@@ -706,7 +707,7 @@ export const ComfyUIServer = function (config: any = null): ServerContext {
                 async (data: any) => {
                     const param = data.param || {};
                     if (!param.comfyuiName) {
-                        throw "请选择要调用的通用工作流";
+                        throw t("error.comfyuiWorkflowRequired");
                     }
                     return {
                         id: data.id,
@@ -729,7 +730,7 @@ export const ComfyUIServer = function (config: any = null): ServerContext {
                         if (r.msg) {
                             throw r.msg;
                         }
-                        throw "执行失败，请查看模型日志";
+                        throw t("error.runFailedCheckLog");
                     }
                     // 返回全部输出文件（url 主文件 + files 列表），前端按类型展示
                     return {

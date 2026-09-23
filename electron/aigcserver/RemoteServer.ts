@@ -9,6 +9,7 @@ import { Files } from "../mapi/file/main";
 import axios from "axios";
 import { Base64 } from "js-base64";
 import { Log } from "../mapi/log/main";
+import { t } from "../config/lang";
 
 type LauncherResultType = {
     result: {
@@ -472,7 +473,7 @@ export const RemoteServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: await downloadUrl(launcherResult.result.url),
@@ -511,7 +512,7 @@ export const RemoteServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: await downloadUrl(launcherResult.result.url),
@@ -552,7 +553,7 @@ export const RemoteServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: await downloadUrl(launcherResult.result.url),
@@ -590,7 +591,7 @@ export const RemoteServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     records: launcherResult.result.records,
@@ -624,7 +625,7 @@ export const RemoteServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: await downloadUrl(launcherResult.result.url),
@@ -663,7 +664,7 @@ export const RemoteServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: await downloadUrl(launcherResult.result.url),
@@ -697,7 +698,7 @@ export const RemoteServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: await downloadUrl(launcherResult.result.url),
@@ -740,7 +741,7 @@ export const RemoteServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: await downloadUrl(launcherResult.result.url),

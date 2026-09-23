@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { t } from "../../lang";
 import { doOpenFile } from "./util";
-import { computed, ref } from "vue";
+import { computed, watch } from "vue";
 import { FileUtil } from "../../lib/file";
 import AudioPlayerButton from "./AudioPlayerButton.vue";
+import { useTruncated } from "./useTruncated";
 
 const props = defineProps<{
     modelValue: string;
@@ -49,10 +50,22 @@ const name = computed(() => {
     if (!props.modelValue) return "";
     return FileUtil.getBaseName(props.modelValue, true);
 });
+
+// Full button text; ellipsized in narrow cards, full text on hover when cut
+const buttonText = computed(() => {
+    const label = t("common.selectAudio");
+    return `${label} (${t("common.extensions", {
+        extensions: effectiveExts.value.join(", "),
+    })})`;
+});
+const { textEl, truncated, check } = useTruncated();
+watch(buttonText, () => {
+    check();
+});
 </script>
 
 <template>
-    <div class="flex items-center gap-2 min-w-64">
+    <div class="flex items-center gap-2 min-w-0 w-full">
         <template v-if="modelValue">
             <AudioPlayerButton :source="modelValue" />
             <a-tooltip :content="modelValue" mini>
@@ -68,11 +81,21 @@ const name = computed(() => {
             </a-button>
         </template>
         <template v-else>
-            <a-button @click="doSelectFile" class="min-w-64">
-                <i-mdi-music-note />
-                {{ t("common.selectAudio") }}
-                ({{ effectiveExts.join(", ") }})
-            </a-button>
+            <a-tooltip :content="buttonText" :disabled="!truncated" mini>
+                <a-button
+                    @click="doSelectFile"
+                    class="max-w-full overflow-hidden"
+                >
+                    <span
+                        class="inline-flex items-center gap-1 min-w-0 max-w-full text-left"
+                    >
+                        <i-mdi-music-note class="flex-shrink-0" />
+                        <span ref="textEl" class="truncate">
+                            {{ buttonText }}
+                        </span>
+                    </span>
+                </a-button>
+            </a-tooltip>
         </template>
     </div>
 </template>

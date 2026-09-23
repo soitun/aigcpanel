@@ -7,6 +7,7 @@ import {
     ServerInfo,
 } from "../mapi/server/type";
 import { AigcServerUtil } from "./util";
+import { t } from "../config/lang";
 
 type LauncherResultType = {
     result: {
@@ -428,7 +429,7 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: launcherResult.result.url,
@@ -464,7 +465,7 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: launcherResult.result.url,
@@ -499,7 +500,7 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: launcherResult.result.url,
@@ -533,7 +534,7 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     records: launcherResult.result.records,
@@ -567,7 +568,7 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: launcherResult.result.url,
@@ -602,7 +603,7 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: launcherResult.result.url,
@@ -635,7 +636,7 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: launcherResult.result.url,
@@ -669,13 +670,31 @@ export const EasyServer = function (config: any) {
                     if (launcherResult.result.msg) {
                         throw launcherResult.result.msg;
                     }
-                    throw "执行失败，请查看模型日志";
+                    throw t("error.runFailedCheckLog");
                 }
                 return {
                     url: launcherResult.result.url,
                 };
             },
         );
+    };
+
+    // 读取 config.json general[].result 声明的业务字段名列表，
+    // 用于判断通用模型任务是否真正产出了结果。
+    this._generalResultNames = function (funcName: string): string[] {
+        const generalList = (me.serverConfig.general || []) as {
+            name?: string;
+            result?: { name?: string }[];
+        }[];
+        const def = generalList.find(
+            (g) => g && g.name === (funcName || "general"),
+        );
+        if (!def || !Array.isArray(def.result)) {
+            return [];
+        }
+        return def.result
+            .map((r) => r && r.name)
+            .filter((name): name is string => !!name);
     };
 
     // 通用模型调用（工具"通用模型"）：
@@ -700,8 +719,31 @@ export const EasyServer = function (config: any) {
                 data: ServerFunctionDataType,
                 launcherResult: LauncherResultType,
             ) => {
+                const result = launcherResult.result || {};
+                // 模型执行失败：优先抛出错误信息（如显存不足 / 崩溃侦测）
+                if (result.error) {
+                    throw result.error;
+                }
+                if (result.msg) {
+                    throw result.msg;
+                }
+                // 校验任务是否真正产出了结果：
+                // - config.json general[].result 声明了输出字段时，至少产出一个才算成功；
+                // - 未声明输出字段时，退化为要求结束标记 End。
+                // 否则说明模型进程异常退出（如启动即崩溃，launcher 本地模式仍以
+                // 退出码 0 结束）或错误被吞掉只剩一个 End，不能当作成功。
+                const resultNames = me._generalResultNames(
+                    data.funcName || "general",
+                );
+                const succeeded =
+                    resultNames.length > 0
+                        ? resultNames.some((name) => name in result)
+                        : !!result.End;
+                if (!succeeded) {
+                    throw t("error.runFailedCheckLog");
+                }
                 // 透传服务端结果 json（含 url/images/files/text/records 等字段）
-                return launcherResult.result;
+                return result;
             },
         );
     };
