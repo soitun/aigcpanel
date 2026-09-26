@@ -3,6 +3,7 @@ import { ipcMain } from "electron";
 import { Log } from "../log/main";
 import { mapError } from "./error";
 import { AigcServer } from "../../aigcserver";
+import { voiceApiTest } from "../../aigcserver/voiceapi";
 import { SendType, ServerContext, ServerInfo } from "./type";
 import { Files } from "../file/main";
 import { getGpuInfo } from "../../lib/env-main";
@@ -63,6 +64,12 @@ const getModule = async (
                 serverModule[serverInfo.localPath] = server;
             } else if (serverInfo.type === EnumServerType.REMOTE) {
                 const server = new AigcServer["RemoteServer"](serverInfo);
+                server.type = "buildIn";
+                server.ServerApi = ServerApi;
+                await server.init();
+                serverModule[serverInfo.localPath] = server;
+            } else if (serverInfo.type === EnumServerType.API) {
+                const server = new AigcServer["ApiServer"](serverInfo);
                 server.type = "buildIn";
                 server.ServerApi = ServerApi;
                 await server.init();
@@ -207,6 +214,21 @@ ipcMain.handle("server:deletes", async (event, serverInfo: ServerInfo) => {
     }
     return true;
 });
+
+ipcMain.handle(
+    "server:apiVoiceTest",
+    async (event, config: any, text: string) => {
+        try {
+            const url = await voiceApiTest(
+                config,
+                text || "你好，这是一段语音试听。",
+            );
+            return { code: 0, msg: "ok", data: { url } };
+        } catch (e: any) {
+            return { code: -1, msg: (e && e.message) || String(e) };
+        }
+    },
+);
 
 ipcMain.handle("server:config", async (event, serverInfo: ServerInfo) => {
     const module = await getModule(serverInfo);

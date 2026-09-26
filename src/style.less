@@ -225,6 +225,26 @@ body:not([data-theme="dark"]) {
 
 
 /////////// arco start ///////////
+// 弹窗由内容撑高，超出视口时滚动整个弹窗，并在首尾留出空白。
+.arco-modal-wrapper:not(:has(.arco-modal-fullscreen)):not(:has(.modal-independent-scroll)) {
+    box-sizing: border-box;
+    padding-bottom: 48px;
+
+    &.arco-modal-wrapper-align-center::after {
+        display: none;
+    }
+
+    .arco-modal:not(.arco-modal-fullscreen) {
+        top: 48px !important;
+        vertical-align: top;
+        margin-bottom: 48px;
+    }
+
+    .arco-modal-body {
+        overflow: visible;
+    }
+}
+
 .arco-btn, .arco-input-wrapper, .arco-textarea-wrapper, .arco-input-tag, .arco-radio-group-button, .arco-alert {
     border-radius: 0.5rem;
 }
@@ -288,4 +308,3 @@ body:not([data-theme="dark"]) {
 }
 
 /////////// arco end ///////////
-

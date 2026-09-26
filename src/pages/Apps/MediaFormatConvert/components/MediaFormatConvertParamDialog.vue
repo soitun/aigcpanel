@@ -63,11 +63,7 @@ defineExpose({
                 }}</a-button>
             </div>
         </template>
-        <div
-            v-if="visible"
-            class="overflow-y-auto"
-            style="max-height: calc(100vh - 10rem)"
-        >
+        <div v-if="visible">
             <MediaFormatConvertParamForm ref="paramForm" />
         </div>
     </a-modal>

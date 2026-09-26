@@ -82,7 +82,7 @@ onMounted(async () => {
         <template #title>
             <div class="font-bold">{{ $t("voice.timbreManage") }}</div>
         </template>
-        <div style="height: calc(100vh - 15rem)">
+        <div>
             <ListerTop
                 :loading="loading"
                 :total="records.length"

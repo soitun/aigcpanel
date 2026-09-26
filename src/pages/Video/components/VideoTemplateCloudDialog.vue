@@ -106,7 +106,7 @@ const emit = defineEmits({
         <template #title>
             {{ $t("model.cloudVideoAvatar") }}
         </template>
-        <div style="height: calc(100vh - 15rem)">
+        <div>
             <div>
                 <a-alert class="mb-3">
                     {{ $t("model.cloudVideoAvatarDesc") }}

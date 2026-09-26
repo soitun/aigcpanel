@@ -314,6 +314,9 @@ type DefsMapi = {
             includeExt: boolean = true,
             maxLimit: number = 100,
         ) => string;
+        dataRoot: () => Promise<string>;
+        dataRootDefault: () => Promise<string>;
+        isDataRootCustom: () => Promise<boolean>;
         hubRootDefault: () => Promise<string>;
         hubRoot: () => Promise<string>;
         hubSave: (
@@ -474,6 +477,7 @@ type DefsMapi = {
         deletes: (serverInfo: ServerInfo) => Promise<void>;
         ping: (serverInfo: ServerInfo) => Promise<boolean>;
         config: (serverInfo: ServerInfo) => Promise<any>;
+        apiVoiceTest: (config: any, text: string) => Promise<any>;
         callFunction: (
             serverInfo: ServerInfo,
             method: string,

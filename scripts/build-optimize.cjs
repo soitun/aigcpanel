@@ -19,7 +19,7 @@ exports.default = async function (context) {
 
     console.log("BuildOptimize", { platformName, platformArch, targetArch, name });
 
-    // macOS 本地构建版（make build-and-install 触发，AIGCPANEL_LOCAL_INSTALL=1）：
+    // macOS 本地构建版（make build-install 触发，AIGCPANEL_LOCAL_INSTALL=1）：
     // - 钥匙串已导入 Developer ID 证书时，electron-builder 随后会用证书签名，
     //   授权记录按 TeamID 匹配，重装/升级后授权可持久，无需 adhoc 覆盖。
     // - 无证书（identity=null，不签名）时，用 ad-hoc 重新签名并指定 appId，使签名

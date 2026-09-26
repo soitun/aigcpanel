@@ -1,4 +1,6 @@
+import chardet from "chardet";
 import { execSync } from "child_process";
+import iconv from "iconv-lite";
 import { resolve } from "node:path";
 import fs from "node:fs";
 import os from "os";
@@ -33,11 +35,50 @@ export const memoryInfo = () => {
     };
 };
 
+// Decode raw command output bytes into a readable UTF-8 string.
+// Windows command output (such as cmd.exe error messages) is usually encoded
+// with the local ANSI code page (GBK / cp936), which shows as garbled text
+// when it is interpreted as UTF-8.
+const outputToUtf8 = (data: string | Buffer | null | undefined): string => {
+    if (!data) {
+        return "";
+    }
+    const buffer = Buffer.isBuffer(data) ? data : Buffer.from(data, "binary");
+    if (!isWin) {
+        return buffer.toString("utf8");
+    }
+    const detected = chardet.detect(buffer);
+    if (detected && /utf-?8/i.test(detected)) {
+        return buffer.toString("utf8");
+    }
+    return iconv.decode(buffer, "cp936");
+};
+
+// Run a command and return its UTF-8 stdout.
+// stderr is captured instead of being forwarded to the parent process, so a
+// missing command (expected on newer Windows, e.g. wmic) never leaks a
+// garbled message into the console.
+const execCommand = (command: string): string => {
+    const stdout = execSync(command, {
+        stdio: ["ignore", "pipe", "pipe"],
+        encoding: "binary",
+    }) as unknown as string;
+    return outputToUtf8(stdout);
+};
+
 const tryFirst = (functionList: (() => any)[]) => {
     for (const fun of functionList) {
         try {
             return fun();
-        } catch (e) {}
+        } catch (e: any) {
+            // A probe command may be unavailable on some systems (e.g. wmic was
+            // removed in newer Windows). This is expected, so record a single
+            // info line instead of treating the raw command error as an error.
+            const reason = outputToUtf8(e?.stderr || e?.message || "")
+                .trim()
+                .split("\n")[0];
+            Log.info("env.command.skip", reason || null);
+        }
     }
     return null;
 };
@@ -48,26 +89,20 @@ export const platformVersion = () => {
         const functionList: any[] = [];
         if (isWin) {
             functionList.push(() =>
-                execSync("wmic os get Version")
-                    .toString()
-                    .split("\n")[1]
-                    .trim(),
+                execCommand("wmic os get Version").split("\n")[1].trim(),
             );
             functionList.push(() =>
-                execSync(
+                execCommand(
                     "powershell -command \"(Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion').ReleaseId\"",
-                )
-                    .toString()
-                    .trim(),
+                ).trim(),
             );
         } else if (isMac) {
             functionList.push(() =>
-                execSync("sw_vers -productVersion").toString().trim(),
+                execCommand("sw_vers -productVersion").trim(),
             );
         } else if (isLinux) {
             functionList.push(() =>
-                execSync("cat /etc/os-release | grep VERSION_ID")
-                    .toString()
+                execCommand("cat /etc/os-release | grep VERSION_ID")
                     .split("=")[1]
                     .trim()
                     .replace(/"/g, ""),
@@ -98,29 +133,22 @@ export const platformUUID = () => {
         const functionList: any[] = [];
         if (isWin) {
             functionList.push(() =>
-                execSync("wmic csproduct get UUID")
-                    .toString()
-                    .split("\n")[1]
-                    .trim(),
+                execCommand("wmic csproduct get UUID").split("\n")[1].trim(),
             );
             functionList.push(() =>
-                execSync(
+                execCommand(
                     'powershell -command "(Get-WmiObject Win32_ComputerSystemProduct).UUID"',
-                )
-                    .toString()
-                    .trim(),
+                ).trim(),
             );
         } else if (isMac) {
             functionList.push(() =>
-                execSync("system_profiler SPHardwareDataType | grep UUID")
-                    .toString()
+                execCommand("system_profiler SPHardwareDataType | grep UUID")
                     .split(": ")[1]
                     .trim(),
             );
         } else if (isLinux) {
             functionList.push(() =>
-                execSync("cat /var/lib/dbus/machine-id")
-                    .toString()
+                execCommand("cat /var/lib/dbus/machine-id")
                     .trim()
                     .toUpperCase(),
             );

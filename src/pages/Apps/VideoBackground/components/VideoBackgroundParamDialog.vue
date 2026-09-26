@@ -54,7 +54,7 @@ defineExpose({
                 <div class="font-bold mr-2">{{ t("app.setParams") }}</div>
             </div>
         </template>
-        <div style="height: calc(100vh - 15rem)">
+        <div>
             <VideoBackgroundParamForm ref="paramForm" />
         </div>
         <template #footer>

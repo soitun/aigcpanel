@@ -20,6 +20,7 @@ declare type SoundAsrParamType = {
 };
 
 declare type SoundGenerateParamType = {
+    voiceId?: number;
     serverName: string;
     serverTitle: string;
     serverVersion: string;

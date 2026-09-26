@@ -50,10 +50,7 @@
                         </a-button>
                     </div>
                 </div>
-                <div
-                    class="overflow-auto ub-scroll-bar-mini px-3"
-                    style="height: 60vh"
-                >
+                <div class="ub-scroll-bar-mini px-3">
                     <div
                         v-if="filterRecords.length === 0 && speakers.length > 0"
                     >

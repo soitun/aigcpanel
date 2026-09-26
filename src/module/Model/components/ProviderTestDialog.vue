@@ -70,11 +70,7 @@ defineExpose({
                 $t("common.close")
             }}</a-button>
         </template>
-        <div
-            style="max-height: 50vh"
-            class="overflow-y-auto"
-            v-if="props.provider"
-        >
+        <div v-if="props.provider">
             <a-form :model="data" layout="vertical" class="mt-4">
                 <a-form-item name="modelId">
                     <a-select v-model:model-value="data.modelId">

@@ -550,6 +550,29 @@ const copy = async (
     fs.copyFileSync(fullPathOld, fullPathNew);
 };
 
+// Effective data root directory (may be redirected via AIGCPANEL_DATA_ROOT)
+const dataRoot = async (): Promise<string> => {
+    await waitAppEnvReady();
+    return root();
+};
+
+// Default Electron data root directory (<userData>/data when not redirected)
+const dataRootDefault = async (): Promise<string> => {
+    await waitAppEnvReady();
+    return AppEnv.dataRootDefault;
+};
+
+// Whether the effective data root has been customized (differs from the default)
+const isDataRootCustom = async (): Promise<boolean> => {
+    await waitAppEnvReady();
+    if (!AppEnv.dataRootDefault) {
+        return false;
+    }
+    // Only trim trailing path separators to avoid false mismatches between Windows and *nix
+    const normalize = (p: string) => (p || "").replace(/[\\/]+$/, "");
+    return normalize(AppEnv.dataRoot) !== normalize(AppEnv.dataRootDefault);
+};
+
 const hubRootDefault = async () => {
     await waitAppEnvReady();
     return path.join(root(), "hub");
@@ -1292,6 +1315,9 @@ export const FileIndex = {
     stat,
     textToName,
     pathToName,
+    dataRoot,
+    dataRootDefault,
+    isDataRootCustom,
     hubRootDefault,
     hubRoot,
     hubSave,

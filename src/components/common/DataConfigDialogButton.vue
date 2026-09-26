@@ -64,7 +64,7 @@ const type = computed(() => {
                 {{ $t("common.save") }}
             </a-button>
         </template>
-        <div class="-mx-2 -my-3" style="height: 60vh">
+        <div class="-mx-2 -my-3">
             <slot></slot>
             <div v-if="help">
                 <a-alert type="info" show-icon class="mb-2">

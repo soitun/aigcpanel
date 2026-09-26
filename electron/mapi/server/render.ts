@@ -37,6 +37,10 @@ const config = async (serverInfo: ServerInfo) => {
     return ipcRenderer.invoke("server:config", serverInfo);
 };
 
+const apiVoiceTest = async (config: any, text: string) => {
+    return ipcRenderer.invoke("server:apiVoiceTest", config, text);
+};
+
 const callFunction = async (
     serverInfo: ServerInfo,
     method: string,
@@ -84,6 +88,7 @@ export default {
     cancel,
     deletes,
     config,
+    apiVoiceTest,
     callFunction,
     callFunctionWithException,
 };

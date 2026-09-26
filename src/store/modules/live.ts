@@ -5,6 +5,7 @@ import { Dialog } from "../../lib/dialog";
 import { mapError } from "../../lib/error";
 import { ObjectUtil } from "../../lib/util";
 import { LiveAvatarService } from "../../service/LiveAvatarService";
+import { liveVoiceProviderName } from "../../service/VoiceService";
 import { StorageService } from "../../service/StorageService";
 import { LiveStatusType } from "../../types/Live";
 import { EnumServerStatus, ServerRecord } from "../../types/Server";
@@ -118,6 +119,8 @@ export const liveStore = defineStore("live", {
                 ttsProviderSetting: {} as {
                     [key: string]: any;
                 },
+                /** 直播音色 id（音色管理中选择），为空时回退 ttsProvider */
+                voiceId: 0,
                 eventDefaultUsername: "宝子",
                 eventEnterIgnoreSecond: 120,
                 liveMonitorType: "douyin",
@@ -133,6 +136,28 @@ export const liveStore = defineStore("live", {
         },
         liveDataUpdateTimer: undefined as any,
     }),
+    getters: {
+        // 直播服务使用的 TTS provider：优先使用音色管理中选择的音色，
+        // 未选择音色时回退到旧的声音驱动配置
+        activeTtsProvider(state): string {
+            if (state.localConfig.config.voiceId) {
+                return liveVoiceProviderName(state.localConfig.config.voiceId);
+            }
+            return state.localConfig.config.ttsProvider;
+        },
+        activeTtsProviderParam(state): Record<string, any> {
+            if (state.localConfig.config.voiceId) {
+                return {};
+            }
+            return state.localConfig.config.ttsProviderParam;
+        },
+        activeTtsProviderSetting(state): Record<string, any> {
+            if (state.localConfig.config.voiceId) {
+                return { voiceId: state.localConfig.config.voiceId };
+            }
+            return state.localConfig.config.ttsProviderSetting;
+        },
+    },
     actions: {
         async init() {
             const localConfig = await $mapi.storage.get("live", "config", {});
@@ -174,6 +199,8 @@ export const liveStore = defineStore("live", {
             this.localConfig.config.ttsProviderSetting =
                 localConfig.config?.ttsProviderSetting ||
                 this.localConfig.config.ttsProviderSetting;
+            this.localConfig.config.voiceId =
+                localConfig.config?.voiceId || this.localConfig.config.voiceId;
             this.localConfig.config.eventDefaultUsername =
                 localConfig.config?.eventDefaultUsername ||
                 this.localConfig.config.eventDefaultUsername;
@@ -485,10 +512,9 @@ export const liveStore = defineStore("live", {
                     flowTalkMode: this.localConfig.config.flowTalkMode,
                     flowTalkDelayMin: this.localConfig.config.flowTalkDelayMin,
                     flowTalkDelayMax: this.localConfig.config.flowTalkDelayMax,
-                    ttsProvider: this.localConfig.config.ttsProvider,
-                    ttsProviderParam: this.localConfig.config.ttsProviderParam,
-                    ttsProviderSetting:
-                        this.localConfig.config.ttsProviderSetting,
+                    ttsProvider: this.activeTtsProvider,
+                    ttsProviderParam: this.activeTtsProviderParam,
+                    ttsProviderSetting: this.activeTtsProviderSetting,
                     eventDefaultUsername:
                         this.localConfig.config.eventDefaultUsername,
                     eventEnterIgnoreSecond:

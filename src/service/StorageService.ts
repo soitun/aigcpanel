@@ -1,5 +1,11 @@
 export type StorageBiz =
-    "SoundPrompt" | "LiveAvatar" | "LiveKnowledge" | "LiveEvent" | "LiveTalk";
+    | "SoundPrompt"
+    | "LiveAvatar"
+    | "LiveKnowledge"
+    | "LiveEvent"
+    | "LiveTalk"
+    | "LiveVoice"
+    | "SoundVoice";
 
 export type StorageRecord = {
     id?: number;

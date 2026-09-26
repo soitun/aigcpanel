@@ -70,6 +70,8 @@
     "setting.basic": "基础设置",
     "setting.cudaAcceleration": "CUDA加速",
     "setting.dataConfig": "数据配置",
+    "setting.dataRootCustom": "自定义数据目录",
+    "setting.dataRootCustomDesc": "软件当前运行在自定义数据目录（非默认位置），所有数据均存放于此目录。",
     "setting.env": "环境设置",
     "setting.exitDirectly": "直接退出",
     "setting.fixCommand": "修复命令",
@@ -147,5 +149,15 @@
     "cli.commentCallFunction": "# 调用服务功能（示例：语音合成）",
     "cli.winCommentViewVersion": ":: 查看版本",
     "cli.winCommentListModels": ":: 列出已安装服务",
-    "cli.winCommentCallFunction": ":: 调用服务功能（示例：语音合成）"
+    "cli.winCommentCallFunction": ":: 调用服务功能（示例：语音合成）",
+    "model.addApiVoice": "添加云端语音模型",
+    "model.apiVoiceProvider": "厂商",
+    "model.apiVoiceTest": "试听",
+    "model.apiVoiceTestText": "试听文本",
+    "model.apiVoiceTestSuccess": "试听生成成功",
+    "model.apiVoiceSaveSuccess": "云端语音模型已添加",
+    "model.apiVoiceDocs": "查看密钥申请文档",
+    "model.apiVoiceRequired": "请填写 {title}",
+    "model.otherModel": "其他模型",
+    "model.apiVoiceCheckFailed": "接口校验失败：{msg}"
 }

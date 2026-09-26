@@ -33,7 +33,11 @@ onMounted(() => {
     // 截图钩子：对本地路径等隐私信息脱敏（截图脚本按截图名 setting.prepare 调用）
     testActionSet("setting.prepare", async () => {
         const demoHome = "/Users/demo";
-        const actions = ["Setting.setHubRootDemo", "Setting.setCliPathDemo"];
+        const actions = [
+            "Setting.setHubRootDemo",
+            "Setting.setCliPathDemo",
+            "Setting.setDataRootDemo",
+        ];
         for (const action of actions) {
             try {
                 await testRegistry.callAction(action, { home: demoHome });

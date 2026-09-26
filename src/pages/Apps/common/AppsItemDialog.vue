@@ -89,10 +89,7 @@ defineExpose({
                 {{ props.title || t("common.viewRecord") }}
             </div>
         </template>
-        <div
-            v-if="visible"
-            class="h-[calc(100vh-10rem)] -my-6 -mx-4 p-3 overflow-y-auto"
-        >
+        <div v-if="visible" class="-my-6 -mx-4 p-3">
             <div
                 v-if="loading && !record"
                 class="flex justify-center items-center p-8"

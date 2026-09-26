@@ -186,7 +186,7 @@ const columns = computed(() => [
         title-align="start"
         @open="loadWorkflows"
     >
-        <div style="max-height: calc(100vh - 300px); overflow: auto">
+        <div>
             <a-table
                 :data="workflows"
                 :columns="columns"

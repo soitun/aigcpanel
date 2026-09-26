@@ -134,7 +134,7 @@ const emit = defineEmits({
                 {{ $t("common.save") }}
             </a-button>
         </template>
-        <div style="max-height: 60vh">
+        <div>
             <div class="flex p-4">
                 <div class="w-1/2 flex-shrink-0 mr-5">
                     <a-form :model="{}" layout="vertical">

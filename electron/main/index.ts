@@ -70,6 +70,10 @@ if (app.getName() !== "aigcpanel") {
 // 实现「正式使用数据与开发测试完全隔离」。
 // 必须在 requestSingleInstanceLock() 与 app.getPath("userData") 之前执行，否则锁文件与
 // 后续所有 userData 相关路径仍会落在默认目录。
+// Record the default Electron userData before redirecting it via setPath("userData", ...),
+// so the setup page can tell whether the effective data directory has been customized.
+const defaultUserData = app.getPath("userData");
+
 const clientConfig = loadClientConfig();
 if (clientConfig.dataPath) {
     app.setPath("userData", clientConfig.dataPath);
@@ -91,6 +95,7 @@ AppEnv.appRoot = process.env.APP_ROOT;
 AppEnv.appData = app.getPath("appData");
 AppEnv.userData = app.getPath("userData");
 AppEnv.dataRoot = path.join(AppEnv.userData, "data");
+AppEnv.dataRootDefault = path.join(defaultUserData, "data");
 
 if (!fs.existsSync(AppEnv.dataRoot)) {
     fs.mkdirSync(AppEnv.dataRoot, { recursive: true });

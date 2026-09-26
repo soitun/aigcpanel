@@ -642,6 +642,9 @@ export const serverStore = defineStore("server", {
                 result.localPath = await $mapi.file.fullPath(
                     server.localPath as string,
                 );
+            } else if (server.type === EnumServerType.API) {
+                // API 类型模型无本地目录，使用稳定的唯一 key 作为模块缓存标识
+                result.localPath = (server.localPath as string) || server.key;
             }
             const serverRuntime = getOrCreateServerRuntime(server);
             if (serverRuntime) {

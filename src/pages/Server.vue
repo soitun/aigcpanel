@@ -17,6 +17,7 @@ import { useServerStore } from "../store/modules/server";
 import { EnumServerType } from "../types/Server";
 
 import ServerRemoteAddDialog from "../components/Server/ServerRemoteAddDialog.vue";
+
 import ListerTop from "../components/common/ListerTop.vue";
 import PageHeader from "../components/PageHeader.vue";
 import { testActionSet, testActionUnset } from "../utils/test";
@@ -26,6 +27,7 @@ const addDialog = ref<InstanceType<typeof ServerAddDialog> | null>(null);
 const remoteAddDialog = ref<InstanceType<typeof ServerRemoteAddDialog> | null>(
     null,
 );
+
 const modelSettingDialog = ref<InstanceType<typeof ModelSettingDialog> | null>(
     null,
 );
@@ -135,24 +137,9 @@ onUnmounted(() => {
     <div
         class="pb-device-container bg-white p-6 min-h-full relative select-none"
     >
-        <PageHeader title="AI模型">
+        <PageHeader title="AI模型" />
+        <ListerTop :total="serverStore.records.length" @refresh="doRefresh">
             <template #actions>
-                <a-button @click="modelSettingDialog?.show()">
-                    <template #icon>
-                        <icon-command />
-                    </template>
-                    {{ $t("setting.llm") }}
-                </a-button>
-                
-                <a-button
-                    v-if="serverStore.records.length > 0"
-                    @click="remoteAddDialog?.show()"
-                >
-                    <template #icon>
-                        <icon-cloud />
-                    </template>
-                    {{ $t("model.addRemote") }}
-                </a-button>
                 <a-button
                     v-if="serverStore.records.length > 0"
                     @click="addDialog?.show()"
@@ -162,9 +149,32 @@ onUnmounted(() => {
                     </template>
                     {{ $t("model.addLocal") }}
                 </a-button>
+                
+                <a-dropdown trigger="click">
+                    <a-button>
+                        <template #icon>
+                            <icon-apps />
+                        </template>
+                        {{ $t("model.otherModel") }}
+                    </a-button>
+                    <template #content>
+                        <a-doption @click="remoteAddDialog?.show()">
+                            <template #icon>
+                                <icon-cloud />
+                            </template>
+                            {{ $t("model.remoteModel") }}
+                        </a-doption>
+                        
+                    </template>
+                </a-dropdown>
+                <a-button @click="modelSettingDialog?.show()">
+                    <template #icon>
+                        <icon-command />
+                    </template>
+                    {{ $t("setting.llm") }}
+                </a-button>
             </template>
-        </PageHeader>
-        <ListerTop :total="serverStore.records.length" @refresh="doRefresh" />
+        </ListerTop>
         <div>
             <div v-if="!serverStore.records.length" class="py-20">
                 <div class="text-center">
@@ -183,12 +193,20 @@ onUnmounted(() => {
                         </template>
                         {{ $t("model.addLocal") }}
                     </a-button>
-                    <a-button class="ml-1" @click="remoteAddDialog?.show()">
-                        <template #icon>
-                            <icon-cloud />
+                    <a-dropdown trigger="click">
+                        <a-button class="ml-1">
+                            <template #icon>
+                                <icon-apps />
+                            </template>
+                            {{ $t("model.otherModel") }}
+                        </a-button>
+                        <template #content>
+                            <a-doption @click="remoteAddDialog?.show()">
+                                {{ $t("model.remoteModel") }}
+                            </a-doption>
+                            
                         </template>
-                        {{ $t("model.addRemote") }}
-                    </a-button>
+                    </a-dropdown>
                     <a-button v-if="0" class="ml-1">
                         <template #icon>
                             <icon-apps />
@@ -333,6 +351,7 @@ onUnmounted(() => {
     </div>
     <ServerAddDialog ref="addDialog" @update="doRefresh" />
     <ServerRemoteAddDialog ref="remoteAddDialog" @update="doRefresh" />
+    
     <ModelSettingDialog ref="modelSettingDialog" />
     
 </template>

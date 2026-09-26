@@ -155,10 +155,19 @@ const createApp = (port: number, apiToken: string, lanEnabled: boolean) => {
             .send(html);
     });
 
-    // Auth middleware: every API request must carry the access token
+    // Auth middleware: every API request must carry the access token.
+    // Accept both `Authorization: Bearer <token>` and `Api-Token: <token>`
+    // (the latter is used by the local live service to call back into the app).
     app.use((req, res, next) => {
         const auth = req.headers["authorization"] || "";
-        const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+        let token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+        if (!token) {
+            const header =
+                req.headers["api-token"] || req.headers["x-api-token"];
+            token = Array.isArray(header)
+                ? header[0]
+                : (header as string) || "";
+        }
 
         if (token && token === apiToken) {
             next();

@@ -4,6 +4,7 @@ import modelRoutes from "./model";
 import workflowRoutes from "./workflow";
 import toolsRoutes from "./tools";
 import uploadRoutes from "./upload";
+import liveRoutes from "./live";
 
 const router = Router();
 
@@ -12,5 +13,6 @@ router.use("/api/model", modelRoutes);
 router.use("/api/workflow", workflowRoutes);
 router.use("/api/tools", toolsRoutes);
 router.use("/api/upload", uploadRoutes);
+router.use("/api/live", liveRoutes);
 
 export default router;

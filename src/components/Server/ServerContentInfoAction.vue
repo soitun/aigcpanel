@@ -72,10 +72,7 @@ watch(
         <template #title>
             {{ $t("model.description") }}
         </template>
-        <div
-            class="overflow-y-auto overflow-x-hidden leading-6 pb-content-info"
-            style="max-height: 60vh"
-        >
+        <div class="overflow-x-hidden leading-6 pb-content-info">
             <div v-html="content"></div>
         </div>
     </a-modal>

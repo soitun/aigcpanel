@@ -6,40 +6,42 @@ import ServerSelector from "../../../components/Server/ServerSelector.vue";
 import { t } from "../../../lang";
 import { Dialog } from "../../../lib/dialog";
 import { StorageUtil } from "../../../lib/storage";
-import { StorageService } from "../../../service/StorageService";
+import VoiceSelector from "../../../components/Voice/VoiceSelector.vue";
+import { SoundVoiceService } from "../../../service/VoiceService";
 import { useServerStore } from "../../../store/modules/server";
 import { EnumServerStatus } from "../../../types/Server";
-import SoundPromptDialog from "./SoundPromptDialog.vue";
-import SoundPromptSelector from "./SoundPromptSelector.vue";
+
+const props = withDefaults(defineProps<{ voiceSelectOnly?: boolean }>(), {
+    voiceSelectOnly: false,
+});
 
 const serverStore = useServerStore();
 const formData = ref({
     type: "SoundTts",
     ttsServerKey: "",
-    cloneServerKey: "",
-    promptId: 0,
+    cloneVoiceId: 0,
+    voiceId: 0,
 });
 const ttsParamForm = ref<InstanceType<typeof ParamForm>>();
-const cloneParamForm = ref<InstanceType<typeof ParamForm>>();
 const ttsParam = ref([]);
-const cloneParam = ref([]);
 const ttsModelConfig = ref(null);
-const cloneModelConfig = ref(null);
+const voiceEmpty = ref(false);
 const onSoundTtsServerUpdate = async (config: any) => {
     ttsParam.value = config.functions.soundTts?.param || [];
     ttsModelConfig.value = config;
 };
 
-const onSoundCloneServerUpdate = async (config: any) => {
-    cloneParam.value = config.functions.soundClone?.param || [];
-    cloneModelConfig.value = config;
+const refreshVoiceEmpty = async () => {
+    voiceEmpty.value = (await SoundVoiceService.list()).length === 0;
 };
+
 onMounted(async () => {
     const old = StorageUtil.getObject("SoundGenerateForm.formData");
     formData.value.type = old.type || "SoundTts";
     formData.value.ttsServerKey = old.ttsServerKey || "";
-    formData.value.cloneServerKey = old.cloneServerKey || "";
-    formData.value.promptId = old.promptId || 0;
+    formData.value.cloneVoiceId = old.cloneVoiceId || 0;
+    formData.value.voiceId = old.voiceId || 0;
+    await refreshVoiceEmpty();
 });
 watch(
     () => formData.value,
@@ -52,6 +54,43 @@ watch(
 );
 
 const getValue = async (): Promise<SoundGenerateParamType | undefined> => {
+    if (props.voiceSelectOnly) {
+        const voice = await SoundVoiceService.get(formData.value.voiceId);
+        if (!voice || !voice.content) {
+            Dialog.tipError(t("soundVoice.selectRequired"));
+            return;
+        }
+        const server = await serverStore.getByNameVersion(
+            voice.content.serverName,
+            voice.content.serverVersion,
+        );
+        if (!server) {
+            Dialog.tipError(t("hint.selectVoiceModel"));
+            return;
+        }
+        if (server.status !== EnumServerStatus.RUNNING) {
+            Dialog.tipError(t("error.voiceModelNotStarted"));
+            return;
+        }
+        if (voice.content.type === "clone" && voice.content.promptUrl) {
+            const promptUrl = voice.content.promptUrl;
+            if (
+                !/^https?:\/\//i.test(promptUrl) &&
+                !(await window.$mapi.file.exists(promptUrl))
+            ) {
+                Dialog.tipError(t("sound.timbreAudioNotFound"));
+                return;
+            }
+        }
+        return {
+            ...SoundVoiceService.buildModelConfig(voice, ""),
+            voiceId: voice.id as number,
+            serverName: server.name,
+            serverTitle: server.title,
+            serverVersion: server.version,
+            promptTitle: voice.title,
+        };
+    }
     const data: any = {};
     data.type = formData.value.type;
     if (!data.type) {
@@ -83,9 +122,20 @@ const getValue = async (): Promise<SoundGenerateParamType | undefined> => {
             }
         }
     } else if (data.type === "SoundClone") {
-        data.cloneServerKey = formData.value.cloneServerKey;
-        data.promptId = formData.value.promptId;
-        const server = await serverStore.getByKey(data.cloneServerKey);
+        data.cloneVoiceId = formData.value.cloneVoiceId;
+        const voice = await SoundVoiceService.get(data.cloneVoiceId);
+        if (!voice) {
+            Dialog.tipError(t("soundVoice.selectRequired"));
+            return;
+        }
+        if (voice.content?.type !== "clone") {
+            Dialog.tipError(t("soundVoice.cloneRequired"));
+            return;
+        }
+        const server = await serverStore.getByNameVersion(
+            voice.content.serverName,
+            voice.content.serverVersion,
+        );
         if (!server) {
             Dialog.tipError(t("hint.selectVoiceModel"));
             return;
@@ -94,33 +144,15 @@ const getValue = async (): Promise<SoundGenerateParamType | undefined> => {
             Dialog.tipError(t("error.voiceModelNotStarted"));
             return;
         }
+        data.cloneServerKey = voice.content.serverKey;
         data.serverName = server.name;
         data.serverTitle = server.title;
         data.serverVersion = server.version;
-        data.cloneParam = cloneParamForm.value
-            ? cloneParamForm.value.getValue()
-            : {};
-        if (!data.cloneParam) {
-            Dialog.tipError(t("error.voiceParamInvalid"));
-            return;
-        }
-        if (cloneParamForm.value) {
-            if (!cloneParamForm.value.validate()) {
-                return;
-            }
-        }
-        if (!data.promptId) {
-            Dialog.tipError(t("hint.selectTimbre"));
-            return;
-        }
-        const prompt = await StorageService.get(data.promptId);
-        if (!prompt) {
-            Dialog.tipError(t("error.timbreNotFound"));
-            return;
-        }
-        data.promptTitle = prompt.title;
-        data.promptUrl = prompt.content.url;
-        data.promptText = prompt.content.promptText;
+        data.cloneParam = voice.content.param || {};
+        data.promptId = 0;
+        data.promptTitle = voice.title;
+        data.promptUrl = voice.content.promptUrl;
+        data.promptText = voice.content.promptText;
         if (data.promptUrl && !data.promptUrl.startsWith("http")) {
             if (!(await window.$mapi.file.exists(data.promptUrl))) {
                 Dialog.tipError(t("sound.timbreAudioNotFound"));
@@ -132,23 +164,20 @@ const getValue = async (): Promise<SoundGenerateParamType | undefined> => {
 };
 
 const setValue = (data: Partial<SoundGenerateParamType>) => {
+    if (data.voiceId !== undefined) {
+        formData.value.voiceId = data.voiceId;
+    }
     if (data.type !== undefined) {
         formData.value.type = data.type;
     }
     if (data.ttsServerKey !== undefined) {
         formData.value.ttsServerKey = data.ttsServerKey;
     }
-    if (data.cloneServerKey !== undefined) {
-        formData.value.cloneServerKey = data.cloneServerKey;
-    }
-    if (data.promptId !== undefined) {
-        formData.value.promptId = data.promptId;
+    if ((data as any).cloneVoiceId !== undefined) {
+        formData.value.cloneVoiceId = (data as any).cloneVoiceId;
     }
     if (data.ttsParam !== undefined) {
         ttsParamForm.value?.setValue(data.ttsParam);
-    }
-    if (data.cloneParam !== undefined) {
-        cloneParamForm.value?.setValue(data.cloneParam);
     }
 };
 
@@ -166,122 +195,112 @@ defineExpose({
             </div>
             {{ $t("voice.synthesisConfig") }}
         </div>
-        <div class="flex items-start min-h-8">
-            <div class="mr-1">
-                <a-tooltip :content="$t('task.synthesisType')" mini>
-                    <i-mdi-volume-high class="w-4 h-4" />
-                </a-tooltip>
+        <template v-if="voiceSelectOnly">
+            <div class="flex items-start min-h-8">
+                <div class="mr-1 pt-2">
+                    <a-tooltip :content="$t('soundVoice.title')" mini>
+                        <i-mdi-microphone class="w-4 h-4" />
+                    </a-tooltip>
+                </div>
+                <div class="flex flex-wrap items-center gap-1">
+                    <VoiceSelector
+                        v-model="formData.voiceId"
+                        :service="SoundVoiceService"
+                        :placeholder="$t('soundVoice.select')"
+                    />
+                    <div v-if="voiceEmpty" class="text-gray-400 text-sm">
+                        {{ $t("soundVoice.empty") }}
+                    </div>
+                </div>
             </div>
-            <div class="mr-1">
-                <a-radio-group v-model="formData.type">
-                    <a-radio value="SoundTts">
-                        <i-mdi-text-to-speech
-                            class="w-4 h-4 inline-block align-middle"
+            <div class="mt-2"><slot /></div>
+        </template>
+        <template v-else>
+            <div class="flex items-start min-h-8">
+                <div class="mr-1">
+                    <a-tooltip :content="$t('task.synthesisType')" mini>
+                        <i-mdi-volume-high class="w-4 h-4" />
+                    </a-tooltip>
+                </div>
+                <div class="mr-1">
+                    <a-radio-group v-model="formData.type">
+                        <a-radio value="SoundTts">
+                            <i-mdi-text-to-speech
+                                class="w-4 h-4 inline-block align-middle"
+                            />
+                            {{ $t("voice.synthesis") }}
+                        </a-radio>
+                        <a-radio value="SoundClone">
+                            <i-mdi-account-voice
+                                class="w-4 h-4 inline-block align-middle"
+                            />
+                            {{ $t("voice.clone") }}
+                        </a-radio>
+                    </a-radio-group>
+                </div>
+            </div>
+            <div
+                v-if="formData.type === 'SoundTts'"
+                class="flex items-start min-h-8"
+            >
+                <div class="mr-1 pt-2">
+                    <a-tooltip :content="$t('voice.synthesisModel')" mini>
+                        <i-mdi-server-outline class="w-4 h-4" />
+                    </a-tooltip>
+                </div>
+                <div class="flex flex-wrap gap-1">
+                    <div>
+                        <ServerSelector
+                            v-model="formData.ttsServerKey"
+                            @update="onSoundTtsServerUpdate"
+                            functionName="soundTts"
                         />
-                        {{ $t("voice.synthesis") }}
-                    </a-radio>
-                    <a-radio value="SoundClone">
-                        <i-mdi-account-voice
-                            class="w-4 h-4 inline-block align-middle"
+                    </div>
+                    <div>
+                        <ServerContentInfoAction
+                            :config="ttsModelConfig as any"
+                            func="soundTts"
                         />
-                        {{ $t("voice.clone") }}
-                    </a-radio>
-                </a-radio-group>
-            </div>
-        </div>
-        <div
-            v-if="formData.type === 'SoundTts'"
-            class="flex items-start min-h-8"
-        >
-            <div class="mr-1 pt-2">
-                <a-tooltip :content="$t('voice.synthesisModel')" mini>
-                    <i-mdi-server-outline class="w-4 h-4" />
-                </a-tooltip>
-            </div>
-            <div class="flex flex-wrap gap-1">
-                <div>
-                    <ServerSelector
-                        v-model="formData.ttsServerKey"
-                        @update="onSoundTtsServerUpdate"
-                        functionName="soundTts"
-                    />
-                </div>
-                <div>
-                    <ServerContentInfoAction
-                        :config="ttsModelConfig as any"
-                        func="soundTts"
-                    />
+                    </div>
                 </div>
             </div>
-        </div>
-        <div
-            v-if="formData.type === 'SoundClone'"
-            class="flex items-start min-h-8 gap-1"
-        >
-            <div class="mr-1 pt-2">
-                <a-tooltip :content="$t('voice.cloneModel')" mini>
-                    <i-mdi-server-outline class="w-4 h-4" />
-                </a-tooltip>
-            </div>
-            <div class="flex flex-wrap gap-1">
-                <div>
-                    <ServerSelector
-                        v-model="formData.cloneServerKey"
-                        @update="onSoundCloneServerUpdate"
-                        functionName="soundClone"
-                    />
+            <div
+                v-if="formData.type === 'SoundClone'"
+                class="flex items-start min-h-8 gap-1"
+            >
+                <div class="mr-1 pt-2">
+                    <a-tooltip :content="$t('soundVoice.title')" mini>
+                        <i-mdi-microphone class="w-4 h-4" />
+                    </a-tooltip>
                 </div>
-                <div class="">
-                    <ServerContentInfoAction
-                        :config="cloneModelConfig as any"
-                        func="soundClone"
+                <div class="flex flex-wrap gap-1 items-center">
+                    <VoiceSelector
+                        v-model="formData.cloneVoiceId"
+                        :service="SoundVoiceService"
+                        :placeholder="$t('soundVoice.select')"
                     />
+                    <div v-if="voiceEmpty" class="text-gray-400 text-sm">
+                        {{ $t("soundVoice.empty") }}
+                    </div>
                 </div>
             </div>
-        </div>
-        <div
-            v-if="formData.type === 'SoundClone'"
-            class="flex items-center min-h-8 mt-2 gap-2"
-        >
-            <div class="">
-                <a-tooltip :content="$t('voice.timbre')" mini>
-                    <i-mdi-comment-text-outline class="w-4 h-4" />
-                </a-tooltip>
+            <!-- 用户输入信息（文本、图片等）插入 Server 选择与自定义参数之间 -->
+            <div class="mt-2">
+                <slot />
             </div>
-            <div class="mr-2 flex items-center">
-                <SoundPromptSelector v-model="formData.promptId" />
+            <div
+                class="flex items-start mt-2"
+                v-if="formData.type === 'SoundTts' && ttsParam.length > 0"
+            >
+                <div class="pt-3 w-5 flex-shrink-0">
+                    <a-tooltip :content="$t('model.customParam')" mini>
+                        <i-mdi-tune-variant class="w-4 h-4" />
+                    </a-tooltip>
+                </div>
+                <div class="flex-grow min-w-0">
+                    <ParamForm ref="ttsParamForm" :param="ttsParam" />
+                </div>
             </div>
-        </div>
-        <!-- 用户输入信息（文本、图片等）插入 Server 选择与自定义参数之间 -->
-        <div class="mt-2">
-            <slot />
-        </div>
-        <div
-            class="flex items-start mt-2"
-            v-if="formData.type === 'SoundTts' && ttsParam.length > 0"
-        >
-            <div class="pt-3 w-5 flex-shrink-0">
-                <a-tooltip :content="$t('model.customParam')" mini>
-                    <i-mdi-tune-variant class="w-4 h-4" />
-                </a-tooltip>
-            </div>
-            <div class="flex-grow min-w-0">
-                <ParamForm ref="ttsParamForm" :param="ttsParam" />
-            </div>
-        </div>
-        <div
-            class="flex items-start mt-2"
-            v-else-if="formData.type === 'SoundClone' && cloneParam.length > 0"
-        >
-            <div class="pt-3 w-5 flex-shrink-0">
-                <a-tooltip :content="$t('model.customParam')" mini>
-                    <i-mdi-tune-variant class="w-4 h-4" />
-                </a-tooltip>
-            </div>
-            <div class="flex-grow min-w-0">
-                <ParamForm ref="cloneParamForm" :param="cloneParam" />
-            </div>
-        </div>
+        </template>
     </div>
-    <SoundPromptDialog />
 </template>

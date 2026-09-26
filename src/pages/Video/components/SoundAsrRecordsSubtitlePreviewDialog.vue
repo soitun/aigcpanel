@@ -68,10 +68,7 @@ defineExpose({
                 $t("common.close")
             }}</a-button>
         </template>
-        <div
-            class="-mx-4 -my-5 overflow-y-auto"
-            style="max-height: calc(100vh - 20rem)"
-        >
+        <div class="-mx-4 -my-5">
             <div
                 class="border border-gray-200 rounded-lg shadow-md bg-white text-xs"
             >

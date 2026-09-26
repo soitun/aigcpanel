@@ -90,7 +90,7 @@ exports.default = async function notarizing(context) {
     const appId = "AIGCPanel";
     const appPath = `${appOutDir}/${appName}.app`;
 
-    // 本地构建安装版（make build-and-install，AIGCPANEL_LOCAL_INSTALL=1）：
+    // 本地构建安装版（make build-install，AIGCPANEL_LOCAL_INSTALL=1）：
     // 不公证；钥匙串已有 Developer ID 证书时补签 .node 原生模块并重签 app，
     // 保持 CodeResources 一致（避免 Gatekeeper/hardened runtime 校验失败）。
     // 无证书（adhoc 路径）时跳过，保持产物一致。

@@ -378,6 +378,7 @@ const doInstall = async () => {
             :width="'min(900px, 92vw)'"
             :footer="false"
             title-align="start"
+            modal-class="modal-independent-scroll"
             :body-style="{ padding: '0', height: 'calc(100vh - 12rem)' }"
             :modal-style="{ 'max-height': 'calc(100vh - 4rem)' }"
         >

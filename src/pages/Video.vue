@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { t } from "../lang";
-import { getNavTab, rememberNavTab } from "../lib/nav-memory";
 import Router from "../router";
 import SoundGenerate from "./Video/SoundGenerate.vue";
+import Voice from "./Video/Voice.vue";
 import VideoGen from "./Video/VideoGen.vue";
 import VideoTemplate from "./Video/VideoTemplate.vue";
 import VideoGenFlow from "./Apps/VideoGenFlow/VideoGenFlow.vue";
@@ -12,6 +12,7 @@ import { testActionSet, testActionUnset } from "../utils/test";
 const tab = ref("");
 const VIDEO_TABS = [
     "soundGenerate",
+    "voice",
     "videoGen",
     "videoTemplate",
     "VideoGenFlow",
@@ -19,17 +20,9 @@ const VIDEO_TABS = [
 
 const syncTab = () => {
     const next =
-        (Router.currentRoute.value.query.tab as string) ||
-        getNavTab("/video") ||
-        "soundGenerate";
+        (Router.currentRoute.value.query.tab as string) || "soundGenerate";
     tab.value = VIDEO_TABS.includes(next) ? next : "soundGenerate";
 };
-
-watch(tab, (v) => {
-    if (v) {
-        rememberNavTab("/video", v);
-    }
-});
 
 onMounted(() => {
     syncTab();
@@ -62,6 +55,18 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
                         class="w-5 h-5 inline-block text-indigo-500 mr-1"
                     />
                     {{ t("voice.synthesis") }}
+                </div>
+            </div>
+            <div
+                class="p-2 rounded-lg mb-2 cursor-pointer"
+                :class="tab === 'voice' ? 'menu-item-active' : ''"
+                @click="tab = 'voice'"
+            >
+                <div class="text-base truncate flex items-center">
+                    <i-mdi-microphone
+                        class="w-5 h-5 inline-block text-indigo-500 mr-1"
+                    />
+                    {{ t("soundVoice.title") }}
                 </div>
             </div>
             <div class="text-xs text-gray-400 mb-2 mt-4 uppercase">
@@ -107,6 +112,9 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
         <div class="flex-grow h-full overflow-y-auto">
             <div v-if="tab === 'soundGenerate'">
                 <SoundGenerate />
+            </div>
+            <div v-else-if="tab === 'voice'">
+                <Voice />
             </div>
             <div v-else-if="tab === 'videoGen'">
                 <VideoGen />

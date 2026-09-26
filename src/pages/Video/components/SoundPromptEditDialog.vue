@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import AudioPlayer from "../../../components/common/AudioPlayer.vue";
 import { AudioUtil } from "../../../lib/audio";
 import WebFileSelectButton from "../../../components/common/WebFileSelectButton.vue";
@@ -23,6 +23,13 @@ const add = () => {
     formData.value.promptText = "";
     visible.value = true;
 };
+
+// Stop the reference audio playback when the dialog is closed.
+watch(visible, (val) => {
+    if (!val) {
+        audioPlayer.value?.doStop();
+    }
+});
 
 const onSelectFile = async (file) => {
     await audioPlayer.value?.setRecordFromFile(file);
@@ -97,7 +104,7 @@ const emit = defineEmits({
                 {{ $t("common.save") }}
             </a-button>
         </template>
-        <div style="max-height: 60vh">
+        <div>
             <div class="flex">
                 <div class="w-1/2 flex-shrink-0 mr-5">
                     <a-form :model="{}" layout="vertical">

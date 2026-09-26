@@ -70,6 +70,8 @@
     "setting.basic": "Basic Settings",
     "setting.cudaAcceleration": "CUDA Acceleration",
     "setting.dataConfig": "Data Config",
+    "setting.dataRootCustom": "Custom Data Directory",
+    "setting.dataRootCustomDesc": "The software is running in a custom data directory (not the default location). All data is stored here.",
     "setting.env": "Environment Settings",
     "setting.exitDirectly": "Exit Directly",
     "setting.fixCommand": "Fix Command",
@@ -147,5 +149,15 @@
     "cli.commentCallFunction": "# Call service function (example: TTS)",
     "cli.winCommentViewVersion": ":: View version",
     "cli.winCommentListModels": ":: List installed services",
-    "cli.winCommentCallFunction": ":: Call service function (example: TTS)"
+    "cli.winCommentCallFunction": ":: Call service function (example: TTS)",
+    "model.addApiVoice": "Add Cloud Voice Model",
+    "model.apiVoiceProvider": "Provider",
+    "model.apiVoiceTest": "Preview",
+    "model.apiVoiceTestText": "Preview Text",
+    "model.apiVoiceTestSuccess": "Preview generated",
+    "model.apiVoiceSaveSuccess": "Cloud voice model added",
+    "model.apiVoiceDocs": "View API key documentation",
+    "model.apiVoiceRequired": "Please fill in {title}",
+    "model.otherModel": "Other Models",
+    "model.apiVoiceCheckFailed": "API check failed: {msg}"
 }

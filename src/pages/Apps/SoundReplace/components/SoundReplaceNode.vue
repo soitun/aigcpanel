@@ -72,11 +72,7 @@ const doSubmit = async () => {
                 }}</a-button>
             </div>
         </template>
-        <div
-            v-if="visible"
-            class="space-y-4 overflow-y-auto"
-            style="max-height: calc(100vh - 10rem)"
-        >
+        <div v-if="visible" class="space-y-4">
             <SoundAsrForm ref="soundAsrForm" />
             <SoundGenerateForm ref="soundGenerateForm" />
         </div>

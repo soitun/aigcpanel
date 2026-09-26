@@ -11,6 +11,8 @@ export enum EnumServerType {
     LOCAL_DIR = "localDir",
     CLOUD = "cloud",
     REMOTE = "remote",
+    /** 云厂商 API 直连模型（如火山引擎、阿里云百炼语音） */
+    API = "api",
 }
 
 export type ServerRecord = {
@@ -38,6 +40,8 @@ export type ServerRecord = {
     };
     cloudConfig?: any;
     remoteConfig?: any; // Remote model config: { url: string, name: string, version: string, ... }
+    // 云厂商 API 模型配置：{ provider: "volcengine" | "aliyun", ...credentials }
+    apiConfig?: any;
     status?: any;
     runtime?: ServerRuntime | any;
     config?: {

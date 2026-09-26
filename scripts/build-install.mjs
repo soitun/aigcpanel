@@ -1,15 +1,15 @@
 /**
- * build-and-install.mjs — Build and install AIGCPanel on the current system.
+ * build-install.mjs — Build and install AIGCPanel on the current system.
  *
- * Ported from focusany-pro scripts/build-and-install.mjs.
+ * Ported from focusany-pro scripts/build-install.mjs.
  *
- * Usage: node scripts/build-and-install.mjs
+ * Usage: node scripts/build-install.mjs
  *
  * Flow:
  *   1. Kill running AIGCPanel processes
  *   2. Run a full local build without code signing (electron-builder auto-discovers
  *      the Developer ID certificate from the keychain; when absent, afterPack
- *      hook build_optimize.cjs downgrades to an adhoc re-sign)
+ *      hook build-optimize.cjs downgrades to an adhoc re-sign)
  *   3. Detect build artifacts
  *   4. Install to the system path
  *
@@ -92,7 +92,7 @@ function killRunningInstances() {
 function buildProject() {
   step('构建项目');
   // 不指定证书，electron-builder 自动发现钥匙串中的 Developer ID 证书；
-  // 无证书时由构建脚本 build_optimize.cjs 降级为 adhoc 签名。
+  // 无证书时由构建脚本 build-optimize.cjs 降级为 adhoc 签名。
   const env = {
     AIGCPANEL_LOCAL_INSTALL: '1',
     // 本地安装不公证（公证需上传构建产物到苹果，仅发布时使用）

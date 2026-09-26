@@ -262,7 +262,7 @@ const emit = defineEmits({
             {{ $t("model.addLocal") }}
         </template>
         <div>
-            <div class="select-none" style="max-height: 70vh">
+            <div class="select-none">
                 <div v-if="!modelInfo.name">
                     <div class="px-3">
                         <div>

@@ -229,6 +229,17 @@ const doPlay = () => {
 const doPause = () => {
     wave.value?.pause();
 };
+// Stop playback (reset to the beginning) and stop recording if active.
+const doStop = () => {
+    wave.value?.stop();
+    if (
+        waveRecord.value &&
+        (waveRecord.value.isRecording() || waveRecord.value.isPaused())
+    ) {
+        waveRecord.value.stopRecording();
+        isRecording.value = false;
+    }
+};
 const onSeek = (value: number) => {
     wave.value?.seekTo(value / timeTotal.value);
 };
@@ -365,6 +376,9 @@ const getAudioBuffer = () => {
 defineExpose({
     setRecordFromFile,
     getAudioBuffer,
+    doPlay,
+    doPause,
+    doStop,
 });
 </script>
 
