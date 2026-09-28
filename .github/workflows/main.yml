@@ -317,6 +317,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Read current version from package.json
+          VERSION=$(node -p "require('./package.json').version")
+          RELEASE_TITLE="snapshot-${VERSION}"
+          echo "=== Current version: ${VERSION} ==="
+          echo "=== Release title: ${RELEASE_TITLE} ==="
           # Delete existing vsnapshot release if present
           echo "=== Checking for existing vsnapshot release ==="
           if gh release view vsnapshot --json id 2>/dev/null; then
@@ -328,8 +333,8 @@ jobs:
           fi
           # Create fresh vsnapshot release
           gh release create vsnapshot \
-            --title "Snapshot" \
-            --notes "Latest build from main branch" \
+            --title "$RELEASE_TITLE" \
+            --notes "Latest build from main branch (${VERSION})" \
             --prerelease
           # Copy artifacts to temp dir with version replaced by "snapshot"
           tmpdir=$(mktemp -d)

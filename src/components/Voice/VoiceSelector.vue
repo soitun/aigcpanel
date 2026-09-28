@@ -85,7 +85,7 @@ defineExpose({ refresh: doRefresh });
 </script>
 
 <template>
-    <div class="flex items-center">
+    <div class="flex items-center gap-2">
         <a-select
             :model-value="modelValue || undefined"
             :disabled="disabled"
@@ -98,7 +98,7 @@ defineExpose({ refresh: doRefresh });
             </a-option>
         </a-select>
         <ServerContentInfoAction :config="modelConfig" :func="modelFunction" />
-        <a-button class="ml-2" @click="goManage">
+        <a-button @click="goManage">
             <template #icon>
                 <icon-settings />
             </template>
